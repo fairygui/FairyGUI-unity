@@ -5,3 +5,5 @@ A flexible UI framework for Unity3D, working with the FREE professional Game UI 
 Download the editor from here: [www.fairygui.com](http://www.fairygui.com/index.php/download)
 
 Get FairyGUI from [Unity AssetStore](http://u3d.as/kX8)
+
+国内用户可加群获得源码： 434866637 
