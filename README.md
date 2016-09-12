@@ -10,21 +10,21 @@ FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致
 
 Get Started
 ====
-- Examples.Unity4
+- Examples.Unity4  
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity4.x版本的工程(这里使用的Unity版本是4.6.6)。
 
-- Examples.Unity5
+- Examples.Unity5  
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的工程(这里使用的Unity版本是5.2.1)。
 
-- Source
+- Source  
 这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
 这里的源码和着色器都是Unity所有版本通用的。
 
-- Assembly
+- Assembly  
 如果你喜欢使用DLL形式的插件，从这里可以获得编译好的版本。使用DLL可以使你的工程更加干净，但请注意按照Unity版本选用不同的二进制文件。
 另外，着色器请从Source里导入。
 
-- LuaSupport
+- LuaSupport  
 FairyGUI对Lua十分友好，如果你使用Lua开发Unity游戏，这里为你准备了非常便利的支持。
 
 
