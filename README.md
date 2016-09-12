@@ -1,52 +1,51 @@
 FairyGUI-unity
 ====
 
-A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.
-Download the editor from here: [www.fairygui.com](http://www.fairygui.com/download)
+A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.  
+Download the editor from here: [www.fairygui.com](http://www.fairygui.com/download)  
 
 FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致，美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity，Starling，Egret， LayaAir，Flash等多个主流应用和游戏平台。
 下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/download)
 
-====
+
 Get Started
---------------------
-1. Examples.Unity4
+====
+- Examples.Unity4
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity4.x版本的工程(这里使用的Unity版本是4.6.6)。
 
-2. Examples.Unity5
+- Examples.Unity5
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的工程(这里使用的Unity版本是5.2.1)。
 
-3. Source
-这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。
+- Source
+这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
 这里的源码和着色器都是Unity所有版本通用的。
 
-4. Assembly
+- Assembly
 如果你喜欢使用DLL形式的插件，从这里可以获得编译好的版本。使用DLL可以使你的工程更加干净，但请注意按照Unity版本选用不同的二进制文件。
 另外，着色器请从Source里导入。
 
-5. LuaSupport
+- LuaSupport
 FairyGUI对Lua十分友好，如果你使用Lua开发Unity游戏，这里为你准备了非常便利的支持。
 
-====
+
 Learn
---------------------
-
-1. 下载FairyGUI编辑器。
-2. 下载Examples工程，浏览一遍FairyGUI的例子。
-3. 解压Exampples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。
-4. 观看视频教程：[FairyGUI游戏UI开发基础](http://www.youkexueyuan.com/course_show/1216.html)
-5. 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/tutorial)
-6. 进群与小伙伴一起交流：434866637
-
 ====
+
+- 下载FairyGUI编辑器。  
+- 下载Examples工程，浏览一遍FairyGUI的例子。  
+- 解压Exampples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
+- 观看视频教程：[FairyGUI游戏UI开发基础](http://www.youkexueyuan.com/course_show/1216.html)  
+- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/tutorial)  
+- 进群与小伙伴一起交流：434866637  
+
 License
---------------------
-MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
+====
+MIT 你可以自由使用FairyGUI在你的商业和非商业项目。  
 如果觉得FairyGUI好用，请在Unity商店购买支持作者。[Unity AssetStore](http://u3d.as/kX8)
 
-====
+
  Version History
------------------
+====
 1.5.3
 - FIXED: A Bug in multi-language file parsing.
 - FIXED: Failed to change scroll positions in onScroll event handler.
