@@ -124,7 +124,7 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 - NEW: Sort UIPanel by z order is supported. See Stage.SortWorldSpacePanelsByZOrder.
 - IMPROVE: Image FillMethod implementation. FillImage shader is removed.
 - IMPROVE: Shader optimization.
-- 
+
 1.2.0
 - NEW: Added editor extensions: UIPanel/UIScaler/StageCamera.
 - NEW: Added FillMethod to image/loader.
