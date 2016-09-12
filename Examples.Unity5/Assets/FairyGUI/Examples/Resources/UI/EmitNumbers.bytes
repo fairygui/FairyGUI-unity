@@ -1,0 +1,59 @@
+mulj0.fnt|626|info creator=UIBuilder
+common lineHeight=0
+char id=48 img=mulj1 xoffset=0 yoffset=0 xadvance=24
+char id=49 img=mulj2 xoffset=0 yoffset=0 xadvance=22
+char id=50 img=mulj3 xoffset=0 yoffset=0 xadvance=24
+char id=51 img=mulj4 xoffset=0 yoffset=0 xadvance=24
+char id=52 img=mulj5 xoffset=0 yoffset=0 xadvance=24
+char id=53 img=mulj6 xoffset=0 yoffset=0 xadvance=24
+char id=54 img=mulj7 xoffset=0 yoffset=0 xadvance=24
+char id=55 img=mulj8 xoffset=0 yoffset=0 xadvance=24
+char id=56 img=mulj9 xoffset=0 yoffset=0 xadvance=24
+char id=57 img=mulja xoffset=0 yoffset=0 xadvance=24
+char id=45 img=muljb xoffset=0 yoffset=0 xadvance=22
+muljc.fnt|626|info creator=UIBuilder
+common lineHeight=0
+char id=48 img=muljd xoffset=0 yoffset=0 xadvance=22
+char id=49 img=mulje xoffset=0 yoffset=0 xadvance=22
+char id=50 img=muljf xoffset=0 yoffset=0 xadvance=24
+char id=51 img=muljg xoffset=0 yoffset=0 xadvance=24
+char id=52 img=muljh xoffset=0 yoffset=0 xadvance=24
+char id=53 img=mulji xoffset=0 yoffset=0 xadvance=24
+char id=54 img=muljj xoffset=0 yoffset=0 xadvance=24
+char id=55 img=muljk xoffset=0 yoffset=0 xadvance=24
+char id=56 img=muljl xoffset=0 yoffset=0 xadvance=24
+char id=57 img=muljm xoffset=0 yoffset=0 xadvance=24
+char id=45 img=muljn xoffset=0 yoffset=0 xadvance=24
+muljp.xml|57|<component size="1136,640">
+  <displayList/>
+</component>package.xml|1584|<packageDescription id="t7096b8q" name="EmitNumbers">
+  <resources>
+    <atlas id="atlas0" size="256,256" file="atlas0.png"/>
+    <component id="muljp" name="Main" exported="true" size="1136,640"/>
+    <font id="mulj0" name="number1" exported="true"/>
+    <font id="muljc" name="number2" exported="true"/>
+    <image id="mulj1" name="0(2)5.png" size="30,35"/>
+    <image id="mulj2" name="1(2)5.png" size="30,35"/>
+    <image id="mulj3" name="2(2)5.png" size="30,35"/>
+    <image id="mulj4" name="3(2)5.png" size="30,35"/>
+    <image id="mulj5" name="4(2)5.png" size="30,35"/>
+    <image id="mulj6" name="5(2)5.png" size="30,35"/>
+    <image id="mulj7" name="6(2)5.png" size="30,35"/>
+    <image id="mulj8" name="7(2)5.png" size="30,35"/>
+    <image id="mulj9" name="8(2)5.png" size="30,35"/>
+    <image id="mulja" name="9(2)5.png" size="30,35"/>
+    <image id="muljb" name="m2.png" size="30,35"/>
+    <image id="muljd" name="0(4).png" size="30,35"/>
+    <image id="mulje" name="1(4).png" size="30,35"/>
+    <image id="muljf" name="2(4).png" size="30,35"/>
+    <image id="muljg" name="3(4).png" size="30,35"/>
+    <image id="muljh" name="4(4).png" size="30,35"/>
+    <image id="mulji" name="5(4).png" size="30,35"/>
+    <image id="muljj" name="6(4).png" size="30,35"/>
+    <image id="muljk" name="7(4).png" size="30,35"/>
+    <image id="muljl" name="8(4).png" size="30,35"/>
+    <image id="muljm" name="9(4).png" size="30,35"/>
+    <image id="muljn" name="m1.png" size="30,35"/>
+    <image id="muljo" name="critical" size="148,83" exported="true"/>
+  </resources>
+</packageDescription>

@@ -1,0 +1,12 @@
+package.xml|172|<packageDescription id="lua1ugq6" name="Gesture">
+  <resources>
+    <component id="t5or0" name="Main" exported="true" size="1136,640"/>
+  </resources>
+</packageDescription>t5or0.xml|427|<component size="1136,640">
+  <displayList>
+    <graph id="n0" name="holder" xy="70,37" size="1028,574" type="rect" lineSize="0" fillColor="#00000000">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </graph>
+    <text id="n1" name="n1" xy="48,19" size="815,67" fontSize="30" color="#ffffff" text="Try Pinch/Swipe/Rotate/Long-Press Gesture on the globe&#xA;试试在地球上使用摁捏扭扫手势"/>
+  </displayList>
+</component>

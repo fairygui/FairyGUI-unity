@@ -1,0 +1,78 @@
+fou90.xml|856|<component size="1136,640">
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="1136,640" type="rect" lineSize="0" fillColor="#ff336666">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n0" name="pb" src="fou91" xy="279,515">
+      <relation target="" sidePair="bottom-bottom,center-center"/>
+      <ProgressBar value="75" max="100"/>
+    </component>
+    <text id="n2" name="n2" xy="440,159" size="255,54" fontSize="50" color="#ffffff" strokeColor="#000000" text="Loading...">
+      <relation target="" sidePair="center-center"/>
+    </text>
+    <text id="n3" name="n3" xy="43,13" size="1058,30" fontSize="26" color="#ffffff" ubb="true" strokeColor="#000000" text="Please make sure Assets/Examples/Scenes/scene1 and scene2 is in [color=#FF3300]Build Scenes List[/b]"/>
+  </displayList>
+</component>fou91.xml|547|<component size="577,53" extention="ProgressBar">
+  <displayList>
+    <image id="n1" name="n0" src="fou92" xy="53,17" size="470,16" grayed="true"/>
+    <image id="n4" name="bar" src="fou92" xy="53,17" size="470,16"/>
+    <image id="n6" name="n6" src="fou93" xy="3,-4"/>
+    <image id="n7" name="n7" src="fou94" xy="485,-4"/>
+    <loader id="n8" name="ani" xy="455,-30" size="100,100" url="ui://ddm193o7fou95">
+      <relation target="n4" sidePair="right-right"/>
+    </loader>
+  </displayList>
+  <ProgressBar titleType="valueAndmax"/>
+</component>fou95.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+  <frames>
+    <frame rect="9,0,74,65"/>
+    <frame rect="7,5,74,64"/>
+    <frame rect="8,6,72,63"/>
+    <frame rect="8,3,75,65"/>
+    <frame rect="5,2,79,66"/>
+    <frame rect="2,7,80,62"/>
+    <frame rect="6,6,74,68"/>
+    <frame rect="0,2,81,65"/>
+  </frames>
+</movieclip>fou96.xml|330|<component size="1136,640" opaque="false">
+  <displayList>
+    <component id="n0" name="n0" src="fou97" xy="174,417" size="145,48">
+      <Button title="Scene1"/>
+    </component>
+    <component id="n1" name="n1" src="fou97" xy="386,421" size="145,48">
+      <Button title="Scene2"/>
+    </component>
+  </displayList>
+</component>fou97.xml|1149|<component size="100,36" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fff0f0f0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n2" name="n2" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fffafafa">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#ffcccccc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n4" name="title" xy="0,0" size="100,36" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>package.xml|645|<packageDescription id="ddm193o7" name="CutScene">
+  <resources>
+    <atlas id="atlas0" size="256,256" file="atlas0.png"/>
+    <component id="fou90" name="CutScene" exported="true" size="1136,640"/>
+    <component id="fou91" name="ProgressBar5" size="577,53"/>
+    <component id="fou96" name="Main" exported="true" size="1136,640"/>
+    <component id="fou97" name="Button1" size="100,36"/>
+    <image id="fou92" name="loading.png" size="4,16"/>
+    <image id="fou93" name="huawen1.png" size="85,59"/>
+    <image id="fou94" name="huawen2.png" size="88,59"/>
+    <movieclip id="fou95" name="pet" size="84,74"/>
+  </resources>
+</packageDescription>

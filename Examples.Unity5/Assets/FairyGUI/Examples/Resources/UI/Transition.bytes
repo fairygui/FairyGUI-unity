@@ -1,0 +1,235 @@
+fou916.fnt|583|info creator=UIBuilder
+common lineHeight=0
+char id=48 img=fou917 xoffset=0 yoffset=0 xadvance=33
+char id=49 img=fou918 xoffset=0 yoffset=0 xadvance=33
+char id=50 img=fou919 xoffset=0 yoffset=0 xadvance=32
+char id=51 img=fou91a xoffset=0 yoffset=0 xadvance=33
+char id=52 img=fou91b xoffset=0 yoffset=0 xadvance=33
+char id=53 img=fou91c xoffset=0 yoffset=0 xadvance=32
+char id=54 img=fou91d xoffset=0 yoffset=0 xadvance=32
+char id=55 img=fou91e xoffset=0 yoffset=0 xadvance=33
+char id=56 img=fou91f xoffset=0 yoffset=0 xadvance=33
+char id=57 img=fou91g xoffset=0 yoffset=0 xadvance=33
+gkq00.xml|1647|<component size="1136,640">
+  <displayList>
+    <image id="n4" name="n4" src="gkq01" xy="279,103">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+    <image id="n5" name="n5" src="gkq02" xy="533,292">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Sound" value="ui://zgmoraj4gkq03"/>
+    <item time="0" type="XY" target="n4" tween="true" startValue="-275,-" endValue="279,-" duration="12" ease="Expo.Out"/>
+    <item time="0" type="XY" target="n3" tween="true" startValue="-,-398" endValue="-,88" duration="12" ease="Back.Out"/>
+    <item time="0" type="XY" target="n5" tween="true" startValue="1183,-" endValue="533,-" duration="12" ease="Expo.Out"/>
+    <item time="12" type="Rotation" target="n3" tween="true" startValue="0" endValue="8" duration="6"/>
+    <item time="18" type="Rotation" target="n3" tween="true" startValue="8" endValue="-8" duration="6" ease="Back.Out"/>
+    <item time="24" type="Rotation" target="n3" tween="true" startValue="-8" endValue="5" duration="6" ease="Back.Out"/>
+    <item time="30" type="Rotation" target="n3" tween="true" startValue="5" endValue="-5" duration="6" ease="Back.Out"/>
+    <item time="36" type="Rotation" target="n3" tween="true" startValue="-5" endValue="0" duration="6" ease="Back.Out"/>
+    <item time="36" type="XY" target="n4" tween="true" startValue="279,-" endValue="1132,-" duration="9" ease="Expo.Out"/>
+    <item time="36" type="XY" target="n5" tween="true" startValue="533,-" endValue="-399,-" duration="9" ease="Expo.Out"/>
+  </transition>
+</component>gkq04.xml|915|<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="gkq05" xy="0,60" size="1136,81">
+      <relation target="" sidePair="center-center"/>
+    </image>
+    <loader id="n4" name="icon" xy="99,62" size="938,68" url="ui://zgmoraj4gkq06" align="center">
+      <relation target="" sidePair="center-center"/>
+    </loader>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Alpha" target="n0" value="1.00"/>
+    <item time="0" type="XY" target="n4" tween="true" startValue="1180,-" endValue="167,-" duration="12"/>
+    <item time="12" type="XY" target="n4" tween="true" startValue="167,-" endValue="99,62" duration="36" ease="Linear"/>
+    <item time="48" type="Alpha" target="n0" tween="true" startValue="1.00" endValue="0.00" duration="12"/>
+    <item time="48" type="XY" target="n4" tween="true" startValue="99,62" endValue="-948,-" duration="12"/>
+  </transition>
+</component>gkq07.xml|1216|<component size="1136,640">
+  <displayList>
+    <graph id="n1" name="n1" xy="0,200" size="1136,154" type="rect" lineSize="0" fillColor="#681c0000">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <image id="n3" name="n3" src="gkq08" xy="389,88" pivot="179,0" size="358,367">
+      <relation target="" sidePair="center-center"/>
+    </image>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Sound" value="ui://zgmoraj4gkq03"/>
+    <item time="0" type="XY" target="n3" tween="true" startValue="-,-398" endValue="-,88" duration="12" ease="Back.Out"/>
+    <item time="12" type="Rotation" target="n3" tween="true" startValue="0" endValue="8" duration="6"/>
+    <item time="18" type="Rotation" target="n3" tween="true" startValue="8" endValue="-8" duration="6" ease="Back.Out"/>
+    <item time="24" type="Rotation" target="n3" tween="true" startValue="-8" endValue="5" duration="6" ease="Back.Out"/>
+    <item time="30" type="Rotation" target="n3" tween="true" startValue="5" endValue="-5" duration="6" ease="Back.Out"/>
+    <item time="36" type="Rotation" target="n3" tween="true" startValue="-5" endValue="0" duration="6" ease="Back.Out"/>
+  </transition>
+</component>gkq0a.xml|804|<component size="1136,640">
+  <displayList>
+    <component id="n0" name="btn0" src="gkq0b" xy="85,64" size="121,42" group="n3">
+      <Button title="Play1"/>
+    </component>
+    <component id="n1" name="btn1" src="gkq0b" xy="260,64" size="121,42" group="n3">
+      <Button title="Play2"/>
+    </component>
+    <component id="n2" name="btn2" src="gkq0b" xy="435,64" size="121,42" group="n3">
+      <Button title="Play3"/>
+    </component>
+    <component id="n4" name="btn3" src="gkq0b" xy="610,64" size="121,42" group="n3">
+      <Button title="Play4"/>
+    </component>
+    <component id="n5" name="btn4" src="gkq0b" xy="785,62" size="121,42" group="n3">
+      <Button title="Play5"/>
+    </component>
+    <group id="n3" name="g0" xy="85,62" size="821,44" advanced="true"/>
+  </displayList>
+</component>gkq0b.xml|1149|<component size="100,36" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fff0f0f0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n2" name="n2" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fffafafa">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#ffcccccc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n4" name="title" xy="0,0" size="100,36" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>nra412.xml|512|<movieclip pivot="242,83" interval="41" frameCount="10">
+  <frames>
+    <frame rect="124,19,222,113"/>
+    <frame rect="107,9,255,130"/>
+    <frame rect="89,0,290,146"/>
+    <frame rect="40,49,358,68" addDelay="41"/>
+    <frame rect="18,52,380,67" addDelay="41"/>
+    <frame rect="0,53,398,66" addDelay="41"/>
+    <frame rect="126,53,226,65" addDelay="41"/>
+    <frame rect="129,53,219,65" addDelay="41"/>
+    <frame rect="129,53,220,55" addDelay="41"/>
+    <frame rect="132,55,214,52"/>
+  </frames>
+</movieclip>nra413.xml|856|<component size="250,205">
+  <displayList>
+    <image id="n0" name="n0" src="nra414" xy="22,45"/>
+    <loader id="n2" name="word" xy="8,1" size="238,105" url="ui://zgmoraj4nra415" align="right" vAlign="bottom"/>
+    <text id="n3" name="t0" xy="85,112" size="47,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="height" text="8"/>
+    <text id="n4" name="t1" xy="121,102" size="52,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="none" text="5"/>
+    <text id="n5" name="t2" xy="158,93" size="52,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="none" text="8"/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Pivot" value="1,0"/>
+    <item time="0" type="Scale" tween="true" startValue="1.5,1.5" endValue="1,1" duration="7" ease="Bounce.Out"/>
+    <item time="7" type="Shake" value="3,0.5"/>
+  </transition>
+</component>nra4c.xml|1437|<component size="500,120">
+  <displayList>
+    <image id="n3" name="n3" src="nra4d" xy="4,38" group="n6"/>
+    <image id="n0" name="n0" src="nra4e" xy="9,36" group="n6"/>
+    <text id="n1" name="value" xy="187,43" size="172,50" group="n6" font="ui://zgmoraj4nra4f" fontSize="24" autoSize="none" text="1234567"/>
+    <text id="n2" name="add_value" xy="196,3" size="149,40" group="n6" font="ui://zgmoraj4nra4q" fontSize="24" text="+12345"/>
+    <movieclip id="n5" name="powEffect" src="nra412" xy="42,-13" group="n6" visible="false" playing="false"/>
+    <group id="n6" name="n6" xy="4,-13" size="462,146" advanced="true"/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Alpha" value="1.00"/>
+    <item time="0" type="XY" value="0,0"/>
+    <item time="0" type="XY" target="n6" tween="true" startValue="-471,-" endValue="56,-" duration="12" ease="Expo.Out"/>
+    <item time="12" type="XY" target="n6" label="play_num_now" tween="true" startValue="56,-" endValue="66,-" duration="15" ease="Linear"/>
+    <item time="21" type="Animation" target="n5" value="0,p"/>
+    <item time="21" type="Visible" target="n5" value="true"/>
+    <item time="30" type="Visible" target="n5" value="false"/>
+    <item time="36" type="Alpha" tween="true" startValue="1.00" endValue="0.00" duration="12"/>
+    <item time="36" type="XY" tween="true" startValue="0,0" endValue="-40,-400" duration="12" label2="end"/>
+  </transition>
+</component>nra4f.fnt|573|info creator=UIBuilder
+common lineHeight=0
+char id=57 img=nra4g xoffset=0 yoffset=0 xadvance=24
+char id=56 img=nra4h xoffset=0 yoffset=0 xadvance=24
+char id=55 img=nra4i xoffset=0 yoffset=0 xadvance=24
+char id=54 img=nra4j xoffset=0 yoffset=0 xadvance=24
+char id=53 img=nra4k xoffset=0 yoffset=0 xadvance=24
+char id=52 img=nra4l xoffset=0 yoffset=0 xadvance=24
+char id=51 img=nra4m xoffset=0 yoffset=0 xadvance=24
+char id=50 img=nra4n xoffset=0 yoffset=0 xadvance=24
+char id=49 img=nra4o xoffset=0 yoffset=0 xadvance=24
+char id=48 img=nra4p xoffset=0 yoffset=0 xadvance=24
+nra4q.fnt|629|info creator=UIBuilder
+common lineHeight=0
+char id=43 img=nra4r xoffset=0 yoffset=0 xadvance=25
+char id=57 img=nra4s xoffset=0 yoffset=0 xadvance=25
+char id=56 img=nra4t xoffset=0 yoffset=0 xadvance=25
+char id=55 img=nra4u xoffset=0 yoffset=0 xadvance=25
+char id=54 img=nra4v xoffset=0 yoffset=0 xadvance=25
+char id=53 img=nra4w xoffset=0 yoffset=0 xadvance=25
+char id=52 img=nra4x xoffset=0 yoffset=0 xadvance=25
+char id=51 img=nra4y xoffset=0 yoffset=0 xadvance=25
+char id=50 img=nra4z xoffset=0 yoffset=0 xadvance=25
+char id=49 img=nra410 xoffset=-2 yoffset=0 xadvance=20
+char id=48 img=nra411 xoffset=0 yoffset=0 xadvance=25
+package.xml|2981|<packageDescription id="zgmoraj4" name="Transition">
+  <resources>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
+    <component id="gkq00" name="BOSS" exported="true" size="1136,640"/>
+    <component id="gkq04" name="BOSS_SKILL" exported="true" size="1136,640"/>
+    <component id="gkq07" name="TRAP" exported="true" size="1136,640"/>
+    <component id="gkq0a" name="Main" exported="true" size="1136,640"/>
+    <component id="gkq0b" name="Button1" size="100,36"/>
+    <component id="nra413" name="GoodHit" exported="true" size="250,205"/>
+    <component id="nra4c" name="PowerUp" exported="true" size="500,120"/>
+    <font id="fou916" name="number3" exported="true"/>
+    <font id="nra4f" name="number1" exported="true"/>
+    <font id="nra4q" name="number2" exported="true"/>
+    <image id="fou917" name="h0" size="50,50"/>
+    <image id="fou918" name="h1" size="50,50"/>
+    <image id="fou919" name="h2" size="50,50"/>
+    <image id="fou91a" name="h3" size="50,50"/>
+    <image id="fou91b" name="h4" size="50,50"/>
+    <image id="fou91c" name="h5" size="50,50"/>
+    <image id="fou91d" name="h6" size="50,50"/>
+    <image id="fou91e" name="h7" size="50,50"/>
+    <image id="fou91f" name="h8" size="50,50"/>
+    <image id="fou91g" name="h9" size="50,50"/>
+    <image id="gkq01" name="2" size="270,231"/>
+    <image id="gkq02" name="3" size="396,119"/>
+    <image id="gkq05" name="0" size="1024,56"/>
+    <image id="gkq06" name="1" size="722,66"/>
+    <image id="gkq08" name="4" size="358,367"/>
+    <image id="nra410" name="0009_1" size="28,36"/>
+    <image id="nra411" name="0010_0" size="28,36"/>
+    <image id="nra414" name="blood" size="227,163"/>
+    <image id="nra415" name="bangjile" size="242,123"/>
+    <image id="nra4d" name="red" size="462,72"/>
+    <image id="nra4e" name="power" size="163,61"/>
+    <image id="nra4g" name="0000_9.png" size="36,46"/>
+    <image id="nra4h" name="0001_8.png" size="36,46"/>
+    <image id="nra4i" name="0002_7.png" size="36,46"/>
+    <image id="nra4j" name="0003_6.png" size="36,46"/>
+    <image id="nra4k" name="0004_5.png" size="36,46"/>
+    <image id="nra4l" name="0005_4.png" size="36,46"/>
+    <image id="nra4m" name="0006_3.png" size="36,46"/>
+    <image id="nra4n" name="0007_2.png" size="36,46"/>
+    <image id="nra4o" name="0008_1.png" size="36,46"/>
+    <image id="nra4p" name="0009_0-.png" size="36,46"/>
+    <image id="nra4r" name="0000_+" size="28,36"/>
+    <image id="nra4s" name="0001_9" size="28,36"/>
+    <image id="nra4t" name="0002_8" size="28,36"/>
+    <image id="nra4u" name="0003_7" size="28,36"/>
+    <image id="nra4v" name="0004_6" size="28,36"/>
+    <image id="nra4w" name="0005_5" size="28,36"/>
+    <image id="nra4x" name="0006_4" size="28,36"/>
+    <image id="nra4y" name="0007_3" size="28,36"/>
+    <image id="nra4z" name="0008_2" size="28,36"/>
+    <movieclip id="nra412" name="U1UIT17" size="398,146"/>
+    <sound id="gkq03" name="BUZZ4" file="gkq03.wav"/>
+  </resources>
+</packageDescription>

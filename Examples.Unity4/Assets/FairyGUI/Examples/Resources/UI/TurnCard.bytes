@@ -1,0 +1,27 @@
+c5s80.xml|570|<component size="1136,640">
+  <displayList>
+    <component id="n2" name="c0" src="c5s83" xy="131,91">
+      <Button icon="ui://f3xz8s8wc5s82"/>
+    </component>
+    <component id="n3" name="c1" src="c5s83" xy="667,90">
+      <Button icon="ui://f3xz8s8wc5s84"/>
+    </component>
+    <text id="n4" name="n4" xy="193,28" size="200,34" fontSize="30" color="#ffffff" text="Common Effect"/>
+    <text id="n5" name="n5" xy="671,11" size="335,67" fontSize="30" color="#ffffff" align="center" text="Simulate Perspertive&#xA;in Orthographic Camera"/>
+  </displayList>
+</component>c5s83.xml|260|<component size="363,505" extention="Button">
+  <displayList>
+    <loader id="n2" name="icon" xy="0,0" pivot="0.5,0.5" size="363,505"/>
+    <image id="n0" name="n0" src="c5s81" xy="0,0" pivot="0.5,0.5" size="363,505"/>
+  </displayList>
+  <Button/>
+</component>package.xml|459|<packageDescription id="f3xz8s8w" name="TurnCard">
+  <resources>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
+    <component id="c5s80" name="Main" exported="true" size="1136,640"/>
+    <component id="c5s83" name="CardComponent" size="363,505"/>
+    <image id="c5s81" name="card_back" size="362,505"/>
+    <image id="c5s82" name="card_k" size="363,505"/>
+    <image id="c5s84" name="card_a" size="363,505"/>
+  </resources>
+</packageDescription>

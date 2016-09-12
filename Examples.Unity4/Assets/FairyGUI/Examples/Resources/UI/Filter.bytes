@@ -1,0 +1,90 @@
+package.xml|849|<packageDescription id="9fb2r88o" name="Filter">
+  <resources>
+    <atlas id="atlas0" size="512,512" file="atlas0.png"/>
+    <component id="srct2" name="Slider2" size="361,23"/>
+    <component id="srct5" name="Slider2_grip" size="56,57"/>
+    <component id="srctl" name="Button5" size="180,70"/>
+    <component id="v5sa0" name="Main" exported="true" size="1136,640"/>
+    <image id="srct3" name="background" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="srct4" name="full bar" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
+    <image id="srct6" name="back btn" size="56,57"/>
+    <image id="srctm" name="VIP.png" size="181,70"/>
+    <image id="srctn" name="k18" size="110,27"/>
+    <image id="v5sa1" name="pic" size="179,386"/>
+    <movieclip id="srctk" name="pet" size="84,74"/>
+  </resources>
+</packageDescription>srct2.xml|443|<component size="361,23" extention="Slider">
+  <displayList>
+    <image id="n1" name="n1" src="srct3" xy="0,0" size="361,23">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="bar" src="srct4" xy="0,1" size="362,21"/>
+    <component id="n3" name="grip" src="srct5" xy="328,-13">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>srct5.xml|225|<component size="56,57" extention="Button">
+  <Button/>
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="srct6" name="n1" xy="0,0"/>
+  </displayList>
+</component>srctk.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+  <frames>
+    <frame rect="9,0,74,65"/>
+    <frame rect="7,5,74,64"/>
+    <frame rect="8,6,72,63"/>
+    <frame rect="8,3,75,65"/>
+    <frame rect="5,2,79,66"/>
+    <frame rect="2,7,80,62"/>
+    <frame rect="6,6,74,68"/>
+    <frame rect="0,2,81,65"/>
+  </frames>
+</movieclip>srctl.xml|758|<component size="180,70" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n0" name="bg" src="srctm" xy="2,3" size="181,70">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n1" name="title" xy="10,10" size="157,46" fontSize="22" color="#ffff00" align="center" vAlign="middle" autoSize="none" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n2" name="icon" xy="10,7" size="160,49" align="center" vAlign="middle">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.80"/>
+</component>v5sa0.xml|2048|<component size="1136,640">
+  <displayList>
+    <graph id="n15" name="n15" xy="532,43" size="586,536" type="rect" lineSize="4" lineColor="#ff339966" fillColor="#00ffffff"/>
+    <text id="n3" name="n3" xy="220,36" size="185,31" fontSize="27" color="#ffffff" ubb="true" bold="true" text="[color=#FF9900,#FFFFFF]Color Filter[/color]"/>
+    <component id="n5" name="s0" src="srct2" xy="128,121">
+      <Slider value="100" max="200"/>
+    </component>
+    <component id="n6" name="s1" src="srct2" xy="128,207">
+      <Slider value="100" max="200"/>
+    </component>
+    <component id="n7" name="s2" src="srct2" xy="128,293">
+      <Slider value="100" max="200"/>
+    </component>
+    <text id="n8" name="n8" xy="53,82" size="135,29" fontSize="25" color="#ffffff" text="brightness"/>
+    <text id="n9" name="n9" xy="53,167" size="109,29" fontSize="25" color="#ffffff" text="contrast"/>
+    <component id="n10" name="s3" src="srct2" xy="128,379">
+      <Slider value="100" max="200"/>
+    </component>
+    <text id="n11" name="n11" xy="53,252" size="135,29" fontSize="25" color="#ffffff" text="saturation"/>
+    <text id="n12" name="n12" xy="53,337" size="44,29" fontSize="25" color="#ffffff" text="hue"/>
+    <image id="n0" name="n0" src="v5sa1" xy="556,104" filter="color" filterData="0.00,0.00,0.00,1.00"/>
+    <movieclip id="n13" name="n13" src="srctk" xy="782,234" filter="color" filterData="0.00,0.00,0.00,1.00"/>
+    <component id="n14" name="n14" src="srctl" xy="742,493" pivot="0.5,0.5" filter="color" filterData="0.00,0.00,0.00,1.00">
+      <Button icon="ui://9fb2r88osrctn"/>
+    </component>
+    <text id="n16" name="n16" xy="220,451" size="170,31" fontSize="27" color="#ffffff" ubb="true" bold="true" text="[color=#FF9900,#FFFFFF]Blur Filter[/color]"/>
+    <component id="n17" name="s4" src="srct2" xy="128,536">
+      <Slider max="100"/>
+    </component>
+    <text id="n18" name="n18" xy="53,497" size="57,29" fontSize="25" color="#ffffff" text="size"/>
+    <image id="n21" name="n21" src="v5sa1" xy="917,104"/>
+  </displayList>
+</component>

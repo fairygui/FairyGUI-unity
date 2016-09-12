@@ -1,0 +1,81 @@
+c8s20.xml|933|<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="c8s21" xy="185,56" size="404,562"/>
+    <image id="n1" name="n1" src="c8s22" xy="197,70" size="384,63"/>
+    <image id="n2" name="n2" src="c8s23" xy="315,82"/>
+    <list id="n3" name="mailList" xy="197,130" size="380,473" overflow="scroll" scrollBarFlags="2" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://qkteqwfpc8s24"/>
+    <text id="n4" name="n4" xy="171,15" size="425,28" fontSize="24" color="#ffffff" text="The below list contains 1000 items."/>
+    <component id="n6" name="n6" src="rpolb" xy="693,153" size="183,48">
+      <Button title="Select 500th"/>
+    </component>
+    <component id="n7" name="n7" src="rpolb" xy="693,224" size="183,48">
+      <Button title="Top"/>
+    </component>
+    <component id="n8" name="n8" src="rpolb" xy="693,300" size="183,48">
+      <Button title="Bottom"/>
+    </component>
+  </displayList>
+</component>c8s24.xml|1387|<component size="380,125" extention="Button">
+  <controller name="IsRead" pages="0,未读,1,已读" selected="0"/>
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <controller name="c1" pages="0,未领,1,已领" selected="1"/>
+  <displayList>
+    <image id="n10" name="n10" src="c8s25" xy="3,2" size="375,122"/>
+    <image id="n13" name="n13" src="c8s26" xy="-2,-3" size="386,131">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+    <image id="n14" name="n14" src="c8s27" xy="30,26"/>
+    <image id="n15" name="n15" src="c8s28" xy="40,29">
+      <gearDisplay controller="IsRead" pages="1"/>
+    </image>
+    <image id="n16" name="n16" src="c8s29" xy="40,42">
+      <gearDisplay controller="IsRead" pages="0"/>
+    </image>
+    <text id="n4" name="timeText" xy="113,67" size="239,39" fontSize="20" color="#075747" vAlign="middle" leading="0" autoSize="none" text=""/>
+    <text id="n9" name="title" xy="114,28" size="240,28" fontSize="22" color="#3333ff" vAlign="middle" autoSize="none" text=""/>
+    <image id="n17" name="n17" src="c8s2a" xy="234,2">
+      <gearDisplay controller="c1" pages="1"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+  <transition name="t0">
+    <item time="0" type="Visible" value="true"/>
+    <item time="0" type="XY" tween="true" startValue="391,-" endValue="0,0" duration="9"/>
+  </transition>
+</component>package.xml|928|<packageDescription id="qkteqwfp" name="VirtualList">
+  <resources>
+    <atlas id="atlas0" size="512,256" file="atlas0.png"/>
+    <component id="c8s20" name="Main" exported="true" size="1136,640"/>
+    <component id="c8s24" name="mailItem" size="380,125"/>
+    <component id="rpolb" name="Button1" size="100,36"/>
+    <image id="c8s21" name="1" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="c8s22" name="3" size="261,63" scale="9grid" scale9grid="110,16,33,32"/>
+    <image id="c8s23" name="4" size="133,34"/>
+    <image id="c8s25" name="2" size="78,141" scale="9grid" scale9grid="25,26,26,90"/>
+    <image id="c8s26" name="0" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="c8s27" name="7" size="71,71"/>
+    <image id="c8s28" name="9" size="55,59"/>
+    <image id="c8s29" name="6" size="55,47"/>
+    <image id="c8s2a" name="8" size="143,120"/>
+  </resources>
+</packageDescription>rpolb.xml|1149|<component size="100,36" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fff0f0f0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n2" name="n2" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fffafafa">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#ffcccccc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n4" name="title" xy="0,0" size="100,36" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>

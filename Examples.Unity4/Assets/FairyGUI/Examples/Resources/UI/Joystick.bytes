@@ -1,0 +1,31 @@
+iitt1.xml|784|<component size="1136,640">
+  <displayList>
+    <image id="n7" name="joystick_center" src="q9do1a" xy="179,422">
+      <relation target="" sidePair="bottom-bottom"/>
+    </image>
+    <component id="n4" name="joystick" src="q9do18" xy="109,351">
+      <relation target="" sidePair="bottom-bottom"/>
+    </component>
+    <graph id="n2" name="joystick_touch" xy="29,330" size="374,254" type="rect" lineSize="0" fillColor="#00ffffff">
+      <relation target="" sidePair="bottom-bottom"/>
+    </graph>
+    <text id="n8" name="n8" xy="642,113" size="89,28" fontSize="24" color="#ffffff" strokeColor="#000000" text="Degree:"/>
+    <text id="n9" name="n9" xy="732,113" size="302,28" fontSize="24" color="#ffffff" autoSize="height" strokeColor="#000000" text=""/>
+  </displayList>
+</component>package.xml|385|<packageDescription id="rbw1tvvv" name="Joystick">
+  <resources>
+    <atlas id="atlas0" size="256,256" file="atlas0.png"/>
+    <component id="iitt1" name="Main" exported="true" size="1136,640"/>
+    <component id="q9do18" name="circle" size="212,212"/>
+    <image id="q9do19" name="1" size="178,160"/>
+    <image id="q9do1a" name="0" size="76,77"/>
+  </resources>
+</packageDescription>q9do18.xml|352|<component size="212,212" scroll="both" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="thumb" src="q9do19" xy="17,26" pivot="89,80">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

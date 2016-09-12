@@ -1,0 +1,25 @@
+package.xml|333|<packageDescription id="qef31w6w" name="Model">
+  <resources>
+    <atlas id="atlas0" size="512,512" file="atlas0.png"/>
+    <component id="rpol0" name="Main" exported="true" size="1136,640"/>
+    <image id="rpol1" name="change" size="282,500"/>
+    <movieclip id="rpol2" name="pet" size="84,74"/>
+  </resources>
+</packageDescription>rpol0.xml|251|<component size="1136,640">
+  <displayList>
+    <image id="n1" name="n1" src="rpol1" xy="352,50"/>
+    <graph id="n0" name="holder" xy="451,424" size="100,100"/>
+    <movieclip id="n3" name="n3" src="rpol2" xy="456,269"/>
+  </displayList>
+</component>rpol2.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+  <frames>
+    <frame rect="9,0,74,65"/>
+    <frame rect="7,5,74,64"/>
+    <frame rect="8,6,72,63"/>
+    <frame rect="8,3,75,65"/>
+    <frame rect="5,2,79,66"/>
+    <frame rect="2,7,80,62"/>
+    <frame rect="6,6,74,68"/>
+    <frame rect="0,2,81,65"/>
+  </frames>
+</movieclip>

@@ -1,0 +1,34 @@
+chmf5.xml|356|<component size="90,100" extention="Button">
+  <displayList>
+    <graph id="n3" name="effect" xy="32,85" size="28,27"/>
+    <movieclip id="n5" name="n5" src="chmf8" xy="-11,33"/>
+    <text id="n4" name="n4" xy="4,-2" size="90,27" fontSize="22" color="#ffffff" autoSize="none" strokeColor="#000000" text="Drag Me"/>
+  </displayList>
+  <Button/>
+</component>chmf8.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+  <frames>
+    <frame rect="9,0,74,65"/>
+    <frame rect="7,5,74,64"/>
+    <frame rect="8,6,72,63"/>
+    <frame rect="8,3,75,65"/>
+    <frame rect="5,2,79,66"/>
+    <frame rect="2,7,80,62"/>
+    <frame rect="6,6,74,68"/>
+    <frame rect="0,2,81,65"/>
+  </frames>
+</movieclip>package.xml|416|<packageDescription id="jqu05wyc" name="Particles">
+  <resources>
+    <atlas id="atlas0" size="512,512" file="atlas0.png"/>
+    <component id="chmf5" name="CoolComponent" exported="true" size="90,100"/>
+    <component id="x7kw0" name="Main" exported="true" size="1136,640"/>
+    <image id="chmf1" name="change" size="282,500"/>
+    <movieclip id="chmf8" name="pet" size="84,74"/>
+  </resources>
+</packageDescription>x7kw0.xml|308|<component size="1136,640">
+  <displayList>
+    <image id="n1" name="n1" src="chmf1" xy="52,46"/>
+    <graph id="n6" name="holder" xy="199,454" size="63,48"/>
+    <component id="n3" name="c0" src="chmf5" xy="607,158"/>
+    <component id="n5" name="c1" src="chmf5" xy="829,368"/>
+  </displayList>
+</component>

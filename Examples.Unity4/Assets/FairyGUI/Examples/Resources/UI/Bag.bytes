@@ -1,0 +1,127 @@
+dwwc3.xml|693|<component size="615,387" extention="Label">
+  <displayList>
+    <image id="n0" name="n0" src="dwwc2" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <graph id="n3" name="dragArea" xy="10,1" size="500,40">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n1" name="title" xy="101,11" size="412,26" fontSize="22" color="#ffffff" align="center" autoSize="none" strokeColor="#000000" text="窗口标题">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <component id="n2" name="closeButton" src="dwwc4" xy="509,-9">
+      <relation target="" sidePair="left-right"/>
+    </component>
+  </displayList>
+</component>dwwc4.xml|893|<component size="60,74" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="3"/>
+  <controller name="c1" pages="0,,1," selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="dwwc5" xy="0,0" size="61,74">
+      <gearDisplay controller="c1" pages="0"/>
+    </image>
+    <image id="n3" name="n3" src="dwwc5" xy="0,0" size="60,74">
+      <gearDisplay controller="c1" pages="0"/>
+      <gearSize controller="button" pages="0,1,2,3" values="-|64,80|-|-" default="60,74"/>
+    </image>
+    <image id="n4" name="n4" src="dwwc6" xy="2,13" size="55,47">
+      <gearDisplay controller="c1" pages="1"/>
+      <gearXY controller="button" pages="0,1,2,3" values="0,10|2,13|0,10|2,13" default="0,8"/>
+      <gearSize controller="button" pages="0,1,2,3" values="61,53|-|61,53|-" default="55,47"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>fvaib.xml|540|<component size="1136,640">
+  <displayList>
+    <component id="n0" name="bagBtn" src="thi7c" xy="29,505" group="n1"/>
+    <group id="n1" name="n1" xy="29,505" size="90,100" advanced="true">
+      <relation target="" sidePair="bottom-bottom"/>
+    </group>
+    <text id="n2" name="n2" xy="31,23" size="1028,55" fontSize="24" color="#ffffff" align="center" autoSize="height" strokeColor="#000000" text="Icons are in seperated assetbundles. &#xA;Use 'Window Menu->Build FairyGUI example bundles' to create them"/>
+  </displayList>
+</component>jlmg7.xml|549|<component size="100,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n13" name="n13" src="jlmg8" xy="5,4"/>
+    <loader id="n4" name="icon" xy="6,6" size="88,88" align="center" vAlign="middle" fill="scale"/>
+    <image id="n12" name="n12" src="jlmg9" xy="0,0"/>
+    <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
+  </displayList>
+  <Button mode="Radio"/>
+</component>kcy10.xml|1119|<component size="640,582">
+  <displayList>
+    <component id="n7" name="frame" src="dwwc3" xy="0,0" size="640,582">
+      <Label title="Bag"/>
+    </component>
+    <list id="n8" name="list" xy="53,76" size="521,328" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="5" colGap="5" defaultItem="ui://rbw1tv9tjlmg7">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <image id="n9" name="n9" src="thi7g" xy="61,418" size="511,2"/>
+    <image id="n10" name="n10" src="thi7h" xy="61,425" size="130,124"/>
+    <loader id="n11" name="n11" xy="67,432" size="120,110" align="center" vAlign="middle"/>
+    <text id="n12" name="n12" xy="205,461" size="113,28" fontSize="24" color="#ff0099" text="Selected:"/>
+    <text id="n13" name="n13" xy="336,461" size="119,28" fontSize="24" color="#ff0099" autoSize="height" text=""/>
+  </displayList>
+</component>package.xml|1096|<packageDescription id="rbw1tv9t" name="Bag">
+  <resources>
+    <atlas id="atlas0" size="1024,512" file="atlas0.png"/>
+    <component id="dwwc3" name="WindowFrame" size="615,387"/>
+    <component id="dwwc4" name="CloseButton" size="60,74"/>
+    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
+    <component id="jlmg7" name="BagGridSub" size="100,100"/>
+    <component id="kcy10" name="BagWin" exported="true" size="640,582"/>
+    <component id="thi7c" name="BagButton" size="90,100"/>
+    <image id="dwwc2" name="5" size="615,387" scale="9grid" scale9grid="88,78,441,243"/>
+    <image id="dwwc5" name="0" size="60,74"/>
+    <image id="dwwc6" name="4" size="61,53"/>
+    <image id="jlmg8" name="1" size="90,91"/>
+    <image id="jlmg9" name="3" size="100,100"/>
+    <image id="thi7d" name="btnimage" size="86,99"/>
+    <image id="thi7g" name="7" size="332,2" scale="9grid" scale9grid="83,1,166,2"/>
+    <image id="thi7h" name="8" size="122,103" scale="9grid" scale9grid="31,26,62,52"/>
+    <movieclip id="thi7j" name="quan" size="120,119"/>
+  </resources>
+</packageDescription>thi7c.xml|412|<component size="90,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="thi7d" xy="2,0">
+      <gearColor controller="button" pages="0,1,2,3" values="-|#aeaeae|-|#aeaeae" default="#ffffff"/>
+    </image>
+    <movieclip id="n2" name="n2" src="thi7j" xy="-13,-6"/>
+  </displayList>
+  <Button/>
+</component>thi7j.xml|476|<movieclip pivot="60,60" interval="166" frameCount="12">
+  <frames>
+    <frame rect="17,18,86,85"/>
+    <frame rect="18,18,84,84"/>
+    <frame rect="18,19,84,80"/>
+    <frame rect="17,17,86,75"/>
+    <frame rect="12,14,96,91"/>
+    <frame rect="4,5,112,110"/>
+    <frame rect="0,0,120,119"/>
+    <frame rect="18,17,84,85"/>
+    <frame rect="18,24,84,78"/>
+    <frame rect="17,31,86,72"/>
+    <frame rect="12,17,96,91"/>
+    <frame rect="5,5,110,109"/>
+  </frames>
+</movieclip>

@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 3765565779
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: a6d1485bddcb42165a6a1a86c10559e0
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 7c0a6a24fc909dd95208e56e2ca96f9c
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+Assets:
+- Assets/FairyGUI/Examples/Resources/Icons/i9.png
+Dependencies: []

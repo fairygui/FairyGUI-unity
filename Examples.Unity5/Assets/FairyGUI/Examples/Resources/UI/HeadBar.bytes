@@ -1,0 +1,46 @@
+fuxf6.xml|57|<component size="1136,640">
+  <displayList/>
+</component>gjh30.xml|635|<component size="145,106" pivot="0.5,1" anchor="true">
+  <displayList>
+    <component id="n5" name="blood" src="gjh32" xy="0,86" touchable="false">
+      <ProgressBar value="67" max="100"/>
+    </component>
+    <loader id="n8" name="sign" xy="47,-1" size="50,50" url="ui://g6qoonuhgjh35" align="center" vAlign="bottom"/>
+    <richtext id="n9" name="name" xy="-14,56" size="173,28" fontSize="24" color="#ff6600" ubb="true" strokeColor="#000000" singleLine="true" text="Long [color=#FFFFFF]Long[/color][img]ui://g6qoonuhrfrh8[/img] Name">
+      <relation target="" sidePair="center-center"/>
+    </richtext>
+  </displayList>
+</component>gjh32.xml|218|<component size="145,20" extention="ProgressBar">
+  <displayList>
+    <image id="n2" name="n2" src="gjh33" xy="0,0"/>
+    <image id="n3" name="bar" src="gjh34" xy="11,5"/>
+  </displayList>
+  <ProgressBar/>
+</component>package.xml|667|<packageDescription id="g6qoonuh" name="HeadBar">
+  <resources>
+    <atlas id="atlas0" size="256,256" file="atlas0.png"/>
+    <component id="fuxf6" name="Main" exported="true" size="1136,640"/>
+    <component id="gjh30" name="HeadBar" exported="true" size="145,106"/>
+    <component id="gjh32" name="bloodbar" size="145,20"/>
+    <image id="gjh33" name="0" size="145,20"/>
+    <image id="gjh34" name="1" size="122,9" scale="9grid" scale9grid="7,2,108,3"/>
+    <image id="gjh35" name="task" size="47,44" exported="true"/>
+    <movieclip id="rfrh7" name="fighting" size="73,70"/>
+    <movieclip id="rfrh8" name="cool" size="24,24"/>
+  </resources>
+</packageDescription>rfrh7.xml|303|<movieclip pivot="37,41" interval="125" frameCount="7">
+  <frames>
+    <frame rect="0,0,73,68"/>
+    <frame rect="4,2,65,67"/>
+    <frame rect="8,8,57,61"/>
+    <frame rect="10,15,53,55"/>
+    <frame rect="8,8,57,61"/>
+    <frame rect="4,2,65,67"/>
+    <frame rect="0,0,73,68"/>
+  </frames>
+</movieclip>rfrh8.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>

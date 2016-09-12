@@ -1,0 +1,15 @@
+fou90.xml|560|<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="fou91" xy="509,79" pivot="52,256"/>
+    <text id="n1" name="n1" xy="212,18" size="761,55" fontSize="24" color="#ffffff" align="center" strokeColor="#000000" text="This UIPackage is loaded from AssetBundle.&#xA;Use 'Window Menu->Build FairyGUI example bundles' to create it."/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Rotation" target="n0" tween="true" startValue="0" endValue="360" duration="48" ease="Linear" repeat="10000"/>
+  </transition>
+</component>package.xml|286|<packageDescription id="d8m5tmok" name="BundleUsage">
+  <resources>
+    <atlas id="atlas0" size="128,512" file="atlas0.png"/>
+    <component id="fou90" name="Main" exported="true" size="1136,640"/>
+    <image id="fou91" name="sword" size="104,512"/>
+  </resources>
+</packageDescription>

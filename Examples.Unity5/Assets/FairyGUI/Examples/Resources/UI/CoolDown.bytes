@@ -1,0 +1,65 @@
+fvaib.xml|193|<component size="1136,640">
+  <displayList>
+    <component id="n2" name="b0" src="ltiql" xy="308,287"/>
+    <component id="n4" name="b1" src="p3yap" xy="452,264"/>
+  </displayList>
+</component>ltiql.xml|446|<component size="60,60" extention="Button">
+  <displayList>
+    <image id="n5" name="n5" src="ltiqo" xy="0,0" size="60,60" visible="false"/>
+    <loader id="n6" name="icon" xy="0,0" size="60,60" fill="scaleFree"/>
+    <image id="n9" name="n9" src="ltiqo" xy="0,0" size="60,60"/>
+    <image id="n10" name="mask" src="uo8117" xy="3,3" size="54,54" alpha="0.6" fillMethod="radial360" fillClockwise="false"/>
+  </displayList>
+  <Button/>
+</component>p3yap.xml|807|<component size="100,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n5" name="n5" src="p3yaq" xy="-13,-13">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+    <image id="n6" name="n6" src="p3yar" xy="-13,-13">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+    <loader id="n2" name="icon" xy="9,10" size="80,80" fill="scaleFree"/>
+    <image id="n0" name="btn" src="p3yau" xy="9,9"/>
+    <text id="n3" name="title" xy="8,23" size="81,60" font="ui://y768eypfp3yav" fontSize="24" align="center" autoSize="none" text="5"/>
+    <image id="n7" name="mask" src="uo8118" xy="10,11" alpha="0.6" fillMethod="radial360" fillClockwise="false"/>
+  </displayList>
+  <Button/>
+</component>p3yav.fnt|579|info creator=UIBuilder
+common lineHeight=0
+char id=48 img=p3yaw xoffset=0 yoffset=0 xadvance=35
+char id=49 img=p3yax xoffset=0 yoffset=0 xadvance=35
+char id=50 img=p3yay xoffset=0 yoffset=0 xadvance=35
+char id=51 img=p3yaz xoffset=0 yoffset=0 xadvance=35
+char id=52 img=p3ya10 xoffset=0 yoffset=0 xadvance=35
+char id=53 img=p3ya11 xoffset=0 yoffset=0 xadvance=35
+char id=54 img=p3ya12 xoffset=0 yoffset=0 xadvance=35
+char id=55 img=p3ya13 xoffset=0 yoffset=0 xadvance=35
+char id=56 img=p3ya14 xoffset=0 yoffset=0 xadvance=35
+char id=57 img=p3ya15 xoffset=0 yoffset=0 xadvance=35
+package.xml|1267|<packageDescription id="y768eypf" name="Cooldown">
+  <resources>
+    <atlas id="atlas0" size="512,256" file="atlas0.png"/>
+    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
+    <component id="ltiql" name="Button1" size="60,60"/>
+    <component id="p3yap" name="Button2" size="100,100"/>
+    <font id="p3yav" name="cdtime" exported="true"/>
+    <image id="ltiqo" name="14" size="40,40" scale="9grid" scale9grid="10,10,20,20"/>
+    <image id="p3ya10" name="4(4).png" size="41,45"/>
+    <image id="p3ya11" name="5(4).png" size="41,45"/>
+    <image id="p3ya12" name="6(4).png" size="41,45"/>
+    <image id="p3ya13" name="7(4).png" size="41,45"/>
+    <image id="p3ya14" name="8(4).png" size="41,45"/>
+    <image id="p3ya15" name="9(4).png" size="41,45"/>
+    <image id="p3yaq" name="11" size="127,127"/>
+    <image id="p3yar" name="13" size="127,127"/>
+    <image id="p3yau" name="12" size="82,82"/>
+    <image id="p3yaw" name="0(4).png" size="41,45"/>
+    <image id="p3yax" name="1(4).png" size="41,45"/>
+    <image id="p3yay" name="2(4).png" size="41,45"/>
+    <image id="p3yaz" name="3(4).png" size="41,45"/>
+    <image id="uo8117" name="mask0" size="48,48"/>
+    <image id="uo8118" name="mask1" size="80,80"/>
+  </resources>
+</packageDescription>

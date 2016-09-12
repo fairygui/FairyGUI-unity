@@ -1,0 +1,114 @@
+g25y13.xml|882|<component size="1136,640">
+  <displayList>
+    <image id="n5" name="n5" src="g25y14" xy="93,78" size="936,405"/>
+    <list id="n10" name="list" xy="107,94" size="910,376" overflow="scroll" scrollBarFlags="4" margin="0,0,0,0" defaultItem="ui://y768eypakfcb1j" autoItemSize="false">
+      <item url="ui://y768eypakfcb1h"/>
+      <item/>
+    </list>
+    <image id="n6" name="n6" src="g25y15" xy="95,496" size="765,84"/>
+    <text id="n7" name="input" xy="106,501" size="746,70" input="true" fontSize="26" vAlign="middle" autoSize="none" singleLine="true" text=""/>
+    <component id="n8" name="btnSend" src="g25y16" xy="871,500">
+      <Button title="Send"/>
+    </component>
+    <text id="n12" name="n12" xy="98,24" size="935,34" fontSize="30" color="#ff9900" strokeColor="#000000" text="Test it on IOS device. Input Emoji by the native IOS keyboard."/>
+  </displayList>
+</component>g25y16.xml|992|<component size="163,69" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n5" name="n5" src="g25y17" xy="-5,-2">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n1" name="n1" src="g25y18" xy="-3,-1" size="169,72">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <loader id="n4" name="icon" xy="0,4" size="163,61" align="center" vAlign="middle">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+    <text id="n3" name="title" xy="0,3" size="163,63" fontSize="22" color="#ffffff" align="center" vAlign="middle" autoSize="none" bold="true" strokeColor="#003c49" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>g25y1b.xml|675|<component size="900,94" extention="Button">
+  <displayList>
+    <image id="n7" name="n7" src="g25y15" xy="1,2" size="86,86"/>
+    <image id="n0" name="n0" src="g25y1d" xy="88,33" size="700,55">
+      <relation target="n3" sidePair="height-height,width-width"/>
+    </image>
+    <loader id="n1" name="icon" xy="4,5" size="80,80" align="center" vAlign="middle" fill="scale"/>
+    <richtext id="n3" name="msg" xy="112,46" size="663,28" fontSize="24" leading="5" autoSize="height" text=""/>
+    <text id="n8" name="name" xy="94,4" size="40,26" fontSize="22" singleLine="true" text=""/>
+  </displayList>
+  <Button/>
+  <relation target="n0" sidePair="height-height"/>
+</component>g25y1e.xml|706|<component size="900,90" extention="Button">
+  <displayList>
+    <image id="n13" name="n13" src="g25y15" xy="811,1" size="86,86"/>
+    <image id="n9" name="n9" src="g25y1f" xy="111,5" size="700,55">
+      <relation target="n11" sidePair="height-height,width-width"/>
+      <relation target="" sidePair="right-right"/>
+    </image>
+    <loader id="n10" name="icon" xy="814,5" size="80,80" align="center" vAlign="middle" fill="scale"/>
+    <richtext id="n11" name="msg" xy="124,18" size="663,28" fontSize="24" leading="5" autoSize="height" text="">
+      <relation target="" sidePair="right-right"/>
+    </richtext>
+  </displayList>
+  <Button/>
+  <relation target="n9" sidePair="height-height"/>
+</component>package.xml|3606|<packageDescription id="evxk1eek" name="EmojiPro">
+  <resources>
+    <atlas id="atlas0" size="1024,512" file="atlas0.png"/>
+    <component id="g25y13" name="Main" exported="true" size="1136,640"/>
+    <component id="g25y16" name="Button" size="163,69"/>
+    <component id="g25y1b" name="chatLeft" exported="true" size="900,94"/>
+    <component id="g25y1e" name="chatRight" exported="true" size="900,90"/>
+    <image id="g25y1" name="1f626" size="60,58" exported="true"/>
+    <image id="g25y10" name="1f629" size="62,61" exported="true"/>
+    <image id="g25y11" name="1f628" size="62,60" exported="true"/>
+    <image id="g25y12" name="1f627" size="60,58" exported="true"/>
+    <image id="g25y14" name="3" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="g25y15" name="9" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
+    <image id="g25y17" name="0" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="g25y18" name="1" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="g25y1d" name="6" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
+    <image id="g25y1f" name="7" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
+    <image id="g25y1h" name="r0" size="117,120" exported="true"/>
+    <image id="g25y1i" name="r1" size="120,120" exported="true"/>
+    <image id="g25y2" name="1f625" size="62,60" exported="true"/>
+    <image id="g25y3" name="1f624" size="62,61" exported="true"/>
+    <image id="g25y4" name="1f623" size="62,60" exported="true"/>
+    <image id="g25y5" name="1f622" size="62,60" exported="true"/>
+    <image id="g25y6" name="1f621" size="62,60" exported="true"/>
+    <image id="g25y7" name="1f620" size="62,60" exported="true"/>
+    <image id="g25y8" name="1f619" size="60,58" exported="true"/>
+    <image id="g25y9" name="1f618" size="63,60" exported="true"/>
+    <image id="g25ya" name="1f617" size="60,58" exported="true"/>
+    <image id="g25yb" name="1f616" size="62,60" exported="true"/>
+    <image id="g25yc" name="1f615" size="60,58" exported="true"/>
+    <image id="g25yd" name="1f614" size="62,60" exported="true"/>
+    <image id="g25ye" name="1f613" size="62,63" exported="true"/>
+    <image id="g25yf" name="1f612" size="62,60" exported="true"/>
+    <image id="g25yg" name="1f611" size="60,58" exported="true"/>
+    <image id="g25yh" name="1f610" size="62,60" exported="true"/>
+    <image id="g25yi" name="1f609" size="62,60" exported="true"/>
+    <image id="g25yj" name="1f608" size="64,63" exported="true"/>
+    <image id="g25yk" name="1f607" size="62,64" exported="true"/>
+    <image id="g25yl" name="1f606" size="62,60" exported="true"/>
+    <image id="g25ym" name="1f605" size="62,60" exported="true"/>
+    <image id="g25yn" name="1f604" size="62,60" exported="true"/>
+    <image id="g25yo" name="1f603" size="62,60" exported="true"/>
+    <image id="g25yp" name="1f602" size="62,60" exported="true"/>
+    <image id="g25yq" name="1f601" size="62,60" exported="true"/>
+    <image id="g25yr" name="1f600" size="60,58" exported="true"/>
+    <image id="g25ys" name="1f637" size="62,60" exported="true"/>
+    <image id="g25yt" name="1f636" size="62,61" exported="true"/>
+    <image id="g25yu" name="1f635" size="62,61" exported="true"/>
+    <image id="g25yv" name="1f634" size="60,59" exported="true"/>
+    <image id="g25yw" name="1f633" size="62,60" exported="true"/>
+    <image id="g25yx" name="1f632" size="62,60" exported="true"/>
+    <image id="g25yy" name="1f631" size="58,60" exported="true"/>
+    <image id="g25yz" name="1f630" size="62,60" exported="true"/>
+  </resources>
+</packageDescription>

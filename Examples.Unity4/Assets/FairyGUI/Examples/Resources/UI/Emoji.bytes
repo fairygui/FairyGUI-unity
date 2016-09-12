@@ -1,0 +1,275 @@
+fvaib.xml|770|<component size="1136,640">
+  <displayList>
+    <image id="n5" name="n5" src="fymi17" xy="93,78" size="936,405"/>
+    <list id="n10" name="list" xy="107,94" size="910,376" overflow="scroll" scrollBarFlags="4" margin="0,0,0,0" defaultItem="ui://y768eypakfcb1j" autoItemSize="false">
+      <item url="ui://y768eypakfcb1h"/>
+      <item/>
+    </list>
+    <image id="n6" name="n6" src="fymi18" xy="95,496" size="660,59"/>
+    <text id="n7" name="input" xy="106,501" size="637,48" input="true" fontSize="26" vAlign="middle" autoSize="none" singleLine="true" text=""/>
+    <component id="n8" name="btnSend" src="fymi1b" xy="871,489">
+      <Button title="Send"/>
+    </component>
+    <component id="n9" name="btnEmoji" src="fymi19" xy="773,485"/>
+  </displayList>
+</component>fymi19.xml|446|<component size="84,84" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="3"/>
+  <displayList>
+    <image id="n3" name="n3" src="fymi1a" xy="9,9" size="65,65">
+      <gearXY controller="button" pages="0,1,2,3" values="-|9,9|-|9,9" default="6,6"/>
+      <gearSize controller="button" pages="0,1,2,3" values="-|65,65|-|65,65" default="71,71"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>fymi1b.xml|992|<component size="163,69" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n5" name="n5" src="fymi1c" xy="-5,-2">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n1" name="n1" src="fymi1d" xy="-3,-1" size="169,72">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <loader id="n4" name="icon" xy="0,4" size="163,61" align="center" vAlign="middle">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+    <text id="n3" name="title" xy="0,3" size="163,63" fontSize="22" color="#ffffff" align="center" vAlign="middle" autoSize="none" bold="true" strokeColor="#003c49" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>iy2u1n.xml|408|<component size="60,60" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <graph id="n3" name="n3" xy="0,0" size="60,60" type="rect" lineColor="#ff999999" fillColor="#5effffff"/>
+    <loader id="n2" name="icon" xy="4,4" size="52,52" align="center" vAlign="middle" fill="scale"/>
+  </displayList>
+  <Button mode="Radio"/>
+</component>iy2u1q.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1r.xml|313|<movieclip pivot="0,0" interval="41" frameCount="5">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="1000"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="2000"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1s.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="125"/>
+    <frame rect="0,0,24,24" addDelay="125"/>
+  </frames>
+</movieclip>iy2u1t.xml|547|<movieclip pivot="0,0" interval="41" frameCount="11">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24"/>
+    <frame rect="0,0,24,24"/>
+    <frame rect="0,0,24,24" addDelay="1000"/>
+  </frames>
+</movieclip>iy2u1u.xml|478|<movieclip pivot="0,0" interval="41" frameCount="9">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1v.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1w.xml|398|<movieclip pivot="0,0" interval="41" frameCount="7">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="500"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1x.xml|223|<movieclip pivot="0,0" interval="41" frameCount="3">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1y.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+  </frames>
+</movieclip>iy2u1z.xml|661|<movieclip pivot="0,0" interval="41" frameCount="13">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+  </frames>
+</movieclip>iy2u20.xml|580|<movieclip pivot="0,0" interval="41" frameCount="11">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="500"/>
+  </frames>
+</movieclip>iy2u21.xml|264|<movieclip pivot="0,0" interval="41" frameCount="4">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+  </frames>
+</movieclip>iy2u22.xml|396|<movieclip pivot="0,0" interval="41" frameCount="7">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+  </frames>
+</movieclip>iy2u23.xml|803|<movieclip pivot="0,0" interval="41" frameCount="16">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="500"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="500"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="83"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="500"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="166"/>
+    <frame rect="0,0,24,24" addDelay="2000"/>
+  </frames>
+</movieclip>iy2u24.xml|1039|<component size="538,168">
+  <displayList>
+    <image id="n0" name="n0" src="fymi17" xy="0,0" size="538,168"/>
+    <list id="n1" name="list" xy="10,13" size="520,146" layout="flow_hz" margin="0,0,0,0" lineGap="15" colGap="15" defaultItem="ui://y768eypaiy2u1n">
+      <item title="88" icon="ui://y768eypaiy2u1q"/>
+      <item title="am" icon="ui://y768eypaiy2u1r"/>
+      <item title="bs" icon="ui://y768eypaiy2u1s"/>
+      <item title="bz" icon="ui://y768eypaiy2u1t"/>
+      <item title="ch" icon="ui://y768eypaiy2u1u"/>
+      <item title="cool" icon="ui://y768eypaiy2u1v"/>
+      <item title="dhq" icon="ui://y768eypaiy2u1w"/>
+      <item title="dn" icon="ui://y768eypaiy2u1x"/>
+      <item title="fd" icon="ui://y768eypaiy2u1y"/>
+      <item title="gz" icon="ui://y768eypaiy2u1z"/>
+      <item title="han" icon="ui://y768eypaiy2u20"/>
+      <item title="hx" icon="ui://y768eypaiy2u21"/>
+      <item title="hxiao" icon="ui://y768eypaiy2u22"/>
+      <item title="hxiu" icon="ui://y768eypaiy2u23"/>
+    </list>
+  </displayList>
+</component>kfcb1e.xml|281|<component size="2,376" extention="ScrollBar">
+  <displayList>
+    <graph id="n5" name="bar" xy="-7,0" size="9,376">
+      <relation target="" sidePair="height-height"/>
+    </graph>
+    <image id="n8" name="grip" src="kfcb1g" xy="-7,0" alpha="0.34"/>
+  </displayList>
+</component>kfcb1h.xml|675|<component size="900,94" extention="Button">
+  <displayList>
+    <image id="n7" name="n7" src="fymi18" xy="1,2" size="86,86"/>
+    <image id="n0" name="n0" src="kfcb1i" xy="88,33" size="700,55">
+      <relation target="n3" sidePair="height-height,width-width"/>
+    </image>
+    <loader id="n1" name="icon" xy="4,5" size="80,80" align="center" vAlign="middle" fill="scale"/>
+    <richtext id="n3" name="msg" xy="112,46" size="663,28" fontSize="24" leading="5" autoSize="height" text=""/>
+    <text id="n8" name="name" xy="94,4" size="40,26" fontSize="22" singleLine="true" text=""/>
+  </displayList>
+  <Button/>
+  <relation target="n0" sidePair="height-height"/>
+</component>kfcb1j.xml|706|<component size="900,90" extention="Button">
+  <displayList>
+    <image id="n13" name="n13" src="fymi18" xy="811,1" size="86,86"/>
+    <image id="n9" name="n9" src="kfcb1k" xy="111,5" size="700,55">
+      <relation target="n11" sidePair="height-height,width-width"/>
+      <relation target="" sidePair="right-right"/>
+    </image>
+    <loader id="n10" name="icon" xy="814,5" size="80,80" align="center" vAlign="middle" fill="scale"/>
+    <richtext id="n11" name="msg" xy="124,18" size="663,28" fontSize="24" leading="5" autoSize="height" text="">
+      <relation target="" sidePair="right-right"/>
+    </richtext>
+  </displayList>
+  <Button/>
+  <relation target="n9" sidePair="height-height"/>
+</component>package.xml|2231|<packageDescription id="y768eypa" name="Emoji">
+  <resources>
+    <atlas id="atlas0" size="512,512" file="atlas0.png"/>
+    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
+    <component id="fymi19" name="Button2" size="84,84"/>
+    <component id="fymi1b" name="Button" size="163,69"/>
+    <component id="iy2u1n" name="faceSub" size="60,60"/>
+    <component id="iy2u24" name="EmojiSelectUI" exported="true" size="538,168"/>
+    <component id="kfcb1e" name="ScrollBar_VT" exported="true" size="2,376"/>
+    <component id="kfcb1h" name="chatLeft" exported="true" size="900,94"/>
+    <component id="kfcb1j" name="chatRight" exported="true" size="900,90"/>
+    <image id="fymi17" name="3" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="fymi18" name="9" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
+    <image id="fymi1a" name="8" size="71,71"/>
+    <image id="fymi1c" name="0" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="fymi1d" name="1" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="kfcb1g" name="4" size="9,206" scale="9grid" scale9grid="2,6,4,193"/>
+    <image id="kfcb1i" name="6" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
+    <image id="kfcb1k" name="7" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
+    <image id="l7d51l" name="r1" size="120,120" exported="true"/>
+    <image id="l7d51m" name="r0" size="117,120" exported="true"/>
+    <movieclip id="iy2u1q" name="88" size="24,24"/>
+    <movieclip id="iy2u1r" name="am" size="24,24"/>
+    <movieclip id="iy2u1s" name="bs" size="24,24"/>
+    <movieclip id="iy2u1t" name="bz" size="24,24"/>
+    <movieclip id="iy2u1u" name="ch" size="24,24"/>
+    <movieclip id="iy2u1v" name="cool" size="24,24"/>
+    <movieclip id="iy2u1w" name="dhq" size="24,24"/>
+    <movieclip id="iy2u1x" name="dn" size="24,24"/>
+    <movieclip id="iy2u1y" name="fd" size="24,24"/>
+    <movieclip id="iy2u1z" name="gz" size="24,24"/>
+    <movieclip id="iy2u20" name="han" size="24,24"/>
+    <movieclip id="iy2u21" name="hx" size="24,24"/>
+    <movieclip id="iy2u22" name="hxiao" size="24,24"/>
+    <movieclip id="iy2u23" name="hxiu" size="24,24"/>
+  </resources>
+</packageDescription>

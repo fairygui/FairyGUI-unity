@@ -1,0 +1,114 @@
+iitt1.xml|200|<component size="1136,640">
+  <displayList>
+    <component id="n2" name="n2" src="p60317" xy="163,411" size="230,36">
+      <Button title="Open Window"/>
+    </component>
+  </displayList>
+</component>iitt5.xml|553|<component size="478,544">
+  <displayList>
+    <component id="n16" name="frame" src="iitt6" xy="0,0" size="483,544">
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <image id="n14" name="n14" src="iittf" xy="51,52" size="367,458"/>
+    <image id="n20" name="n20" src="kotx15" xy="-16,81"/>
+    <graph id="n15" name="holder" xy="80,101" size="303,376"/>
+    <component id="n17" name="btnLeft" src="kotx12" xy="86,330"/>
+    <component id="n18" name="btnRight" src="kotxz" xy="323,330"/>
+  </displayList>
+</component>iitt6.xml|768|<component size="615,387" extention="Label">
+  <displayList>
+    <image id="n0" name="n0" src="iitt7" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <graph id="n3" name="dragArea" xy="10,1" size="500,40">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n1" name="title" xy="101,11" size="412,26" fontSize="22" color="#ffffff" align="center" autoSize="none" strokeColor="#000000" text="Window Title">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <component id="n2" name="closeButton" src="iitt8" xy="509,-16">
+      <relation target="" sidePair="left-right"/>
+    </component>
+    <graph id="n4" name="contentArea" xy="50,50" size="502,309"/>
+  </displayList>
+</component>iitt8.xml|893|<component size="60,74" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="3"/>
+  <controller name="c1" pages="0,,1," selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="iitt9" xy="0,0" size="61,74">
+      <gearDisplay controller="c1" pages="0"/>
+    </image>
+    <image id="n3" name="n3" src="iitt9" xy="0,0" size="60,74">
+      <gearDisplay controller="c1" pages="0"/>
+      <gearSize controller="button" pages="0,1,2,3" values="-|64,80|-|-" default="60,74"/>
+    </image>
+    <image id="n4" name="n4" src="iitta" xy="2,13" size="55,47">
+      <gearDisplay controller="c1" pages="1"/>
+      <gearXY controller="button" pages="0,1,2,3" values="0,10|2,13|0,10|2,13" default="0,8"/>
+      <gearSize controller="button" pages="0,1,2,3" values="61,53|-|61,53|-" default="55,47"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>kotx12.xml|426|<component size="60,60" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="kotx13" xy="12,12">
+      <gearDisplay controller="button" pages="0,2"/>
+    </image>
+    <image id="n2" name="n2" src="kotx14" xy="12,12">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>kotxz.xml|426|<component size="60,60" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="kotx10" xy="12,12">
+      <gearDisplay controller="button" pages="0,2"/>
+    </image>
+    <image id="n2" name="n2" src="kotx11" xy="12,12">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>p60317.xml|1149|<component size="100,36" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fff0f0f0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n2" name="n2" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fffafafa">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#ffcccccc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n4" name="title" xy="0,0" size="100,36" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>package.xml|1121|<packageDescription id="rbw1tc9t" name="RenderTexture">
+  <resources>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
+    <component id="iitt1" name="Main" exported="true" size="1136,640"/>
+    <component id="iitt5" name="TestWin" exported="true" size="478,544"/>
+    <component id="iitt6" name="WindowFrame" size="615,387"/>
+    <component id="iitt8" name="CloseButton" size="60,74"/>
+    <component id="kotx12" name="ButtonLeft" size="60,60"/>
+    <component id="kotxz" name="ButtonRight" size="60,60"/>
+    <component id="p60317" name="Button1" size="100,36"/>
+    <image id="iitt7" name="5" size="615,387" scale="9grid" scale9grid="64,54,484,303"/>
+    <image id="iitt9" name="0" size="60,74"/>
+    <image id="iitta" name="4" size="61,53"/>
+    <image id="iittf" name="8" size="122,103" scale="9grid" scale9grid="20,22,84,61"/>
+    <image id="kotx10" name="10" size="36,35"/>
+    <image id="kotx11" name="9" size="36,35"/>
+    <image id="kotx13" name="12" size="36,35"/>
+    <image id="kotx14" name="11" size="36,35"/>
+    <image id="kotx15" name="13" size="484,432"/>
+  </resources>
+</packageDescription>

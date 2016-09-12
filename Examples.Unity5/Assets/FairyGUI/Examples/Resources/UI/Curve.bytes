@@ -1,0 +1,30 @@
+113wo0.xml|804|<component size="1320,500">
+  <displayList>
+    <graph id="n4" name="n4" xy="0,0" size="1320,500" type="rect" lineSize="0" fillColor="#69000000"/>
+    <list id="n2" name="list" xy="0,39" size="1320,460" layout="row" overflow="scroll" scroll="horizontal" scrollBarFlags="2" scrollBar="hidden" margin="0,0,0,0" clipSoftness="20,0" colGap="20" defaultItem="ui://i1i2ucwo113wo2">
+      <item icon="ui://i1i2ucwo113wo3"/>
+      <item icon="ui://i1i2ucwo113wo4"/>
+      <item icon="ui://i1i2ucwo113wo5"/>
+      <item icon="ui://i1i2ucwo113wo6"/>
+      <item icon="ui://i1i2ucwo113wo7"/>
+    </list>
+    <text id="n3" name="n3" xy="0,14" size="1320,40" fontSize="36" color="#ffffff" align="center" autoSize="none" text="You can attach UI to any 3D model, with fully interactive."/>
+  </displayList>
+</component>113wo2.xml|260|<component size="248,460" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <loader id="n0" name="icon" xy="0,41" size="248,378"/>
+  </displayList>
+  <Button mode="Radio"/>
+</component>package.xml|616|<packageDescription id="i1i2ucwo" name="Curve">
+  <resources>
+    <atlas id="atlas0" size="256,2048" file="atlas0.png"/>
+    <component id="113wo0" name="Main" exported="true" size="1320,500"/>
+    <component id="113wo2" name="item" size="248,460"/>
+    <image id="113wo3" name="n1" size="248,378" exported="true"/>
+    <image id="113wo4" name="n2" size="248,378" exported="true"/>
+    <image id="113wo5" name="n3" size="248,378" exported="true"/>
+    <image id="113wo6" name="n4" size="248,378" exported="true"/>
+    <image id="113wo7" name="n5" size="248,378" exported="true"/>
+  </resources>
+</packageDescription>

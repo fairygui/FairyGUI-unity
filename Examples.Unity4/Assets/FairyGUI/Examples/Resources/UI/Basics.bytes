@@ -1,0 +1,1785 @@
+796x7a.xml|749|<component size="400,203">
+  <displayList>
+    <component id="n0" name="frame" src="niii7d" xy="68,0" size="332,203">
+      <relation target="" sidePair="width-width,height-height"/>
+      <Label title="窗口B"/>
+    </component>
+    <image id="n7" name="n7" src="sner1h" xy="-29,-91"/>
+    <text id="n10" name="n10" xy="191,20" size="156,39" font="Comic Sans MS" fontSize="27" color="#ff3366" text="Hello World"/>
+    <component id="n12" name="n12" src="t9fj57" xy="185,139" scale="0.70,1.00">
+      <ProgressBar value="80" max="100"/>
+    </component>
+  </displayList>
+  <transition name="t1">
+    <item time="0" type="XY" target="n7" tween="true" startValue="-29,-" endValue="-9,-" duration="8" repeat="11" yoyo="true"/>
+  </transition>
+</component>a7vt7n.xml|1392|<component size="505,35" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="505,33" type="rect" lineColor="#ffccffff" fillColor="#0026498b">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="505,35" type="rect" lineColor="#ff7b98ac" fillColor="#b548797e">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n0" name="t0" xy="1,3" size="47,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="1"/>
+    <graph id="n4" name="n4" xy="0,34" size="505,1" type="rect" lineSize="0" fillColor="#ff325b62">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n5" name="t1" xy="53,3" size="229,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="Name"/>
+    <text id="n6" name="t2" xy="289,3" size="94,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="Fairy"/>
+    <component id="n7" name="star" src="fjqr7j" xy="402,5">
+      <ProgressBar value="67" max="100"/>
+    </component>
+  </displayList>
+  <Button mode="Radio"/>
+</component>atih7o.xml|1348|<component size="505,50" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="505,48" type="rect" lineColor="#ffccffff" fillColor="#0026498b">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="505,50" type="rect" lineColor="#ff7b98ac" fillColor="#b548797e">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n1" name="t3" xy="387,11" size="115,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="100000">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <graph id="n4" name="n4" xy="0,49" size="505,1" type="rect" lineSize="0" fillColor="#ff325b62">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n5" name="t1" xy="62,11" size="220,28" fontSize="22" color="#ffffff" autoSize="none" singleLine="true" text="Name"/>
+    <component id="n7" name="cb" src="rpmb16" xy="1,0">
+      <Button checked="true"/>
+    </component>
+    <movieclip id="n8" name="mc" src="iwqq89" xy="317,13"/>
+  </displayList>
+  <Button mode="Radio"/>
+</component>c2z47l.xml|1831|<component size="1136,570">
+  <displayList>
+    <graph id="n27" name="n27" xy="32,61" size="528,337" type="rect" lineColor="#49959595" fillColor="#ff233e43"/>
+    <image id="n18" name="n18" src="a7vt7m" xy="32,23" size="527,39"/>
+    <list id="n19" name="list1" xy="32,61" size="527,336" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://9leh0eyfa7vt7n">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <text id="n20" name="n20" xy="41,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Order"/>
+    <text id="n21" name="n21" xy="432,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Stars"/>
+    <text id="n23" name="n23" xy="338,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Color"/>
+    <text id="n24" name="n24" xy="178,29" size="49,26" group="n25" fontSize="22" color="#ccffff" text="Name"/>
+    <group id="n25" name="n25" xy="41,29" size="451,26" advanced="true"/>
+    <graph id="n28" name="n28" xy="585,59" size="527,337" type="rect" lineColor="#49959595" fillColor="#ff233e43"/>
+    <image id="n29" name="n29" src="a7vt7m" xy="585,21" size="527,39"/>
+    <list id="n30" name="list2" xy="585,59" size="526,336" selectionMode="none" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://9leh0eyfatih7o">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <text id="n32" name="n32" xy="998,27" size="60,26" group="n35" fontSize="22" color="#ccffff" text="Power"/>
+    <text id="n33" name="n33" xy="887,27" size="60,26" group="n35" fontSize="22" color="#ccffff" text="Color"/>
+    <text id="n34" name="n34" xy="647,26" size="49,26" group="n35" fontSize="22" color="#ccffff" text="Name"/>
+    <group id="n35" name="n35" xy="647,26" size="411,27" advanced="true"/>
+  </displayList>
+</component>duef6m.fnt|583|info creator=UIBuilder
+common lineHeight=0
+char id=48 img=duef6n xoffset=0 yoffset=0 xadvance=33
+char id=49 img=duef6o xoffset=0 yoffset=0 xadvance=33
+char id=50 img=duef6p xoffset=0 yoffset=0 xadvance=32
+char id=51 img=duef6q xoffset=0 yoffset=0 xadvance=33
+char id=52 img=duef6r xoffset=0 yoffset=0 xadvance=33
+char id=53 img=duef6s xoffset=0 yoffset=0 xadvance=32
+char id=54 img=duef6t xoffset=0 yoffset=0 xadvance=32
+char id=55 img=duef6u xoffset=0 yoffset=0 xadvance=33
+char id=56 img=duef6v xoffset=0 yoffset=0 xadvance=33
+char id=57 img=duef6w xoffset=0 yoffset=0 xadvance=33
+dyz47i.xml|1109|<component size="180,70" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <controller name="grayed" pages="0,,1," selected="1"/>
+  <displayList>
+    <image id="n0" name="bg" src="rpmb1" xy="0,-1" size="181,70">
+      <gearXY controller="button" pages="0,1,2,3" values="0,-1|1,1|0,0|1,1" default="1,5"/>
+      <gearSize controller="button" pages="0,1,2,3" values="181,70,1.00,1.00|178,68,1.00,1.00|-|178,68,1.00,1.00" default="181,70,1.00,1.00"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n1" name="title" xy="9,7" size="157,46" fontSize="22" color="#ffff00" align="center" vAlign="middle" autoSize="none" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n2" name="icon" xy="8,4" size="160,49" grayed="true" align="center" vAlign="middle">
+      <gearLook controller="grayed" pages="0,1" values="1.00,0,0|-" default="1.00,0,1"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+  </displayList>
+  <Button/>
+</component>es412y.xml|1291|<component size="1136,570">
+  <displayList>
+    <component id="n29" name="n29" src="gxip82" xy="841,98"/>
+    <text id="n28" name="n28" xy="856,59" size="126,26" fontSize="22" text="Custom Mask"/>
+    <component id="n0" name="n0" src="es412z" xy="43,42"/>
+    <text id="n7" name="n7" xy="67,8" size="181,26" fontSize="22" text="Overflow: hidden"/>
+    <graph id="n4" name="n4" xy="15,398" size="341,151" type="rect" fillColor="#ff000000"/>
+    <component id="n3" name="n3" src="smv73f" xy="15,398"/>
+    <component id="n2" name="n2" src="smv731" xy="321,41"/>
+    <text id="n9" name="n9" xy="313,10" size="236,26" fontSize="22" text="Overflow: Free Scroll"/>
+    <graph id="n17" name="n17" xy="594,35" size="225,343" type="rect" fillColor="#ff000000"/>
+    <component id="n14" name="n14" src="smv73g" xy="594,35"/>
+    <text id="n15" name="n15" xy="598,6" size="412,26" fontSize="22" text="Overflow: Vertical scroll and margins"/>
+    <graph id="n19" name="n19" xy="374,399" size="341,151" type="rect" fillColor="#ff000000"/>
+    <component id="n18" name="n18" src="smv73h" xy="374,399"/>
+    <graph id="n24" name="n24" xy="739,421" size="387,120" type="rect" fillColor="#ff000000"/>
+    <component id="n22" name="n22" src="smv73i" xy="739,422" size="387,120"/>
+  </displayList>
+</component>es412z.xml|143|<component size="224,310" overflow="hidden">
+  <displayList>
+    <image id="n1" name="n1" src="es4130" xy="0,0"/>
+  </displayList>
+</component>eut94u.xml|460|<component size="480,45" extention="Slider">
+  <displayList>
+    <image id="n0" name="n0" src="eut94v" xy="0,0"/>
+    <image id="n1" name="bar" src="eut94w" xy="30,3"/>
+    <component id="n2" name="grip" src="eut94x" xy="425,-32">
+      <relation target="n1" sidePair="right-right"/>
+    </component>
+    <text id="n3" name="title" xy="220,25" size="40,16" fontSize="12" color="#ff9900" strokeColor="#000000" text=""/>
+  </displayList>
+  <Slider/>
+</component>eut94x.xml|426|<component size="50,50" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="eut94y" xy="12,14">
+      <gearDisplay controller="button" pages="0,2"/>
+    </image>
+    <image id="n2" name="n2" src="eut94z" xy="12,14">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>f2ax74.xml|56|<component size="640,890">
+  <displayList/>
+</component>fjqr7j.xml|165|<component size="90,23" extention="ProgressBar">
+  <displayList>
+    <image id="n0" name="bar" src="fjqr7k" xy="0,0"/>
+  </displayList>
+  <ProgressBar/>
+</component>fou97q.xml|770|<component size="1136,570">
+  <displayList>
+    <text id="n20" name="n20" xy="18,22" size="1077,76" fontSize="22" autoSize="height" text="By default, children in component are arrange according to their index. You can use property 'sortingOrder' to customize the dept. This mechanism is useful in game, e.g. serveral modules who dont know each other trying to add objects to same container."/>
+    <component id="n22" name="n22" src="fou97r" xy="38,144"/>
+    <component id="n24" name="btn0" src="poiq7e" xy="628,162" size="167,45">
+      <Button title="Add a child"/>
+    </component>
+    <component id="n25" name="btn1" src="poiq7e" xy="630,252" size="454,53">
+      <Button title="Add a child with bigger sortingOrder"/>
+    </component>
+  </displayList>
+</component>fou97r.xml|141|<component size="400,400">
+  <displayList>
+    <graph id="n0" name="n0" xy="15,14" size="150,150" type="rect"/>
+  </displayList>
+</component>gojg7s.xml|436|<component size="100,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="gojg7t" xy="1,1" pivot="49,49">
+      <gearLook controller="button" pages="0,1,2,3" values="-|1,180,0|-|1,180,0" default="1,0,0" tween="true" ease="Sine.Out"/>
+    </image>
+  </displayList>
+  <Button mode="Check" sound="ui://9leh0eyfgojg7u"/>
+</component>gx2b76.xml|321|<component size="1136,570">
+  <displayList>
+    <component id="n0" name="n0" src="poiq7e" xy="60,48" size="158,48">
+      <Button title="Popup Menu"/>
+    </component>
+    <component id="n1" name="n1" src="poiq7e" xy="342,48" size="158,48">
+      <Button title="Popup Any"/>
+    </component>
+  </displayList>
+</component>gx2b77.xml|315|<component size="640,400">
+  <displayList>
+    <component id="n0" name="n0" src="poiq7e" xy="62,58" size="121,36">
+      <Button title="WindowA"/>
+    </component>
+    <component id="n1" name="n1" src="poiq7e" xy="223,58" size="127,36">
+      <Button title="WindowB"/>
+    </component>
+  </displayList>
+</component>gx2b78.xml|1022|<component size="1136,570">
+  <displayList>
+    <component id="n0" name="a" src="gx2b79" xy="61,49">
+      <Button title="A" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+    <component id="n1" name="b" src="gx2b79" xy="67,270">
+      <Button title="B" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+    <component id="n2" name="c" src="gx2b79" xy="447,268">
+      <Button title="C"/>
+    </component>
+    <text id="n3" name="n3" xy="49,19" size="291,26" fontSize="22" text="'A' can be dragged freely."/>
+    <text id="n4" name="n4" xy="53,178" size="478,51" fontSize="22" text="Try drag B to C. B's icon will assign to C.&#xA;拖动B到C的位置可以将B的图标赋予C"/>
+    <text id="n6" name="n6" xy="612,26" size="368,26" fontSize="22" text="'D' can be dragged inside bounds."/>
+    <graph id="n7" name="n7" xy="640,76" size="440,413" type="rect" lineSize="3" fillColor="#00ffffff"/>
+    <component id="n5" name="d" src="gx2b79" xy="819,231">
+      <Button title="D" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+  </displayList>
+</component>gx2b79.xml|453|<component size="100,100" extention="Button">
+  <displayList>
+    <image id="n13" name="n13" src="kpev61" xy="5,4"/>
+    <loader id="n4" name="icon" xy="6,6" size="88,88" align="center" vAlign="middle" fill="scale"/>
+    <image id="n12" name="n12" src="kpev62" xy="0,0"/>
+    <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
+  </displayList>
+  <Button/>
+</component>gxip82.xml|225|<component size="282,500" mask="n28">
+  <displayList>
+    <image id="n27" name="n27" src="es4130" xy="0,0"/>
+    <graph id="n28" name="n28" xy="72,43" size="167,171" type="eclipse" lineSize="0"/>
+  </displayList>
+</component>gzpr81.xml|188|<component size="99,99" extention="ProgressBar">
+  <displayList>
+    <image id="n8" name="bar" src="gzpr80" xy="0,0" fillMethod="radial360"/>
+  </displayList>
+  <ProgressBar/>
+</component>hixt1j.xml|992|<component size="163,69" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n5" name="n5" src="hixt1k" xy="-5,-2">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n1" name="n1" src="hixt1l" xy="-3,-1" size="169,72">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <loader id="n4" name="icon" xy="0,4" size="163,61" align="center" vAlign="middle">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+    <text id="n3" name="title" xy="0,3" size="163,63" fontSize="22" color="#ffffff" align="center" vAlign="middle" autoSize="none" bold="true" strokeColor="#003c49" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>hixt1m.xml|1037|<component size="1136,570">
+  <displayList>
+    <graph id="n1" name="n1" xy="42,102" size="100,100" type="rect"/>
+    <graph id="n2" name="n2" xy="207,101" size="100,100" type="rect" lineSize="5" lineColor="#ffffff66" fillColor="#ffcc9933"/>
+    <graph id="n3" name="n3" xy="363,107" size="100,100" type="rect" lineSize="5" lineColor="#ff663333" fillColor="#ff33cccc"/>
+    <graph id="n4" name="n4" xy="427,146" size="100,100" type="eclipse" lineSize="0" fillColor="#6866cc33"/>
+    <graph id="n5" name="n5" xy="66,299" pivot="0.5,0.5" size="206,113" skew="60,30" type="rect" lineSize="0" fillColor="#ff006600"/>
+    <graph id="n6" name="n6" xy="347,288" size="206,113" type="eclipse" lineSize="0" fillColor="#ff336699"/>
+    <graph id="n7" name="n7" xy="602,122" size="46,256" grayed="true" type="rect" lineSize="15" lineColor="#ffff99ff" fillColor="#ffff6600"/>
+    <text id="n8" name="n8" xy="13,10" size="742,26" fontSize="22" text="Simple graphics. (Empty graph is usually for place holder purpose.)"/>
+  </displayList>
+</component>hixt1n.xml|875|<component size="1136,570">
+  <displayList>
+    <text id="n0" name="n0" xy="16,9" size="605,71" fontSize="22" autoSize="none" text="1. Import gif directly&#xA;2. Use builtin tool to create movieclip"/>
+    <movieclip id="n8" name="n8" src="hixt1v" xy="44,109"/>
+    <movieclip id="n13" name="n13" src="hixt1v" xy="52,243" color="#0066cc"/>
+    <movieclip id="n14" name="n14" src="hixt1v" xy="70,416" frame="1" playing="false"/>
+    <movieclip id="n15" name="n15" src="hixt1v" xy="298,227" pivot="0.5,0.5" size="155,144" alpha="0.33" rotation="-49" frame="1"/>
+    <component id="n18" name="n18" src="rpmb10" xy="170,426" size="84,42">
+      <Button title="点我" icon="ui://9leh0eyfhixt1v"/>
+    </component>
+    <movieclip id="n19" name="n19" src="t9fj5f" xy="172,111"/>
+    <movieclip id="n22" name="n22" src="hixt1v" xy="176,243" grayed="true"/>
+  </displayList>
+</component>hixt1v.xml|558|<movieclip pivot="30,29" interval="125" frameCount="15">
+  <frames>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,1,59,57"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,1,59,57"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,1,59,57"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,1,59,57"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,1,59,57"/>
+    <frame rect="0,0,59,56"/>
+    <frame rect="0,0,59,59"/>
+    <frame rect="0,0,59,59" addDelay="1041"/>
+  </frames>
+</movieclip>i3s65i.xml|635|<component size="200,17" idnum="5" extention="ScrollBar">
+  <displayList>
+    <image id="n0" name="n0" src="i3s65j" xy="0,0" size="200,17">
+      <relation target="" sidePair="width-width"/>
+    </image>
+    <graph id="n5" name="bar" xy="20,0" size="160,17">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <component id="n2" name="arrow1" src="i3s65k" xy="0,17" rotation="-90"/>
+    <component id="n3" name="arrow2" src="i3s65o" xy="180,17" rotation="-90">
+      <relation target="" sidePair="right-right"/>
+    </component>
+    <component id="n4" name="grip" src="i3s65s" xy="36,0"/>
+  </displayList>
+</component>i3s65k.xml|777|<component size="17,20" idnum="5" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="i3s65l" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="i3s65m" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="i3s65n" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>i3s65o.xml|777|<component size="17,20" idnum="4" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="i3s65p" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="i3s65q" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="i3s65r" xy="3,6" size="11,7">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>i3s65s.xml|777|<component size="20,17" idnum="5" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="i3s65t" xy="0,4" size="20,9">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="i3s65u" xy="0,4" size="20,9">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="i3s65v" xy="0,4" size="20,9">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>i3s65w.xml|609|<component size="17,200" idnum="6" extention="ScrollBar">
+  <displayList>
+    <image id="n0" name="n0" src="i3s65j" xy="0,0" size="17,200">
+      <relation target="" sidePair="height-height"/>
+    </image>
+    <component id="n1" name="arrow1" src="i3s65k" xy="0,0"/>
+    <component id="n2" name="arrow2" src="i3s65o" xy="0,180">
+      <relation target="" sidePair="bottom-bottom"/>
+    </component>
+    <graph id="n5" name="bar" xy="0,20" size="17,160">
+      <relation target="" sidePair="height-height"/>
+    </graph>
+    <component id="n4" name="grip" src="i3s65x" xy="0,33"/>
+  </displayList>
+</component>i3s65x.xml|777|<component size="17,20" idnum="5" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="i3s65t" xy="4,0" size="9,20">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="i3s65u" xy="4,0" size="9,20">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="i3s65v" xy="4,0" size="9,20">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>iehu7x.xml|859|<component size="52,49" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver,4,disabled,5,selectedDisabled" selected="1"/>
+  <displayList>
+    <image id="n4" name="n4" src="iehu7y" xy="1,0">
+      <gearDisplay controller="button" pages="4,5"/>
+    </image>
+    <image id="n3" name="n3" src="iehu7z" xy="4,-1">
+      <gearDisplay controller="button" pages="5"/>
+    </image>
+    <image id="n1" name="n1" src="rpmbq" xy="0,0" size="52,49">
+      <gearDisplay controller="button" pages="0,1,2,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbp" xy="3,-3" size="58,48">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button mode="Check"/>
+</component>iwqq89.xml|661|<movieclip pivot="0,0" interval="41" frameCount="13">
+  <frames>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+    <frame rect="0,0,24,24" addDelay="41"/>
+  </frames>
+</movieclip>kpev60.xml|673|<component size="100,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n13" name="n13" src="kpev61" xy="5,4"/>
+    <loader id="n4" name="icon" xy="6,6" size="88,88" align="center" vAlign="middle" fill="scale"/>
+    <image id="n12" name="n12" src="kpev62" xy="0,0"/>
+    <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
+    <image id="n11" name="n11" src="kpev63" xy="-4,-4">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+</component>l6f46x.xml|300|<component size="160,60" idnum="2">
+  <displayList>
+    <image id="n0" name="n0" src="l6f46y" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <list id="n1" name="list" xy="1,1" size="156,56" defaultItem="ui://9leh0eyfl6f46z"/>
+  </displayList>
+</component>l6f46z.xml|977|<component size="80,22" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="2"/>
+  <controller name="checked" pages="0,,1,,2," selected="0"/>
+  <displayList>
+    <image id="n14" name="n14" src="l6f470" xy="0,0" size="80,22">
+      <gearDisplay controller="button" pages="1,2,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n6" name="n6" src="l6f471" xy="18,0">
+      <relation target="" sidePair="height-height"/>
+    </image>
+    <text id="n1" name="title" xy="22,3" size="50,16" fontSize="12" autoSize="none" singleLine="true" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n3" name="icon" xy="1,1" size="16,20" align="center" vAlign="middle"/>
+    <image id="n13" name="n13" src="l6f472" xy="3,7">
+      <gearDisplay controller="checked" pages="2"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+</component>l6f473.xml|934|<component size="400,400">
+  <displayList>
+    <component id="n0" name="frame" src="rt103l" xy="0,0" size="400,400">
+      <relation target="" sidePair="width-width,height-height"/>
+      <Label title="Window A"/>
+    </component>
+    <component id="n2" name="n2" src="zd9g41" xy="33,47">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n5" name="n5" src="rpmb13" xy="108,320" pivot="90,35,0.5,0.5">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <list id="n6" name="n6" xy="39,98" size="335,215" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60"/>
+  </displayList>
+</component>mulj7p.xml|390|<component size="400,297">
+  <displayList>
+    <image id="n9" name="n9" src="rt103z" xy="0,0" size="400,297">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n10" name="n10" src="rpmbh" xy="67,117"/>
+    <image id="n11" name="n11" src="rpmbh" xy="188,117"/>
+    <image id="n12" name="n12" src="rpmbh" xy="300,117"/>
+  </displayList>
+</component>niii7b.xml|744|<component size="40,43" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="2"/>
+  <displayList>
+    <image id="n1" name="n1" src="niii7c" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="niii7c" xy="0,0" alpha="0.75">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="niii7c" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>niii7d.xml|544|<component size="388,272" extention="Label">
+  <displayList>
+    <graph id="n0" name="n0" xy="0,0" size="388,272" type="rect" lineSize="0" fillColor="#ff003300">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="dragArea" xy="4,7" size="383,256">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n2" name="closeButton" src="niii7b" xy="363,-15">
+      <relation target="" sidePair="right-right"/>
+    </component>
+  </displayList>
+</component>nz0z1z.xml|3858|<component size="1136,570">
+  <displayList>
+    <graph id="n16" name="n16" xy="621,183" size="471,211" type="rect" fillColor="#ff000000"/>
+    <graph id="n15" name="n15" xy="33,123" size="337,50" type="rect"/>
+    <text id="n2" name="n2" xy="33,123" size="337,50" fontSize="22" color="#cc3300" align="center" vAlign="middle" autoSize="none" text="Text Align"/>
+    <graph id="n14" name="n14" xy="34,183" size="459,160" type="rect" fillColor="#ff000000"/>
+    <text id="n0" name="n0" xy="41,61" size="159,26" fontSize="22" text="Auto Size text"/>
+    <text id="n3" name="n3" xy="218,61" size="125,26" fontSize="22" color="#993300" align="center" vAlign="middle" underline="true" bold="true" italic="true" text="Text Style"/>
+    <text id="n4" name="n4" xy="476,61" size="192,26" fontSize="22" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" text="Text with outline"/>
+    <text id="n5" name="n5" xy="34,183" size="459,160" fontSize="22" color="#ffffff" leading="12" ubb="true" autoSize="none" text="Support UBB grammer：&#xA;[color=#FF3300][b]FairyGUI Editor[/b][/color] is a [i]WYSWYG[/i][size=30] Game UI Editor[/size]，FairyGUI是一个所见即所得的[color=#FFFF00]游戏UI编辑器[/color]。"/>
+    <text id="n7" name="n7" xy="171,382" size="345,54" font="ui://9leh0eyfduef6m" fontSize="16" color="#ffffff" leading="12" autoSize="height" text="1234567890"/>
+    <text id="n8" name="n8" xy="31,386" size="126,26" fontSize="22" text="Bitmap Font"/>
+    <text id="n10" name="n10" xy="26,462" size="418,26" fontSize="22" ubb="true" text="Support fnt files generated by [b]BMFont[/b]"/>
+    <text id="n11" name="n11" xy="48,501" size="225,36" font="ui://9leh0eyfwa8u2r" fontSize="16" color="#993300" text="如何使用UI编辑器"/>
+    <richtext id="n12" name="n12" xy="621,183" size="471,211" fontSize="22" color="#ccff00" ubb="true" autoSize="none" text="RichText support click events, html tags(small set), support links and images. 多媒体文本支持点击/触摸事件，可以直接使用html标签（仅支持部分），可以带链接和图片。&#xA;&lt;img src='ui://9leh0eyfrpmb6'/>I am image&#xA;&lt;a href='event:xx'>I am link, click me&lt;/a>"/>
+    <text id="n17" name="n17" xy="39,12" size="478,26" fontSize="22" color="#ccff00" text="The quick brown fox jump sover the lazy dog"/>
+    <text id="n18" name="n18" xy="361,61" size="97,26" fontSize="22" color="#993300" align="center" vAlign="middle" underline="true" bold="true" italic="true" text="字体样式"/>
+    <text id="n19" name="n19" xy="686,61" size="93,26" fontSize="22" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" text="描边效果"/>
+    <text id="n20" name="n20" xy="622,136" size="329,28" font="Consolas" fontSize="22" color="#ccff00" text="Use system font(Unity5&amp;Web)"/>
+    <graph id="n21" name="n21" xy="688,430" size="348,35" type="rect"/>
+    <text id="n22" name="n22" xy="692,432" size="341,29" input="true" prompt="[i][color=#999999]Your Name Here[/color][/i]" fontSize="22" vAlign="middle" autoSize="none" singleLine="true" text=""/>
+    <text id="n23" name="n23" xy="563,435" size="120,26" fontSize="22" autoSize="height" text="Input Test"/>
+    <text id="n24" name="n24" xy="690,485" size="299,26" fontSize="22" color="#ff3300" autoSize="height" text=""/>
+    <component id="n25" name="n25" src="poiq7e" xy="999,480" size="119,36">
+      <Button title="Get Input"/>
+    </component>
+    <text id="n26" name="n26" xy="806,61" size="148,26" fontSize="22" ubb="true" strokeColor="#000000" text="[color=#FF9900,#FFFFFF]Gradient Text[/color]"/>
+    <text id="n27" name="n27" xy="972,61" size="148,26" fontSize="22" ubb="true" strokeColor="#000000" text="[color=#3399FF,#3399FF,#FFFFFF,#FFFFFF]Gradient Text[/color]"/>
+    <text id="n28" name="n28" xy="475,92" size="181,26" fontSize="22" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" shadowColor="#000000" shadowOffset="3,3" text="Text with shadow"/>
+  </displayList>
+</component>package.xml|14244|<packageDescription id="9leh0eyf" name="Basics">
+  <resources>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
+    <atlas id="atlas1" size="64,64" file="atlas1.png"/>
+    <component id="796x7a" name="WindowB" exported="true" size="400,203"/>
+    <component id="a7vt7n" name="GridItem" size="505,35"/>
+    <component id="atih7o" name="GridItem2" size="505,50"/>
+    <component id="c2z47l" name="Demo_Grid" exported="true" size="1136,570"/>
+    <component id="dyz47i" name="Button52" size="180,70"/>
+    <component id="es412y" name="Demo_Clip&amp;Scroll" exported="true" size="1136,570"/>
+    <component id="es412z" name="Component1" size="224,310"/>
+    <component id="eut94u" name="Slider1" size="480,45"/>
+    <component id="eut94x" name="Button13" size="50,50"/>
+    <component id="f2ax74" name="Component4" size="640,890"/>
+    <component id="fjqr7j" name="Component11" size="90,23"/>
+    <component id="fou97q" name="Demo_Depth" exported="true" size="1136,570"/>
+    <component id="fou97r" name="Component13" size="400,400"/>
+    <component id="gojg7s" name="Button16" size="100,100"/>
+    <component id="gx2b76" name="Demo_Popup" exported="true" size="1136,570"/>
+    <component id="gx2b77" name="Demo_Window" exported="true" size="640,400"/>
+    <component id="gx2b78" name="Demo_Drag&amp;Drop" exported="true" size="1136,570"/>
+    <component id="gx2b79" name="BagGridSub2" size="100,100"/>
+    <component id="gxip82" name="Component14" size="282,500"/>
+    <component id="gzpr81" name="CircleProgress" exported="true" size="99,99"/>
+    <component id="hixt1j" name="Button10" size="163,69"/>
+    <component id="hixt1m" name="Demo_Graph" exported="true" size="1136,570"/>
+    <component id="hixt1n" name="Demo_MovieClip" exported="true" size="1136,570"/>
+    <component id="i3s65i" name="ScrollBar_HZ" exported="true" size="200,17"/>
+    <component id="i3s65k" name="ScrollUpButton" size="17,20"/>
+    <component id="i3s65o" name="ScrollDownButton" size="17,20"/>
+    <component id="i3s65s" name="GripButton_HZ" size="20,17"/>
+    <component id="i3s65w" name="ScrollBar_VT" exported="true" size="17,200"/>
+    <component id="i3s65x" name="GripButton_VT" size="17,20"/>
+    <component id="iehu7x" name="Button82" size="52,49"/>
+    <component id="kpev60" name="BagGridSub" size="100,100"/>
+    <component id="l6f46x" name="PopupMenu" exported="true" size="160,60"/>
+    <component id="l6f46z" name="PopupMenuItem" size="80,22"/>
+    <component id="l6f473" name="WindowA" exported="true" size="400,400"/>
+    <component id="mulj7p" name="Component12" exported="true" size="400,297"/>
+    <component id="niii7b" name="CloseButton" size="40,43"/>
+    <component id="niii7d" name="WindowFrameB" size="388,272"/>
+    <component id="nz0z1z" name="Demo_Text" exported="true" size="1136,570"/>
+    <component id="poiq7e" name="Button1" size="100,36"/>
+    <component id="qa477h" name="Component6" size="250,250"/>
+    <component id="rpmb10" name="Button2" size="85,40"/>
+    <component id="rpmb11" name="Button3" size="85,40"/>
+    <component id="rpmb12" name="Button4" size="131,45"/>
+    <component id="rpmb13" name="Button5" size="180,70"/>
+    <component id="rpmb14" name="Button6" size="66,44"/>
+    <component id="rpmb15" name="Button7" size="69,62"/>
+    <component id="rpmb16" name="Button8" size="52,49"/>
+    <component id="rpmb17" name="Button9" size="159,52"/>
+    <component id="rpmb18" name="Checkbox" size="20,19"/>
+    <component id="rpmb19" name="OnOffButton" size="100,40"/>
+    <component id="rpmb1a" name="RadioButton" size="29,19"/>
+    <component id="rpmb1b" name="Demo_Button" exported="true" size="1136,570"/>
+    <component id="rpmb1c" name="Main" exported="true" size="1136,640"/>
+    <component id="rpmbz" name="Button" size="85,25"/>
+    <component id="rt103l" name="WindowFrame" size="157,202"/>
+    <component id="rt103n" name="WindowCloseButton" size="19,19"/>
+    <component id="rt103r" name="Component3" size="348,62"/>
+    <component id="rt103s" name="Demo_ComboBox" exported="true" size="1136,570"/>
+    <component id="rt103t" name="ComboBox" size="100,20"/>
+    <component id="rt103y" name="ComboBoxPopup" size="158,58"/>
+    <component id="rt1040" name="ComboBoxItem" size="100,19"/>
+    <component id="smv731" name="Component7" size="225,310"/>
+    <component id="smv73f" name="Component2" size="341,151"/>
+    <component id="smv73g" name="Component8" size="225,343"/>
+    <component id="smv73h" name="Component9" size="341,151"/>
+    <component id="smv73i" name="Component10" size="425,120"/>
+    <component id="sner1i" name="Demo_Image" exported="true" size="1136,570"/>
+    <component id="srct86" name="Slider2_grip" size="56,57"/>
+    <component id="srct87" name="Slider2" size="361,23"/>
+    <component id="suiz4i" name="Slider_HZ" size="112,23"/>
+    <component id="suiz4l" name="SliderArrow_HZ" size="10,19"/>
+    <component id="suiz4o" name="Slider_VT" size="23,112"/>
+    <component id="suiz4r" name="SliderArrow_VT" size="19,10"/>
+    <component id="t24n7f" name="Demo_Component" exported="true" size="1136,570"/>
+    <component id="t24n7g" name="Component5" size="250,250"/>
+    <component id="t9fj50" name="ProgressBar" size="145,12"/>
+    <component id="t9fj53" name="ProgressBar6" size="105,21"/>
+    <component id="t9fj57" name="ProgressBar3" size="277,32"/>
+    <component id="t9fj59" name="ProgressBar1" size="227,30"/>
+    <component id="t9fj5b" name="ProgressBar5" size="577,53"/>
+    <component id="t9fj5g" name="ProgressBar4" size="277,32"/>
+    <component id="t9fj5h" name="ProgressBar2" size="227,30"/>
+    <component id="w42o3j" name="Demo_Label" exported="true" size="1136,570"/>
+    <component id="wa8u2s" name="Demo_Loader" exported="true" size="1136,570"/>
+    <component id="wa8u2v" name="Demo_Controller" exported="true" size="1136,570"/>
+    <component id="wa8u2x" name="Demo_Relation" exported="true" size="1136,570"/>
+    <component id="zd9g41" name="Dropdown" size="132,40"/>
+    <component id="zd9g42" name="Button15" size="132,40"/>
+    <component id="zd9g47" name="Dropdown2" size="100,100"/>
+    <component id="zd9g49" name="Button14" size="102,40"/>
+    <component id="zd9g4e" name="Demo_Slider" exported="true" size="1136,570"/>
+    <component id="zd9g4f" name="Demo_ProgressBar" exported="true" size="1136,570"/>
+    <component id="zd9g4g" name="Demo_List" exported="true" size="1136,570"/>
+    <font id="duef6m" name="HitNumber" exported="true"/>
+    <font id="wa8u2r" name="BMFontTest" exported="true"/>
+    <image id="a7vt7m" name="grid_header.png" size="200,20" scale="9grid" scale9grid="50,5,100,10"/>
+    <image id="duef6n" name="h0" size="50,50"/>
+    <image id="duef6o" name="h1" size="50,50"/>
+    <image id="duef6p" name="h2" size="50,50"/>
+    <image id="duef6q" name="h3" size="50,50"/>
+    <image id="duef6r" name="h4" size="50,50"/>
+    <image id="duef6s" name="h5" size="50,50"/>
+    <image id="duef6t" name="h6" size="50,50"/>
+    <image id="duef6u" name="h7" size="50,50"/>
+    <image id="duef6v" name="h8" size="50,50"/>
+    <image id="duef6w" name="h9" size="50,50"/>
+    <image id="es4130" name="change" size="282,500" scale="tile"/>
+    <image id="eut94v" name="k33" size="480,26"/>
+    <image id="eut94w" name="k34" size="420,15" scale="9grid" scale9grid="41,4,342,5"/>
+    <image id="eut94y" name="b3" size="25,22"/>
+    <image id="eut94z" name="b2" size="25,22"/>
+    <image id="fjqr7k" name="start" size="90,23" scale="tile"/>
+    <image id="gojg7t" name="22" size="97,97"/>
+    <image id="gzpr80" name="Shape 1 copy 4" size="99,99"/>
+    <image id="h5p722" name="i256" size="90,90"/>
+    <image id="hixt1k" name="b4" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="hixt1l" name="b5" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="i3s65j" name="s10.png" size="17,20"/>
+    <image id="i3s65l" name="s6.png" size="11,7"/>
+    <image id="i3s65m" name="s4.png" size="11,7"/>
+    <image id="i3s65n" name="s5.png" size="11,7"/>
+    <image id="i3s65p" name="s9.png" size="11,7"/>
+    <image id="i3s65q" name="s7.png" size="11,7"/>
+    <image id="i3s65r" name="s8.png" size="11,7"/>
+    <image id="i3s65t" name="s1.png" size="9,20"/>
+    <image id="i3s65u" name="s2.png" size="9,20"/>
+    <image id="i3s65v" name="s3.png" size="9,20"/>
+    <image id="iehu7y" name="k36" size="49,49"/>
+    <image id="iehu7z" name="k35" size="55,46"/>
+    <image id="kpev61" name="k0" size="90,91"/>
+    <image id="kpev62" name="k2" size="100,100"/>
+    <image id="kpev63" name="k1" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="l6f46y" name="p16.png" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
+    <image id="l6f470" name="a8.png" size="88,20" scale="9grid" scale9grid="8,5,70,10"/>
+    <image id="l6f471" name="VtSeperator" size="2,22"/>
+    <image id="l6f472" name="a18.png" size="12,9"/>
+    <image id="niii7c" name="close.png" size="40,43"/>
+    <image id="nz0z20" name="long_dead2.png" size="32,32" scale="tile"/>
+    <image id="rpmb1" name="VIP.png" size="181,70"/>
+    <image id="rpmb2" name="a1.png" size="13,13"/>
+    <image id="rpmb3" name="a2.png" size="13,13"/>
+    <image id="rpmb4" name="a3.png" size="13,13"/>
+    <image id="rpmb5" name="a4.png" size="13,13"/>
+    <image id="rpmb6" name="angry_smile.png" size="32,32"/>
+    <image id="rpmb7" name="b1.png" size="13,13"/>
+    <image id="rpmb8" name="b12.png" size="100,40"/>
+    <image id="rpmb9" name="b13.png" size="100,40"/>
+    <image id="rpmba" name="b2.png" size="13,13"/>
+    <image id="rpmbb" name="b3.png" size="13,13"/>
+    <image id="rpmbc" name="b4.png" size="13,13"/>
+    <image id="rpmbd" name="b5.png" size="85,25" scale="9grid" scale9grid="12,7,61,14"/>
+    <image id="rpmbe" name="b6.png" size="85,25" scale="9grid" scale9grid="9,5,66,16"/>
+    <image id="rpmbf" name="b7.png" size="85,25" scale="9grid" scale9grid="8,7,66,14"/>
+    <image id="rpmbg" name="long_dead.png" size="32,32"/>
+    <image id="rpmbh" name="plus_smile.png" size="32,32"/>
+    <image id="rpmbi" name="b1" size="70,52"/>
+    <image id="rpmbj" name="k3" size="62,34" scale="9grid" scale9grid="16,9,32,6"/>
+    <image id="rpmbk" name="k4" size="66,44"/>
+    <image id="rpmbl" name="k5" size="66,44"/>
+    <image id="rpmbm" name="k6" size="62,41" scale="9grid" scale9grid="16,11,32,7"/>
+    <image id="rpmbn" name="k8" size="69,62"/>
+    <image id="rpmbo" name="k9" size="69,62"/>
+    <image id="rpmbp" name="k10" size="55,46"/>
+    <image id="rpmbq" name="k11" size="49,49"/>
+    <image id="rpmbr" name="k12" size="159,52" scale="9grid" scale9grid="40,19,80,18"/>
+    <image id="rpmbs" name="k14" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbt" name="k13" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbu" name="k18" size="110,27"/>
+    <image id="rpmbv" name="k20" size="131,45"/>
+    <image id="rpmbw" name="k25" size="36,24"/>
+    <image id="rpmbx" name="k26" size="37,24"/>
+    <image id="rt103m" name="6.png" size="157,202" scale="9grid" scale9grid="40,40,80,142"/>
+    <image id="rt103o" name="10.png" size="19,19"/>
+    <image id="rt103p" name="9.png" size="19,19"/>
+    <image id="rt103q" name="8.png" size="19,19"/>
+    <image id="rt103u" name="c1.png" size="93,21" scale="9grid" scale9grid="7,5,73,10"/>
+    <image id="rt103v" name="c3.png" size="93,21" scale="9grid" scale9grid="11,5,71,10"/>
+    <image id="rt103w" name="c2.png" size="93,21" scale="9grid" scale9grid="8,5,73,10"/>
+    <image id="rt103x" name="b7(2).png" size="15,16"/>
+    <image id="rt103z" name="p1.png" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
+    <image id="sner1h" name="pic" size="179,386"/>
+    <image id="srct83" name="back btn" size="56,57"/>
+    <image id="srct84" name="full bar" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
+    <image id="srct85" name="background" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="suiz4j" name="p10.png" size="112,23"/>
+    <image id="suiz4k" name="p11.png" size="62,3"/>
+    <image id="suiz4m" name="p14.png" size="10,19"/>
+    <image id="suiz4n" name="p15.png" size="10,19"/>
+    <image id="suiz4p" name="p13.png" size="23,112"/>
+    <image id="suiz4q" name="p12.png" size="3,62"/>
+    <image id="suiz4s" name="p8.png" size="19,10"/>
+    <image id="suiz4t" name="p9.png" size="19,10"/>
+    <image id="t9fj51" name="p2.png" size="145,12" scale="9grid" scale9grid="10,4,121,4"/>
+    <image id="t9fj52" name="p3.png" size="53,6"/>
+    <image id="t9fj54" name="k17" size="105,21" scale="9grid" scale9grid="27,9,54,2"/>
+    <image id="t9fj55" name="k16" size="32,11" scale="9grid" scale9grid="8,5,16,2"/>
+    <image id="t9fj56" name="k7" size="89,26"/>
+    <image id="t9fj58" name="caiji" size="277,32"/>
+    <image id="t9fj5a" name="caiji2" size="227,30"/>
+    <image id="t9fj5c" name="loading.png" size="4,16"/>
+    <image id="t9fj5d" name="huawen1.png" size="85,59"/>
+    <image id="t9fj5e" name="huawen2.png" size="88,59"/>
+    <image id="wa8u2t" name="r3" size="90,90" exported="true"/>
+    <image id="wa8u2u" name="r4" size="89,90" exported="true"/>
+    <image id="zd9g43" name="k30" size="132,40" scale="9grid" scale9grid="33,10,57,20"/>
+    <image id="zd9g44" name="k28" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g45" name="k31" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g46" name="k29" size="132,40" scale="9grid" scale9grid="33,10,53,20"/>
+    <image id="zd9g48" name="k32" size="104,42" scale="9grid" scale9grid="26,11,52,22"/>
+    <image id="zd9g4a" name="k23" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4b" name="k21" size="102,40" scale="9grid" scale9grid="11,7,82,26"/>
+    <image id="zd9g4c" name="k24" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4d" name="k22" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <movieclip id="hixt1v" name="nlge1k" size="59,59"/>
+    <movieclip id="iwqq89" name="gz" size="24,24"/>
+    <movieclip id="t9fj5f" name="pet" size="84,74"/>
+    <sound id="gojg7u" name="tabswitch" file="gojg7u.wav" exported="true"/>
+    <sound id="o4lt7w" name="click" file="o4lt7w.wav" exported="true"/>
+  </resources>
+</packageDescription>poiq7e.xml|1149|<component size="100,36" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fff0f0f0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n2" name="n2" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#fffafafa">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="100,36" touchable="false" type="rect" lineSize="0" fillColor="#ffcccccc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n4" name="title" xy="0,0" size="100,36" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>qa477h.xml|548|<component size="250,250">
+  <displayList>
+    <image id="n1" name="n1" src="rt103m" xy="0,0" size="250,250">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n2" name="n2" xy="70,110" size="109,30" fontSize="26" color="#ffffff" strokeColor="#000000" text="居中文字">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+    <image id="n3" name="n3" src="rpmbx" xy="198,212">
+      <relation target="" sidePair="right-right,bottom-bottom"/>
+    </image>
+  </displayList>
+</component>rpmb10.xml|1071|<component size="85,40" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbf" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbd" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbe" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n4" name="title" xy="41,3" size="40,34" fontSize="12" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n5" name="icon" xy="3,3" size="32,32" align="center" vAlign="middle" fill="scale"/>
+  </displayList>
+  <Button/>
+</component>rpmb11.xml|1136|<component size="85,40" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbf" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbd" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbe" xy="0,0" size="85,40">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n4" name="title" xy="4,3" size="40,34" fontSize="12" align="right" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n5" name="icon" xy="48,3" size="32,32" align="center" vAlign="middle">
+      <relation target="" sidePair="right-right"/>
+    </loader>
+  </displayList>
+  <Button/>
+</component>rpmb12.xml|532|<component size="131,45" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n0" name="n0" src="rpmbv" xy="0,0"/>
+    <image id="n2" name="n2" src="rpmbx" xy="79,12"/>
+    <image id="n3" name="n3" src="rpmbw" xy="14,13"/>
+    <image id="n1" name="n1" src="rpmbi" xy="-5,-1">
+      <gearXY controller="button" pages="0,1,2,3" values="-|64,-1|-|64,-1" default="-5,-1" tween="true"/>
+    </image>
+  </displayList>
+  <Button mode="Check"/>
+</component>rpmb13.xml|758|<component size="180,70" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n0" name="bg" src="rpmb1" xy="2,3" size="181,70">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n1" name="title" xy="10,10" size="157,46" fontSize="22" color="#ffff00" align="center" vAlign="middle" autoSize="none" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n2" name="icon" xy="10,7" size="160,49" align="center" vAlign="middle">
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.80"/>
+</component>rpmb14.xml|1396|<component size="66,44" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="2"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbl" xy="0,0" size="66,44">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbj" xy="0,0" size="66,37">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbm" xy="0,0" size="66,44">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n4" name="n4" src="rpmbk" xy="0,0" size="66,44">
+      <gearDisplay controller="button" pages="3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <loader id="n6" name="icon" xy="0,0" size="66,30" align="center" vAlign="middle"/>
+    <text id="n5" name="title" xy="0,0" size="66,25" fontSize="16" color="#ffffff" align="center" leading="0" autoSize="none" strokeColor="#000000" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+      <gearColor controller="button" pages="0,1,2,3" values="#ffffff|-|#ffffff|-" default="#dfb536"/>
+    </text>
+  </displayList>
+  <Button mode="Radio"/>
+</component>rpmb15.xml|511|<component size="69,62" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="rpmbo" name="n1" xy="0,0">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="rpmbn" name="n2" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>rpmb16.xml|594|<component size="52,49" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbq" xy="0,0" size="52,49">
+      <gearDisplay controller="button" pages="0,1,2,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbp" xy="3,-3" size="58,48">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <Button mode="Check"/>
+</component>rpmb17.xml|1248|<component size="159,52" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbs" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <gearLook controller="button" pages="0,2" values="1.00,0,0|0.00,0,0" default="1.00,0,0" tween="true" ease="Quad.Out" duration="0.5"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbr" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbt" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <gearLook controller="button" pages="0,2" values="0.00,0,0|1.00,0,0" default="1.00,0,0" tween="true" ease="Quad.Out" duration="0.5"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n5" name="title" xy="0,7" size="159,45" fontSize="18" color="#dfb536" align="center" vAlign="middle" autoSize="none" strokeColor="#000000" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>rpmb18.xml|843|<component size="20,19" idnum="6" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbc" xy="0,2">
+      <gearDisplay controller="button" pages="0"/>
+    </image>
+    <image id="n2" name="n2" src="rpmb7" xy="0,2">
+      <gearDisplay controller="button" pages="1"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbb" xy="0,2">
+      <gearDisplay controller="button" pages="2"/>
+    </image>
+    <image id="n4" name="n4" src="rpmba" xy="0,2">
+      <gearDisplay controller="button" pages="3"/>
+    </image>
+    <text id="n5" name="title" xy="13,1" size="10,19" fontSize="12" autoSize="none" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button mode="Check"/>
+</component>rpmb19.xml|940|<component size="100,40" overflow="hidden" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n0" name="n0" src="rpmb8" xy="-100,0">
+      <gearDisplay controller="button" pages="0,2"/>
+      <gearXY controller="button" pages="0,1,2,3" values="-|-100,0|-|-100,0" default="0,0" tween="true" ease="Quad.Out"/>
+    </image>
+    <image id="n1" name="n1" src="rpmb9" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <gearXY controller="button" pages="0,1,2,3" values="-|0,0|-|0,0" default="100,0" tween="true" ease="Quad.Out"/>
+    </image>
+    <text id="n4" name="title" xy="0,0" size="64,40" fontSize="24" color="#ffffff" align="center" vAlign="middle" autoSize="none" text="">
+      <gearXY controller="button" pages="0,1,2,3" values="37,0|0,0|37,0|0,0" default="14,6"/>
+    </text>
+  </displayList>
+  <Button mode="Check"/>
+</component>rpmb1a.xml|829|<component size="29,19" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmb2" xy="0,3">
+      <gearDisplay controller="button" pages="0"/>
+    </image>
+    <image id="n2" name="n2" src="rpmb4" xy="0,3">
+      <gearDisplay controller="button" pages="1"/>
+    </image>
+    <image id="n3" name="n3" src="rpmb3" xy="0,3">
+      <gearDisplay controller="button" pages="2"/>
+    </image>
+    <image id="n4" name="n4" src="rpmb5" xy="0,3">
+      <gearDisplay controller="button" pages="3"/>
+    </image>
+    <text id="n5" name="title" xy="13,1" size="10,19" fontSize="12" autoSize="none" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button mode="Radio"/>
+</component>rpmb1b.xml|3984|<component size="1136,570">
+  <controller name="RadioGroup" pages="0,,1,,2," selected="0"/>
+  <controller name="tab" pages="0,,1,,2," selected="0"/>
+  <displayList>
+    <graph id="n26" name="n26" xy="705,154" size="246,116" type="rect" fillColor="#ff333333"/>
+    <component id="n3" name="n3" src="rpmbz" xy="30,26">
+      <Button title="Simple"/>
+    </component>
+    <component id="n4" name="n4" src="rpmb18" xy="42,145" size="88,19">
+      <Button title="CheckBox"/>
+    </component>
+    <component id="n5" name="n5" src="rpmb1a" xy="161,145" size="86,19">
+      <Button title="Radio"/>
+    </component>
+    <component id="n6" name="n6" src="rpmb10" xy="158,19" size="113,40">
+      <Button title="Click Me" icon="ui://9leh0eyfrpmb6"/>
+    </component>
+    <component id="n7" name="n7" src="rpmb12" xy="278,298"/>
+    <text id="n8" name="n8" xy="38,308" size="203,26" fontSize="22" text="Transition Effect:"/>
+    <component id="n11" name="n11" src="rpmb11" xy="330,22" size="88,40">
+      <Button title="点我" icon="ui://9leh0eyfrpmb6"/>
+    </component>
+    <component id="n12" name="n12" src="rpmb16" xy="281,129">
+      <Button checked="true"/>
+    </component>
+    <component id="n13" name="n13" src="rpmb13" xy="489,20">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <component id="n15" name="n15" src="rpmb15" xy="704,19"/>
+    <component id="n16" name="n16" src="rpmb19" xy="473,300">
+      <Button title="On" selectedTitle="Off"/>
+    </component>
+    <component id="n17" name="n17" src="rpmb17" xy="627,289">
+      <Button title="Fade In Out"/>
+    </component>
+    <component id="n18" name="n18" src="rpmb1a" xy="408,158" size="86,19">
+      <Button checked="true" title="Option1" controller="RadioGroup" page="0"/>
+    </component>
+    <component id="n19" name="n19" src="rpmb1a" xy="408,190" size="86,19">
+      <Button title="Option2" controller="RadioGroup" page="1"/>
+    </component>
+    <component id="n20" name="n20" src="rpmb1a" xy="408,220" size="86,19">
+      <Button title="Option3" controller="RadioGroup" page="2"/>
+    </component>
+    <text id="n21" name="n21" xy="410,125" size="115,26" fontSize="22" text="RadioGroup"/>
+    <text id="n22" name="n22" xy="728,123" size="49,26" fontSize="22" text="Tabs"/>
+    <component id="n23" name="n23" src="rpmb14" xy="725,161">
+      <Button checked="true" title="Tab1" controller="tab" page="0"/>
+    </component>
+    <component id="n24" name="n24" src="rpmb14" xy="794,161">
+      <Button title="Tab2" controller="tab" page="1"/>
+    </component>
+    <component id="n25" name="n25" src="rpmb14" xy="867,161">
+      <Button title="Tab3" controller="tab" page="2"/>
+    </component>
+    <image id="n29" name="n29" src="rpmb6" xy="815,221">
+      <gearDisplay controller="tab" pages="0"/>
+    </image>
+    <image id="n30" name="n30" src="rpmbg" xy="816,221">
+      <gearDisplay controller="tab" pages="1"/>
+    </image>
+    <image id="n31" name="n31" src="rpmbh" xy="815,221">
+      <gearDisplay controller="tab" pages="2"/>
+    </image>
+    <component id="n32" name="n32" src="rpmb13" xy="48,413" touchable="false" grayed="true">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <text id="n33" name="n33" xy="38,373" size="390,26" fontSize="22" text="Disable button: grayed+no touchable"/>
+    <component id="n34" name="n34" src="poiq7e" xy="832,28" size="145,48">
+      <Button title="简单按钮"/>
+    </component>
+    <component id="n35" name="n35" src="dyz47i" xy="469,437" grayed="true">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <text id="n36" name="n36" xy="451,374" size="376,51" fontSize="22" autoSize="height" text="Custom grayed&#xA;(Use a controller named 'grayed')"/>
+    <text id="n37" name="n37" xy="849,369" size="282,51" fontSize="22" autoSize="height" text="Custom grayed&#xA;(Use disabled page)"/>
+    <component id="n38" name="n38" src="iehu7x" xy="870,437" grayed="true">
+      <Button checked="true"/>
+    </component>
+  </displayList>
+</component>rpmb1c.xml|3955|<component size="1136,640" overflow="hidden">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <displayList>
+    <graph id="n26" name="n26" xy="0,70" size="1136,570" type="rect" lineSize="0" fillColor="#ff9f9f9f">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n25" name="container" src="f2ax74" xy="-1143,70" size="1136,570">
+      <gearDisplay controller="c1" pages="1"/>
+      <gearXY controller="c1" pages="0,1" values="-1143,70|-" default="0,70" tween="true"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <graph id="n21" name="n21" xy="0,0" size="1136,70" type="rect" fillColor="#ff006699">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <component id="n22" name="btn_Back" src="hixt1j" xy="963,-1">
+      <relation target="" sidePair="right-right"/>
+      <Button title="&lt;&lt;Back"/>
+    </component>
+    <component id="n2" name="btn_Button" src="hixt1j" xy="462,298" group="n23">
+      <Button title="Button"/>
+    </component>
+    <component id="n3" name="btn_Image" src="hixt1j" xy="274,100" group="n23">
+      <Button title="Image"/>
+    </component>
+    <component id="n4" name="btn_Graph" src="hixt1j" xy="86,100" group="n23">
+      <Button title="Graph"/>
+    </component>
+    <component id="n5" name="btn_MovieClip" src="hixt1j" xy="462,100" group="n23">
+      <Button title="MovieClip"/>
+    </component>
+    <component id="n6" name="btn_Depth" src="hixt1j" xy="650,397" group="n23">
+      <Button title="Depth"/>
+    </component>
+    <component id="n7" name="btn_Loader" src="hixt1j" xy="838,100" group="n23">
+      <Button title="Loader"/>
+    </component>
+    <component id="n8" name="btn_List" src="hixt1j" xy="86,199" group="n23">
+      <Button title="List"/>
+    </component>
+    <component id="n9" name="btn_ProgressBar" src="hixt1j" xy="86,397" group="n23">
+      <Button title="ProgressBar"/>
+    </component>
+    <component id="n10" name="btn_Slider" src="hixt1j" xy="838,298" group="n23">
+      <Button title="Slider"/>
+    </component>
+    <component id="n11" name="btn_ComboBox" src="hixt1j" xy="650,298" group="n23">
+      <Button title="ComboBox"/>
+    </component>
+    <component id="n12" name="btn_Clip&amp;Scroll" src="hixt1j" xy="838,199" size="163,69" group="n23">
+      <Button title="Clip&amp;Scroll"/>
+    </component>
+    <component id="n13" name="btn_Controller" src="hixt1j" xy="462,199" group="n23">
+      <Button title="Controller"/>
+    </component>
+    <component id="n14" name="btn_Relation" src="hixt1j" xy="650,199" group="n23">
+      <Button title="Relation"/>
+    </component>
+    <component id="n17" name="btn_Label" src="hixt1j" xy="274,298" group="n23">
+      <Button title="Label"/>
+    </component>
+    <component id="n18" name="btn_Popup" src="hixt1j" xy="274,397" group="n23">
+      <Button title="Popup"/>
+    </component>
+    <component id="n19" name="btn_Window" src="hixt1j" xy="462,397" group="n23">
+      <Button title="Window"/>
+    </component>
+    <component id="n20" name="btn_Drag&amp;Drop" src="hixt1j" xy="838,397" group="n23">
+      <Button title="Drag&amp;Drop"/>
+    </component>
+    <component id="n27" name="btn_Component" src="hixt1j" xy="86,298" group="n23">
+      <Button title="Component"/>
+    </component>
+    <component id="n28" name="btn_Grid" src="hixt1j" xy="274,199" group="n23">
+      <Button title="Grid"/>
+    </component>
+    <component id="n29" name="btn_Text" src="hixt1j" xy="650,100" group="n23">
+      <Button title="Text"/>
+    </component>
+    <group id="n23" name="btns" xy="86,100" size="915,366" advanced="true">
+      <gearDisplay controller="c1" pages="0"/>
+      <gearXY controller="c1" pages="0,1" values="86,100|1159,100" default="31,102" tween="true"/>
+    </group>
+    <text id="n24" name="n24" xy="13,12" size="276,47" font="微软雅黑" fontSize="35" color="#ff9900" bold="true" text="FairyGUI-Demo"/>
+  </displayList>
+</component>rpmbz.xml|946|<component size="85,25" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rpmbf" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rpmbd" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rpmbe" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n4" name="title" xy="0,2" size="85,22" fontSize="12" align="center" vAlign="middle" autoSize="none" singleLine="true" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>rt103l.xml|811|<component size="157,202" extention="Label">
+  <displayList>
+    <image id="n0" name="n0" src="rt103m" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <component id="n1" name="closeButton" src="rt103n" xy="133,5">
+      <relation target="" sidePair="right-right"/>
+    </component>
+    <graph id="n3" name="dragArea" xy="6,4" size="123,22">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n2" name="title" xy="36,6" size="83,18" fontSize="12" color="#ffffff" align="center" autoSize="none" text="窗口标题">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <graph id="n4" name="contentArea" xy="4,27" size="150,172">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+  </displayList>
+</component>rt103n.xml|689|<component size="19,19" extention="Button" idnum="4">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="rt103o" name="n1" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="rt103p" name="n2" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n3" src="rt103q" name="n3" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>rt103r.xml|515|<component size="348,62" extention="Label">
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="348,62" type="rect" fillColor="#ff003333">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <loader id="n0" name="icon" xy="6,5" size="54,50" align="center" vAlign="middle"/>
+    <text id="n1" name="title" xy="66,21" size="274,20" fontSize="16" color="#ffffff" autoSize="none" text="">
+      <relation target="" sidePair="width-width"/>
+    </text>
+  </displayList>
+</component>rt103s.xml|1533|<component size="1136,570">
+  <displayList>
+    <component id="n1" name="n1" src="rt103t" xy="83,64">
+      <ComboBox visibleItemCount="10">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+        <item title="Item 8"/>
+      </ComboBox>
+    </component>
+    <component id="n4" name="n4" src="zd9g41" xy="258,137">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n5" name="n5" src="zd9g41" xy="80,141">
+      <ComboBox visibleItemCount="10">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n6" name="n6" src="rt103t" xy="256,66">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+        <item title="Item 8"/>
+      </ComboBox>
+    </component>
+  </displayList>
+</component>rt103t.xml|1052|<component size="100,20" extention="ComboBox">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="rt103u" xy="0,0" size="100,20">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="rt103v" xy="0,0" size="100,20">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="rt103w" xy="0,0" size="100,20">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n4" name="title" xy="2,2" size="78,16" fontSize="12" color="#ffcc00" autoSize="none" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <image id="n5" name="n5" src="rt103x" xy="83,2"/>
+  </displayList>
+  <ComboBox dropdown="ui://9leh0eyfrt103y"/>
+</component>rt103y.xml|344|<component size="158,58">
+  <displayList>
+    <image id="n0" name="n0" src="rt103z" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <list id="n1" name="list" xy="0,1" size="157,56" overflow="scroll" scrollBarFlags="4" margin="0,0,0,0" defaultItem="ui://9leh0eyfrt1040"/>
+  </displayList>
+</component>rt1040.xml|781|<component size="100,19" idnum="3" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="100,19" type="rect" lineSize="0" lineColor="#00ff9966" fillColor="#ff3399ff">
+      <gearDisplay controller="button" pages="1,2,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n1" name="title" xy="1,1" size="100,17" fontSize="12" vAlign="middle" autoSize="none" singleLine="true" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+      <gearColor controller="button" pages="0,1,2,3" values="-|#ffffff|#ffffff|#ffffff" default="#000000"/>
+    </text>
+  </displayList>
+  <Button mode="Radio"/>
+</component>smv731.xml|157|<component size="225,310" overflow="scroll" scroll="both">
+  <displayList>
+    <image id="n1" name="n1" src="es4130" xy="0,0"/>
+  </displayList>
+</component>smv73f.xml|417|<component size="341,151" overflow="scroll">
+  <displayList>
+    <text id="n0" name="n0" xy="0,0" size="308,268" fontSize="14" color="#cccccc" leading="11" autoSize="height" text="三体人在利用魔法般的科技锁死了地球人的科学之后，庞大的宇宙舰队直扑太阳系，意欲清除地球文明。&#xA;面对前所未有的危局，经历过无数磨难的地球人组建起同样庞大的太空舰队，同时，利用三体人思维透明的致命缺陷，制订了神秘莫测的“面壁计划”，精选出四位“面壁者”。秘密展开对三体人的反击。&#xA;三体人自身虽然无法识破人类的诡谲计谋，却依靠由地球人中的背叛者挑选出的“破壁人”，与“面壁者”展开智慧博弈。[9] "/>
+  </displayList>
+</component>smv73g.xml|178|<component size="225,343" overflow="scroll" scroll="both" margin="30,30,30,30">
+  <displayList>
+    <image id="n1" name="n1" src="es4130" xy="0,0"/>
+  </displayList>
+</component>smv73h.xml|436|<component size="341,151" overflow="scroll" scrollBarFlags="1">
+  <displayList>
+    <text id="n0" name="n0" xy="0,0" size="318,268" fontSize="14" color="#cccccc" leading="11" autoSize="height" text="三体人在利用魔法般的科技锁死了地球人的科学之后，庞大的宇宙舰队直扑太阳系，意欲清除地球文明。&#xA;面对前所未有的危局，经历过无数磨难的地球人组建起同样庞大的太空舰队，同时，利用三体人思维透明的致命缺陷，制订了神秘莫测的“面壁计划”，精选出四位“面壁者”。秘密展开对三体人的反击。&#xA;三体人自身虽然无法识破人类的诡谲计谋，却依靠由地球人中的背叛者挑选出的“破壁人”，与“面壁者”展开智慧博弈。[9] "/>
+  </displayList>
+</component>smv73i.xml|464|<component size="425,120" overflow="scroll" scroll="horizontal" scrollBarMargin="0,0,100,0">
+  <displayList>
+    <text id="n0" name="n0" xy="0,0" size="914,93" fontSize="14" color="#cccccc" leading="11" autoSize="height" text="三体人在利用魔法般的科技锁死了地球人的科学之后，庞大的宇宙舰队直扑太阳系，意欲清除地球文明。&#xA;面对前所未有的危局，经历过无数磨难的地球人组建起同样庞大的太空舰队，同时，利用三体人思维透明的致命缺陷，制订了神秘莫测的“面壁计划”，精选出四位“面壁者”。秘密展开对三体人的反击。&#xA;三体人自身虽然无法识破人类的诡谲计谋，却依靠由地球人中的背叛者挑选出的“破壁人”，与“面壁者”展开智慧博弈。[9] "/>
+  </displayList>
+</component>sner1i.xml|1294|<component size="1136,570" overflow="scroll" scrollBar="hidden">
+  <displayList>
+    <image id="n6" name="n6" src="sner1h" xy="19,63"/>
+    <image id="n7" name="n7" src="sner1h" xy="197,63" color="#66ff00" flip="hz"/>
+    <image id="n8" name="n8" src="sner1h" xy="709,109" size="179,223" alpha="0.62" color="#707070" flip="vt"/>
+    <image id="n9" name="n9" src="sner1h" xy="434,222" size="130,142" rotation="-39" color="#5e5e5e"/>
+    <text id="n11" name="n11" xy="38,463" size="1028,51" fontSize="22" autoSize="height" text="9 Grid and tile scale mode supported.Double click the image in library panel to change the settings."/>
+    <image id="n12" name="n12" src="rt103m" xy="23,567" size="294,173"/>
+    <text id="n14" name="n14" xy="135,535" size="71,26" fontSize="22" text="9 Grid"/>
+    <image id="n15" name="n15" src="nz0z20" xy="379,571" size="209,165"/>
+    <text id="n16" name="n16" xy="457,537" size="49,26" fontSize="22" text="Tile"/>
+    <image id="n17" name="n17" src="nz0z20" xy="383,747" size="209,165" grayed="true" flip="both"/>
+    <image id="n18" name="n18" src="rt103m" xy="25,743" size="294,173" grayed="true" flip="vt"/>
+    <text id="n19" name="n19" xy="23,6" size="467,26" fontSize="22" text="Image  properties: Color, Brightness, Flip"/>
+  </displayList>
+</component>srct86.xml|226|<component size="56,57" extention="Button">
+  <Button/>
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="srct83" name="n1" xy="0,0"/>
+  </displayList>
+</component>srct87.xml|446|<component size="361,23" extention="Slider">
+  <displayList>
+    <image id="n1" name="n1" src="srct85" xy="0,0" size="361,23">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="bar" src="srct84" xy="0,1" size="362,21"/>
+    <component id="n3" name="grip" src="srct86" xy="328,-13">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>suiz4i.xml|490|<component size="112,23" idnum="3" extention="Slider">
+  <displayList>
+    <image id="n0" name="n0" src="suiz4j" xy="0,0">
+      <relation target="" sidePair="width-width"/>
+    </image>
+    <image id="n2" name="bar" src="suiz4k" xy="5,9" size="100,6">
+      <relation target="n0" sidePair="width-width"/>
+    </image>
+    <component id="n1" name="grip" src="suiz4l" xy="101,2">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>suiz4l.xml|523|<component size="10,19" extention="Button" idnum="3">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="suiz4m" name="n1" xy="0,0">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="suiz4n" name="n2" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>suiz4o.xml|496|<component size="23,112" idnum="7" extention="Slider">
+  <displayList>
+    <image id="n5" name="n5" src="suiz4p" xy="0,0">
+      <relation target="" sidePair="height-height"/>
+    </image>
+    <image id="n6" name="bar_v" src="suiz4q" xy="8,7" size="6,100">
+      <relation target="" sidePair="height-height"/>
+    </image>
+    <component id="n1" name="grip" src="suiz4r" xy="3,102">
+      <relation target="n6" sidePair="bottom-bottom"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>suiz4r.xml|523|<component size="19,10" extention="Button" idnum="3">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="suiz4s" name="n1" xy="0,0">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="suiz4t" name="n2" xy="0,0">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>t24n7f.xml|752|<component size="1136,570" overflow="scroll" scrollBar="hidden">
+  <displayList>
+    <text id="n0" name="n0" xy="15,6" size="1025,51" fontSize="22" autoSize="height" text="Change the width or height of the component does not stretch the content by default.&#xA;改变组件的宽和高并不会直接拉伸组件内的内容"/>
+    <component id="n12" name="n12" src="t24n7g" xy="10,78"/>
+    <component id="n13" name="n13" src="t24n7g" xy="286,80" size="327,322"/>
+    <text id="n16" name="n16" xy="12,430" size="437,51" fontSize="22" autoSize="height" text="Use 'Relation' to adjust the content.&#xA;利用关联，可以使组件大小改变时调整内容"/>
+    <component id="n17" name="n17" src="qa477h" xy="18,501"/>
+    <component id="n20" name="n20" src="qa477h" xy="295,499" size="330,324"/>
+  </displayList>
+</component>t24n7g.xml|316|<component size="250,250">
+  <displayList>
+    <image id="n1" name="n1" src="rt103m" xy="0,0" size="250,250"/>
+    <text id="n2" name="n2" xy="70,110" size="109,30" fontSize="26" color="#ffffff" strokeColor="#000000" text="居中文字"/>
+    <image id="n4" name="n4" src="rpmbx" xy="199,213"/>
+  </displayList>
+</component>t9fj50.xml|305|<component size="145,12" idnum="3" extention="ProgressBar">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj51" xy="0,0">
+      <relation target="" sidePair="width-width"/>
+    </image>
+    <image id="n1" name="bar" src="t9fj52" xy="2,3" size="140,6"/>
+  </displayList>
+  <ProgressBar/>
+</component>t9fj53.xml|719|<component size="105,21" overflow="hidden" extention="ProgressBar">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj54" xy="0,0">
+      <relation target="" sidePair="width-width"/>
+    </image>
+    <image id="n2" name="bar" src="t9fj55" xy="13,5" size="79,11"/>
+    <image id="n3" name="n3" src="t9fj56" xy="8,-2">
+      <relation target="n2" sidePair="right-right"/>
+    </image>
+    <text id="n1" name="title" xy="15,3" size="72,16" fontSize="12" color="#cccccc" align="center" vAlign="middle" autoSize="height" strokeColor="#000000" singleLine="true" text="1/1">
+      <relation target="" sidePair="width-width,center-center"/>
+    </text>
+  </displayList>
+  <ProgressBar titleType="valueAndmax"/>
+</component>t9fj57.xml|249|<component size="277,32" extention="ProgressBar">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj58" xy="0,0"/>
+    <component id="n2" name="bar" src="t9fj59" xy="23,-1"/>
+  </displayList>
+  <ProgressBar titleType="valueAndmax"/>
+</component>t9fj59.xml|142|<component size="227,30" overflow="hidden">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj5a" xy="0,0"/>
+  </displayList>
+</component>t9fj5b.xml|552|<component size="577,53" extention="ProgressBar">
+  <displayList>
+    <image id="n1" name="n0" src="t9fj5c" xy="53,17" size="470,16" grayed="true"/>
+    <image id="n4" name="bar" src="t9fj5c" xy="53,17" size="470,16"/>
+    <image id="n6" name="n6" src="t9fj5d" xy="3,-4"/>
+    <image id="n7" name="n7" src="t9fj5e" xy="485,-4"/>
+    <loader id="n8" name="ani" xy="455,-30" size="100,100" url="ui://9leh0eyft9fj5f">
+      <relation target="n4" sidePair="right-right"/>
+    </loader>
+  </displayList>
+  <ProgressBar titleType="valueAndmax"/>
+</component>t9fj5f.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+  <frames>
+    <frame rect="9,0,74,65"/>
+    <frame rect="7,5,74,64"/>
+    <frame rect="8,6,72,63"/>
+    <frame rect="8,3,75,65"/>
+    <frame rect="5,2,79,66"/>
+    <frame rect="2,7,80,62"/>
+    <frame rect="6,6,74,68"/>
+    <frame rect="0,2,81,65"/>
+  </frames>
+</movieclip>t9fj5g.xml|264|<component size="277,32" extention="ProgressBar">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj58" xy="0,0"/>
+    <component id="n2" name="bar" src="t9fj5h" xy="23,-1"/>
+  </displayList>
+  <ProgressBar titleType="valueAndmax" reverse="true"/>
+</component>t9fj5h.xml|205|<component size="227,30" overflow="hidden">
+  <displayList>
+    <image id="n0" name="n0" src="t9fj5a" xy="0,0">
+      <relation target="" sidePair="right-right"/>
+    </image>
+  </displayList>
+</component>w42o3j.xml|683|<component size="1136,570">
+  <displayList>
+    <text id="n1" name="n1" xy="9,10" size="918,51" fontSize="22" autoSize="height" text="Label extention makes component have a title and icon property.&#xA;标签(Label)是对组件的一种扩展，使其具有标题和图标属性"/>
+    <component id="n3" name="frame" src="rt103l" xy="24,91" size="223,226">
+      <Label title="Bag"/>
+    </component>
+    <component id="n4" name="n4" src="rt103r" xy="270,118">
+      <Label title="Hello world" icon="ui://9leh0eyfrpmbg"/>
+    </component>
+    <component id="n5" name="n5" src="rt103r" xy="271,213">
+      <Label title="Hello Unity" titleColor="#ffcc33" icon="ui://9leh0eyfhixt1v"/>
+    </component>
+  </displayList>
+</component>wa8u2r.fnt|2011|info face="ÃÔÄã¼ò¿¨ͨ" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=32 base=26 scaleW=256 scaleH=256 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
+page id=0 file="11_0.png"
+chars count=15
+char id=0    x=0     y=0     width=22    height=36    xoffset=0     yoffset=0     xadvance=22    page=0  chnl=15
+char id=35   x=22    y=37    width=15    height=20    xoffset=0     yoffset=6     xadvance=14    page=0  chnl=15
+char id=73   x=59    y=25    width=5     height=17    xoffset=0     yoffset=9     xadvance=5     page=0  chnl=15
+char id=85   x=38    y=25    width=20    height=19    xoffset=0     yoffset=7     xadvance=20    page=0  chnl=15
+char id=20307 x=23    y=0     width=24    height=24    xoffset=2     yoffset=4     xadvance=28    page=0  chnl=15
+char id=20309 x=166   y=0     width=24    height=22    xoffset=1     yoffset=6     xadvance=28    page=0  chnl=15
+char id=20351 x=48    y=0     width=23    height=24    xoffset=2     yoffset=5     xadvance=28    page=0  chnl=15
+char id=20837 x=0     y=37    width=21    height=20    xoffset=3     yoffset=7     xadvance=28    page=0  chnl=15
+char id=22120 x=191   y=0     width=21    height=22    xoffset=3     yoffset=6     xadvance=28    page=0  chnl=15
+char id=22914 x=213   y=0     width=21    height=22    xoffset=3     yoffset=6     xadvance=28    page=0  chnl=15
+char id=23383 x=96    y=0     width=21    height=24    xoffset=3     yoffset=4     xadvance=28    page=0  chnl=15
+char id=23884 x=72    y=0     width=23    height=24    xoffset=2     yoffset=5     xadvance=28    page=0  chnl=15
+char id=29992 x=235   y=0     width=19    height=21    xoffset=4     yoffset=6     xadvance=28    page=0  chnl=15
+char id=32534 x=118   y=0     width=23    height=23    xoffset=2     yoffset=5     xadvance=28    page=0  chnl=15
+char id=36753 x=142   y=0     width=23    height=23    xoffset=2     yoffset=5     xadvance=28    page=0  chnl=15
+wa8u2s.xml|728|<component size="1136,570">
+  <displayList>
+    <text id="n0" name="n0" xy="14,10" size="588,29" fontSize="22" leading="6" text="Loader is for loading image or movieclip dynamically."/>
+    <loader id="n1" name="n1" xy="27,67" size="90,90" url="ui://9leh0eyfwa8u2t"/>
+    <loader id="n2" name="n2" xy="142,65" size="133,131" url="ui://9leh0eyfwa8u2t" fill="scale"/>
+    <loader id="n3" name="n3" xy="295,66" size="133,131" scale="2.00,2.00" url="ui://9leh0eyfwa8u2u" align="center" vAlign="middle"/>
+    <loader id="n4" name="n4" xy="47,184" size="60,60" url="ui://9leh0eyfhixt1v"/>
+    <loader id="n5" name="n5" xy="66,270" size="183,121" url="ui://9leh0eyft9fj5f" align="center" vAlign="middle"/>
+  </displayList>
+</component>wa8u2v.xml|2845|<component size="1136,570">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <controller name="c2" pages="0,,1," selected="0"/>
+  <displayList>
+    <graph id="n3" name="n3" xy="181,271" size="100,100" type="rect" fillColor="#ff666699">
+      <gearXY controller="c1" pages="0,1" values="181,271|60,328" default="174,120" tween="true"/>
+      <gearSize controller="c1" pages="1" values="196,174,1,1" default="100,100,1,1" tween="true"/>
+    </graph>
+    <text id="n0" name="n0" xy="18,21" size="1086,131" fontSize="23" autoSize="height" text="Controller is one of the key technologies of FairyGUI. Controller contains multiple pages. Elements can be in different status in different pages. Click the button below to observe the different effects.&#xA;控制器是FairyGUI核心特色功能之一。控制器包含多个页面，元件可以在不同页面中具有不同状态。点击下面的按钮，观察不同效果。"/>
+    <graph id="n5" name="n5" xy="65,271" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="65,271|252,190" default="36,310" tween="true"/>
+    </graph>
+    <text id="n6" name="n6" xy="191,341" size="69,20" fontSize="16" color="#ffffff" text="FairyGUI">
+      <gearColor controller="c1" pages="1" values="#000000" default="#ffffff"/>
+    </text>
+    <image id="n7" name="n7" src="h5p722" xy="133,393" pivot="0.5,0.5" size="90,90">
+      <gearXY controller="c1" pages="0,1" values="133,393|314,349" default="126,242" tween="true"/>
+      <gearSize controller="c1" pages="1" values="132,132,1,1" default="90,90,1,1" tween="true"/>
+      <gearLook controller="c1" pages="1" values="0.54,180,0" default="1,0,0" tween="true"/>
+    </image>
+    <image id="n8" name="n8" src="wa8u2t" xy="256,194">
+      <gearDisplay controller="c1" pages="1"/>
+    </image>
+    <image id="n9" name="n9" src="wa8u2u" xy="65,276">
+      <gearColor controller="c1" pages="1" values="#66ff99" default="#ffffff"/>
+    </image>
+    <movieclip id="n10" name="n10" src="hixt1v" xy="422,285">
+      <gearAni controller="c1" pages="1" values="0,s" default="0,p"/>
+    </movieclip>
+    <component id="n11" name="n11" src="rpmb12" xy="89,195">
+      <Button controller="c1" page="1"/>
+    </component>
+    <image id="n13" name="n13" src="h5p722" xy="1383,450" group="n16"/>
+    <image id="n14" name="n14" src="h5p722" xy="1265,450" group="n16"/>
+    <image id="n15" name="n15" src="h5p722" xy="1154,450" group="n16"/>
+    <group id="n16" name="n16" xy="1154,450" size="319,90" advanced="true">
+      <gearDisplay controller="c2" pages="1"/>
+      <gearXY controller="c2" pages="0" values="1154,450" default="661,450" tween="true"/>
+      <relation target="" sidePair="bottom-bottom,right-right"/>
+    </group>
+    <component id="n12" name="switchBtn" src="gojg7s" xy="1015,449">
+      <relation target="" sidePair="right-right,bottom-bottom"/>
+      <Button controller="c2" page="1"/>
+    </component>
+  </displayList>
+</component>wa8u2x.xml|1834|<component size="1136,570">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <displayList>
+    <text id="n0" name="n0" xy="15,6" size="964,76" fontSize="22" autoSize="height" text="Relation is one of the key technologies of FairyGUI, which defines the position and size relation between the components&#xA;“关联”是FairyGUI核心特色功能之一。“关联”定义元件之间的位置和大小关系。"/>
+    <graph id="n2" name="n2" xy="181,219" size="100,100" type="rect" fillColor="#ff009900">
+      <relation target="n1" sidePair="left-left,top-top"/>
+    </graph>
+    <graph id="n1" name="n1" xy="45,219" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="45,219|336,224" default="40,212" tween="true"/>
+    </graph>
+    <component id="n5" name="n5" src="rpmb12" xy="37,108">
+      <Button controller="c1" page="1"/>
+    </component>
+    <graph id="n7" name="n7" xy="278,380" size="100,100" type="rect" fillColor="#ff009900">
+      <relation target="n8" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n8" name="n8" xy="48,380" size="100,100" type="rect">
+      <gearSize controller="c1" pages="0,1" values="-|188,165,1.00,1.00" default="100,100,1.00,1.00" tween="true"/>
+    </graph>
+    <graph id="n9" name="n9" xy="945,219" size="99,100" type="rect" fillColor="#ff009900">
+      <relation target="n10" sidePair="leftext-right"/>
+    </graph>
+    <graph id="n10" name="n10" xy="816,219" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="816,219|635,224" default="153,546" tween="true"/>
+    </graph>
+    <graph id="n12" name="n12" xy="950,399" size="99,104" type="rect" fillColor="#ff009900">
+      <gearSize controller="c1" pages="0,1" values="-|285,104,1.00,1.00" default="99,104,1.00,1.00" tween="true"/>
+      <relation target="" sidePair="right-right"/>
+    </graph>
+  </displayList>
+</component>zd9g41.xml|487|<component size="132,40" extention="ComboBox">
+  <displayList>
+    <component id="n0" name="button" src="zd9g42" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <text id="n1" name="title" xy="5,8" size="87,25" fontSize="15" color="#ffcc00" align="center" autoSize="none" strokeColor="#000000" text="">
+      <relation target="" sidePair="width-width"/>
+    </text>
+  </displayList>
+  <ComboBox dropdown="ui://9leh0eyfzd9g47"/>
+</component>zd9g42.xml|856|<component size="132,40" extention="Button" idnum="5">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="zd9g43" name="n1" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="zd9g44" name="n2" xy="0,0">
+      <gearDisplay controller="button" pages="1"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n3" src="zd9g45" name="n3" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n4" src="zd9g46" name="n4" xy="0,0">
+      <gearDisplay controller="button" pages="3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>zd9g47.xml|422|<component size="100,100">
+  <displayList>
+    <image id="n0" name="n0" src="zd9g48" xy="0,0" size="100,100">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <list id="n1" name="list" xy="3,3" size="94,94" overflow="scroll" scrollBarFlags="4" margin="0,0,0,0" defaultItem="ui://9leh0eyfzd9g49"/>
+  </displayList>
+  <relation target="n1" sidePair="width-width,height-height"/>
+</component>zd9g49.xml|1132|<component size="102,40" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n1" name="n1" src="zd9g4a" xy="0,0">
+      <gearDisplay controller="button" pages="0"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="n2" src="zd9g4b" xy="0,0">
+      <gearDisplay controller="button" pages="1"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n3" name="n3" src="zd9g4c" xy="0,0">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n4" name="n4" src="zd9g4d" xy="0,0">
+      <gearDisplay controller="button" pages="3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n5" name="title" xy="0,0" size="102,40" fontSize="15" color="#ffff00" align="center" vAlign="middle" autoSize="none" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>zd9g4e.xml|525|<component size="1136,570">
+  <displayList>
+    <component id="n1" name="n1" src="suiz4i" xy="84,63">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n2" name="n2" src="suiz4o" xy="281,50">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n3" name="n3" src="eut94u" xy="57,236">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n4" name="n4" src="srct87" xy="114,389">
+      <Slider value="50" max="100"/>
+    </component>
+  </displayList>
+</component>zd9g4f.xml|900|<component size="1136,570">
+  <displayList>
+    <component id="n1" name="n1" src="t9fj50" xy="55,37">
+      <ProgressBar value="50" max="100"/>
+    </component>
+    <component id="n2" name="n2" src="t9fj53" xy="228,32">
+      <ProgressBar value="78" max="100"/>
+    </component>
+    <component id="n3" name="n3" src="t9fj57" xy="48,118">
+      <ProgressBar value="80" max="100"/>
+    </component>
+    <component id="n4" name="n4" src="t9fj5b" xy="41,239">
+      <ProgressBar value="75" max="100"/>
+    </component>
+    <component id="n6" name="n6" src="t9fj5g" xy="354,116">
+      <ProgressBar value="80" max="100"/>
+    </component>
+    <component id="n7" name="n7" src="fjqr7j" xy="69,341">
+      <ProgressBar value="67" max="100"/>
+    </component>
+    <component id="n9" name="n9" src="gzpr81" xy="242,310">
+      <ProgressBar value="30" max="100"/>
+    </component>
+  </displayList>
+</component>zd9g4g.xml|2673|<component size="1136,570">
+  <displayList>
+    <list id="n0" name="n0" xy="34,89" size="163,422" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n1" name="n1" xy="7,7" size="1072,29" fontSize="22" leading="6" autoSize="height" text="List provides four layouts. If the list supports selection, list item type must be radio button."/>
+    <text id="n2" name="n2" xy="40,54" size="148,26" fontSize="22" text="Single Column"/>
+    <list id="n4" name="n4" xy="534,110" size="571,126" layout="row" overflow="scroll" scroll="horizontal" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n5" name="n5" xy="534,74" size="115,26" fontSize="22" text="Single row"/>
+    <list id="n7" name="n7" xy="534,300" size="434,178" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n8" name="n8" xy="534,263" size="170,26" fontSize="22" text="Flow horizontal"/>
+    <list id="n9" name="n9" xy="238,89" size="263,447" layout="flow_vt" overflow="scroll" scroll="horizontal" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n10" name="n10" xy="305,54" size="148,26" fontSize="22" text="Flow vertical"/>
+  </displayList>
+</component>
