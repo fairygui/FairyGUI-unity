@@ -238,7 +238,7 @@ namespace FairyGUI
 			cachedTransform.localPosition = v;
 		}
 
-		internal void SetPositionOffset(Vector2 value)
+		virtual protected void SetPositionOffset(Vector2 value)
 		{
 			Vector3 v = cachedTransform.localPosition;
 			v.x += (_positionOffset.x - value.x);
