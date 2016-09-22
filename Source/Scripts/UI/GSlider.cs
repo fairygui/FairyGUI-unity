@@ -142,6 +142,8 @@ namespace FairyGUI
 				_barObjectV.height = Mathf.RoundToInt((this.height - _barMaxHeightDelta) * percent);
 			if (_aniObject != null)
 				_aniObject.frame = Mathf.RoundToInt(percent * 100);
+
+			this.InvalidateBatchingState();
 		}
 
 		override public void ConstructFromXML(XML cxml)
