@@ -147,9 +147,17 @@ namespace FairyGUI
 
 			if (_titleObject is GTextInput)
 			{
+				GTextInput input = ((GTextInput)_titleObject);
 				str = xml.GetAttribute("promptText");
 				if (str != null)
-					((GTextInput)_titleObject).promptText = str;
+					input.promptText = str;
+
+				str = xml.GetAttribute("restrict");
+				if (str != null)
+					input.restrict = str;
+
+				input.maxLength = xml.GetAttributeInt("maxLength", input.maxLength);
+				input.keyboardType = xml.GetAttributeInt("keyboardType", input.keyboardType);
 			}
 		}
 	}
