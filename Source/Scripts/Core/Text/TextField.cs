@@ -1088,7 +1088,8 @@ namespace FairyGUI
 							{
 								if (_input)
 									_charPositions.Add(((int)charX << 16) + i);
-								htmlObj.SetPosition(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
+								element.position = new Vector2(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
+								htmlObj.SetPosition(element.position.x - _positionOffset.x, element.position.y - _positionOffset.y);
 								element.hidden = lineClipped || clipped && charX + htmlObj.width > _contentRect.width - GUTTER_X;
 								charX += htmlObj.width + letterSpacing + 2;
 								hasObject = true;
@@ -1613,25 +1614,24 @@ namespace FairyGUI
 			}
 
 			yOffset = -yOffset;
-			Vector2 oldOffset = _GetPositionOffset();
-			if (yOffset != oldOffset.y)
-				_SetPositionOffset(new Vector2(oldOffset.x, yOffset));
+			if (yOffset != _positionOffset.y)
+				SetPositionOffset(new Vector2(_positionOffset.x, yOffset));
 		}
 
-		void _SetPositionOffset(Vector2 offset)
+		override protected void SetPositionOffset(Vector2 value)
 		{
-			if (richTextField != null)
-				richTextField.SetPositionOffset(offset);
-			else
-				this.SetPositionOffset(offset);
-		}
+			base.SetPositionOffset(value);
 
-		Vector2 _GetPositionOffset()
-		{
 			if (richTextField != null)
-				return richTextField._positionOffset;
-			else
-				return _positionOffset;
+			{
+				int count = _elements.Count;
+				for (int i = 0; i < count; i++)
+				{
+					HtmlElement element = _elements[i];
+					if (element.htmlObject != null)
+						element.htmlObject.SetPosition(element.position.x - value.x, element.position.y - value.y);
+				}
+			}
 		}
 
 		void AdjustCaret(CharPosition cp)
@@ -1639,7 +1639,7 @@ namespace FairyGUI
 			_caretPosition = cp.charIndex;
 			Vector2 pos = GetCharLocation(cp);
 
-			Vector2 offset = _GetPositionOffset();
+			Vector2 offset = _positionOffset;
 			if (pos.x - offset.x < _textFormat.size)
 			{
 				float move = pos.x - (int)Math.Min(50, _contentRect.width / 2);
@@ -1674,7 +1674,7 @@ namespace FairyGUI
 					offset.y = move;
 			}
 
-			_SetPositionOffset(offset);
+			SetPositionOffset(offset);
 
 			if (line.height > 0) //将光标居中
 				pos.y += (int)(line.height - _textFormat.size) / 2;
@@ -1881,7 +1881,7 @@ namespace FairyGUI
 							return;
 
 						LineInfo line = _lines[cp.lineIndex - 1];
-						cp = GetCharPosition(new Vector3(_caret.cachedTransform.localPosition.x + _GetPositionOffset().x, line.y, 0));
+						cp = GetCharPosition(new Vector3(_caret.cachedTransform.localPosition.x + _positionOffset.x, line.y, 0));
 						AdjustCaret(cp);
 						break;
 					}
@@ -1903,7 +1903,7 @@ namespace FairyGUI
 							return;
 
 						LineInfo line = _lines[cp.lineIndex + 1];
-						cp = GetCharPosition(new Vector3(_caret.cachedTransform.localPosition.x + _GetPositionOffset().x, line.y, 0));
+						cp = GetCharPosition(new Vector3(_caret.cachedTransform.localPosition.x + _positionOffset.x, line.y, 0));
 						AdjustCaret(cp);
 						break;
 					}
@@ -2037,9 +2037,9 @@ namespace FairyGUI
 			{
 				Vector3 v = Stage.inst.touchPosition;
 				v = this.GlobalToLocal(v);
-				Vector2 offset = _GetPositionOffset();
-				v.x += offset.x;
-				v.y += offset.y;
+
+				v.x += _positionOffset.x;
+				v.y += _positionOffset.y;
 				cp = GetCharPosition(v);
 			}
 
@@ -2063,9 +2063,8 @@ namespace FairyGUI
 			if (float.IsNaN(v.x))
 				return;
 
-			Vector2 offset = _GetPositionOffset();
-			v.x += offset.x;
-			v.y += offset.y;
+			v.x += _positionOffset.x;
+			v.y += _positionOffset.y;
 
 			CharPosition cp = GetCharPosition(v);
 			if (cp.charIndex != _caretPosition)

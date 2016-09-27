@@ -1926,9 +1926,11 @@ namespace FairyGUI
 			{
 				string url = ix.GetAttribute("url");
 				if (string.IsNullOrEmpty(url))
+				{
 					url = defaultItem;
-				if (string.IsNullOrEmpty(url))
-					continue;
+					if (string.IsNullOrEmpty(url))
+						continue;
+				}
 
 				GObject obj = GetFromPool(url);
 				if (obj != null)
@@ -1936,13 +1938,21 @@ namespace FairyGUI
 					AddChild(obj);
 					if (obj is GButton)
 					{
-						((GButton)obj).title = ix.GetAttribute("title");
-						((GButton)obj).icon = ix.GetAttribute("icon");
+						str = ix.GetAttribute("title");
+						if (str != null)
+							((GButton)obj).title = str;
+						str = ix.GetAttribute("icon");
+						if (str != null)
+							((GButton)obj).icon = str;
 					}
 					else if (obj is GLabel)
 					{
-						((GLabel)obj).title = ix.GetAttribute("title");
-						((GLabel)obj).icon = ix.GetAttribute("icon");
+						str = ix.GetAttribute("title");
+						if (str != null)
+							((GLabel)obj).title = str;
+						str = ix.GetAttribute("icon");
+						if (str != null)
+							((GLabel)obj).icon = str;
 					}
 
 					str = ix.GetAttribute("name");

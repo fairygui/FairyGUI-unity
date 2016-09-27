@@ -34,6 +34,7 @@ namespace FairyGUI.Utils
 		public bool added;
 		public bool hidden;
 		public int space;
+		public Vector2 position;
 
 		Hashtable attributes;
 

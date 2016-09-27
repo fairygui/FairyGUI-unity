@@ -78,6 +78,7 @@ namespace FairyGUI
 			meshRenderer = gameObject.AddComponent<MeshRenderer>();
 #if UNITY_5
 			meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+			meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 #else
             meshRenderer.castShadows = false;
 #endif

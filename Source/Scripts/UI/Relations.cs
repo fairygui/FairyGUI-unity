@@ -65,8 +65,10 @@ namespace FairyGUI
 		/// <param name="usePercent"></param>
 		public void Add(GObject target, RelationType relationType, bool usePercent)
 		{
-			foreach (RelationItem item in _items)
+			int cnt = _items.Count;
+			for (int i = 0; i < cnt; i++)
 			{
+				RelationItem item = _items[i];
 				if (item.target == target)
 				{
 					item.Add(relationType, usePercent);
@@ -112,7 +114,7 @@ namespace FairyGUI
 				if (tid == -1)
 					throw new ArgumentException("invalid relation type: " + s);
 
-				newItem.QuickAdd((RelationType)tid, usePercent);
+				newItem.InternalAdd((RelationType)tid, usePercent);
 			}
 
 			_items.Add(newItem);
@@ -154,8 +156,10 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool Contains(GObject target)
 		{
-			foreach (RelationItem item in _items)
+			int cnt = _items.Count;
+			for (int i = 0; i < cnt; i++)
 			{
+				RelationItem item = _items[i];
 				if (item.target == target)
 					return true;
 			}
@@ -189,8 +193,10 @@ namespace FairyGUI
 		/// </summary>
 		public void ClearAll()
 		{
-			foreach (RelationItem item in _items)
+			int cnt = _items.Count;
+			for (int i = 0; i < cnt; i++)
 			{
+				RelationItem item = _items[i];
 				item.Dispose();
 			}
 			_items.Clear();
@@ -228,13 +234,12 @@ namespace FairyGUI
 		/// <param name="dHeight"></param>
 		public void OnOwnerSizeChanged(float dWidth, float dHeight)
 		{
-			if (_items.Count == 0)
+			int cnt = _items.Count;
+			if (cnt == 0)
 				return;
 
-			foreach (RelationItem item in _items)
-			{
-				item.ApplyOnSelfSizeChanged(dWidth, dHeight);
-			}
+			for (int i = 0; i < cnt; i++)
+				_items[i].ApplyOnSelfSizeChanged(dWidth, dHeight);
 		}
 
 		/// <summary>
