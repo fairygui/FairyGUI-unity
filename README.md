@@ -34,7 +34,7 @@ Learn
 - 下载FairyGUI编辑器。  
 - 下载Examples工程，浏览一遍FairyGUI的例子。  
 - 解压Examples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
-- 观看视频教程：[FairyGUI游戏UI开发基础](http://www.youkexueyuan.com/course_show/1216.html)  
+- 观看视频教程：[FairyGUI游戏UI开发基础](http://www.taikr.com/course/446)  
 - 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/tutorial)  
 - 进群与小伙伴一起交流：434866637  
 
