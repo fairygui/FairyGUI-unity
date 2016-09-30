@@ -83,7 +83,6 @@ namespace FairyGUI
 #else
             meshRenderer.castShadows = false;
 #endif
-			meshRenderer.useLightProbes = false;
 			meshRenderer.receiveShadows = false;
 			mesh = new Mesh();
 			mesh.MarkDynamic();
