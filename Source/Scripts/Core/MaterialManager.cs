@@ -72,7 +72,7 @@ namespace FairyGUI
 			blendMode = grahpics.blendMode;
 			int pool;
 
-			if (context.clipped)
+			if (context.clipped && !grahpics.dontClip)
 			{
 				clipId = context.clipInfo.clipId;
 

@@ -2,6 +2,9 @@
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum FillMethod
 	{
 		None = 0,
@@ -32,18 +35,27 @@ namespace FairyGUI
 		Radial360 = 5,
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum OriginHorizontal
 	{
 		Left,
 		Right,
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum OriginVertical
 	{
 		Top,
 		Bottom
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum Origin90
 	{
 		TopLeft,
@@ -52,6 +64,9 @@ namespace FairyGUI
 		BottomRight
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum Origin180
 	{
 		Top,
@@ -60,6 +75,9 @@ namespace FairyGUI
 		Right
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum Origin360
 	{
 		Top,
@@ -68,6 +86,9 @@ namespace FairyGUI
 		Right
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public class FillUtils
 	{
 		public static void FillHorizontal(OriginHorizontal origin, float amount, Rect vertRect, Rect uvRect, Vector3[] verts, Vector2[] uv)

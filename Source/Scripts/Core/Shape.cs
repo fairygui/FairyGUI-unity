@@ -28,7 +28,7 @@ namespace FairyGUI
 		public void DrawRect(int lineSize, Color lineColor, Color fillColor)
 		{
 			_type = 1;
-			_optimizeNotTouchable = false;
+			_touchDisabled = false;
 			_lineSize = lineSize;
 			_lineColor = lineColor;
 			_fillColor = fillColor;
@@ -38,7 +38,7 @@ namespace FairyGUI
 		public void DrawEllipse(Color fillColor)
 		{
 			_type = 2;
-			_optimizeNotTouchable = false;
+			_touchDisabled = false;
 			_lineSize = 0;
 			_lineColor = Color.clear;
 			_fillColor = fillColor;
@@ -48,7 +48,7 @@ namespace FairyGUI
 		public void DrawPolygon(Color fillColor, Vector2[] points)
 		{
 			_type = 3;
-			_optimizeNotTouchable = false;
+			_touchDisabled = false;
 			_lineSize = 0;
 			_lineColor = Color.clear;
 			_fillColor = fillColor;
@@ -59,7 +59,7 @@ namespace FairyGUI
 		public void Clear()
 		{
 			_type = 0;
-			_optimizeNotTouchable = true;
+			_touchDisabled = true;
 			graphics.ClearMesh();
 		}
 

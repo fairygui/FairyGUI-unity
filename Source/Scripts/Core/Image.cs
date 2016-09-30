@@ -4,6 +4,9 @@ using System;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum FlipType
 	{
 		None,
@@ -12,6 +15,9 @@ namespace FairyGUI
 		Both
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Image : DisplayObject
 	{
 		protected NTexture _texture;
@@ -37,7 +43,7 @@ namespace FairyGUI
 
 		void Create(NTexture texture)
 		{
-			_optimizeNotTouchable = true;
+			_touchDisabled = true;
 			_fillClockwise = true;
 
 			CreateGameObject("Image");

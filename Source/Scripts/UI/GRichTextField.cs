@@ -1,4 +1,5 @@
-﻿using FairyGUI.Utils;
+﻿using System.Collections.Generic;
+using FairyGUI.Utils;
 using UnityEngine;
 
 namespace FairyGUI
@@ -8,6 +9,11 @@ namespace FairyGUI
 	/// </summary>
 	public class GRichTextField : GTextField
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		public RichTextField richTextField { get; private set; }
+
 		public GRichTextField()
 			: base()
 		{
@@ -15,12 +21,11 @@ namespace FairyGUI
 
 		override protected void CreateDisplayObject()
 		{
-			base.CreateDisplayObject();
-
-			RichTextField richTextField = new RichTextField(_textField);
-			_textField.gOwner = null;
+			richTextField = new RichTextField();
 			richTextField.gOwner = this;
 			displayObject = richTextField;
+
+			_textField = richTextField.textField;
 		}
 
 		override protected void UpdateTextFieldText()
@@ -33,17 +38,26 @@ namespace FairyGUI
 
 		public IHtmlObject GetHtmlObject(string name)
 		{
-			return _textField.richTextField.GetHtmlObject(name);
+			return richTextField.GetHtmlObject(name);
 		}
 
 		public IHtmlObject GetHtmlObjectAt(int index)
 		{
-			return _textField.richTextField.GetHtmlObjectAt(index);
+			return richTextField.GetHtmlObjectAt(index);
 		}
 
 		public int htmlObjectCount
 		{
-			get { return _textField.richTextField.htmlObjectCount; }
+			get { return richTextField.htmlObjectCount; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Dictionary<uint, Emoji> emojies
+		{
+			get { return richTextField.emojies; }
+			set { richTextField.emojies = value; }
 		}
 	}
 }

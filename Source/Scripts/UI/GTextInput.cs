@@ -1,4 +1,5 @@
-﻿using FairyGUI.Utils;
+﻿using System.Collections.Generic;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -7,17 +8,48 @@ namespace FairyGUI
 	/// </summary>
 	public class GTextInput : GTextField
 	{
-		string _promptText;
-		bool _displayAsPassword;
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onFocusIn { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onFocusOut { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onChanged { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public InputTextField inputTextField { get; private set; }
 
 		public GTextInput()
 		{
+			onFocusIn = new EventListener(this, "onFocusIn");
+			onFocusOut = new EventListener(this, "onFocusOut");
+			onChanged = new EventListener(this, "onChanged");
+
 			this.focusable = true;
 			_textField.autoSize = false;
 			_textField.wordWrap = false;
-			_textField.onChanged.AddCapture(__onChanged);
-			_textField.onFocusIn.AddCapture(__onFocusIn);
-			_textField.onFocusOut.AddCapture(__onFocusOut);
+		}
+
+		public override string text
+		{
+			get
+			{
+				_text = inputTextField.text;
+				return _text;
+			}
+			set
+			{
+				base.text = value;
+			}
 		}
 
 		/// <summary>
@@ -25,8 +57,8 @@ namespace FairyGUI
 		/// </summary>
 		public bool editable
 		{
-			get { return _textField.input; }
-			set { _textField.input = value; }
+			get { return inputTextField.editable; }
+			set { inputTextField.editable = value; }
 		}
 
 		/// <summary>
@@ -34,8 +66,8 @@ namespace FairyGUI
 		/// </summary>
 		public int maxLength
 		{
-			get { return _textField.maxLength; }
-			set { _textField.maxLength = value; }
+			get { return inputTextField.maxLength; }
+			set { inputTextField.maxLength = value; }
 		}
 
 		/// <summary>
@@ -43,24 +75,17 @@ namespace FairyGUI
 		/// </summary>
 		public string restrict
 		{
-			get { return _textField.restrict; }
-			set { _textField.restrict = value; }
+			get { return inputTextField.restrict; }
+			set { inputTextField.restrict = value; }
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		override public bool displayAsPassword
+		public bool displayAsPassword
 		{
-			get
-			{
-				return _displayAsPassword;
-			}
-			set
-			{
-				_displayAsPassword = value;
-				_textField.displayAsPassword = value;
-			}
+			get { return inputTextField.displayAsPassword; }
+			set { inputTextField.displayAsPassword = value; }
 		}
 
 		/// <summary>
@@ -68,8 +93,8 @@ namespace FairyGUI
 		/// </summary>
 		public int caretPosition
 		{
-			get { return _textField.caretPosition; }
-			set { _textField.caretPosition = value; }
+			get { return inputTextField.caretPosition; }
+			set { inputTextField.caretPosition = value; }
 		}
 
 		/// <summary>
@@ -77,15 +102,8 @@ namespace FairyGUI
 		/// </summary>
 		public string promptText
 		{
-			get
-			{
-				return _promptText;
-			}
-			set
-			{
-				_promptText = value;
-				UpdateTextFieldText();
-			}
+			get { return inputTextField.promptText; }
+			set { inputTextField.promptText = value; }
 		}
 
 		/// <summary>
@@ -93,8 +111,17 @@ namespace FairyGUI
 		/// </summary>
 		public int keyboardType
 		{
-			get { return _textField.keyboardType; }
-			set { _textField.keyboardType = value; }
+			get { return inputTextField.keyboardType; }
+			set { inputTextField.keyboardType = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Dictionary<uint, Emoji> emojies
+		{
+			get { return inputTextField.emojies; }
+			set { inputTextField.emojies = value; }
 		}
 
 		/// <summary>
@@ -103,83 +130,34 @@ namespace FairyGUI
 		/// <param name="value"></param>
 		public void ReplaceSelection(string value)
 		{
-			_textField.ReplaceSelection(value);
-			_text = _textField.text;
-			UpdateSize();
+			inputTextField.ReplaceSelection(value);
+		}
+
+		override protected void UpdateTextFieldText()
+		{
+			inputTextField.text = _text;
 		}
 
 		override protected void CreateDisplayObject()
 		{
-			base.CreateDisplayObject();
+			inputTextField = new InputTextField();
+			inputTextField.gOwner = this;
+			displayObject = inputTextField;
 
-			_textField.input = true;
-			RichTextField richTextField = new RichTextField(_textField);
-			_textField.gOwner = null;
-			richTextField.gOwner = this;
-			displayObject = richTextField;
+			_textField = inputTextField.textField;
 		}
 
 		public override void Setup_BeforeAdd(Utils.XML xml)
 		{
 			base.Setup_BeforeAdd(xml);
 
-			_promptText = xml.GetAttribute("prompt");
-			_textField.restrict = xml.GetAttribute("restrict");
-			_textField.maxLength = xml.GetAttributeInt("maxLength", int.MaxValue);
-			_textField.keyboardType = xml.GetAttributeInt("keyboardType");
-		}
-
-		public override void Setup_AfterAdd(XML xml)
-		{
-			base.Setup_AfterAdd(xml);
-
-			if (string.IsNullOrEmpty(_text))
-			{
-				if (!string.IsNullOrEmpty(_promptText))
-				{
-					_textField.displayAsPassword = false;
-					_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText));
-				}
-			}
-		}
-
-		override protected void UpdateTextFieldText()
-		{
-			if (string.IsNullOrEmpty(_text) && !string.IsNullOrEmpty(_promptText))
-			{
-				_textField.displayAsPassword = false;
-				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText));
-			}
-			else
-			{
-				_textField.displayAsPassword = _displayAsPassword;
-				_textField.text = _text;
-			}
-		}
-
-		void __onChanged(EventContext context)
-		{
-			_text = _textField.text;
-			UpdateSize();
-		}
-
-		void __onFocusIn(EventContext context)
-		{
-			if (string.IsNullOrEmpty(_text) && !string.IsNullOrEmpty(_promptText))
-			{
-				_textField.displayAsPassword = _displayAsPassword;
-				_textField.text = string.Empty;
-			}
-		}
-
-		void __onFocusOut(EventContext context)
-		{
-			_text = _textField.text;
-			if (string.IsNullOrEmpty(_text) && !string.IsNullOrEmpty(_promptText))
-			{
-				_textField.displayAsPassword = false;
-				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText));
-			}
+			string str = xml.GetAttribute("prompt");
+			if (str != null)
+				inputTextField.promptText = str;
+			inputTextField.displayAsPassword = xml.GetAttributeBool("password", false);
+			inputTextField.restrict = xml.GetAttribute("restrict");
+			inputTextField.maxLength = xml.GetAttributeInt("maxLength", int.MaxValue);
+			inputTextField.keyboardType = xml.GetAttributeInt("keyboardType");
 		}
 	}
 }

@@ -2,6 +2,9 @@
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ShaderConfig
 	{
 		public delegate Shader GetFunction(string name);
@@ -13,6 +16,11 @@ namespace FairyGUI
 		public static string textBrighterShader = "FairyGUI/Text Brighter";
 		public static string bmFontShader = "FairyGUI/BMFont";
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public static Shader GetShader(string name)
 		{
 			Shader shader = Get(name);

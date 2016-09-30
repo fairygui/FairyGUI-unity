@@ -55,11 +55,10 @@ namespace FairyGUI
 		protected int _paintingFlag;
 
 		protected Rect _contentRect;
-		internal Vector2 _positionOffset;
 		protected bool _requireUpdateMesh;
 		protected Matrix4x4? _transformMatrix;
 
-		internal protected bool _optimizeNotTouchable;
+		internal protected bool _touchDisabled;
 		internal Rect _internal_bounds;
 		internal protected bool _skipInFairyBatching;
 
@@ -158,11 +157,11 @@ namespace FairyGUI
 		/// </summary>
 		public float x
 		{
-			get { return cachedTransform.localPosition.x + _positionOffset.x; }
+			get { return cachedTransform.localPosition.x; }
 			set
 			{
 				Vector3 v = cachedTransform.localPosition;
-				v.x = value - _positionOffset.x;
+				v.x = value;
 				cachedTransform.localPosition = v;
 			}
 		}
@@ -172,11 +171,11 @@ namespace FairyGUI
 		/// </summary>
 		public float y
 		{
-			get { return -cachedTransform.localPosition.y + _positionOffset.y; }
+			get { return -cachedTransform.localPosition.y ; }
 			set
 			{
 				Vector3 v = cachedTransform.localPosition;
-				v.y = -value + _positionOffset.y;
+				v.y = -value;
 				cachedTransform.localPosition = v;
 			}
 		}
@@ -232,19 +231,10 @@ namespace FairyGUI
 		public void SetPosition(float xv, float yv, float zv)
 		{
 			Vector3 v = cachedTransform.localPosition;
-			v.x = xv - _positionOffset.x;
-			v.y = -yv + _positionOffset.y;
+			v.x = xv;
+			v.y = -yv;
 			v.z = zv;
 			cachedTransform.localPosition = v;
-		}
-
-		virtual protected void SetPositionOffset(Vector2 value)
-		{
-			Vector3 v = cachedTransform.localPosition;
-			v.x += (_positionOffset.x - value.x);
-			v.y += value.y - _positionOffset.y;
-			cachedTransform.localPosition = v;
-			_positionOffset = value;
 		}
 
 		/// <summary>
@@ -944,7 +934,7 @@ namespace FairyGUI
 
 		protected internal DisplayObject InternalHitTest()
 		{
-			if (!_visible || (HitTestContext.forTouch && (!_touchable || _optimizeNotTouchable)))
+			if (!_visible || (HitTestContext.forTouch && (!_touchable || _touchDisabled)))
 				return null;
 
 			return HitTest();
@@ -1085,8 +1075,6 @@ namespace FairyGUI
 				HitTestContext.worldPoint = this.cachedTransform.TransformPoint(localPoint);
 			}
 			localPoint.y = -localPoint.y;
-			localPoint.x -= this._positionOffset.x;
-			localPoint.y -= this._positionOffset.y;
 
 			return localPoint;
 		}
@@ -1108,8 +1096,6 @@ namespace FairyGUI
 			{
 				v = targetSpace.cachedTransform.InverseTransformPoint(v);
 				v.y = -v.y;
-				v.x -= targetSpace._positionOffset.x;
-				v.y -= targetSpace._positionOffset.y;
 			}
 			return v;
 		}
@@ -1146,15 +1132,11 @@ namespace FairyGUI
 
 		protected void TransformRectPoint(float px, float py, DisplayObject targetSpace, ref Rect rect)
 		{
-			px += _positionOffset.x;
-			py += _positionOffset.y;
 			Vector2 v = this.cachedTransform.TransformPoint(px, -py, 0);
 			if (targetSpace != null)
 			{
 				v = targetSpace.cachedTransform.InverseTransformPoint(v);
 				v.y = -v.y;
-				v.x -= targetSpace._positionOffset.x;
-				v.y -= targetSpace._positionOffset.y;
 			}
 			if (rect.xMin > v.x) rect.xMin = v.x;
 			if (rect.xMax < v.x) rect.xMax = v.x;

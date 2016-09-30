@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
+using System.Text;
 
 #if UNITY_5_3_OR_NEWER
 using UnityEngine.SceneManagement;
@@ -17,6 +18,7 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		public static bool touchScreen { get; private set; }
+		public static bool keyboardInput { get; private set; }
 
 		/// <summary>
 		/// 
@@ -38,24 +40,10 @@ namespace FairyGUI
 		/// </summary>
 		public EventListener onStageResized { get; private set; }
 
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onCopy { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onPaste { get; private set; }
-
 		/// <summary>
 		/// 
 		/// </summary>
 		public EventListener onTouchMove { get; private set; }
-
-		internal InputCaret inputCaret { get; private set; }
-		internal Highlighter highlighter { get; private set; }
 
 		DisplayObject _touchTarget;
 		DisplayObject _focused;
@@ -71,7 +59,13 @@ namespace FairyGUI
 		Vector2 _customInputPos;
 		bool _customInputButtonDown;
 
+		EventCallback1 _focusRemovedDelegate;
+
 		AudioSource _audio;
+
+#pragma warning disable 0649
+		IKeyboard _keyboard;
+#pragma warning restore 0649
 
 		List<NTexture> _toCollectTextures = new List<NTexture>();
 
@@ -116,7 +110,13 @@ namespace FairyGUI
 			stageHeight = Screen.height;
 			_frameGotHitTarget = -1;
 
-			touchScreen = Input.touchSupported;
+			if (Application.platform == RuntimePlatform.WindowsPlayer
+				|| Application.platform == RuntimePlatform.WindowsPlayer
+				|| Application.platform == RuntimePlatform.OSXPlayer
+				|| Application.platform == RuntimePlatform.OSXEditor)
+				touchScreen = false;
+			else
+				touchScreen = Input.touchSupported;
 
 			_touches = new TouchInfo[5];
 			for (int i = 0; i < _touches.Length; i++)
@@ -130,8 +130,6 @@ namespace FairyGUI
 
 			onStageResized = new EventListener(this, "onStageResized");
 			onTouchMove = new EventListener(this, "onTouchMove");
-			onCopy = new EventListener(this, "onCopy");
-			onPaste = new EventListener(this, "onPaste");
 
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
@@ -153,18 +151,20 @@ namespace FairyGUI
 
 			EnableSound();
 
-			inputCaret = new InputCaret();
-			highlighter = new Highlighter();
+			if (touchScreen)
+			{
+#if !(UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR)
+				_keyboard = new FairyGUI.TouchScreenKeyboard();
+				keyboardInput = true;
+#endif
+			}
 
 			Timers.inst.Add(5, 0, RunTextureCollector);
-
-#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
-			CopyPastePatch.Apply();
-#endif
 
 #if UNITY_5_4_OR_NEWER
 			SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 #endif
+			_focusRemovedDelegate = OnFocusRemoved;
 		}
 
 #if UNITY_5_4_OR_NEWER
@@ -220,15 +220,10 @@ namespace FairyGUI
 
 				if (_focused != null)
 				{
-					if (_focused is TextField)
-					{
-						TextField textField = (TextField)_focused;
-						textField.onFocusOut.Call();
-						if (textField.richTextField != null)
-							textField.richTextField.onFocusOut.Call();
-					}
+					if (_focused is InputTextField)
+						((InputTextField)_focused).onFocusOut.Call();
 
-					_focused.onRemovedFromStage.RemoveCapture(OnFocusRemoved);
+					_focused.onRemovedFromStage.RemoveCapture(_focusRemovedDelegate);
 				}
 
 				_focused = value;
@@ -236,21 +231,10 @@ namespace FairyGUI
 					_focused = null;
 				if (_focused != null)
 				{
-					TextField textField = null;
-					if ((_focused is RichTextField))
-						textField = ((RichTextField)_focused).textField;
-					else if ((_focused is TextField))
-						textField = (TextField)_focused;
+					if (_focused is InputTextField)
+						((InputTextField)_focused).onFocusIn.Call();
 
-					if (textField != null)
-					{
-						_focused = textField;
-						textField.onFocusIn.Call();
-						if (textField.richTextField != null)
-							textField.richTextField.onFocusIn.Call();
-					}
-
-					_focused.onRemovedFromStage.AddCapture(OnFocusRemoved);
+					_focused.onRemovedFromStage.AddCapture(_focusRemovedDelegate);
 				}
 			}
 		}
@@ -409,6 +393,18 @@ namespace FairyGUI
 				_audio.PlayOneShot(clip, this.soundVolume);
 		}
 
+		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType)
+		{
+			if (_keyboard != null)
+				_keyboard.Open(text, autocorrection, multiline, secure, alert, textPlaceholder, keyboardType);
+		}
+
+		public void CloseKeyboard()
+		{
+			if (_keyboard != null)
+				_keyboard.Close();
+		}
+
 		public void SetCustomInput(Vector2 screenPos, bool buttonDown)
 		{
 			_customInput = true;
@@ -555,6 +551,7 @@ namespace FairyGUI
 				TouchInfo touch = _touches[0];
 				touch.keyCode = evt.keyCode;
 				touch.modifiers = evt.modifiers;
+				InputEvent.shiftDown = (evt.modifiers & EventModifiers.Shift) != 0;
 
 				touch.UpdateEvent();
 				DisplayObject f = this.focus;
@@ -600,6 +597,9 @@ namespace FairyGUI
 				HandleTouchEvents();
 			else
 				HandleMouseEvents();
+
+			if (_focused is InputTextField)
+				HandleTextInput();
 		}
 
 		void UpdateTouchPosition()
@@ -629,6 +629,38 @@ namespace FairyGUI
 						pos.y = stageHeight - pos.y;
 						_touchPosition = pos;
 					}
+				}
+			}
+		}
+
+		void HandleTextInput()
+		{
+			InputTextField textField = (InputTextField)_focused;
+			if (!textField.editable)
+				return;
+
+			if (_keyboard != null)
+			{
+				string s = _keyboard.GetInput();
+				if (s != null)
+					textField.ReplaceText(s);
+
+				if (_keyboard.done)
+					this.focus = null;
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(Input.inputString))
+				{
+					StringBuilder sb = new StringBuilder();
+					int len = Input.inputString.Length;
+					for (int i = 0; i < len; ++i)
+					{
+						char ch = Input.inputString[i];
+						if (ch >= ' ') sb.Append(ch.ToString());
+					}
+					if (sb.Length > 0)
+						textField.ReplaceSelection(sb.ToString());
 				}
 			}
 		}

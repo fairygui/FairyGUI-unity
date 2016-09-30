@@ -2,11 +2,12 @@
 
 namespace FairyGUI
 {
-	public class MobileInputAdapter : IMobileInputAdapter
+	/// <summary>
+	/// 
+	/// </summary>
+	public class TouchScreenKeyboard : IKeyboard
 	{
-		public int keyboardType { get; set; }
-
-		TouchScreenKeyboard _keyboard;
+		UnityEngine.TouchScreenKeyboard _keyboard;
 
 		public bool done
 		{
@@ -28,15 +29,15 @@ namespace FairyGUI
 				return null;
 		}
 
-		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder)
+		public void Open(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType)
 		{
 			if (_keyboard != null)
 				return;
 
-			_keyboard = TouchScreenKeyboard.Open(text, (TouchScreenKeyboardType)keyboardType, autocorrection, multiline, secure, alert, textPlaceholder);
+			_keyboard = UnityEngine.TouchScreenKeyboard.Open(text, (TouchScreenKeyboardType)keyboardType, autocorrection, multiline, secure, alert, textPlaceholder);
 		}
 
-		public void CloseKeyboard()
+		public void Close()
 		{
 			if (_keyboard != null)
 			{

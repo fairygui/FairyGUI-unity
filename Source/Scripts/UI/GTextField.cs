@@ -12,21 +12,6 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public EventListener onFocusIn { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onFocusOut { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public GearColor gearColor { get; private set; }
 
 		protected TextField _textField;
@@ -60,10 +45,6 @@ namespace FairyGUI
 			_textField.wordWrap = false;
 
 			gearColor = new GearColor(this);
-
-			onFocusIn = new EventListener(this, "onFocusIn");
-			onFocusOut = new EventListener(this, "onFocusOut");
-			onChanged = new EventListener(this, "onChanged");
 		}
 
 		override protected void CreateDisplayObject()
@@ -98,15 +79,6 @@ namespace FairyGUI
 				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
 			else
 				_textField.text = _text;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		virtual public bool displayAsPassword
-		{
-			get { return _textField.displayAsPassword; }
-			set { _textField.displayAsPassword = value; }
 		}
 
 		/// <summary>
@@ -282,27 +254,6 @@ namespace FairyGUI
 			get { return _textField.textHeight; }
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public Dictionary<uint, Emoji> emojies
-		{
-			get
-			{
-				if (_textField.richTextField == null)
-					return null;
-
-				return _textField.richTextField.emojies;
-			}
-			set
-			{
-				if (_textField.richTextField == null)
-					return;
-
-				_textField.richTextField.emojies = value;
-			}
-		}
-
 		override public void HandleControllerChanged(Controller c)
 		{
 			base.HandleControllerChanged(c);
@@ -366,7 +317,6 @@ namespace FairyGUI
 			base.Setup_BeforeAdd(xml);
 
 			string str;
-			this.displayAsPassword = xml.GetAttributeBool("password", false);
 			str = xml.GetAttribute("font");
 			if (str != null)
 				_textFormat.font = str;

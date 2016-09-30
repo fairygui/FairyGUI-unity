@@ -33,6 +33,7 @@ namespace FairyGUI
 		public bool grayed;
 
 		public static uint frameId;
+		public static bool working;
 		public static EventCallback0 OnBegin;
 		public static EventCallback0 OnEnd;
 
@@ -69,10 +70,14 @@ namespace FairyGUI
 				_tmpBegin.Invoke();
 				_tmpBegin = OnBegin;
 			}
+
+			working = true;
 		}
 
 		public void End()
 		{
+			working = false;
+
 			if (OnEnd != null)
 				OnEnd.Invoke();
 

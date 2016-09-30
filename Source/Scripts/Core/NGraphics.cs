@@ -21,6 +21,7 @@ namespace FairyGUI
 
 		public bool grayed;
 		public BlendMode blendMode;
+		public bool dontClip; //不参与剪裁
 		public uint maskFrameId;
 
 		public Matrix4x4? vertexMatrix;
@@ -82,6 +83,7 @@ namespace FairyGUI
 #else
             meshRenderer.castShadows = false;
 #endif
+			meshRenderer.useLightProbes = false;
 			meshRenderer.receiveShadows = false;
 			mesh = new Mesh();
 			mesh.MarkDynamic();

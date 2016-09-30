@@ -4,10 +4,19 @@ using UnityEngine;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class CaptureCamera : MonoBehaviour
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		[System.NonSerialized]
 		public Transform cachedTransform;
+		/// <summary>
+		/// 
+		/// </summary>
 		[System.NonSerialized]
 		public Camera cachedCamera;
 
@@ -31,6 +40,9 @@ namespace FairyGUI
 				_main = this;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void CheckMain()
 		{
 			if (_main != null && _main.cachedCamera != null)
@@ -59,6 +71,9 @@ namespace FairyGUI
 			cameraObject.AddComponent<CaptureCamera>();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int layer
 		{
 			get
@@ -77,6 +92,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int hiddenLayer
 		{
 			get
@@ -95,6 +113,13 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="stencilSupport"></param>
+		/// <returns></returns>
 		public static RenderTexture CreateRenderTexture(int width, int height, bool stencilSupport)
 		{
 			RenderTexture texture = new RenderTexture(width, height, stencilSupport ? 24 : 0, RenderTextureFormat.ARGB32);
@@ -107,6 +132,12 @@ namespace FairyGUI
 			return texture;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="texture"></param>
+		/// <param name="offset"></param>
 		public static void Capture(DisplayObject target, RenderTexture texture, Vector2 offset)
 		{
 			CheckMain();
