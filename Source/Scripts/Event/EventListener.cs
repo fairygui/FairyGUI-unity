@@ -136,8 +136,8 @@ namespace FairyGUI
 			get
 			{
 				if (_bridge == null)
-					_bridge = this.owner.GetEventBridge(_type);
-				return _bridge.isEmpty;
+					_bridge = this.owner.TryGetEventBridge(_type);
+				return _bridge != null && _bridge.isEmpty;
 			}
 		}
 
@@ -149,8 +149,8 @@ namespace FairyGUI
 			get
 			{
 				if (_bridge == null)
-					_bridge = this.owner.GetEventBridge(_type);
-				return _bridge._dispatching;
+					_bridge = this.owner.TryGetEventBridge(_type);
+				return _bridge != null && _bridge._dispatching;
 			}
 		}
 
@@ -171,9 +171,6 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool Call()
 		{
-			if (_bridge == null)
-				_bridge = this.owner.GetEventBridge(_type);
-
 			return owner.InternalDispatchEvent(this._type, _bridge, null, null);
 		}
 
@@ -184,9 +181,6 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool Call(object data)
 		{
-			if (_bridge == null)
-				_bridge = this.owner.GetEventBridge(_type);
-
 			return owner.InternalDispatchEvent(this._type, _bridge, data, null);
 		}
 

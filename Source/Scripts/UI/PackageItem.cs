@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -32,6 +33,7 @@ namespace FairyGUI
 
 		//componenet
 		public XML componentData;
+		public ArrayList componentChildren;
 
 		//font
 		public BitmapFont bitmapFont;

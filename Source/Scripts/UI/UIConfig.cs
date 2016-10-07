@@ -141,6 +141,11 @@ namespace FairyGUI
 		/// </summary>
 		public static Color inputHighlightColor = new Color32(255, 223, 141, 128);
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public static float frameTimeForAsyncUIConstruction = 0.02f;
+
 		public enum ConfigKey
 		{
 			DefaultFont,

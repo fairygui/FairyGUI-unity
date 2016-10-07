@@ -163,18 +163,21 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool DispatchEvent(string strType, object data)
 		{
-			return InternalDispatchEvent(strType, TryGetEventBridge(strType), data, null);
+			return InternalDispatchEvent(strType, null, data, null);
 		}
 
 		public bool DispatchEvent(string strType, object data, object initiator)
 		{
-			return InternalDispatchEvent(strType, TryGetEventBridge(strType), data, initiator);
+			return InternalDispatchEvent(strType, null, data, initiator);
 		}
 
 		static InputEvent sCurrentInputEvent = new InputEvent();
 
 		internal bool InternalDispatchEvent(string strType, EventBridge bridge, object data, object initiator)
 		{
+			if (bridge == null)
+				bridge = TryGetEventBridge(strType);
+
 			EventBridge gBridge = null;
 			if ((this is DisplayObject) && ((DisplayObject)this).gOwner != null)
 				gBridge = ((DisplayObject)this).gOwner.TryGetEventBridge(strType);

@@ -438,7 +438,7 @@ namespace FairyGUI
 			SetCustomInput(screenPos, buttonDown, buttonUp);
 		}
 
-		internal int InternalUpdate()
+		internal void InternalUpdate()
 		{
 			HandleEvents();
 
@@ -455,8 +455,6 @@ namespace FairyGUI
 
 				DynamicFont.textRebuildFlag = false;
 			}
-
-			return _updateContext.counter;
 		}
 
 		void GetHitTarget()

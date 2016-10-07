@@ -90,6 +90,8 @@ namespace FairyGUI
 			meshFilter.hideFlags = DisplayOptions.hideFlags;
 			meshRenderer.hideFlags = DisplayOptions.hideFlags;
 			mesh.hideFlags = DisplayOptions.hideFlags;
+
+			Stats.LatestGraphicsCreation++;
 		}
 
 		public NTexture texture
@@ -224,6 +226,8 @@ namespace FairyGUI
 
 		public void UpdateMaterial(UpdateContext context)
 		{
+			Stats.GraphicsCount++;
+
 			NMaterial nm = null;
 			if (_manager != null && !_customMatarial)
 			{

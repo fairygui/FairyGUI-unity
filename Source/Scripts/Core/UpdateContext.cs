@@ -24,7 +24,6 @@ namespace FairyGUI
 		public bool clipped;
 		public ClipInfo clipInfo;
 
-		public int counter;
 		public int renderingOrder;
 		public int batchingDepth;
 		public int rectMaskDepth;
@@ -50,7 +49,6 @@ namespace FairyGUI
 			frameId++;
 			if (frameId == 0)
 				frameId = 1;
-			counter = 0;
 			renderingOrder = 0;
 			batchingDepth = 0;
 			rectMaskDepth = 0;
@@ -60,6 +58,9 @@ namespace FairyGUI
 
 			clipped = false;
 			_clipStack.Clear();
+
+			Stats.ObjectCount = 0;
+			Stats.GraphicsCount = 0;
 
 			_tmpBegin = OnBegin;
 			OnBegin = null;

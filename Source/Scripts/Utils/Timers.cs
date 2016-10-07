@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 namespace FairyGUI
@@ -20,6 +21,8 @@ namespace FairyGUI
 		List<Anymous_T> _pool;
 		float _lastTime;
 
+		TimersEngine _engine;
+
 		private static Timers _inst;
 		public static Timers inst
 		{
@@ -37,8 +40,9 @@ namespace FairyGUI
 			gameObject = new GameObject();
 			gameObject.hideFlags = HideFlags.HideInHierarchy;
 			gameObject.SetActive(true);
-			gameObject.AddComponent<TimersEngine>();
 			Object.DontDestroyOnLoad(gameObject);
+
+			_engine = gameObject.AddComponent<TimersEngine>();
 
 			_items = new Dictionary<TimerCallback, Anymous_T>();
 			_toAdd = new Dictionary<TimerCallback, Anymous_T>();
@@ -105,6 +109,11 @@ namespace FairyGUI
 		public void AddUpdate(TimerCallback callback, object callbackParam)
 		{
 			Add(0.001f, 0, callback, callbackParam);
+		}
+
+		public void StartCoroutine(IEnumerator routine)
+		{
+			_engine.StartCoroutine(routine);
 		}
 
 		public bool Exists(TimerCallback callback)
