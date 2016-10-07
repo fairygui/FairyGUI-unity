@@ -911,10 +911,11 @@ namespace FairyGUI
 				this.autoPlayRepeat = xml.GetAttributeInt("autoPlayRepeat", 1);
 				this.autoPlayDelay = xml.GetAttributeFloat("autoPlayDelay");
 			}
-			XMLList col = xml.Elements("item");
 
-			foreach (XML cxml in col)
+			XMLList.Enumerator et = xml.GetEnumerator("item");
+			while(et.MoveNext())
 			{
+				XML cxml = et.Current;
 				TransitionItem item = new TransitionItem();
 				_items.Add(item);
 

@@ -132,19 +132,18 @@ namespace FairyGUI
 			set { _content.shader = value; }
 		}
 
-		override public void ConstructFromResource(PackageItem pkgItem)
+		override public void ConstructFromResource()
 		{
-			_packageItem = pkgItem;
-			sourceWidth = _packageItem.width;
-			sourceHeight = _packageItem.height;
+			sourceWidth = packageItem.width;
+			sourceHeight = packageItem.height;
 			initWidth = sourceWidth;
 			initHeight = sourceHeight;
-			_content.scale9Grid = _packageItem.scale9Grid;
-			_content.scaleByTile = _packageItem.scaleByTile;
+			_content.scale9Grid = packageItem.scale9Grid;
+			_content.scaleByTile = packageItem.scaleByTile;
 
-			_packageItem.Load();
+			packageItem.Load();
 
-			_content.texture = _packageItem.texture;
+			_content.texture = packageItem.texture;
 
 			SetSize(sourceWidth, sourceHeight);
 		}

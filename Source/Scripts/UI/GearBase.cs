@@ -92,7 +92,7 @@ namespace FairyGUI
 			{
 				string[] pages = xml.GetAttributeArray("pages");
 				if (pages != null)
-					((GearDisplay)this).pages.AddRange(pages);
+					((GearDisplay)this).pages = pages;
 			}
 			else
 			{

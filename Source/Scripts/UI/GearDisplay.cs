@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FairyGUI
 {
@@ -10,7 +11,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Pages involed in this gear.
 		/// </summary>
-		public List<string> pages { get; private set; }
+		public string[] pages { get; set; }
 
 		public GearDisplay(GObject owner)
 			: base(owner)
@@ -23,15 +24,12 @@ namespace FairyGUI
 
 		override protected void Init()
 		{
-			if (pages != null)
-				pages.Clear();
-			else
-				pages = new List<string>();
+			pages = null;
 		}
 
 		override public void Apply()
 		{
-			if (_controller == null || pages == null || pages.Count == 0 || pages.Contains(_controller.selectedPageId))
+			if (_controller == null || pages == null || pages.Length == 0 || Array.IndexOf(pages, _controller.selectedPageId) != -1)
 				_owner.internalVisible++;
 			else
 				_owner.internalVisible = 0;

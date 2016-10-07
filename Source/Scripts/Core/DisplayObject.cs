@@ -1230,7 +1230,7 @@ namespace FairyGUI
 			if (_filter != null)
 				_filter.Update();
 
-			context.counter++;
+			Stats.ObjectCount++;
 		}
 
 		void Capture()

@@ -184,9 +184,8 @@ namespace FairyGUI
 		//Size的实现方式，有两种，0-GObject的w/h等于DisplayObject的w/h。1-GObject的sourceWidth/sourceHeight等于DisplayObject的w/h，剩余部分由scale实现
 		protected int _sizeImplType;
 
-		internal PackageItem _packageItem;
+		internal PackageItem packageItem;
 		internal protected bool underConstruct;
-		internal XML constructingData;
 		internal float _rawWidth;
 		internal float _rawHeight;
 		internal bool _gearLocked;
@@ -938,8 +937,8 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_packageItem != null)
-					return UIPackage.URL_PREFIX + _packageItem.owner.id + _packageItem.id;
+				if (packageItem != null)
+					return UIPackage.URL_PREFIX + packageItem.owner.id + packageItem.id;
 				else
 					return null;
 			}
@@ -1369,9 +1368,8 @@ namespace FairyGUI
 				displayObject.grayed = _grayed;
 		}
 
-		virtual public void ConstructFromResource(PackageItem pkgItem)
+		virtual public void ConstructFromResource()
 		{
-			_packageItem = pkgItem;
 		}
 
 		virtual public void Setup_BeforeAdd(XML xml)

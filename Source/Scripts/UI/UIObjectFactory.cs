@@ -39,6 +39,8 @@ namespace FairyGUI
 		/// <returns></returns>
 		public static GObject NewObject(PackageItem pi)
 		{
+			Stats.LatestObjectCreation++;
+
 			switch (pi.type)
 			{
 				case PackageItemType.Image:
@@ -102,6 +104,8 @@ namespace FairyGUI
 		/// <returns></returns>
 		public static GObject NewObject(string type)
 		{
+			Stats.LatestObjectCreation++;
+
 			switch (type)
 			{
 				case "image":
@@ -118,6 +122,9 @@ namespace FairyGUI
 
 				case "richtext":
 					return new GRichTextField();
+
+				case "inputtext":
+					return new GTextInput();
 
 				case "group":
 					return new GGroup();

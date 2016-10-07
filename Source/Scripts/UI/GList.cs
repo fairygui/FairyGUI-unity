@@ -1921,9 +1921,10 @@ namespace FairyGUI
 
 			autoResizeItem = xml.GetAttributeBool("autoItemSize", true);
 
-			XMLList col = xml.Elements("item");
-			foreach (XML ix in col)
+			XMLList.Enumerator et = xml.GetEnumerator("item");
+			while(et.MoveNext())
 			{
+				XML ix = et.Current;
 				string url = ix.GetAttribute("url");
 				if (string.IsNullOrEmpty(url))
 				{

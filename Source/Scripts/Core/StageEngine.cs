@@ -8,13 +8,15 @@ namespace FairyGUI
 	/// </summary>
 	public class StageEngine : MonoBehaviour
 	{
-		public int ObjectTotal;
-		public int ObjectOnStage;
+		public int ObjectsOnStage;
+		public int GraphicsOnStage;
 
 		void LateUpdate()
 		{
-			ObjectOnStage = Stage.inst.InternalUpdate();
-			ObjectTotal = (int)DisplayObject._gInstanceCounter;
+			Stage.inst.InternalUpdate();
+
+			ObjectsOnStage = Stats.ObjectCount;
+			GraphicsOnStage = Stats.GraphicsCount;
 		}
 
 #if FAIRYGUI_DLL || UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR

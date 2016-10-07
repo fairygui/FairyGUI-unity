@@ -140,20 +140,18 @@ namespace FairyGUI
 				gearColor.Apply();
 		}
 
-		override public void ConstructFromResource(PackageItem pkgItem)
+		override public void ConstructFromResource()
 		{
-			_packageItem = pkgItem;
-
-			sourceWidth = _packageItem.width;
-			sourceHeight = _packageItem.height;
+			sourceWidth = packageItem.width;
+			sourceHeight = packageItem.height;
 			initWidth = sourceWidth;
 			initHeight = sourceHeight;
 
-			_packageItem.Load();
-			_content.interval = _packageItem.interval;
-			_content.swing = _packageItem.swing;
-			_content.repeatDelay = _packageItem.repeatDelay;
-			_content.SetData(_packageItem.texture, _packageItem.frames, new Rect(0, 0, sourceWidth, sourceHeight));
+			packageItem.Load();
+			_content.interval = packageItem.interval;
+			_content.swing = packageItem.swing;
+			_content.repeatDelay = packageItem.repeatDelay;
+			_content.SetData(packageItem.texture, packageItem.frames, new Rect(0, 0, sourceWidth, sourceHeight));
 
 			SetSize(sourceWidth, sourceHeight);
 		}
