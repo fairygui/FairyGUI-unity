@@ -9,11 +9,6 @@ namespace FairyGUI
 	/// </summary>
 	public class GTextField : GObject, IColorGear
 	{
-		/// <summary>
-		/// 
-		/// </summary>
-		public GearColor gearColor { get; private set; }
-
 		protected TextField _textField;
 		protected string _text;
 		protected bool _ubbEnabled;
@@ -43,8 +38,6 @@ namespace FairyGUI
 			_heightAutoSize = true;
 			_textField.autoSize = true;
 			_textField.wordWrap = false;
-
-			gearColor = new GearColor(this);
 		}
 
 		override protected void CreateDisplayObject()
@@ -70,6 +63,7 @@ namespace FairyGUI
 				_text = value;
 				UpdateTextFieldText();
 				UpdateSize();
+				UpdateGear(6);
 			}
 		}
 
@@ -111,10 +105,7 @@ namespace FairyGUI
 				if (!_textFormat.color.Equals(value))
 				{
 					_textFormat.color = value;
-
-					if (gearColor.controller != null)
-						gearColor.UpdateState();
-
+					UpdateGear(4);
 					UpdateTextFormat();
 				}
 			}
@@ -254,14 +245,6 @@ namespace FairyGUI
 			get { return _textField.textHeight; }
 		}
 
-		override public void HandleControllerChanged(Controller c)
-		{
-			base.HandleControllerChanged(c);
-
-			if (gearColor.controller == c)
-				gearColor.Apply();
-		}
-
 		protected void UpdateSize()
 		{
 			if (_updatingSize)
@@ -373,10 +356,6 @@ namespace FairyGUI
 		override public void Setup_AfterAdd(XML xml)
 		{
 			base.Setup_AfterAdd(xml);
-
-			XML cxml = xml.GetNode("gearColor");
-			if (cxml != null)
-				gearColor.Setup(cxml);
 
 			UpdateTextFormat();
 

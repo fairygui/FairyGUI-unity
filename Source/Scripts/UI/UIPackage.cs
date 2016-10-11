@@ -1134,7 +1134,7 @@ namespace FairyGUI
 				return;
 
 			string ename, elementId, value;
-			IEnumerator<XML> nodes = listNode.GetEnumerator();
+			XMLList.Enumerator nodes = listNode.GetEnumerator();
 			while (nodes.MoveNext())
 			{
 				XML cxml = nodes.Current;
@@ -1203,8 +1203,6 @@ namespace FairyGUI
 					}
 				}
 			}
-
-			nodes.Dispose();
 		}
 
 		NTexture CreateSpriteTexture(AtlasSprite sprite)

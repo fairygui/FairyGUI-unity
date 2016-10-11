@@ -18,28 +18,21 @@ namespace FairyGUI
 		/// <summary>
 		/// Icon of the label.
 		/// </summary>
-		public string icon
+		override public string icon
 		{
 			get
 			{
-				if (_iconObject is GLoader)
-					return ((GLoader)_iconObject).url;
-				else if (_iconObject is GLabel)
-					return ((GLabel)_iconObject).icon;
-				else if (_iconObject is GButton)
-					return ((GButton)_iconObject).icon;
+				if (_iconObject != null)
+					return _iconObject.icon;
 				else
 					return null;
 			}
 
 			set
 			{
-				if (_iconObject is GLoader)
-					((GLoader)_iconObject).url = value;
-				else if (_iconObject is GLabel)
-					((GLabel)_iconObject).icon = value;
-				else if (_iconObject is GButton)
-					((GButton)_iconObject).icon = value;
+				if (_iconObject != null)
+					_iconObject.icon = value;
+				UpdateGear(7);
 			}
 		}
 
@@ -59,6 +52,7 @@ namespace FairyGUI
 			{
 				if (_titleObject != null)
 					_titleObject.text = value;
+				UpdateGear(6);
 			}
 		}
 
@@ -148,7 +142,7 @@ namespace FairyGUI
 			if (_titleObject is GTextInput)
 			{
 				GTextInput input = ((GTextInput)_titleObject);
-				str = xml.GetAttribute("promptText");
+				str = xml.GetAttribute("prompt");
 				if (str != null)
 					input.promptText = str;
 
@@ -158,6 +152,7 @@ namespace FairyGUI
 
 				input.maxLength = xml.GetAttributeInt("maxLength", input.maxLength);
 				input.keyboardType = xml.GetAttributeInt("keyboardType", input.keyboardType);
+				input.displayAsPassword = xml.GetAttributeBool("password", input.displayAsPassword);
 			}
 		}
 	}

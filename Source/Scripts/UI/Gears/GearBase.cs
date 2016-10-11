@@ -102,16 +102,16 @@ namespace FairyGUI
 				if (pages != null && values != null)
 				{
 					for (int i = 0; i < values.Length; i++)
-					{
-						str = values[i];
-						if (str != "-")
-							AddStatus(pages[i], str);
-					}
+						AddStatus(pages[i], values[i]);
 				}
 				str = xml.GetAttribute("default");
 				if (str != null)
 					AddStatus(null, str);
 			}
+		}
+
+		virtual public void UpdateFromRelations(float dx, float dy)
+		{
 		}
 
 		abstract protected void AddStatus(string pageId, string value);

@@ -36,6 +36,9 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
+			if (value == "-")
+				return;
+
 			string[] arr = value.Split(',');
 			int frame = int.Parse(arr[0]);
 			bool playing = arr[1] == "p";
@@ -65,7 +68,7 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_owner._gearLocked)
+			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
 			IAnimationGear mc = (IAnimationGear)_owner;

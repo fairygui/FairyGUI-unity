@@ -41,6 +41,9 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
+			if (value == "-") //历史遗留处理
+				return;
+
 			string[] arr = value.Split(',');
 			if (pageId == null)
 			{
@@ -59,7 +62,7 @@ namespace FairyGUI
 
 			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
 			{
-				if(tweener!=null)
+				if (tweener != null)
 				{
 					if (_tweenTarget.x != gv.x || _tweenTarget.y != gv.y)
 					{
@@ -70,7 +73,7 @@ namespace FairyGUI
 						return;
 				}
 
-				if(_owner.x != gv.x || _owner.y != gv.y)
+				if (_owner.x != gv.x || _owner.y != gv.y)
 				{
 					_owner.internalVisible++;
 					_tweenTarget = gv;
@@ -104,7 +107,7 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_owner._gearLocked)
+			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
 			GearXYValue gv;
@@ -117,9 +120,9 @@ namespace FairyGUI
 			}
 		}
 
-		internal void UpdateFromRelations(float dx, float dy)
+		override public void UpdateFromRelations(float dx, float dy)
 		{
-			if (_storage != null)
+			if (_controller != null && _storage != null)
 			{
 				foreach (GearXYValue gv in _storage.Values)
 				{

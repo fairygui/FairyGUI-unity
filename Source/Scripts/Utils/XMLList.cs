@@ -6,53 +6,48 @@ namespace FairyGUI.Utils
 	/// <summary>
 	/// 
 	/// </summary>
-	public class XMLList : IEnumerable<XML>
+	public class XMLList
 	{
-		internal List<XML> _list;
+		public List<XML> rawList;
 
-		internal XMLList()
+		public XMLList()
 		{
-			_list = new List<XML>();
+			rawList = new List<XML>();
 		}
 
-		internal XMLList(List<XML> list)
+		public XMLList(List<XML> list)
 		{
-			_list = list;
+			rawList = list;
 		}
 
-		internal void Add(XML xml)
+		public void Add(XML xml)
 		{
-			_list.Add(xml);
+			rawList.Add(xml);
 		}
 
-		internal void Clear()
+		public void Clear()
 		{
-			_list.Clear();
+			rawList.Clear();
 		}
 
 		public int Count
 		{
-			get { return _list.Count; }
+			get { return rawList.Count; }
 		}
 
 		public XML this[int index]
 		{
-			get { return _list[index]; }
+			get { return rawList[index]; }
 		}
 
-		public IEnumerator<XML> GetEnumerator()
+		public Enumerator GetEnumerator()
 		{
-			return _list.GetEnumerator();
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return _list.GetEnumerator();
+			return new Enumerator(rawList, null);
 		}
 
 		public Enumerator GetEnumerator(string selector)
 		{
-			return new Enumerator(_list, selector);
+			return new Enumerator(rawList, selector);
 		}
 
 		static List<XML> _tmpList = new List<XML>();
@@ -60,10 +55,10 @@ namespace FairyGUI.Utils
 		{
 			bool allFit = true;
 			_tmpList.Clear();
-			int cnt = _list.Count;
+			int cnt = rawList.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				XML xml = _list[i];
+				XML xml = rawList[i];
 				if (xml.name == selector)
 					_tmpList.Add(xml);
 				else
@@ -82,10 +77,10 @@ namespace FairyGUI.Utils
 
 		public XML Find(string selector)
 		{
-			int cnt = _list.Count;
+			int cnt = rawList.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				XML xml = _list[i];
+				XML xml = rawList[i];
 				if (xml.name == selector)
 					return xml;
 			}
@@ -122,7 +117,7 @@ namespace FairyGUI.Utils
 				while (++_index < _total)
 				{
 					_current = _source[_index];
-					if (_current.name == _selector)
+					if (_selector == null || _current.name == _selector)
 						return true;
 				}
 

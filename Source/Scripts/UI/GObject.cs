@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using FairyGUI.Utils;
 using DG.Tweening;
 
@@ -66,26 +67,6 @@ namespace FairyGUI
 		/// Lowlevel display object.
 		/// </summary>
 		public DisplayObject displayObject { get; protected set; }
-
-		/// <summary>
-		/// Gear to display controller.
-		/// </summary>
-		public GearDisplay gearDisplay { get; private set; }
-
-		/// <summary>
-		/// Gear to xy controller.
-		/// </summary>
-		public GearXY gearXY { get; private set; }
-
-		/// <summary>
-		/// Gear to size controller.
-		/// </summary>
-		public GearSize gearSize { get; private set; }
-
-		/// <summary>
-		/// Gear to look controller.
-		/// </summary>
-		public GearLook gearLook { get; private set; }
 
 		/// <summary>
 		/// Dispatched when the object or its child was clicked.
@@ -181,6 +162,8 @@ namespace FairyGUI
 		string _tooltips;
 		bool _pixelSnapping;
 
+		GearBase[] _gears;
+
 		//Size的实现方式，有两种，0-GObject的w/h等于DisplayObject的w/h。1-GObject的sourceWidth/sourceHeight等于DisplayObject的w/h，剩余部分由scale实现
 		protected int _sizeImplType;
 
@@ -208,11 +191,7 @@ namespace FairyGUI
 			CreateDisplayObject();
 
 			relations = new Relations(this);
-
-			gearDisplay = new GearDisplay(this);
-			gearXY = new GearXY(this);
-			gearSize = new GearSize(this);
-			gearLook = new GearLook(this);
+			_gears = new GearBase[8];
 
 			onClick = new EventListener(this, "onClick");
 			onRightClick = new EventListener(this, "onRightClick");
@@ -316,8 +295,7 @@ namespace FairyGUI
 				if (this is GGroup)
 					((GGroup)this).MoveChildren(dx, dy);
 
-				if (gearXY.controller != null)
-					gearXY.UpdateState();
+				UpdateGear(1);
 
 				if (parent != null && !(parent is GList))
 				{
@@ -466,8 +444,7 @@ namespace FairyGUI
 						this.HandlePositionChanged();
 				}
 
-				if (gearSize.controller != null)
-					gearSize.UpdateState();
+				UpdateGear(2);
 
 				if (parent != null)
 				{
@@ -537,8 +514,7 @@ namespace FairyGUI
 				_scaleY = hv;
 				HandleScaleChanged();
 
-				if (gearSize.controller != null)
-					gearSize.UpdateState();
+				UpdateGear(2);
 			}
 		}
 
@@ -657,9 +633,7 @@ namespace FairyGUI
 				{
 					_grayed = value;
 					HandleGrayedChanged();
-
-					if (gearLook.controller != null)
-						gearLook.UpdateState();
+					UpdateGear(3);
 				}
 			}
 		}
@@ -694,9 +668,7 @@ namespace FairyGUI
 				_rotation = value;
 				if (displayObject != null)
 					displayObject.rotation = _rotation;
-
-				if (gearLook.controller != null)
-					gearLook.UpdateState();
+				UpdateGear(3);
 			}
 		}
 
@@ -756,9 +728,7 @@ namespace FairyGUI
 		{
 			if (displayObject != null)
 				displayObject.alpha = _alpha;
-
-			if (gearLook.controller != null)
-				gearLook.UpdateState();
+			UpdateGear(3);
 		}
 
 		/// <summary>
@@ -945,6 +915,90 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// Gear to xy controller.
+		/// </summary>
+		public GearXY gearXY
+		{
+			get
+			{
+				return (GearXY)GetGear(1);
+			}
+		}
+
+		/// <summary>
+		/// Gear to size controller.
+		/// </summary>
+		public GearSize gearSize
+		{
+			get
+			{
+				return (GearSize)GetGear(2);
+			}
+		}
+
+		/// <summary>
+		/// Gear to look controller.
+		/// </summary>
+		public GearLook gearLook
+		{
+			get
+			{
+				return (GearLook)GetGear(3);
+			}
+		}
+
+		public GearBase GetGear(int index)
+		{
+			GearBase gear = _gears[index];
+			if (gear == null)
+			{
+				switch (index)
+				{
+					case 0:
+						gear = new GearDisplay(this);
+						break;
+					case 1:
+						gear = new GearXY(this);
+						break;
+					case 2:
+						gear = new GearSize(this);
+						break;
+					case 3:
+						gear = new GearLook(this);
+						break;
+					case 4:
+						gear = new GearColor(this);
+						break;
+					case 5:
+						gear = new GearAnimation(this);
+						break;
+					case 6:
+						gear = new GearText(this);
+						break;
+					case 7:
+						gear = new GearIcon(this);
+						break;
+					default:
+						throw new System.Exception("FairyGUI: invalid gear index!");
+				}
+				_gears[index] = gear;
+			}
+			return gear;
+		}
+
+		protected void UpdateGear(int index)
+		{
+			if (_gears[index] != null)
+				_gears[index].UpdateState();
+		}
+
+		internal void UpdateGearFromRelations(int index, float dx, float dy)
+		{
+			if (_gears[index] != null)
+				_gears[index].UpdateFromRelations(dx, dy);
+		}
+
+		/// <summary>
 		/// Mark the fairy batching state is invalid. 
 		/// </summary>
 		public void InvalidateBatchingState()
@@ -957,14 +1011,12 @@ namespace FairyGUI
 
 		virtual public void HandleControllerChanged(Controller c)
 		{
-			if (gearDisplay.controller == c)
-				gearDisplay.Apply();
-			if (gearXY.controller == c)
-				gearXY.Apply();
-			if (gearSize.controller == c)
-				gearSize.Apply();
-			if (gearLook.controller == c)
-				gearLook.Apply();
+			for (int i = 0; i < 8; i++)
+			{
+				GearBase gear = _gears[i];
+				if (gear != null && gear.controller == c)
+					gear.Apply();
+			}
 		}
 
 		/// <summary>
@@ -1032,6 +1084,15 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		virtual public string text
+		{
+			get { return null; }
+			set { /*override in child*/}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		virtual public string icon
 		{
 			get { return null; }
 			set { /*override in child*/}
@@ -1463,30 +1524,35 @@ namespace FairyGUI
 				this.tooltips = str;
 		}
 
+		static Dictionary<string, int> GearXMLKeys = new Dictionary<string, int>()
+		{
+			{"gearDisplay",0},
+			{"gearXY",1},
+			{"gearSize",2},
+			{"gearLook",3},
+			{"gearColor",4},
+			{"gearAni",5},
+			{"gearText",6},
+			{"gearIcon",7}
+		};
+
 		virtual public void Setup_AfterAdd(XML xml)
 		{
-			XML cxml = null;
 			string str;
 
 			str = xml.GetAttribute("group");
 			if (str != null)
 				group = parent.GetChildById(str) as GGroup;
 
-			cxml = xml.GetNode("gearDisplay");
-			if (cxml != null)
-				gearDisplay.Setup(cxml);
-
-			cxml = xml.GetNode("gearXY");
-			if (cxml != null)
-				gearXY.Setup(cxml);
-
-			cxml = xml.GetNode("gearSize");
-			if (cxml != null)
-				gearSize.Setup(cxml);
-
-			cxml = xml.GetNode("gearLook");
-			if (cxml != null)
-				gearLook.Setup(cxml);
+			XMLList.Enumerator et = xml.GetEnumerator();
+			XML cxml;
+			int index;
+			while (et.MoveNext())
+			{
+				cxml = et.Current;
+				if (GearXMLKeys.TryGetValue(cxml.name, out index))
+					GetGear(index).Setup(cxml);
+			}
 		}
 
 		#region Drag support

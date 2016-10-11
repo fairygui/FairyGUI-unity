@@ -81,7 +81,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Icon of the button.
 		/// </summary>
-		public string icon
+		override public string icon
 		{
 			get
 			{
@@ -91,12 +91,9 @@ namespace FairyGUI
 			{
 				_icon = value;
 				value = (_selected && _selectedIcon != null) ? _selectedIcon : _icon;
-				if (_iconObject is GLoader)
-					((GLoader)_iconObject).url = value;
-				else if (_iconObject is GLabel)
-					((GLabel)_iconObject).icon = value;
-				else if (_iconObject is GButton)
-					((GButton)_iconObject).icon = value;
+				if (_iconObject != null)
+					_iconObject.icon = value;
+				UpdateGear(7);
 			}
 		}
 
@@ -114,6 +111,7 @@ namespace FairyGUI
 				_title = value;
 				if (_titleObject != null)
 					_titleObject.text = (_selected && _selectedTitle != null) ? _selectedTitle : _title;
+				UpdateGear(6);
 			}
 		}
 
@@ -139,12 +137,8 @@ namespace FairyGUI
 			{
 				_selectedIcon = value;
 				value = (_selected && _selectedIcon != null) ? _selectedIcon : _icon;
-				if (_iconObject is GLoader)
-					((GLoader)_iconObject).url = value;
-				else if (_iconObject is GLabel)
-					((GLabel)_iconObject).icon = value;
-				else if (_iconObject is GButton)
-					((GButton)_iconObject).icon = value;
+				if (_iconObject != null)
+					_iconObject.icon = value;
 			}
 		}
 
@@ -216,12 +210,8 @@ namespace FairyGUI
 					if (_selectedIcon != null)
 					{
 						string str = _selected ? _selectedIcon : _icon;
-						if (_iconObject is GLoader)
-							((GLoader)_iconObject).url = str;
-						else if (_iconObject is GLabel)
-							((GLabel)_iconObject).icon = str;
-						else if (_iconObject is GButton)
-							((GButton)_iconObject).icon = str;
+						if (_iconObject != null)
+							_iconObject.icon = str;
 					}
 					if (_relatedController != null
 						&& parent != null

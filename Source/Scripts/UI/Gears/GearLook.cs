@@ -43,6 +43,9 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
+			if (value == "-")
+				return;
+
 			string[] arr = value.Split(',');
 			if (pageId == null)
 			{
@@ -117,7 +120,7 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_owner._gearLocked)
+			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
 			GearLookValue gv;

@@ -66,6 +66,7 @@ namespace FairyGUI
 			{
 				if (_titleObject != null)
 					_titleObject.text = value;
+				UpdateGear(6);
 			}
 		}
 

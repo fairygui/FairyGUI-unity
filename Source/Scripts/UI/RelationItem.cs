@@ -172,8 +172,7 @@ namespace FairyGUI
 				ox = _owner.x - ox;
 				oy = _owner.y - oy;
 
-				if (_owner.gearXY.controller != null)
-					_owner.gearXY.UpdateFromRelations(ox, oy);
+				_owner.UpdateGearFromRelations(1, ox, oy);
 
 				if (_owner.parent != null)
 				{
@@ -461,8 +460,7 @@ namespace FairyGUI
 				ox = _owner.x - ox;
 				oy = _owner.y - oy;
 
-				if (_owner.gearXY.controller != null)
-					_owner.gearXY.UpdateFromRelations(ox, oy);
+				_owner.UpdateGearFromRelations(1, ox, oy);
 
 				if (_owner.parent != null)
 				{
@@ -503,8 +501,7 @@ namespace FairyGUI
 				ox = _owner.x - ox;
 				oy = _owner.y - oy;
 
-				if (_owner.gearXY.controller != null)
-					_owner.gearXY.UpdateFromRelations(ox, oy);
+				_owner.UpdateGearFromRelations(1, ox, oy);
 
 				if (_owner.parent != null)
 				{
@@ -519,8 +516,7 @@ namespace FairyGUI
 				ow = _owner._rawWidth - ow;
 				oh = _owner._rawHeight - oh;
 
-				if (_owner.gearSize.controller != null)
-					_owner.gearSize.UpdateFromRelations(ow, oh);
+				_owner.UpdateGearFromRelations(2, ox, oy);
 			}
 
 			_owner.relations.handling = null;

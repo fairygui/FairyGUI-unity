@@ -35,6 +35,9 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
+			if (value == "-")
+				return;
+
 			Color col = ToolSet.ConvertFromHtmlColor(value);
 			if (pageId == null)
 				_default.color = col;
@@ -57,7 +60,7 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_owner._gearLocked)
+			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
 			GearColorValue cv;

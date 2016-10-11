@@ -46,6 +46,9 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
+			if (value == "-")
+				return;
+
 			string[] arr = value.Split(',');
 			GearSizeValue gv;
 			if (pageId == null)
@@ -124,7 +127,7 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_owner._gearLocked)
+			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
 			GearSizeValue gv;
@@ -139,9 +142,9 @@ namespace FairyGUI
 			}
 		}
 
-		internal void UpdateFromRelations(float dx, float dy)
+		override public void UpdateFromRelations(float dx, float dy)
 		{
-			if (_storage != null)
+			if (_controller != null && _storage != null)
 			{
 				foreach (GearSizeValue gv in _storage.Values)
 				{
