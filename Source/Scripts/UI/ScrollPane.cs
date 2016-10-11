@@ -14,6 +14,8 @@ namespace FairyGUI
 		/// </summary>
 		public EventListener onScroll { get; private set; }
 		public EventListener onScrollEnd { get; private set; }
+		public EventListener onPullDownRelease { get; private set; }
+		public EventListener onPullUpRelease { get; private set; }
 
 		float _maskWidth;
 		float _maskHeight;
@@ -83,6 +85,8 @@ namespace FairyGUI
 		{
 			onScroll = new EventListener(this, "onScroll");
 			onScrollEnd = new EventListener(this, "onScrollEnd");
+			onPullDownRelease = new EventListener(this, "onPullDownRelease");
+			onPullUpRelease = new EventListener(this, "onPullUpRelease");
 
 			_refreshDelegate = Refresh;
 			_touchEndDelegate = __touchEnd;
@@ -1556,9 +1560,15 @@ namespace FairyGUI
 
 			Vector2 change1, change2;
 			float endX = 0, endY = 0;
+			int fireRelease = 0;
 
 			if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Horizontal)
 			{
+				if (_maskContentHolder.x > UIConfig.touchDragSensitivity)
+					fireRelease = 1;
+				else if (_maskContentHolder.x < Mathf.Min(_maskWidth - _contentWidth) - UIConfig.touchDragSensitivity)
+					fireRelease = 2;
+
 				change1.x = ThrowTween.CalculateChange(xVelocity, duration);
 				change2.x = 0;
 				endX = _maskContentHolder.x + change1.x;
@@ -1591,6 +1601,11 @@ namespace FairyGUI
 
 			if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical)
 			{
+				if (_maskContentHolder.y > UIConfig.touchDragSensitivity)
+					fireRelease = 1;
+				else if (_maskContentHolder.y < Mathf.Min(_maskHeight - _contentHeight, 0) - UIConfig.touchDragSensitivity)
+					fireRelease = 2;
+
 				change1.y = ThrowTween.CalculateChange(yVelocity, duration);
 				change2.y = 0;
 				endY = _maskContentHolder.y + change1.y;
@@ -1670,6 +1685,11 @@ namespace FairyGUI
 				.SetUpdate(true)
 				.OnUpdate(__tweenUpdate2)
 				.OnComplete(__tweenComplete2);
+
+			if (fireRelease == 1)
+				onPullDownRelease.Call();
+			else if (fireRelease == 2)
+				onPullUpRelease.Call();
 		}
 
 		private void __mouseWheel(EventContext context)
