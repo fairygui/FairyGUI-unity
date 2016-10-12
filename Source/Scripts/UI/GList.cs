@@ -1922,7 +1922,7 @@ namespace FairyGUI
 			autoResizeItem = xml.GetAttributeBool("autoItemSize", true);
 
 			XMLList.Enumerator et = xml.GetEnumerator("item");
-			while(et.MoveNext())
+			while (et.MoveNext())
 			{
 				XML ix = et.Current;
 				string url = ix.GetAttribute("url");
@@ -1937,25 +1937,12 @@ namespace FairyGUI
 				if (obj != null)
 				{
 					AddChild(obj);
-					if (obj is GButton)
-					{
-						str = ix.GetAttribute("title");
-						if (str != null)
-							((GButton)obj).title = str;
-						str = ix.GetAttribute("icon");
-						if (str != null)
-							((GButton)obj).icon = str;
-					}
-					else if (obj is GLabel)
-					{
-						str = ix.GetAttribute("title");
-						if (str != null)
-							((GLabel)obj).title = str;
-						str = ix.GetAttribute("icon");
-						if (str != null)
-							((GLabel)obj).icon = str;
-					}
-
+					str = ix.GetAttribute("title");
+					if (str != null)
+						obj.text = str;
+					str = ix.GetAttribute("icon");
+					if (str != null)
+						obj.icon = str;
 					str = ix.GetAttribute("name");
 					if (str != null)
 						obj.name = str;

@@ -19,7 +19,7 @@ namespace FairyGUI
 
 		protected override void Init()
 		{
-			_default = null;
+			_default = _owner.icon;
 			_storage = new Dictionary<string, string>();
 		}
 
