@@ -186,7 +186,7 @@ public class RenderImage
 			useMipMap = false
 		};
 		this._image.texture = new NTexture(_renderTexture);
-		this._image.shader = "FairyGUI/Image (Opaque)";
+		this._image.blendMode = BlendMode.Off;
 	}
 
 	void DestroyTexture()
