@@ -932,6 +932,9 @@ namespace FairyGUI
 			{
 				CheckVirtualList();
 
+				if (index >= _virtualItems.Count)
+					throw new Exception("Invalid child index: " + index + ">" + _virtualItems.Count);
+
 				Rect rect;
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 				{
@@ -1692,14 +1695,14 @@ namespace FairyGUI
 				{
 					float saved = yValue;
 					int index = GetIndexOnPos1(ref yValue);
-					if (saved - yValue > _virtualItems[index].size.y / 2 && index < _realNumItems)
+					if (index < _virtualItems.Count && saved - yValue > _virtualItems[index].size.y / 2 && index < _realNumItems)
 						yValue += _virtualItems[index].size.y + _lineGap;
 				}
 				else
 				{
 					float saved = xValue;
 					int index = GetIndexOnPos2(ref xValue);
-					if (saved - xValue > _virtualItems[index].size.x / 2 && index < _realNumItems)
+					if (index < _virtualItems.Count && saved - xValue > _virtualItems[index].size.x / 2 && index < _realNumItems)
 						xValue += _virtualItems[index].size.x + _columnGap;
 				}
 			}
