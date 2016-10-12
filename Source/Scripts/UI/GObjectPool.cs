@@ -85,8 +85,13 @@ namespace FairyGUI
 		{
 			string url = obj.resourceURL;
 			Queue<GObject> arr;
-			if (_pool.TryGetValue(url, out arr))
-				arr.Enqueue(obj);
+			if (!_pool.TryGetValue(url, out arr))
+			{
+				arr = new Queue<GObject>();
+				_pool.Add(url, arr);
+			}
+			
+			arr.Enqueue(obj);
 		}
 	}
 }

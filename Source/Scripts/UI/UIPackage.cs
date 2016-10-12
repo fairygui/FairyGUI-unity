@@ -829,73 +829,113 @@ namespace FairyGUI
 
 			float frameTime = UIConfig.frameTimeForAsyncUIConstruction;
 
-			ArrayList itemList = new ArrayList();
+			List<DisplayListItem> itemList = new List<DisplayListItem>();
 			CollectComponentChildren(item, itemList);
-			itemList.Add(item);
+			itemList.Add(new DisplayListItem(item, null));
 
 			int cnt = itemList.Count;
 			List<GObject> objectPool = new List<GObject>(cnt);
-			PackageItem pi;
 			GObject obj;
-			object itemClass;
+			DisplayListItem di;
 			float t = Time.realtimeSinceStartup;
 
 			for (int i = 0; i < cnt; i++)
 			{
-				itemClass = itemList[i];
-				if (itemClass is PackageItem)
+				di = itemList[i];
+				if (di.packageItem != null)
 				{
-					pi = (PackageItem)itemClass;
-					obj = UIObjectFactory.NewObject(pi);
-					obj.packageItem = pi;
+					obj = UIObjectFactory.NewObject(di.packageItem);
+					obj.packageItem = di.packageItem;
 					objectPool.Add(obj);
+
 					_constructing++;
-					if (pi.type == PackageItemType.Component)
+					if (di.packageItem.type == PackageItemType.Component)
 					{
-						int poolStart = objectPool.Count - pi.componentChildren.Count - 1;
+						int poolStart = objectPool.Count - di.packageItem.displayList.Length - 1;
 
 						((GComponent)obj).ConstructFromResource(objectPool, poolStart);
 
-						objectPool.RemoveRange(poolStart, pi.componentChildren.Count);
+						objectPool.RemoveRange(poolStart, di.packageItem.displayList.Length);
 					}
 					else
 					{
-						GetItemAsset(pi);
+						GetItemAsset(di.packageItem);
 						obj.ConstructFromResource();
 					}
 					_constructing--;
 				}
 				else
 				{
-					obj = UIObjectFactory.NewObject((string)itemClass);
+					obj = UIObjectFactory.NewObject(di.type);
 					objectPool.Add(obj);
+
+					if (di.type == "list" && di.listItemCount > 0)
+					{
+						int poolStart = objectPool.Count - di.listItemCount - 1;
+						for (int k = 0; k < di.listItemCount; k++) //把他们都放到pool里，这样GList在创建时就不需要创建对象了
+							((GList)obj).itemPool.ReturnObject(objectPool[k + poolStart]);
+						objectPool.RemoveRange(poolStart, di.listItemCount);
+					}
 				}
 
-				if ((i % 5 == 1) && Time.realtimeSinceStartup - t >= frameTime)
+				if ((i % 5 == 0) && Time.realtimeSinceStartup - t >= frameTime)
 				{
-					t = Time.realtimeSinceStartup;
 					yield return null;
+					t = Time.realtimeSinceStartup;
 				}
 			}
 
 			callback(objectPool[0]);
 		}
 
-		void CollectComponentChildren(PackageItem item, IList list)
+		/// <summary>
+		/// 收集创建目标对象所需的所有类型信息
+		/// </summary>
+		/// <param name="item"></param>
+		/// <param name="list"></param>
+		void CollectComponentChildren(PackageItem item, List<DisplayListItem> list)
 		{
 			if (!item.decoded)
 				LoadComponent(item);
-			if (item.componentChildren == null)
+			if (item.displayList == null)
 				LoadComponentChildren(item);
 
-			int cnt = item.componentChildren.Count;
+			int cnt = item.displayList.Length;
 			for (int i = 0; i < cnt; i++)
 			{
-				object cc = item.componentChildren[i];
-				if (cc is PackageItem && ((PackageItem)cc).type == PackageItemType.Component)
-					CollectComponentChildren((PackageItem)cc, list);
+				DisplayListItem di = item.displayList[i];
+				if (di.packageItem != null && di.packageItem.type == PackageItemType.Component)
+					CollectComponentChildren(di.packageItem, list);
+				else if (di.type == "list") //也要收集列表的item
+				{
+					XMLList.Enumerator et = di.desc.GetEnumerator("item");
+					string defaultItem = null;
+					di.listItemCount = 0;
+					while (et.MoveNext())
+					{
+						XML ix = et.Current;
+						string url = ix.GetAttribute("url");
+						if (string.IsNullOrEmpty(url))
+						{
+							if (defaultItem == null)
+								defaultItem = di.desc.GetAttribute("defaultItem");
+							url = defaultItem;
+							if (string.IsNullOrEmpty(url))
+								continue;
+						}
 
-				list.Add(cc);
+						PackageItem pi = UIPackage.GetItemByURL(url);
+						if (pi != null)
+						{
+							if (pi.type == PackageItemType.Component)
+								CollectComponentChildren(pi, list);
+
+							list.Add(new DisplayListItem(pi, null));
+							di.listItemCount++;
+						}
+					}
+				}
+				list.Add(di);
 			}
 		}
 
@@ -994,7 +1034,7 @@ namespace FairyGUI
 						item.decoded = true;
 						LoadComponent(item);
 					}
-					if (!_loadingPackage && item.componentChildren == null)
+					if (!_loadingPackage && item.displayList == null)
 						LoadComponentChildren(item);
 					return item.componentData;
 
@@ -1093,7 +1133,8 @@ namespace FairyGUI
 			{
 				XMLList col = listNode.Elements();
 				int dcnt = col.Count;
-				item.componentChildren = new ArrayList(dcnt);
+				item.displayList = new DisplayListItem[dcnt];
+				DisplayListItem di;
 				for (int i = 0; i < dcnt; i++)
 				{
 					XML cxml = col[i];
@@ -1110,21 +1151,24 @@ namespace FairyGUI
 
 						PackageItem pi = pkg != null ? pkg.GetItem(src) : null;
 						if (pi != null)
-							item.componentChildren.Add(pi);
+							di = new DisplayListItem(pi, null);
 						else
-							item.componentChildren.Add(cxml.name);
+							di = new DisplayListItem(null, cxml.name);
 					}
 					else
 					{
 						if (cxml.name == "text" && cxml.GetAttributeBool("input", false))
-							item.componentChildren.Add("inputtext");
+							di = new DisplayListItem(null, "inputtext");
 						else
-							item.componentChildren.Add(cxml.name);
+							di = new DisplayListItem(null, cxml.name);
 					}
+
+					di.desc = cxml;
+					item.displayList[i] = di;
 				}
 			}
 			else
-				item.componentChildren = new ArrayList(0);
+				item.displayList = new DisplayListItem[0];
 		}
 
 		void TranslateComponent(XML xml, Dictionary<string, string> strings)

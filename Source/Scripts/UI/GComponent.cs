@@ -1238,48 +1238,43 @@ namespace FairyGUI
 
 			GObject child;
 
-			XML listNode = xml.GetNode("displayList");
-			XMLList displayList = null;
-			int childCount = 0;
-			if (listNode != null)
+			DisplayListItem[] displayList = packageItem.displayList;
+			int childCount = displayList.Length;
+			for (int i = 0; i < childCount; i++)
 			{
-				displayList = listNode.Elements();
-				childCount = displayList.Count;
-				for (int i = 0; i < childCount; i++)
+				DisplayListItem di = displayList[i];
+				if (objectPool != null)
 				{
-					if (objectPool != null)
+					child = objectPool[poolIndex + i];
+				}
+				else
+				{
+					if (di.packageItem != null)
 					{
-						child = objectPool[poolIndex + i];
+						di.packageItem.Load();
+						child = UIObjectFactory.NewObject(di.packageItem);
+						child.packageItem = di.packageItem;
+						child.ConstructFromResource();
 					}
 					else
-					{
-						object tt = packageItem.componentChildren[i];
-						if (tt is PackageItem)
-						{
-							((PackageItem)tt).Load();
-							child = UIObjectFactory.NewObject((PackageItem)tt);
-							child.packageItem = (PackageItem)tt;
-							child.ConstructFromResource();
-						}
-						else
-							child = UIObjectFactory.NewObject((string)tt);
-					}
-
-					child.underConstruct = true;
-					child.Setup_BeforeAdd(displayList[i]);
-					child.parent = this;
-					_children.Add(child);
+						child = UIObjectFactory.NewObject(di.type);
 				}
+
+				child.underConstruct = true;
+				child.Setup_BeforeAdd(di.desc);
+				child.parent = this;
+				_children.Add(child);
 			}
+
 			this.relations.Setup(xml);
 
 			for (int i = 0; i < childCount; i++)
-				_children[i].relations.Setup(displayList[i]);
+				_children[i].relations.Setup(displayList[i].desc);
 
 			for (int i = 0; i < childCount; i++)
 			{
 				child = _children[i];
-				child.Setup_AfterAdd(displayList[i]);
+				child.Setup_AfterAdd(displayList[i].desc);
 				child.underConstruct = false;
 			}
 

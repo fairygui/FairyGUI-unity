@@ -11,6 +11,7 @@ namespace FairyGUI
 		int _lineSize;
 		Color _lineColor;
 		Color _fillColor;
+		Color[] _colors;
 		Vector2[] _polygonPoints;
 
 		public Shape()
@@ -32,6 +33,16 @@ namespace FairyGUI
 			_lineSize = lineSize;
 			_lineColor = lineColor;
 			_fillColor = fillColor;
+			_colors = null;
+			_requireUpdateMesh = true;
+		}
+
+		public void DrawRect(int lineSize, Color[] colors)
+		{
+			_type = 1;
+			_touchDisabled = false;
+			_lineSize = lineSize;
+			_colors = colors;
 			_requireUpdateMesh = true;
 		}
 
@@ -73,7 +84,7 @@ namespace FairyGUI
 					if (_contentRect.width > 0 && _contentRect.height > 0)
 					{
 						if (_type == 1)
-							graphics.DrawRect(_contentRect, _lineSize, _lineColor, _fillColor);
+							graphics.DrawRect(_contentRect, _lineSize, _lineColor, _fillColor, _colors);
 						else if (_type == 2)
 							graphics.DrawEllipse(_contentRect, _fillColor);
 						else

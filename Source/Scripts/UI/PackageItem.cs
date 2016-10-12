@@ -33,7 +33,7 @@ namespace FairyGUI
 
 		//componenet
 		public XML componentData;
-		public ArrayList componentChildren;
+		public DisplayListItem[] displayList;
 
 		//font
 		public BitmapFont bitmapFont;
@@ -47,6 +47,23 @@ namespace FairyGUI
 		public object Load()
 		{
 			return owner.GetItemAsset(this);
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class DisplayListItem
+	{
+		public PackageItem packageItem;
+		public string type;
+		public XML desc;
+		public int listItemCount;
+
+		public DisplayListItem(PackageItem pi, string type)
+		{
+			this.packageItem = pi;
+			this.type = type;
 		}
 	}
 }

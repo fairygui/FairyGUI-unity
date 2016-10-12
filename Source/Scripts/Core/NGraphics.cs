@@ -403,7 +403,7 @@ namespace FairyGUI
 				_stencilEraser.meshFilter.mesh = mesh;
 		}
 
-		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color)
+		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color, Color[] allColors = null)
 		{
 			//当四边形发生形变时，只用两个三角面表达会造成图形的变形较严重，这里做一个优化，自动增加更多的面
 			if (vertexMatrix != null)
@@ -433,26 +433,33 @@ namespace FairyGUI
 				uv[7] = new Vector2(uvRect.xMax, cy);
 				uv[8] = new Vector2(cx, uvRect.yMin);
 
-				FillColors(color);
 				this.triangles = TRIANGLES_4_GRID;
-				UpdateMesh();
 			}
 			else
 			{
 				Alloc(4);
 				FillVerts(0, drawRect);
 				FillUV(0, uvRect);
-				FillColors(color);
 				this.triangles = TRIANGLES;
-				UpdateMesh();
 			}
+
+			if (allColors != null)
+			{
+				Color32[] arr = this.colors;
+				int count = arr.Length;
+				for (int i = 0; i < count; i++)
+					arr[i] = allColors[i % allColors.Length];
+			}
+			else
+				FillColors(color);
+			UpdateMesh();
 		}
 
-		public void DrawRect(Rect vertRect, int lineSize, Color lineColor, Color fillColor)
+		public void DrawRect(Rect vertRect, int lineSize, Color lineColor, Color fillColor, Color[] allColors)
 		{
 			if (lineSize == 0)
 			{
-				SetOneQuadMesh(new Rect(0, 0, vertRect.width, vertRect.height), new Rect(0, 0, 1, 1), fillColor);
+				SetOneQuadMesh(new Rect(0, 0, vertRect.width, vertRect.height), new Rect(0, 0, 1, 1), fillColor, allColors);
 			}
 			else
 			{
@@ -480,13 +487,21 @@ namespace FairyGUI
 				for (i = 0; i < 5; i++)
 					FillUV(i * 4, rect);
 
-				Color32 col32 = lineColor;
-				for (i = 0; i < 16; i++)
-					this.colors[i] = col32;
+				if (allColors != null)
+				{
+					for (i = 0; i < 20; i++)
+						this.colors[i] = allColors[i % allColors.Length];
+				}
+				else
+				{
+					Color32 col32 = lineColor;
+					for (i = 0; i < 16; i++)
+						this.colors[i] = col32;
 
-				col32 = fillColor;
-				for (i = 16; i < 20; i++)
-					this.colors[i] = col32;
+					col32 = fillColor;
+					for (i = 16; i < 20; i++)
+						this.colors[i] = col32;
+				}
 
 				FillTriangles();
 				UpdateMesh();
@@ -668,10 +683,11 @@ namespace FairyGUI
 
 		public void FillColors(Color value)
 		{
-			int count = this.colors.Length;
+			Color32[] arr = this.colors;
+			int count = arr.Length;
 			Color32 col32 = value;
 			for (int i = 0; i < count; i++)
-				this.colors[i] = col32;
+				arr[i] = col32;
 		}
 
 		void AllocTriangleArray(int requestSize)

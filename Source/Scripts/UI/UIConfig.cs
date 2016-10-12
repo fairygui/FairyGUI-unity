@@ -144,7 +144,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static float frameTimeForAsyncUIConstruction = 0.02f;
+		public static float frameTimeForAsyncUIConstruction = 0.002f;
 
 		public enum ConfigKey
 		{
