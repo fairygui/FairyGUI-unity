@@ -59,6 +59,7 @@ namespace FairyGUI
 		Regex _restrictPattern;
 		bool _displayAsPassword;
 		string _promptText;
+		string _decodedPromptText;
 
 		bool _editing;
 		int _caretPosition;
@@ -113,8 +114,7 @@ namespace FairyGUI
 				ClearSelection();
 				if (_caretPosition > textField.text.Length)
 					_caretPosition = textField.text.Length;
-				if (_displayAsPassword)
-					UpdateAlternativeText();
+				UpdateAlternativeText();
 			}
 		}
 
@@ -186,6 +186,10 @@ namespace FairyGUI
 			set
 			{
 				_promptText = value;
+				if (!string.IsNullOrEmpty(_promptText))
+					_decodedPromptText = UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText));
+				else
+					_decodedPromptText = null;
 				UpdateAlternativeText();
 			}
 		}
@@ -280,9 +284,9 @@ namespace FairyGUI
 
 		void UpdateAlternativeText()
 		{
-			if (!_editing && !string.IsNullOrEmpty(_promptText) && this.text.Length == 0)
+			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText) )
 			{
-				textField.SetAlternativeText(UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText)), true);
+				textField.SetAlternativeText(_decodedPromptText, true);
 			}
 			else
 			{
