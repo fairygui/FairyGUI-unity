@@ -487,20 +487,22 @@ namespace FairyGUI
 				for (i = 0; i < 5; i++)
 					FillUV(i * 4, rect);
 
+				Color32[] arr = this.colors;
 				if (allColors != null)
 				{
+					int colorCnt = allColors.Length;
 					for (i = 0; i < 20; i++)
-						this.colors[i] = allColors[i % allColors.Length];
+						arr[i] = allColors[i % colorCnt];
 				}
 				else
 				{
 					Color32 col32 = lineColor;
 					for (i = 0; i < 16; i++)
-						this.colors[i] = col32;
+						arr[i] = col32;
 
 					col32 = fillColor;
 					for (i = 16; i < 20; i++)
-						this.colors[i] = col32;
+						arr[i] = col32;
 				}
 
 				FillTriangles();
@@ -508,7 +510,7 @@ namespace FairyGUI
 			}
 		}
 
-		public void DrawEllipse(Rect vertRect, Color fillColor)
+		public void DrawEllipse(Rect vertRect, Color fillColor, Color[] allColors)
 		{
 			float radiusX = vertRect.width / 2;
 			float radiusY = vertRect.height / 2;
@@ -541,12 +543,23 @@ namespace FairyGUI
 			triangles[k++] = numSides;
 			triangles[k++] = 0;
 
-			FillColors(fillColor);
+			if (allColors != null)
+			{
+				int colorCnt = allColors.Length;
+				Color32[] arr = this.colors;
+				arr[0] = allColors[0];
+				colorCnt--;
+				for (int i = 1; i <= numSides; i++)
+					arr[i] = allColors[(i - 1) % colorCnt + 1];
+			}
+			else
+				FillColors(fillColor);
+
 			UpdateMesh();
 		}
 
 		static List<int> sRestIndices = new List<int>();
-		public void DrawPolygon(Vector2[] points, Color fillColor)
+		public void DrawPolygon(Vector2[] points, Color fillColor, Color[] allColors)
 		{
 			int numVertices = points.Length;
 			if (numVertices < 3)
@@ -629,7 +642,16 @@ namespace FairyGUI
 			triangles[k++] = sRestIndices[1];
 			triangles[k++] = sRestIndices[2];
 
-			FillColors(fillColor);
+			if (allColors != null)
+			{
+				int colorCnt = allColors.Length;
+				Color32[] arr = this.colors;
+				for (i = 0; i < numVertices; i++)
+					arr[i] = allColors[i % colorCnt];
+			}
+			else
+				FillColors(fillColor);
+
 			UpdateMesh();
 		}
 

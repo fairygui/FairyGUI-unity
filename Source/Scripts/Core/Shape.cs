@@ -29,42 +29,63 @@ namespace FairyGUI
 		public void DrawRect(int lineSize, Color lineColor, Color fillColor)
 		{
 			_type = 1;
-			_touchDisabled = false;
 			_lineSize = lineSize;
 			_lineColor = lineColor;
 			_fillColor = fillColor;
 			_colors = null;
+
+			_touchDisabled = false;
 			_requireUpdateMesh = true;
 		}
 
 		public void DrawRect(int lineSize, Color[] colors)
 		{
 			_type = 1;
-			_touchDisabled = false;
 			_lineSize = lineSize;
 			_colors = colors;
+
+			_touchDisabled = false;
 			_requireUpdateMesh = true;
 		}
 
 		public void DrawEllipse(Color fillColor)
 		{
 			_type = 2;
-			_touchDisabled = false;
-			_lineSize = 0;
-			_lineColor = Color.clear;
 			_fillColor = fillColor;
+			_colors = null;
+
+			_touchDisabled = false;
 			_requireUpdateMesh = true;
 		}
 
-		public void DrawPolygon(Color fillColor, Vector2[] points)
+		public void DrawEllipse(Color[] colors)
+		{
+			_type = 2;
+			_colors = colors;
+
+			_touchDisabled = false;
+			_requireUpdateMesh = true;
+		}
+
+		public void DrawPolygon(Vector2[] points, Color fillColor)
 		{
 			_type = 3;
-			_touchDisabled = false;
-			_lineSize = 0;
-			_lineColor = Color.clear;
-			_fillColor = fillColor;
-			_requireUpdateMesh = true;
 			_polygonPoints = points;
+			_fillColor = fillColor;
+			_colors = null;
+
+			_touchDisabled = false;
+			_requireUpdateMesh = true;
+		}
+
+		public void DrawPolygon(Vector2[] points, Color[] colors)
+		{
+			_type = 3;
+			_polygonPoints = points;
+			_colors = colors;
+
+			_touchDisabled = false;
+			_requireUpdateMesh = true;
 		}
 
 		public void Clear()
@@ -86,9 +107,9 @@ namespace FairyGUI
 						if (_type == 1)
 							graphics.DrawRect(_contentRect, _lineSize, _lineColor, _fillColor, _colors);
 						else if (_type == 2)
-							graphics.DrawEllipse(_contentRect, _fillColor);
+							graphics.DrawEllipse(_contentRect, _fillColor, _colors);
 						else
-							graphics.DrawPolygon(_polygonPoints, _fillColor);
+							graphics.DrawPolygon(_polygonPoints, _fillColor, _colors);
 					}
 					else
 						graphics.ClearMesh();
