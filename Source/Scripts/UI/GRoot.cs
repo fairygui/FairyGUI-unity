@@ -37,10 +37,8 @@ namespace FairyGUI
 
 		public GRoot()
 		{
-			this.name = "GRoot";
-			this.rootContainer.gameObject.name = "GRoot";
+			this.name = this.rootContainer.name = this.rootContainer.gameObject.name = "GRoot";
 			this.opaque = false;
-			ApplyContentScaleFactor();
 
 			_popupStack = new List<GObject>();
 			_justClosedPopups = new List<GObject>();

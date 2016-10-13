@@ -93,6 +93,7 @@ namespace FairyGUI
 			{
 				_inst = new Stage();
 				GRoot._inst = new GRoot();
+				GRoot._inst.ApplyContentScaleFactor();
 				_inst.AddChild(GRoot._inst.displayObject);
 
 				StageCamera.CheckMainCamera();

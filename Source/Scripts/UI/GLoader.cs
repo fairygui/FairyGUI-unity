@@ -267,7 +267,7 @@ namespace FairyGUI
 
 			set
 			{
-				ClearContent();
+				this.url = null;
 
 				_content.texture = value;
 				if (value != null)

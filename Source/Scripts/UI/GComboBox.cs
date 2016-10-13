@@ -363,6 +363,9 @@ namespace FairyGUI
 
 		private void __touchBegin(EventContext context)
 		{
+			if (context.initiator is InputTextField)
+				return;
+
 			_down = true;
 
 			if (dropdown != null)

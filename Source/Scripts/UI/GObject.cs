@@ -1066,16 +1066,20 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (this is GRoot)
-					return (GRoot)this;
-
-				GObject p = parent;
-				while (p != null)
-				{
-					if (p is GRoot)
-						return (GRoot)p;
+				GObject p = this;
+				while (p.parent != null)
 					p = p.parent;
+
+				if (p is GRoot)
+					return (GRoot)p;
+
+				if (p.displayObject != null && p.displayObject.parent != null)
+				{
+					DisplayObject d = p.displayObject.parent.GetChild("GRoot");
+					if (d != null && (d.gOwner is GRoot))
+						return (GRoot)d.gOwner;
 				}
+
 				return GRoot.inst;
 			}
 		}
