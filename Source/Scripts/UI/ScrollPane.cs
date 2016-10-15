@@ -835,6 +835,9 @@ namespace FairyGUI
 		{
 			get
 			{
+				if (!_hScroll)
+					return 0;
+
 				float diff = _contentWidth - _maskWidth;
 				float mx = _maskContentHolder.x;
 				if (mx > 0)
@@ -850,6 +853,9 @@ namespace FairyGUI
 		{
 			get
 			{
+				if (!_vScroll)
+					return 0;
+
 				float diff = _contentHeight - _maskHeight;
 				float my = _maskContentHolder.y;
 				if (my > 0)
