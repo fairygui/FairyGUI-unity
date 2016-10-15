@@ -46,6 +46,18 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
  Version History
 ====
+1.6.0
+- NEW: Add ScrollPane.onPullDownRelease/ScrollPane.onPullUpRelease event.
+- NEW: UIPackage.CreateObjectAsync for creating object asynchronously.
+- NEW: Support GLabel input options.
+- NEW: Add GearText and GearIcon.
+- IMPROVE: Optimize speed and GC usage of UI construction.
+- IMPROVE: Refactor TextField. Added InputTextField.
+- IMPROVE: Add BlendMode.Off, Remove Image(Opaque) Shader.
+- FIXED: Fixed wrong caret position bug of input text.
+- FIXED: Call InvalidateBatchingState on progress changing of ProgressBar/Slider.
+- FIXED: Pixel snapping bug in relation system.
+
 1.5.3
 - FIXED: A Bug in multi-language file parsing.
 - FIXED: Failed to change scroll positions in onScroll event handler.
