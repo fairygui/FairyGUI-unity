@@ -68,8 +68,11 @@ namespace FairyGUI
 				mat = _target.graphics.material;
 			else
 				mat = _target.paintingGraphics.material;
-			mat.SetMatrix("_ColorMatrix", _shaderMatrix);
-			mat.SetVector("_ColorOffset", _offset);
+			if ((object)mat != null)
+			{
+				mat.SetMatrix("_ColorMatrix", _shaderMatrix);
+				mat.SetVector("_ColorOffset", _offset);
+			}
 		}
 
 		public void Invert()

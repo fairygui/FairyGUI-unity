@@ -705,6 +705,9 @@ namespace FairyGUI
 
 		void BuildNativeDisplayList()
 		{
+			if (displayObject == null || displayObject.isDisposed)
+				return;
+
 			int cnt = _children.Count;
 			if (cnt == 0)
 				return;
