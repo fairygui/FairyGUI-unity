@@ -1111,6 +1111,9 @@ namespace FairyGUI
 
 		private void Refresh()
 		{
+			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
+				return;
+
 			_needRefresh = false;
 			UpdateContext.OnBegin -= _refreshDelegate;
 
