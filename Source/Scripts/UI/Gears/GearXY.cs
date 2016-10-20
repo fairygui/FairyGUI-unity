@@ -86,6 +86,10 @@ namespace FairyGUI
 					}, new Vector2(gv.x, gv.y), tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
+					.OnUpdate(()=>
+					{
+						_owner.InvalidateBatchingState();
+					})
 					.OnComplete(() =>
 					{
 						tweener = null;

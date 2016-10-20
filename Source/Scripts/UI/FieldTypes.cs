@@ -139,7 +139,6 @@ namespace FairyGUI
 		Color,
 		Animation,
 		Visible,
-		Controller,
 		Sound,
 		Transition,
 		Shake,
@@ -445,8 +444,6 @@ namespace FairyGUI
 					return TransitionActionType.Animation;
 				case "Visible":
 					return TransitionActionType.Visible;
-				case "Controller":
-					return TransitionActionType.Controller;
 				case "Sound":
 					return TransitionActionType.Sound;
 				case "Transition":

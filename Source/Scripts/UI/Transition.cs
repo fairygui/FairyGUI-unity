@@ -22,24 +22,24 @@ namespace FairyGUI
 	public class Transition
 	{
 		/// <summary>
-		/// 
+		/// 动效的名称。在编辑器里设定。
 		/// </summary>
 		public string name { get; private set; }
 
 		/// <summary>
-		/// 
-		/// </summary>
-		public bool autoPlay;
-
-		/// <summary>
-		/// 
+		/// 自动播放的次数。
 		/// </summary>
 		public int autoPlayRepeat;
 
 		/// <summary>
-		/// 
+		/// 自动播放的延迟时间。
 		/// </summary>
 		public float autoPlayDelay;
+
+		/// <summary>
+		/// 当你启动了自动合批，动效里有涉及到XY、大小、旋转等的改变，如果你观察到元件的显示深度在播放过程中有错误，可以开启这个选项。
+		/// </summary>
+		public bool invalidateBatchingEveryFrame;
 
 		GComponent _owner;
 		List<TransitionItem> _items;
@@ -52,6 +52,7 @@ namespace FairyGUI
 		int _options;
 		bool _reversed;
 		float _maxTime;
+		bool _autoPlay;
 
 		const int FRAME_RATE = 24;
 
@@ -62,6 +63,31 @@ namespace FairyGUI
 			_owner = owner;
 			_items = new List<TransitionItem>();
 			autoPlayRepeat = 1;
+		}
+
+		/// <summary>
+		/// 动效是否自动播放。
+		/// </summary>
+		public bool autoPlay
+		{
+			get { return _autoPlay; }
+			set
+			{
+				if (_autoPlay != value)
+				{
+					_autoPlay = value;
+					if (_autoPlay)
+					{
+						if (_owner.onStage)
+							Play(autoPlayRepeat, autoPlayDelay, null);
+					}
+					else
+					{
+						if (!_owner.onStage)
+							Stop(false, true);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -324,10 +350,6 @@ namespace FairyGUI
 
 					case TransitionActionType.Visible:
 						value.b = Convert.ToBoolean(aParams[0]);
-						break;
-
-					case TransitionActionType.Controller:
-						value.s = (string)aParams[0];
 						break;
 
 					case TransitionActionType.Sound:
@@ -773,6 +795,8 @@ namespace FairyGUI
 							value.f2 = item.target.y;
 						item.target.SetXY(value.f1, value.f2);
 					}
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
 					break;
 
 				case TransitionActionType.Size:
@@ -781,10 +805,14 @@ namespace FairyGUI
 					if (!value.b2)
 						value.f2 = item.target.height;
 					item.target.SetSize(value.f1, value.f2);
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
 					break;
 
 				case TransitionActionType.Pivot:
 					item.target.SetPivot(value.f1, value.f2);
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
 					break;
 
 				case TransitionActionType.Alpha:
@@ -793,10 +821,14 @@ namespace FairyGUI
 
 				case TransitionActionType.Rotation:
 					item.target.rotation = value.i;
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
 					break;
 
 				case TransitionActionType.Scale:
 					item.target.SetScale(value.f1, value.f2);
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
 					break;
 
 				case TransitionActionType.Color:
@@ -812,26 +844,6 @@ namespace FairyGUI
 
 				case TransitionActionType.Visible:
 					item.target.visible = value.b;
-					break;
-
-				case TransitionActionType.Controller:
-					string[] arr = value.s.Split(',');
-					foreach (string str in arr)
-					{
-						string[] arr2 = str.Split('=');
-						Controller cc = ((GComponent)item.target).GetController(arr2[0]);
-						if (cc != null)
-						{
-							string str2 = arr2[1];
-							if (str2[0] == '$')
-							{
-								str2 = str.Substring(1);
-								cc.selectedPage = str2;
-							}
-							else
-								cc.selectedIndex = int.Parse(str2);
-						}
-					}
 					break;
 
 				case TransitionActionType.Transition:
@@ -905,15 +917,15 @@ namespace FairyGUI
 		{
 			this.name = xml.GetAttribute("name");
 			_options = xml.GetAttributeInt("options");
-			this.autoPlay = xml.GetAttributeBool("autoPlay");
-			if (this.autoPlay)
+			_autoPlay = xml.GetAttributeBool("autoPlay");
+			if (_autoPlay)
 			{
 				this.autoPlayRepeat = xml.GetAttributeInt("autoPlayRepeat", 1);
 				this.autoPlayDelay = xml.GetAttributeFloat("autoPlayDelay");
 			}
 
 			XMLList.Enumerator et = xml.GetEnumerator("item");
-			while(et.MoveNext())
+			while (et.MoveNext())
 			{
 				XML cxml = et.Current;
 				TransitionItem item = new TransitionItem();
@@ -1022,10 +1034,6 @@ namespace FairyGUI
 
 				case TransitionActionType.Visible:
 					value.b = str == "true";
-					break;
-
-				case TransitionActionType.Controller:
-					value.s = str;
 					break;
 
 				case TransitionActionType.Sound:

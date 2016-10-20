@@ -98,10 +98,17 @@ namespace FairyGUI
 					}, new Vector2(gv.alpha, gv.rotation), tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
+					.OnUpdate(() =>
+					{
+						if(b)
+							_owner.InvalidateBatchingState();
+					})
 					.OnComplete(() =>
 					{
 						tweener = null;
 						_owner.internalVisible--;
+						if (b)
+							_owner.InvalidateBatchingState();
 					});
 
 					if (delay > 0)
