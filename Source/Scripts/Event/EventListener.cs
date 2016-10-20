@@ -137,7 +137,7 @@ namespace FairyGUI
 			{
 				if (_bridge == null)
 					_bridge = this.owner.TryGetEventBridge(_type);
-				return _bridge != null && _bridge.isEmpty;
+				return _bridge == null || _bridge.isEmpty;
 			}
 		}
 
