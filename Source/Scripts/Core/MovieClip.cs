@@ -169,11 +169,16 @@ namespace FairyGUI
 			{
 				Frame frame = frames[_currentFrame];
 
-				Rect uvRect = frame.uvRect;
-				if (_flip != FlipType.None)
-					ToolSet.FlipRect(ref uvRect, _flip);
+				if (frame.rect.width == 0)
+					graphics.ClearMesh();
+				else
+				{
+					Rect uvRect = frame.uvRect;
+					if (_flip != FlipType.None)
+						ToolSet.FlipRect(ref uvRect, _flip);
 
-				graphics.SetOneQuadMesh(frame.rect, uvRect, _color);
+					graphics.SetOneQuadMesh(frame.rect, uvRect, _color);
+				}
 			}
 		}
 

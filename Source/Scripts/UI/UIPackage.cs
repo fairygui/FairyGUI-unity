@@ -1308,20 +1308,33 @@ namespace FairyGUI
 			int frameCount = xml.GetAttributeInt("frameCount");
 			item.frames = new MovieClip.Frame[frameCount];
 
-			XMLList frameNodes = xml.GetNode("frames").Elements();
-
 			int i = 0;
-			foreach (XML frameNode in frameNodes)
+			string spriteId;
+			XML frameNode;
+			MovieClip.Frame frame;
+			AtlasSprite sprite;
+
+			XMLList.Enumerator et = xml.GetNode("frames").GetEnumerator();
+			while (et.MoveNext())
 			{
-				MovieClip.Frame frame = new MovieClip.Frame();
+				frameNode = et.Current;
+				frame = new MovieClip.Frame();
+
 				arr = frameNode.GetAttributeArray("rect");
 				frame.rect = new Rect(int.Parse(arr[0]), int.Parse(arr[1]), int.Parse(arr[2]), int.Parse(arr[3]));
 				str = frameNode.GetAttribute("addDelay");
 				if (str != null)
 					frame.addDelay = float.Parse(str) / 1000f;
 
-				AtlasSprite sprite;
-				if (_sprites.TryGetValue(item.id + "_" + i, out sprite))
+				str = frameNode.GetAttribute("sprite");
+				if (str != null)
+					spriteId = item.id + "_" + str;
+				else if (frame.rect.width != 0)
+					spriteId = item.id + "_" + i;
+				else
+					spriteId = null;
+
+				if (spriteId != null && _sprites.TryGetValue(spriteId, out sprite))
 				{
 					PackageItem atlasItem = _itemsById[sprite.atlas];
 					if (atlasItem != null)
