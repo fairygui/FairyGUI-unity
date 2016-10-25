@@ -1369,6 +1369,8 @@ namespace FairyGUI
 			int xadvance = 0;
 			bool resizable = false;
 			bool canTint = false;
+			bool hasFullChannel = false;
+			int lineHeight = 0;
 			BitmapFont.BMGlyph bg = null;
 
 			char[] splitter0 = new char[] { ' ' };
@@ -1411,15 +1413,17 @@ namespace FairyGUI
 					if (kv.TryGetValue("chnl", out str))
 					{
 						bg.channel = int.Parse(str);
-						if (bg.channel == 15)
-							bg.channel = 4;
-						else if (bg.channel == 1)
+						if (bg.channel == 1)
 							bg.channel = 3;
 						else if (bg.channel == 2)
 							bg.channel = 2;
-						else
+						else if (bg.channel == 3)
 							bg.channel = 1;
+						else
+							hasFullChannel = true;
 					}
+					else
+						hasFullChannel = true;
 
 					if (!ttf)
 					{
@@ -1445,7 +1449,7 @@ namespace FairyGUI
 					}
 
 					if (ttf)
-						bg.lineHeight = size;
+						bg.lineHeight = lineHeight;
 					else
 					{
 						if (bg.advance == 0)
@@ -1485,11 +1489,16 @@ namespace FairyGUI
 						resizable = str == "true";
 					if (kv.TryGetValue("colored", out str))
 						canTint = str == "true";
+
+					if (size == 0)
+						size = lineHeight;
+					else if (lineHeight == 0)
+						lineHeight = size;
 				}
 				else if (str == "common")
 				{
-					if (size == 0 && kv.TryGetValue("lineHeight", out str))
-						size = int.Parse(str);
+					if (kv.TryGetValue("lineHeight", out str))
+						lineHeight = int.Parse(str);
 					if (kv.TryGetValue("xadvance", out str))
 						xadvance = int.Parse(str);
 				}
@@ -1503,7 +1512,7 @@ namespace FairyGUI
 			font.size = size;
 			font.resizable = resizable;
 			font.mainTexture = mainTexture;
-			if (!ttf)
+			if (!ttf || hasFullChannel)
 				font.shader = ShaderConfig.imageShader;
 		}
 	}

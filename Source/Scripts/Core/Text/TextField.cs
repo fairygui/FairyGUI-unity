@@ -1076,7 +1076,7 @@ namespace FairyGUI
 									cp.lineIndex = (short)i;
 									cp.charIndex = (short)j;
 									cp.caretIndex = _charPositions.Count;
-									cp.vertCount = -1-elementIndex; //借用
+									cp.vertCount = -1 - elementIndex; //借用
 									cp.offsetX = (int)charX;
 									_charPositions.Add(cp);
 								}
@@ -1111,11 +1111,14 @@ namespace FairyGUI
 						if (_font.hasChannel)
 						{
 							//对于由BMFont生成的字体，使用这个特殊的设置告诉着色器告诉用的是哪个通道
-							specFlag = 10 * (glyph.channel == 0 ? 3 : (glyph.channel - 1));
-							u0.x += specFlag;
-							u1.x += specFlag;
-							u2.x += specFlag;
-							u3.x += specFlag;
+							if (glyph.channel != 0)
+							{
+								specFlag = 10 * (glyph.channel - 1);
+								u0.x += specFlag;
+								u1.x += specFlag;
+								u2.x += specFlag;
+								u3.x += specFlag;
+							}
 						}
 						else if (_font.canLight && format.bold)
 						{

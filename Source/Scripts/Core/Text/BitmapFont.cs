@@ -92,8 +92,8 @@ namespace FairyGUI
 				glyph.width = Mathf.CeilToInt(size * scale / 2);
 				glyph.height = Mathf.CeilToInt(size * scale);
 				glyph.vert.xMin = 0;
-				glyph.vert.xMax = glyph.width * scale;
-				glyph.vert.yMin = -glyph.height * scale;
+				glyph.vert.xMax = 0;
+				glyph.vert.yMin = 0;
 				glyph.vert.yMax = 0;
 				glyph.uvTopLeft = Vector2.zero;
 				glyph.uvBottomLeft = Vector2.zero;
@@ -108,8 +108,8 @@ namespace FairyGUI
 				glyph.height = Mathf.CeilToInt(bg.lineHeight * scale);
 				glyph.vert.xMin = bg.offsetX * scale;
 				glyph.vert.xMax = (bg.offsetX + bg.width) * scale;
-				glyph.vert.yMin = -bg.height * scale;
-				glyph.vert.yMax = 0;
+				glyph.vert.yMin = (-bg.height - bg.offsetY) * scale;
+				glyph.vert.yMax = -bg.offsetY * scale;
 				glyph.uvBottomLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMin);
 				glyph.uvTopLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMax);
 				glyph.uvTopRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMax);
