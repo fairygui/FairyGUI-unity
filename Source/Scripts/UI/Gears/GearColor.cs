@@ -51,8 +51,6 @@ namespace FairyGUI
 
 		override public void Apply()
 		{
-			_owner._gearLocked = true;
-
 			GearColorValue cv;
 			if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
 				cv = _default;
