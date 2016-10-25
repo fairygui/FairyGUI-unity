@@ -36,21 +36,6 @@ namespace FairyGUI
 				_textField.htmlText = _text;
 		}
 
-		public IHtmlObject GetHtmlObject(string name)
-		{
-			return richTextField.GetHtmlObject(name);
-		}
-
-		public IHtmlObject GetHtmlObjectAt(int index)
-		{
-			return richTextField.GetHtmlObjectAt(index);
-		}
-
-		public int htmlObjectCount
-		{
-			get { return richTextField.htmlObjectCount; }
-		}
-
 		/// <summary>
 		/// 
 		/// </summary>

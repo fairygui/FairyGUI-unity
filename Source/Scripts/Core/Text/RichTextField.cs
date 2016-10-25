@@ -79,15 +79,15 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		public IHtmlObject GetHtmlObject(string name)
+		public HtmlElement GetHtmlElement(string name)
 		{
 			List<HtmlElement> elements = textField.htmlElements;
 			int count = elements.Count;
 			for (int i = 0; i < count; i++)
 			{
 				HtmlElement element = elements[i];
-				if (element.htmlObject != null && name.Equals(element.name, System.StringComparison.OrdinalIgnoreCase))
-					return element.htmlObject;
+				if ( name.Equals(element.name, System.StringComparison.OrdinalIgnoreCase))
+					return element;
 			}
 
 			return null;
@@ -98,18 +98,46 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public IHtmlObject GetHtmlObjectAt(int index)
+		public HtmlElement GetHtmlElementAt(int index)
 		{
-			List<HtmlElement> elements = textField.htmlElements;
-			return elements[index].htmlObject;
+			return textField.htmlElements[index];
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public int htmlObjectCount
+		public int htmlElementCount
 		{
 			get { return textField.htmlElements.Count; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="show"></param>
+		public void ShowHtmlObject(int index, bool show)
+		{
+			HtmlElement element = textField.htmlElements[index];
+			if (!element.hidden && element.htmlObject != null && element.type != HtmlElementType.Link)
+			{
+				if (show)
+				{
+					if (!element.added)
+					{
+						element.added = true;
+						element.htmlObject.Add();
+					}
+				}
+				else
+				{
+					if (element.added)
+					{
+						element.added = false;
+						element.htmlObject.Remove();
+					}
+				}
+			}
 		}
 
 		override protected void OnSizeChanged(bool widthChanged, bool heightChanged)

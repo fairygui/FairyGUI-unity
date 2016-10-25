@@ -24,7 +24,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Content container. If the component is not clipped, then container==rootContainer.
 		/// </summary>
-		public Container container { get; private set; }
+		public Container container { get; protected set; }
 		/// <summary>
 		/// ScrollPane of the component. If the component is not scrollable, the value is null.
 		/// </summary>
@@ -43,6 +43,7 @@ namespace FairyGUI
 		protected Margin _margin;
 		protected bool _trackBounds;
 		protected bool _boundsChanged;
+		internal Vector2 _alignOffset;
 
 		Vector2 _clipSoftness;
 		int _sortingChildCount;
@@ -113,11 +114,8 @@ namespace FairyGUI
 			set
 			{
 				_margin = value;
-				if (rootContainer.clipRect != null)
-				{
-					container.x = _margin.left;
-					container.y = _margin.top;
-				}
+				if (rootContainer.clipRect != null && scrollPane == null) //如果scrollPane不为空，则HandleSizeChanged里面的处理会促使ScrollPane处理
+					container.SetXY(_margin.left + _alignOffset.x, _margin.top + _alignOffset.y);
 				HandleSizeChanged();
 			}
 		}
@@ -531,6 +529,27 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		public bool IsAncestorOf(GObject obj)
+		{
+			if (obj == null)
+				return false;
+
+			GComponent p = obj.parent;
+			while (p != null)
+			{
+				if (p == this)
+					return true;
+
+				p = p.parent;
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// Adds a controller to the container.
 		/// </summary>
 		/// <param name="controller">Controller object</param>
@@ -861,26 +880,35 @@ namespace FairyGUI
 			ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
 			String vtScrollBarRes, String hzScrollBarRes)
 		{
-			container = new Container();
-			rootContainer.AddChild(container);
+			if (rootContainer == container)
+			{
+				container = new Container();
+				rootContainer.AddChild(container);
+			}
 
 			scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes);
-			UpdateClipRect();
 		}
 
 		protected void SetupOverflow(OverflowType overflow)
 		{
 			if (overflow == OverflowType.Hidden)
 			{
-				container = new Container();
-				rootContainer.AddChild(container);
+				if (rootContainer == container)
+				{
+					container = new Container();
+					rootContainer.AddChild(container);
+				}
+
 				UpdateClipRect();
 				container.SetXY(_margin.left, _margin.top);
 			}
 			else if (_margin.left != 0 || _margin.top != 0)
 			{
-				container = new Container();
-				rootContainer.AddChild(container);
+				if (rootContainer == container)
+				{
+					container = new Container();
+					rootContainer.AddChild(container);
+				}
 
 				container.SetXY(_margin.left, _margin.top);
 			}

@@ -2,10 +2,18 @@
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class FontManager
 	{
 		static Dictionary<string, BaseFont> sFontFactory = new Dictionary<string, BaseFont>();
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="font"></param>
+		/// <param name="alias"></param>
 		static public void RegisterFont(BaseFont font, string alias)
 		{
 			if (!sFontFactory.ContainsKey(font.name))
@@ -17,11 +25,20 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="font"></param>
 		static public void UnregisterFont(BaseFont font)
 		{
 			sFontFactory.Remove(font.name);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		static public BaseFont GetFont(string name)
 		{
 			BaseFont ret;
@@ -37,6 +54,9 @@ namespace FairyGUI
 			return ret;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		static public void Clear()
 		{
 			sFontFactory.Clear();

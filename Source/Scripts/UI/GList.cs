@@ -64,6 +64,9 @@ namespace FairyGUI
 		int _lineItemCount;
 		int _lineGap;
 		int _columnGap;
+		AlignType _align;
+		VertAlignType _verticalAlign;
+
 		GObjectPool _pool;
 		bool _selectionHandled;
 		int _lastSelectedIndex;
@@ -95,6 +98,9 @@ namespace FairyGUI
 			autoResizeItem = true;
 			this.opaque = true;
 			scrollItemToViewOnClick = true;
+
+			container = new Container();
+			rootContainer.AddChild(container);
 
 			onClickItem = new EventListener(this, "onClickItem");
 		}
@@ -173,6 +179,42 @@ namespace FairyGUI
 				if (_columnGap != value)
 				{
 					_columnGap = value;
+					SetBoundsChangedFlag();
+					if (_virtual)
+						SetVirtualListChangedFlag(true);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public AlignType align
+		{
+			get { return _align; }
+			set
+			{
+				if (_align != value)
+				{
+					_align = value;
+					SetBoundsChangedFlag();
+					if (_virtual)
+						SetVirtualListChangedFlag(true);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public VertAlignType verticalAlign
+		{
+			get { return _verticalAlign; }
+			set
+			{
+				if (_verticalAlign != value)
+				{
+					_verticalAlign = value;
 					SetBoundsChangedFlag();
 					if (_virtual)
 						SetVirtualListChangedFlag(true);
@@ -866,12 +908,9 @@ namespace FairyGUI
 			if (autoResizeItem)
 				AdjustItemsSize();
 
-			if (_layout == ListLayoutType.FlowHorizontal || _layout == ListLayoutType.FlowVertical)
-			{
-				SetBoundsChangedFlag();
-				if (_virtual)
-					SetVirtualListChangedFlag(true);
-			}
+			SetBoundsChangedFlag();
+			if (_virtual)
+				SetVirtualListChangedFlag(true);
 		}
 
 		/// <summary>
@@ -1182,7 +1221,9 @@ namespace FairyGUI
 					ch += _virtualItems[i].size.y + _lineGap;
 				if (ch > 0)
 					ch -= _lineGap;
-				this.scrollPane.SetContentSize(this.scrollPane.contentWidth, ch);
+				cw = this.scrollPane.contentWidth;
+				HandleAlign(cw, ch);
+				this.scrollPane.SetContentSize(cw, ch);
 			}
 			else
 			{
@@ -1190,7 +1231,9 @@ namespace FairyGUI
 					cw += _virtualItems[i].size.x + _columnGap;
 				if (cw > 0)
 					cw -= _columnGap;
-				this.scrollPane.SetContentSize(cw, this.scrollPane.contentHeight);
+				ch = this.scrollPane.contentHeight;
+				HandleAlign(cw, ch);
+				this.scrollPane.SetContentSize(cw, ch);
 			}
 
 			_eventLocked = false;
@@ -1329,6 +1372,7 @@ namespace FairyGUI
 				}
 
 				HandleScroll1(forceUpdate);
+				HandleArchOrder1();
 			}
 			else
 			{
@@ -1343,9 +1387,8 @@ namespace FairyGUI
 				}
 
 				HandleScroll2(forceUpdate);
+				HandleArchOrder2();
 			}
-
-			HandleArchOrder();
 
 			_boundsChanged = false;
 		}
@@ -1662,7 +1705,7 @@ namespace FairyGUI
 			enterCounter--;
 		}
 
-		void HandleArchOrder()
+		void HandleArchOrder1()
 		{
 			if (this.childrenRenderOrder == ChildrenRenderOrder.Arch)
 			{
@@ -1676,6 +1719,31 @@ namespace FairyGUI
 					if (obj.visible)
 					{
 						dist = Mathf.Abs(mid - obj.y - obj.height / 2);
+						if (dist < minDist)
+						{
+							minDist = dist;
+							apexIndex = i;
+						}
+					}
+				}
+				this.apexIndex = apexIndex;
+			}
+		}
+
+		void HandleArchOrder2()
+		{
+			if (this.childrenRenderOrder == ChildrenRenderOrder.Arch)
+			{
+				float mid = this.scrollPane.posX + this.viewWidth / 2;
+				float minDist = int.MaxValue, dist;
+				int apexIndex = 0;
+				int cnt = this.numChildren;
+				for (int i = 0; i < cnt; i++)
+				{
+					GObject obj = GetChildAt(i);
+					if (obj.visible)
+					{
+						dist = Mathf.Abs(mid - obj.x - obj.width / 2);
 						if (dist < minDist)
 						{
 							minDist = dist;
@@ -1708,6 +1776,40 @@ namespace FairyGUI
 			}
 			else
 				base.GetSnappingPosition(ref xValue, ref yValue);
+		}
+
+		private void HandleAlign(float contentWidth, float contentHeight)
+		{
+			Vector2 newOffset = Vector2.zero;
+			if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
+			{
+				if (contentHeight < viewHeight)
+				{
+					if (_verticalAlign == VertAlignType.Middle)
+						newOffset.y = (int)((viewHeight - contentHeight) / 2);
+					else if (_verticalAlign == VertAlignType.Bottom)
+						newOffset.y = viewHeight - contentHeight;
+				}
+			}
+			else
+			{
+				if (contentWidth < this.viewWidth)
+				{
+					if (_align == AlignType.Center)
+						newOffset.x = (int)((viewWidth - contentWidth) / 2);
+					else if (_align == AlignType.Right)
+						newOffset.x = viewWidth - contentWidth;
+				}
+			}
+
+			if (newOffset != _alignOffset)
+			{
+				_alignOffset = newOffset;
+				if (scrollPane != null)
+					scrollPane.AdjustMaskContainer();
+				else
+					container.SetXY(_margin.left + _alignOffset.x, _margin.top + _alignOffset.y);
+			}
 		}
 
 		override protected void UpdateBounds()
@@ -1839,6 +1941,7 @@ namespace FairyGUI
 				ch = maxHeight;
 			}
 
+			HandleAlign(cw, ch);
 			SetBounds(0, 0, cw, ch);
 
 			this.InvalidateBatchingState();
@@ -1873,6 +1976,14 @@ namespace FairyGUI
 			str = xml.GetAttribute("margin");
 			if (str != null)
 				_margin.Parse(str);
+
+			str = xml.GetAttribute("align");
+			if (str != null)
+				_align = FieldTypes.ParseAlign(str);
+
+			str = xml.GetAttribute("vAlign");
+			if (str != null)
+				_verticalAlign = FieldTypes.ParseVerticalAlign(str);
 
 			if (overflow == OverflowType.Scroll)
 			{

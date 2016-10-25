@@ -31,6 +31,7 @@ namespace FairyGUI
 		public float alpha;
 		public bool grayed;
 
+		public static UpdateContext current;
 		public static uint frameId;
 		public static bool working;
 		public static EventCallback0 OnBegin;
@@ -44,8 +45,13 @@ namespace FairyGUI
 			frameId = 1;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Begin()
 		{
+			current = this;
+
 			frameId++;
 			if (frameId == 0)
 				frameId = 1;
@@ -75,6 +81,9 @@ namespace FairyGUI
 			working = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void End()
 		{
 			working = false;
@@ -85,6 +94,12 @@ namespace FairyGUI
 			OnEnd = null;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="clipId"></param>
+		/// <param name="clipRect"></param>
+		/// <param name="softness"></param>
 		public void EnterClipping(uint clipId, Rect? clipRect, Vector4? softness)
 		{
 			_clipStack.Push(clipInfo);
@@ -155,6 +170,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void LeaveClipping()
 		{
 			if (clipInfo.stencil)

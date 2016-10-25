@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -19,8 +20,11 @@ namespace FairyGUI
 	/// </summary>
 	public class GearColor : GearBase
 	{
+		public Tweener tweener { get; private set; }
+
 		Dictionary<string, GearColorValue> _storage;
 		GearColorValue _default;
+		GearColorValue _tweenTarget;
 
 		public GearColor(GObject owner)
 			: base(owner)
@@ -53,9 +57,54 @@ namespace FairyGUI
 			if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
 				cv = _default;
 
-			((IColorGear)_owner).color = cv.color;
+			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
+			{
+				if (tweener != null)
+				{
+					if (_tweenTarget.color != cv.color)
+					{
+						tweener.Kill(true);
+						tweener = null;
+					}
+					else
+						return;
+				}
 
-			_owner._gearLocked = false;
+				if (((IColorGear)_owner).color != cv.color)
+				{
+					_owner.internalVisible++;
+					_tweenTarget = cv;
+
+					tweener = DOTween.To(() => ((IColorGear)_owner).color, v =>
+					{
+						_owner._gearLocked = true;
+						((IColorGear)_owner).color = v;
+						_owner._gearLocked = false;
+					}, cv.color, tweenTime)
+					.SetEase(easeType)
+					.SetUpdate(true)
+					.OnUpdate(() =>
+					{
+						_owner.InvalidateBatchingState();
+					})
+					.OnComplete(() =>
+					{
+						tweener = null;
+						_owner.internalVisible--;
+						_owner.InvalidateBatchingState();
+						_owner.OnGearStop.Call(this);
+					});
+
+					if (delay > 0)
+						tweener.SetDelay(delay);
+				}
+			}
+			else
+			{
+				_owner._gearLocked = true;
+				((IColorGear)_owner).color = cv.color;
+				_owner._gearLocked = false;
+			}
 		}
 
 		override public void UpdateState()

@@ -46,7 +46,8 @@ namespace FairyGUI
 	{
 		None,
 		Both,
-		Height
+		Height,
+		Shrink
 	}
 
 	public enum ScrollType
@@ -272,6 +273,8 @@ namespace FairyGUI
 					return AutoSizeType.Both;
 				case "height":
 					return AutoSizeType.Height;
+				case "shrink":
+					return AutoSizeType.Shrink;
 				default:
 					return AutoSizeType.None;
 			}

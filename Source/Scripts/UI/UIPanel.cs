@@ -68,6 +68,8 @@ namespace FairyGUI
 		Vector2 cachedUISize;
 		[SerializeField]
 		HitTestMode hitTestMode = HitTestMode.Default;
+		[SerializeField]
+		bool setNativeChildrenOrder = false;
 
 		[System.NonSerialized]
 		int screenSizeVer;
@@ -77,6 +79,8 @@ namespace FairyGUI
 		GComponent _ui;
 		[NonSerialized]
 		bool _created;
+
+		List<Renderer> _renders;
 
 		void OnEnable()
 		{
@@ -147,6 +151,8 @@ namespace FairyGUI
 				container.Dispose();
 				container = null;
 			}
+
+			_renders = null;
 		}
 
 		void CreateContainer()
@@ -157,7 +163,9 @@ namespace FairyGUI
 				int cnt = t.childCount;
 				while (cnt > 0)
 				{
-					UnityEngine.Object.DestroyImmediate(t.GetChild(0).gameObject);
+					GameObject go = t.GetChild(cnt - 1).gameObject;
+					if (go.name == "GComponent")
+						UnityEngine.Object.DestroyImmediate(go);
 					cnt--;
 				}
 			}
@@ -173,6 +181,23 @@ namespace FairyGUI
 				SetSortingOrder(this.sortingOrder, true);
 				if (this.hitTestMode == HitTestMode.Raycast)
 					this.container.hitArea = new BoxColliderHitTest(this.gameObject.AddComponent<BoxCollider>());
+
+				if (setNativeChildrenOrder)
+				{
+					CacheNativeChildrenRenderers();
+
+					this.container.onUpdate = () =>
+					{
+						int cnt = _renders.Count;
+						int sv = UpdateContext.current.renderingOrder++;
+						for (int i = 0; i < cnt; i++)
+						{
+							Renderer r = _renders[i];
+							if (r != null)
+								_renders[i].sortingOrder = sv;
+						}
+					};
+				}
 			}
 		}
 
@@ -214,40 +239,67 @@ namespace FairyGUI
 			this.sortingOrder = value;
 			container._panelOrder = value;
 
-			if (!apply)
-				return;
+			if (apply)
+				Stage.inst.ApplyPanelOrder(container);
+		}
 
-			int numChildren = Stage.inst.numChildren;
-			int i = 0;
-			int j;
-			int curIndex = -1;
-			for (; i < numChildren; i++)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		public void SetHitTestMode(HitTestMode value)
+		{
+			if (this.hitTestMode != value)
 			{
-				DisplayObject obj = Stage.inst.GetChildAt(i);
-				if (obj == this.container)
+				this.hitTestMode = value;
+				BoxCollider collider = this.gameObject.GetComponent<BoxCollider>();
+				if (this.hitTestMode == HitTestMode.Raycast)
 				{
-					curIndex = i;
-					continue;
+					if (collider == null)
+						collider = this.gameObject.AddComponent<BoxCollider>();
+					this.container.hitArea = new BoxColliderHitTest(collider);
+					if (_ui != null)
+						UpdateHitArea();
 				}
-
-				if (obj == GRoot.inst.displayObject)
-					j = 1000;
-				else if (obj is Container)
-					j = ((Container)obj)._panelOrder;
 				else
-					continue;
-
-				if (sortingOrder <= j)
 				{
-					if (curIndex != -1)
-						Stage.inst.AddChildAt(this.container, i - 1);
-					else
-						Stage.inst.AddChildAt(this.container, i);
-					break;
+					this.container.hitArea = null;
+					if (collider != null)
+						Component.Destroy(collider);
 				}
 			}
-			if (i == numChildren)
-				Stage.inst.AddChild(this.container);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void CacheNativeChildrenRenderers()
+		{
+			if (_renders == null)
+				_renders = new List<Renderer>();
+			else
+				_renders.Clear();
+
+			Transform t = this.container.cachedTransform;
+			int cnt = t.childCount;
+			for (int i = 0; i < cnt; i++)
+			{
+				GameObject go = t.GetChild(i).gameObject;
+				if (go.name != "GComponent")
+					_renders.AddRange(go.GetComponentsInChildren<Renderer>(true));
+			}
+
+			cnt = _renders.Count;
+			for (int i = 0; i < cnt; i++)
+			{
+				Renderer r = _renders[i];
+				if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
+				{
+					//Set the object rendering in Transparent Queue as UI objects
+					if (r.sharedMaterial != null)
+						r.sharedMaterial.renderQueue = 3000;
+				}
+			}
 		}
 
 		void CreateUI_PlayMode()
@@ -272,7 +324,7 @@ namespace FairyGUI
 					_ui.onSizeChanged.Add(UpdateHitArea);
 					_ui.onPositionChanged.Add(UpdateHitArea);
 				}
-				this.container.AddChild(_ui.displayObject);
+				this.container.AddChildAt(_ui.displayObject, 0);
 
 				HandleScreenSizeChanged();
 			}
@@ -306,7 +358,7 @@ namespace FairyGUI
 				_ui.rotationX = rotation.x;
 				_ui.rotationY = rotation.y;
 				_ui.rotation = rotation.z;
-				this.container.AddChild(_ui.displayObject);
+				this.container.AddChildAt(_ui.displayObject, 0);
 
 				cachedUISize = _ui.size;
 				uiBounds.size = cachedUISize;
@@ -505,6 +557,20 @@ namespace FairyGUI
 		public void EM_Update(UpdateContext context)
 		{
 			container.Update(context);
+
+			if (setNativeChildrenOrder)
+			{
+				CacheNativeChildrenRenderers();
+
+				int cnt = _renders.Count;
+				int sv = context.renderingOrder++;
+				for (int i = 0; i < cnt; i++)
+				{
+					Renderer r = _renders[i];
+					if (r != null)
+						r.sortingOrder = sv;
+				}
+			}
 		}
 
 		public void EM_Reload()

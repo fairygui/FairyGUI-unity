@@ -6,11 +6,30 @@ namespace FairyGUI
 	/// </summary>
 	public struct Margin
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public int left;
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public int right;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int top;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int bottom;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="str"></param>
 		public void Parse(string str)
 		{
 			if (str == null)

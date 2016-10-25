@@ -134,9 +134,24 @@ namespace FairyGUI
 		public EventListener onDragStart { get; private set; }
 
 		/// <summary>
+		/// Dispatched when dragging.
+		/// </summary>
+		public EventListener onDragMove { get; private set; }
+
+		/// <summary>
 		/// Dispatched when drag end.
 		/// </summary>
 		public EventListener onDragEnd { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener OnGearStop { get; private set; }
+
+		/// <summary>
+		/// 当前全局正在被拖动的对象
+		/// </summary>
+		public static GObject draggingObject { get; private set; }
 
 		float _x;
 		float _y;
@@ -207,7 +222,10 @@ namespace FairyGUI
 			onPositionChanged = new EventListener(this, "onPositionChanged");
 			onSizeChanged = new EventListener(this, "onSizeChanged");
 			onDragStart = new EventListener(this, "onDragStart");
+			onDragMove = new EventListener(this, "onDragMove");
 			onDragEnd = new EventListener(this, "onDragEnd");
+
+			OnGearStop = new EventListener(this, "OnGearStop");
 		}
 
 		/// <summary>
@@ -302,6 +320,9 @@ namespace FairyGUI
 					parent.SetBoundsChangedFlag();
 					onPositionChanged.Call();
 				}
+
+				if (draggingObject == this && !sUpdateInDragging)
+					sGlobalRect = this.LocalToGlobal(new Rect(0, 0, this.width, this.height));
 			}
 		}
 
@@ -749,7 +770,10 @@ namespace FairyGUI
 					if (displayObject != null)
 						displayObject.visible = _visible;
 					if (parent != null)
+					{
 						parent.ChildStateChanged(this);
+						parent.SetBoundsChangedFlag();
+					}
 				}
 			}
 		}
@@ -1151,7 +1175,7 @@ namespace FairyGUI
 		/// </summary>
 		public bool dragging
 		{
-			get { return sDragging == this; }
+			get { return draggingObject == this; }
 		}
 
 		/// <summary>
@@ -1161,6 +1185,11 @@ namespace FairyGUI
 		/// <returns></returns>
 		public Vector2 LocalToGlobal(Vector2 pt)
 		{
+			if (_pivotAsAnchor)
+			{
+				pt.x += _width * _pivotX;
+				pt.y += _height * _pivotY;
+			}
 			return displayObject.LocalToGlobal(pt);
 		}
 
@@ -1171,7 +1200,13 @@ namespace FairyGUI
 		/// <returns></returns>
 		public Vector2 GlobalToLocal(Vector2 pt)
 		{
-			return displayObject.GlobalToLocal(pt);
+			pt = displayObject.GlobalToLocal(pt);
+			if (_pivotAsAnchor)
+			{
+				pt.x -= _width * _pivotX;
+				pt.y -= _height * _pivotY;
+			}
+			return pt;
 		}
 
 		/// <summary>
@@ -1216,7 +1251,7 @@ namespace FairyGUI
 		/// <returns></returns>
 		public Vector2 LocalToRoot(Vector2 pt, GRoot r)
 		{
-			pt = displayObject.LocalToGlobal(pt);
+			pt = LocalToGlobal(pt);
 			if (r == null || r == GRoot.inst)
 			{
 				//fast
@@ -1245,7 +1280,7 @@ namespace FairyGUI
 			}
 			else
 				pt = r.LocalToGlobal(pt);
-			return displayObject.GlobalToLocal(pt);
+			return GlobalToLocal(pt);
 		}
 
 		/// <summary>
@@ -1269,7 +1304,7 @@ namespace FairyGUI
 			Vector3 v = camera.WorldToScreenPoint(pt);
 			v.y = Screen.height - v.y;
 			v.z = 0;
-			return displayObject.GlobalToLocal(v);
+			return GlobalToLocal(v);
 		}
 
 		/// <summary>
@@ -1278,9 +1313,14 @@ namespace FairyGUI
 		/// <param name="point"></param>
 		/// <param name="targetSpace"></param>
 		/// <returns></returns>
-		public Vector2 TransformPoint(Vector2 point, GObject targetSpace)
+		public Vector2 TransformPoint(Vector2 pt, GObject targetSpace)
 		{
-			return this.displayObject.TransformPoint(point, targetSpace.displayObject);
+			if (_pivotAsAnchor)
+			{
+				pt.x += _width * _pivotX;
+				pt.y += _height * _pivotY;
+			}
+			return this.displayObject.TransformPoint(pt, targetSpace.displayObject);
 		}
 
 		/// <summary>
@@ -1291,6 +1331,11 @@ namespace FairyGUI
 		/// <returns></returns>
 		public Rect TransformRect(Rect rect, GObject targetSpace)
 		{
+			if (_pivotAsAnchor)
+			{
+				rect.x += _width * _pivotX;
+				rect.y += _height * _pivotY;
+			}
 			return this.displayObject.TransformRect(rect, targetSpace.displayObject);
 		}
 
@@ -1563,9 +1608,9 @@ namespace FairyGUI
 		int _dragTouchId;
 		Vector2 _dragTouchStartPos;
 
-		static GObject sDragging;
 		static Vector2 sGlobalDragStart = new Vector2();
 		static Rect sGlobalRect = new Rect();
+		static bool sUpdateInDragging = false;
 
 		private void InitDrag()
 		{
@@ -1577,25 +1622,28 @@ namespace FairyGUI
 
 		private void DragBegin(int touchId)
 		{
-			if (sDragging != null)
-				sDragging.StopDrag();
+			if (draggingObject != null)
+			{
+				draggingObject.StopDrag();
+				draggingObject = null;
+			}
 
 			_dragTouchId = touchId;
 			sGlobalDragStart = Stage.inst.GetTouchPosition(touchId);
 			sGlobalRect = this.LocalToGlobal(new Rect(0, 0, this.width, this.height));
 
-			sDragging = this;
+			draggingObject = this;
 			Stage.inst.onTouchEnd.Add(__touchEnd2);
 			Stage.inst.onTouchMove.Add(__touchMove2);
 		}
 
 		private void DragEnd()
 		{
-			if (sDragging == this)
+			if (draggingObject == this)
 			{
 				Stage.inst.onTouchEnd.Remove(__touchEnd2);
 				Stage.inst.onTouchMove.Remove(__touchMove2);
-				sDragging = null;
+				draggingObject = null;
 			}
 		}
 
@@ -1640,6 +1688,9 @@ namespace FairyGUI
 
 			Reset();
 
+			if (displayObject == null || displayObject.isDisposed)
+				return;
+
 			if (!onDragStart.Call(_dragTouchId))
 				DragBegin(evt.touchId);
 		}
@@ -1650,9 +1701,13 @@ namespace FairyGUI
 			if (_dragTouchId != -1 && _dragTouchId != evt.touchId)
 				return;
 
-			if (sDragging == this)
+			if (draggingObject == this)
 			{
 				StopDrag();
+
+				if (displayObject == null || displayObject.isDisposed)
+					return;
+
 				onDragEnd.Call();
 			}
 		}
@@ -1661,6 +1716,9 @@ namespace FairyGUI
 		{
 			InputEvent evt = context.inputEvent;
 			if (_dragTouchId != -1 && _dragTouchId != evt.touchId || this.parent == null)
+				return;
+
+			if (displayObject == null || displayObject.isDisposed)
 				return;
 
 			float xx = evt.x - sGlobalDragStart.x + sGlobalRect.x;
@@ -1692,7 +1750,11 @@ namespace FairyGUI
 			if (float.IsNaN(pt.x))
 				return;
 
+			sUpdateInDragging = true;
 			this.SetXY(Mathf.RoundToInt(pt.x), Mathf.RoundToInt(pt.y));
+			sUpdateInDragging = false;
+
+			onDragMove.Call();
 		}
 		#endregion
 

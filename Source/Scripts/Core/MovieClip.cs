@@ -9,6 +9,9 @@ namespace FairyGUI
 	/// </summary>
 	public class MovieClip : Image
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public struct Frame
 		{
 			public Rect rect;
@@ -16,14 +19,39 @@ namespace FairyGUI
 			public Rect uvRect;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public float interval;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool swing;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public float repeatDelay;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int frameCount { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Frame[] frames { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public PlayState playState { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public EventListener onPlayEnd { get; private set; }
 
 		int _currentFrame;
@@ -36,6 +64,9 @@ namespace FairyGUI
 		bool _forceDraw;
 		EventCallback0 _playEndDelegate;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public MovieClip()
 		{
 			playState = new PlayState();
@@ -48,6 +79,12 @@ namespace FairyGUI
 			SetPlaySettings();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="frames"></param>
+		/// <param name="boundsRect"></param>
 		public void SetData(NTexture texture, Frame[] frames, Rect boundsRect)
 		{
 			this.frames = frames;
@@ -66,6 +103,9 @@ namespace FairyGUI
 			_forceDraw = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Clear()
 		{
 			this.frameCount = 0;
@@ -73,12 +113,18 @@ namespace FairyGUI
 			graphics.ClearMesh();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool playing
 		{
 			get { return _playing; }
 			set { _playing = value; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int currentFrame
 		{
 			get { return _currentFrame; }
@@ -94,12 +140,21 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void SetPlaySettings()
 		{
 			SetPlaySettings(0, -1, 0, -1);
 		}
 
-		//从start帧开始，播放到end帧（-1表示结尾），重复times次（0表示无限循环），循环结束后，停止在endAt帧（-1表示参数end）
+		/// <summary>
+		/// 从start帧开始，播放到end帧（-1表示结尾），重复times次（0表示无限循环），循环结束后，停止在endAt帧（-1表示参数end）
+		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		/// <param name="times"></param>
+		/// <param name="endAt"></param>
 		public void SetPlaySettings(int start, int end, int times, int endAt)
 		{
 			_start = start;
@@ -114,6 +169,10 @@ namespace FairyGUI
 			_status = 0;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="context"></param>
 		public override void Update(UpdateContext context)
 		{
 			if (_playing && frameCount != 0 && _status != 3)

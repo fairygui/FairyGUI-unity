@@ -114,6 +114,7 @@ namespace FairyGUI
 						tweener = null;
 						_owner.internalVisible--;
 						_owner.InvalidateBatchingState();
+						_owner.OnGearStop.Call(this);
 					});
 
 					if (delay > 0)

@@ -7,9 +7,19 @@ namespace FairyGUI
 	/// </summary>
 	public class DisplayOptions
 	{
-		public static Transform[] defaultRoot;//use only in edit mode. use array to avoid unity null reference checking
+		/// <summary>
+		/// use only in edit mode. use array to avoid unity null reference checking
+		/// </summary>
+		public static Transform[] defaultRoot;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static HideFlags hideFlags = HideFlags.None;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void SetEditModeHideFlags()
 		{
 #if UNITY_5

@@ -7,13 +7,36 @@ namespace FairyGUI
 	/// </summary>
 	public class ShaderConfig
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public delegate Shader GetFunction(string name);
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static GetFunction Get = Shader.Find;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string imageShader = "FairyGUI/Image";
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string textShader = "FairyGUI/Text";
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string textBrighterShader = "FairyGUI/Text Brighter";
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static string bmFontShader = "FairyGUI/BMFont";
 
 		/// <summary>

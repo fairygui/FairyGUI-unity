@@ -411,6 +411,10 @@ namespace FairyGUI
 			_buttonController = GetController("button");
 			_titleObject = GetChild("title");
 			_iconObject = GetChild("icon");
+			if (_titleObject != null)
+				_title = _titleObject.text;
+			if (_iconObject != null)
+				_icon = _iconObject.icon;
 
 			if (_mode == ButtonMode.Common)
 				SetState(UP);

@@ -145,42 +145,9 @@ namespace FairyGUI
 			this.sortingOrder = value;
 			container._panelOrder = value;
 
-			if (!apply)
-				return;
-
-			int numChildren = Stage.inst.numChildren;
-			int i = 0;
-			int j;
-			int curIndex = -1;
-			for (; i < numChildren; i++)
-			{
-				DisplayObject obj = Stage.inst.GetChildAt(i);
-				if (obj == this.container)
-				{
-					curIndex = i;
-					continue;
-				}
-
-				if (obj == GRoot.inst.displayObject)
-					j = 1000;
-				else if (obj is Container)
-					j = ((Container)obj)._panelOrder;
-				else
-					continue;
-
-				if (sortingOrder <= j)
-				{
-					if (curIndex != -1)
-						Stage.inst.AddChildAt(this.container, i - 1);
-					else
-						Stage.inst.AddChildAt(this.container, i);
-					break;
-				}
-			}
-			if (i == numChildren)
-				Stage.inst.AddChild(this.container);
+			if (apply)
+				Stage.inst.ApplyPanelOrder(container);
 		}
-
 
 		/// <summary>
 		/// 

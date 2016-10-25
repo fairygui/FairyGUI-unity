@@ -25,6 +25,7 @@ namespace FairyGUI
 		protected FlipType _flip;
 		protected Rect? _scale9Grid;
 		protected bool _scaleByTile;
+		protected int _tileGridIndice;
 		protected FillMethod _fillMethod;
 		protected int _fillOrigin;
 		protected float _fillAmount;
@@ -35,6 +36,10 @@ namespace FairyGUI
 			Create(null);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
 		public Image(NTexture texture)
 			: base()
 		{
@@ -55,6 +60,9 @@ namespace FairyGUI
 				UpdateTexture(texture);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public NTexture texture
 		{
 			get { return _texture; }
@@ -64,6 +72,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Color color
 		{
 			get { return _color; }
@@ -77,6 +88,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public FlipType flip
 		{
 			get { return _flip; }
@@ -90,6 +104,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public FillMethod fillMethod
 		{
 			get { return _fillMethod; }
@@ -103,6 +120,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int fillOrigin
 		{
 			get { return _fillOrigin; }
@@ -116,6 +136,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool fillClockwise
 		{
 			get { return _fillClockwise; }
@@ -129,6 +152,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public float fillAmount
 		{
 			get { return _fillAmount; }
@@ -142,6 +168,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Rect? scale9Grid
 		{
 			get { return _scale9Grid; }
@@ -155,6 +184,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool scaleByTile
 		{
 			get { return _scaleByTile; }
@@ -168,6 +200,22 @@ namespace FairyGUI
 			}
 		}
 
+		public int tileGridIndice
+		{
+			get { return _tileGridIndice; }
+			set
+			{
+				if (_tileGridIndice != value)
+				{
+					_tileGridIndice = value;
+					_requireUpdateMesh = true;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public void SetNativeSize()
 		{
 			float oldWidth = _contentRect.width;
@@ -207,6 +255,89 @@ namespace FairyGUI
 			InvalidateBatchingState();
 		}
 
+		static int[] gridTileIndice = new int[] { -1, 0, -1, 2, 4, 3, -1, 1, -1 };
+		static float[] gridX = new float[4];
+		static float[] gridY = new float[4];
+		static float[] gridTexX = new float[4];
+		static float[] gridTexY = new float[4];
+
+		void GenerateGrids(Rect gridRect, Rect uvRect)
+		{
+			float sx = uvRect.width / (float)_texture.width;
+			float sy = uvRect.height / (float)_texture.height;
+			gridTexX[0] = uvRect.xMin;
+			gridTexX[1] = uvRect.xMin + gridRect.xMin * sx;
+			gridTexX[2] = uvRect.xMin + gridRect.xMax * sx;
+			gridTexX[3] = uvRect.xMax;
+			gridTexY[0] = uvRect.yMax;
+			gridTexY[1] = uvRect.yMax - gridRect.yMin * sy;
+			gridTexY[2] = uvRect.yMax - gridRect.yMax * sy;
+			gridTexY[3] = uvRect.yMin;
+
+			if (_contentRect.width >= (_texture.width - gridRect.width))
+			{
+				gridX[1] = gridRect.xMin;
+				gridX[2] = _contentRect.width - (_texture.width - gridRect.xMax);
+				gridX[3] = _contentRect.width;
+			}
+			else
+			{
+				float tmp = gridRect.xMin / (_texture.width - gridRect.xMax);
+				tmp = _contentRect.width * tmp / (1 + tmp);
+				gridX[1] = tmp;
+				gridX[2] = tmp;
+				gridX[3] = _contentRect.width;
+			}
+
+			if (_contentRect.height >= (_texture.height - gridRect.height))
+			{
+				gridY[1] = gridRect.yMin;
+				gridY[2] = _contentRect.height - (_texture.height - gridRect.yMax);
+				gridY[3] = _contentRect.height;
+			}
+			else
+			{
+				float tmp = gridRect.yMin / (_texture.height - gridRect.yMax);
+				tmp = _contentRect.height * tmp / (1 + tmp);
+				gridY[1] = tmp;
+				gridY[2] = tmp;
+				gridY[3] = _contentRect.height;
+			}
+		}
+
+		int TileFill(Rect destRect, Rect uvRect, float sourceW, float sourceH, int vertIndex)
+		{
+			int hc = Mathf.CeilToInt(destRect.width / sourceW);
+			int vc = Mathf.CeilToInt(destRect.height / sourceH);
+			float tailWidth = destRect.width - (hc - 1) * sourceW;
+			float tailHeight = destRect.height - (vc - 1) * sourceH;
+
+			if (vertIndex == -1)
+			{
+				graphics.Alloc(hc * vc * 4);
+				vertIndex = 0;
+			}
+
+			for (int i = 0; i < hc; i++)
+			{
+				for (int j = 0; j < vc; j++)
+				{
+					graphics.FillVerts(vertIndex, new Rect(destRect.x + i * sourceW, destRect.y + j * sourceH,
+							i == (hc - 1) ? tailWidth : sourceW, j == (vc - 1) ? tailHeight : sourceH));
+					Rect uvTmp = uvRect;
+					if (i == hc - 1)
+						uvTmp.xMax = Mathf.Lerp(uvRect.xMin, uvRect.xMax, tailWidth / sourceW);
+					if (j == vc - 1)
+						uvTmp.yMin = Mathf.Lerp(uvRect.yMin, uvRect.yMax, 1 -tailHeight / sourceH);
+
+					graphics.FillUV(vertIndex, uvTmp);
+					vertIndex += 4;
+				}
+			}
+
+			return vertIndex;
+		}
+
 		virtual protected void Rebuild()
 		{
 			_requireUpdateMesh = false;
@@ -243,31 +374,7 @@ namespace FairyGUI
 				}
 				else
 				{
-					int hc = Mathf.CeilToInt(_contentRect.width / _texture.width);
-					int vc = Mathf.CeilToInt(_contentRect.height / _texture.height);
-					float tailWidth = _contentRect.width - (hc - 1) * _texture.width;
-					float tailHeight = _contentRect.height - (vc - 1) * _texture.height;
-
-					graphics.Alloc(hc * vc * 4);
-
-					int k = 0;
-					for (int i = 0; i < hc; i++)
-					{
-						for (int j = 0; j < vc; j++)
-						{
-							graphics.FillVerts(k, new Rect(i * _texture.width, j * _texture.height,
-									i == (hc - 1) ? tailWidth : _texture.width, j == (vc - 1) ? tailHeight : _texture.height));
-							Rect uvTmp = uvRect;
-							if (i == hc - 1)
-								uvTmp.xMax = Mathf.Lerp(uvRect.xMin, uvRect.xMax, tailWidth / _texture.width);
-							if (j == vc - 1)
-								uvTmp.yMin = Mathf.Lerp(uvRect.yMin, uvRect.yMax, 1 - tailHeight / _texture.height);
-
-							graphics.FillUV(k, uvTmp);
-							k += 4;
-						}
-					}
-
+					TileFill(_contentRect, uvRect, _texture.width, _texture.height, -1);
 					graphics.FillColors(_color);
 					graphics.FillTriangles();
 					graphics.UpdateMesh();
@@ -275,60 +382,92 @@ namespace FairyGUI
 			}
 			else if (_scale9Grid != null)
 			{
-				float[] rows;
-				float[] cols;
-				float[] dRows;
-				float[] dCols;
 				Rect gridRect = (Rect)_scale9Grid;
 
 				if (_flip != FlipType.None)
 					ToolSet.FlipInnerRect(_texture.width, _texture.height, ref gridRect, _flip);
 
-				rows = new float[] { 0, gridRect.yMin, gridRect.yMax, _texture.height };
-				cols = new float[] { 0, gridRect.xMin, gridRect.xMax, _texture.width };
+				GenerateGrids(gridRect, uvRect);
 
-				if (_contentRect.height >= (_texture.height - gridRect.height))
-					dRows = new float[] { 0, gridRect.yMin, _contentRect.height - (_texture.height - gridRect.yMax), _contentRect.height };
-				else
+				if (_tileGridIndice == 0)
 				{
-					float tmp = gridRect.yMin / (_texture.height - gridRect.yMax);
-					tmp = _contentRect.height * tmp / (1 + tmp);
-					dRows = new float[] { 0, tmp, tmp, _contentRect.height };
-				}
+					graphics.Alloc(16);
 
-				if (_contentRect.width >= (_texture.width - gridRect.width))
-					dCols = new float[] { 0, gridRect.xMin, _contentRect.width - (_texture.width - gridRect.xMax), _contentRect.width };
-				else
-				{
-					float tmp = gridRect.xMin / (_texture.width - gridRect.xMax);
-					tmp = _contentRect.width * tmp / (1 + tmp);
-					dCols = new float[] { 0, tmp, tmp, _contentRect.width };
-				}
-
-				graphics.Alloc(16);
-
-				int k = 0;
-				for (int cy = 0; cy < 4; cy++)
-				{
-					for (int cx = 0; cx < 4; cx++)
+					int k = 0;
+					for (int cy = 0; cy < 4; cy++)
 					{
-						Vector2 subTextCoords;
-						subTextCoords.x = uvRect.x + cols[cx] / _texture.width * uvRect.width;
-						subTextCoords.y = uvRect.y + (1 - rows[cy] / _texture.height) * uvRect.height;
-						graphics.uv[k] = subTextCoords;
-
-						Vector3 drawCoords;
-						drawCoords.x = dCols[cx];
-						drawCoords.y = -dRows[cy];
-						drawCoords.z = 0;
-						graphics.vertices[k] = drawCoords;
-
-						k++;
+						for (int cx = 0; cx < 4; cx++)
+						{
+							graphics.uv[k] = new Vector2(gridTexX[cx], gridTexY[cy]);
+							graphics.vertices[k] = new Vector2(gridX[cx], -gridY[cy]);
+							k++;
+						}
 					}
+					graphics.FillTriangles(NGraphics.TRIANGLES_9_GRID);
+				}
+				else
+				{
+					int hc, vc;
+					Rect drawRect;
+					Rect texRect;
+					int row, col;
+					int part;
+
+					//先计算需要的顶点数量
+					int vertCount = 0;
+					for (int pi = 0; pi < 9; pi++)
+					{
+						col = pi % 3;
+						row = pi / 3;
+						part = gridTileIndice[pi];
+
+						if (part != -1 && (_tileGridIndice & (1 << part)) != 0)
+						{
+							if (part == 0 || part == 1 || part == 4)
+								hc = Mathf.CeilToInt((gridX[col + 1] - gridX[col]) / gridRect.width);
+							else
+								hc = 1;
+							if (part == 2 || part == 3 || part == 4)
+								vc = Mathf.CeilToInt((gridY[row + 1] - gridY[row]) / gridRect.height);
+							else
+								vc = 1;
+							vertCount += hc * vc * 4;
+						}
+						else
+							vertCount += 4;
+					}
+
+					graphics.Alloc(vertCount);
+
+					int k = 0;
+
+					for (int pi = 0; pi < 9; pi++)
+					{
+						col = pi % 3;
+						row = pi / 3;
+						part = gridTileIndice[pi];
+						drawRect = Rect.MinMaxRect(gridX[col], gridY[row], gridX[col + 1], gridY[row + 1]);
+						texRect = Rect.MinMaxRect(gridTexX[col], gridTexY[row + 1], gridTexX[col + 1], gridTexY[row]);
+
+						if (part != -1 && (_tileGridIndice & (1 << part)) != 0)
+						{
+							k = TileFill(drawRect, texRect,
+								(part == 0 || part == 1 || part == 4) ? gridRect.width : drawRect.width,
+								(part == 2 || part == 3 || part == 4) ? gridRect.height : drawRect.height,
+								k);
+						}
+						else
+						{
+							graphics.FillVerts(k, drawRect);
+							graphics.FillUV(k, texRect);
+							k += 4;
+						}
+					}
+
+					graphics.FillTriangles();
 				}
 
 				graphics.FillColors(_color);
-				graphics.FillTriangles(NGraphics.TRIANGLES_9_GRID);
 				graphics.UpdateMesh();
 			}
 			else
@@ -337,6 +476,11 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 截取当前图片的一部分输出到另一个Mesh。不支持图片的填充模式、九宫格的平铺模式。
+		/// </summary>
+		/// <param name="mesh">目标Mesh</param>
+		/// <param name="localRect">制定图片的区域</param>
 		public void PrintTo(Mesh mesh, Rect localRect)
 		{
 			if (_requireUpdateMesh)
@@ -424,68 +568,48 @@ namespace FairyGUI
 			}
 			else
 			{
-				verts = new Vector3[36];
-				uv = new Vector2[36];
-
-				float[] rows;
-				float[] cols;
-				float[] dRows;
-				float[] dCols;
 				Rect gridRect = (Rect)_scale9Grid;
 
-				rows = new float[] { 0, gridRect.yMin, gridRect.yMax, _texture.height };
-				cols = new float[] { 0, gridRect.xMin, gridRect.xMax, _texture.width };
+				if (_flip != FlipType.None)
+					ToolSet.FlipInnerRect(_texture.width, _texture.height, ref gridRect, _flip);
 
-				if (_contentRect.height >= (_texture.height - gridRect.height))
-					dRows = new float[] { 0, gridRect.yMin, _contentRect.height - (_texture.height - gridRect.yMax), _contentRect.height };
-				else
-				{
-					float tmp = gridRect.yMin / (_texture.height - gridRect.yMax);
-					tmp = _contentRect.height * tmp / (1 + tmp);
-					dRows = new float[] { 0, tmp, tmp, _contentRect.height };
-				}
+				GenerateGrids(gridRect, uvRect);
 
-				if (_contentRect.width >= (_texture.width - gridRect.width))
-					dCols = new float[] { 0, gridRect.xMin, _contentRect.width - (_texture.width - gridRect.xMax), _contentRect.width };
-				else
-				{
-					float tmp = gridRect.xMin / (_texture.width - gridRect.xMax);
-					tmp = _contentRect.width * tmp / (1 + tmp);
-					dCols = new float[] { 0, tmp, tmp, _contentRect.width };
-				}
-
+				verts = new Vector3[36];
+				uv = new Vector2[36];
 				Vector2 offset = new Vector2();
-				for (int cy = 0; cy < 3; cy++)
+
+				Rect drawRect;
+				Rect texRect;
+				int row, col;
+				float u0, u1, v0, v1;
+
+				for (int pi = 0; pi < 9; pi++)
 				{
-					for (int cx = 0; cx < 3; cx++)
+					col = pi % 3;
+					row = pi / 3;
+					drawRect = Rect.MinMaxRect(gridX[col], gridY[row], gridX[col + 1], gridY[row + 1]);
+					texRect = Rect.MinMaxRect(gridTexX[col], gridTexY[row + 1], gridTexX[col + 1], gridTexY[row]);
+					Rect bound = ToolSet.Intersection(ref drawRect, ref localRect);
+					if (bound.xMax - bound.xMin >= 0 && bound.yMax - bound.yMin > 0)
 					{
-						Rect rect = Rect.MinMaxRect(dCols[cx], dRows[cy], dCols[cx + 1], dRows[cy + 1]);
-						Rect bound = ToolSet.Intersection(ref rect, ref localRect);
-						if (bound.xMax - bound.xMin >= 0 && bound.yMax - bound.yMin > 0)
-						{
-							Rect texBound = Rect.MinMaxRect(uvRect.x + cols[cx] / _texture.width * uvRect.width,
-								uvRect.y + (1 - rows[cy + 1] / _texture.height) * uvRect.height,
-								uvRect.x + cols[cx + 1] / _texture.width * uvRect.width,
-								uvRect.y + (1 - rows[cy] / _texture.height) * uvRect.height);
+						u0 = (bound.xMin - drawRect.x) / drawRect.width;
+						u1 = (bound.xMax - drawRect.x) / drawRect.width;
+						v0 = (drawRect.yMax - bound.yMax) / drawRect.height;
+						v1 = (drawRect.yMax - bound.yMin) / drawRect.height;
+						u0 = Mathf.Lerp(texRect.xMin, texRect.xMax, u0);
+						u1 = Mathf.Lerp(texRect.xMin, texRect.xMax, u1);
+						v0 = Mathf.Lerp(texRect.yMin, texRect.yMax, v0);
+						v1 = Mathf.Lerp(texRect.yMin, texRect.yMax, v1);
+						NGraphics.FillUVOfQuad(uv, vertCount, Rect.MinMaxRect(u0, v0, u1, v1));
 
-							float u0 = (bound.xMin - rect.x) / rect.width;
-							float u1 = (bound.xMax - rect.x) / rect.width;
-							float v0 = (rect.y + rect.height - bound.yMax) / rect.height;
-							float v1 = (rect.y + rect.height - bound.yMin) / rect.height;
-							u0 = Mathf.Lerp(texBound.xMin, texBound.xMax, u0);
-							u1 = Mathf.Lerp(texBound.xMin, texBound.xMax, u1);
-							v0 = Mathf.Lerp(texBound.yMin, texBound.yMax, v0);
-							v1 = Mathf.Lerp(texBound.yMin, texBound.yMax, v1);
-							NGraphics.FillUVOfQuad(uv, vertCount, Rect.MinMaxRect(u0, v0, u1, v1));
+						if (vertCount == 0)
+							offset = new Vector2(bound.x, bound.y);
+						bound.x -= offset.x;
+						bound.y -= offset.y;
+						NGraphics.FillVertsOfQuad(verts, vertCount, bound);
 
-							if (vertCount == 0)
-								offset = new Vector2(bound.x, bound.y);
-							bound.x -= offset.x;
-							bound.y -= offset.y;
-							NGraphics.FillVertsOfQuad(verts, vertCount, bound);
-
-							vertCount += 4;
-						}
+						vertCount += 4;
 					}
 				}
 			}

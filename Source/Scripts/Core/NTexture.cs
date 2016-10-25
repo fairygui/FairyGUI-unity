@@ -8,14 +8,49 @@ namespace FairyGUI
 	/// </summary>
 	public class NTexture
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public Texture nativeTexture { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public NTexture alphaTexture { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public NTexture root { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Rect uvRect { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Dictionary<string, MaterialManager> materialManagers { get; internal set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int refCount;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool disposed;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public float lastActive;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool storedODisk;
 
 		Rect? _region;
@@ -30,6 +65,10 @@ namespace FairyGUI
 		}
 
 		static NTexture _empty;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static NTexture Empty
 		{
 			get
@@ -41,6 +80,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void DisposeEmpty()
 		{
 			if (_empty != null)
@@ -50,6 +92,10 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
 		public NTexture(Texture texture)
 		{
 			root = this;
@@ -57,6 +103,12 @@ namespace FairyGUI
 			uvRect = new Rect(0, 0, 1, 1);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="xScale"></param>
+		/// <param name="yScale"></param>
 		public NTexture(Texture texture, float xScale, float yScale)
 		{
 			root = this;
@@ -64,6 +116,11 @@ namespace FairyGUI
 			uvRect = new Rect(0, 0, xScale, yScale);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="region"></param>
 		public NTexture(Texture texture, Rect region)
 		{
 			root = this;
@@ -73,6 +130,11 @@ namespace FairyGUI
 				region.width / nativeTexture.width, region.height / nativeTexture.height);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="root"></param>
+		/// <param name="region"></param>
 		public NTexture(NTexture root, Rect region)
 		{
 			this.root = root;
@@ -89,6 +151,9 @@ namespace FairyGUI
 				region.width * root.uvRect.width / nativeTexture.width, region.height * root.uvRect.height / nativeTexture.height);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int width
 		{
 			get
@@ -100,6 +165,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int height
 		{
 			get
@@ -111,6 +179,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void DestroyMaterials()
 		{
 			if (materialManagers != null && materialManagers.Count > 0)
@@ -123,11 +194,18 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Dispose()
 		{
 			Dispose(false);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="allowDestroyingAssets"></param>
 		public void Dispose(bool allowDestroyingAssets)
 		{
 			if (!disposed)

@@ -28,6 +28,7 @@ namespace FairyGUI
 		protected GList _list;
 
 		protected string[] _items;
+		protected string[] _icons;
 		protected string[] _values;
 		protected string _popupDirection;
 
@@ -111,10 +112,28 @@ namespace FairyGUI
 					else if (_selectedIndex == -1)
 						_selectedIndex = 0;
 					this.text = _items[_selectedIndex];
+					if (_icons != null && selectedIndex < _icons.Length)
+						this.icon = _icons[selectedIndex];
 				}
 				else
+				{
 					this.text = string.Empty;
+					if (_icons != null)
+						this.icon = null;
+					_selectedIndex = -1;
+				}
 				_itemsUpdated = true;
+			}
+		}
+
+		public string[] icons
+		{
+			get { return _icons; }
+			set
+			{
+				_icons = value;
+				if (_icons != null && selectedIndex != -1 && selectedIndex < _icons.Length)
+					this.icon = _icons[selectedIndex];
 			}
 		}
 
@@ -151,10 +170,18 @@ namespace FairyGUI
 					return;
 
 				_selectedIndex = value;
-				if (selectedIndex >= 0 && selectedIndex < _items.Length)
+				if (_selectedIndex >= 0 && _selectedIndex < _items.Length)
+				{
 					this.text = (string)_items[_selectedIndex];
+					if (_icons != null && _selectedIndex < _icons.Length)
+						this.icon = _icons[_selectedIndex];
+				}
 				else
+				{
 					this.text = string.Empty;
+					if (_icons != null)
+						this.icon = null;
+				}
 			}
 		}
 
@@ -266,6 +293,13 @@ namespace FairyGUI
 			{
 				_items[i] = ix.GetAttribute("title");
 				_values[i] = ix.GetAttribute("value");
+				str = ix.GetAttribute("icon");
+				if (str != null)
+				{
+					if (_icons == null)
+						_icons = new string[col.Count];
+					_icons[i] = str;
+				}
 				i++;
 			}
 
@@ -282,6 +316,10 @@ namespace FairyGUI
 			}
 			else
 				_selectedIndex = -1;
+
+			str = xml.GetAttribute("icon");
+			if (str != null && str.Length > 0)
+				this.icon = str;
 		}
 
 		public void UpdateDropdownList()
@@ -317,6 +355,7 @@ namespace FairyGUI
 			{
 				GObject item = _list.AddItemFromPool();
 				item.text = _items[i];
+				item.icon = (_icons != null && i < _icons.Length) ? _icons[i] : null;
 				item.name = i < _values.Length ? _values[i] : string.Empty;
 			}
 		}
@@ -334,11 +373,8 @@ namespace FairyGUI
 		{
 			if (dropdown.parent is GRoot)
 				((GRoot)dropdown.parent).HidePopup(dropdown);
-			_selectedIndex = _list.GetChildIndex((GObject)context.data);
-			if (_selectedIndex >= 0)
-				this.text = _items[_selectedIndex];
-			else
-				this.text = string.Empty;
+			_selectedIndex = int.MinValue;
+			this.selectedIndex = _list.GetChildIndex((GObject)context.data);
 
 			onChanged.Call();
 		}

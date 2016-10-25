@@ -27,6 +27,7 @@ namespace FairyGUIEditor
 		SerializedProperty fitScreen;
 		SerializedProperty touchDisabled;
 		SerializedProperty hitTestMode;
+		SerializedProperty setNativeChildrenOrder;
 
 #if UNITY_5
 		string[] propertyToExclude;
@@ -45,11 +46,13 @@ namespace FairyGUIEditor
 			fitScreen = serializedObject.FindProperty("fitScreen");
 			touchDisabled = serializedObject.FindProperty("touchDisabled");
 			hitTestMode = serializedObject.FindProperty("hitTestMode");
+			setNativeChildrenOrder = serializedObject.FindProperty("setNativeChildrenOrder");
+
 
 #if UNITY_5
 			propertyToExclude = new string[] { "m_Script", "packageName", "componentName", "packagePath", "renderMode",
 				"renderCamera", "sortingOrder", "position", "scale", "rotation", "fairyBatching", "fitScreen","touchDisabled",
-				"hitTestMode","cachedUISize"
+				"hitTestMode","cachedUISize","setNativeChildrenOrder"
 			};
 #endif
 		}
@@ -96,6 +99,7 @@ namespace FairyGUIEditor
 			EditorGUILayout.PropertyField(fairyBatching);
 			EditorGUILayout.PropertyField(hitTestMode);
 			EditorGUILayout.PropertyField(touchDisabled);
+			EditorGUILayout.PropertyField(setNativeChildrenOrder);
 			EditorGUILayout.LabelField("UI Transform", (GUIStyle)"OL Title");
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(position);

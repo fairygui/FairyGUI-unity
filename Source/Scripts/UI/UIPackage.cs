@@ -652,6 +652,8 @@ namespace FairyGUI
 									rect.width = int.Parse(arr[2]);
 									rect.height = int.Parse(arr[3]);
 									pi.scale9Grid = rect;
+
+									pi.tileGridIndice = cxml.GetAttributeInt("gridTile");
 								}
 							}
 							else if (scale == "tile")

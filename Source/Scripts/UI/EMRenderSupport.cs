@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public interface EMRenderTarget
 	{
 		int EM_sortingOrder { get; }
@@ -13,20 +16,36 @@ namespace FairyGUI
 		void EM_Reload();
 	}
 
+	/// <summary>
+	/// 这是一个在编辑状态下渲染UI的功能类。EM=Edit Mode
+	/// </summary>
 	public class EMRenderSupport
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool orderChanged;
 
 		static UpdateContext _updateContext;
 		static List<EMRenderTarget> _targets = new List<EMRenderTarget>();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool packageListReady { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static bool hasTarget
 		{
 			get { return _targets.Count > 0; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Add(EMRenderTarget value)
 		{
 			if (!_targets.Contains(value))
@@ -34,11 +53,18 @@ namespace FairyGUI
 			orderChanged = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public static void Remove(EMRenderTarget value)
 		{
 			_targets.Remove(value);
 		}
 
+		/// <summary>
+		/// 由StageCamera调用
+		/// </summary>
 		public static void Update()
 		{
 			if (Application.isPlaying)
@@ -72,6 +98,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 当发生二进制重载时，或用户点击刷新菜单
+		/// </summary>
 		public static void Reload()
 		{
 			if (Application.isPlaying)

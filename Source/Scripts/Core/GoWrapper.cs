@@ -37,7 +37,8 @@ namespace FairyGUI
 				if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
 				{
 					//Set the object rendering in Transparent Queue as UI objects
-					_renders[i].material.renderQueue = 3000;
+					if (r.sharedMaterial != null)
+						r.sharedMaterial.renderQueue = 3000;
 				}
 			}
 		}
@@ -56,7 +57,7 @@ namespace FairyGUI
 				{
 					Renderer r = _renders[i];
 					if (r != null)
-						_renders[i].sortingOrder = value;
+						r.sortingOrder = value;
 				}
 			}
 		}

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum HitTestMode
 	{
 		Default,

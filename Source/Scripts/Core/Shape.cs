@@ -14,6 +14,9 @@ namespace FairyGUI
 		Color[] _colors;
 		Vector2[] _polygonPoints;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Shape()
 		{
 			CreateGameObject("Shape");
@@ -21,11 +24,20 @@ namespace FairyGUI
 			graphics.texture = NTexture.Empty;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool empty
 		{
 			get { return _type == 0; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="lineSize"></param>
+		/// <param name="lineColor"></param>
+		/// <param name="fillColor"></param>
 		public void DrawRect(int lineSize, Color lineColor, Color fillColor)
 		{
 			_type = 1;
@@ -38,6 +50,11 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="lineSize"></param>
+		/// <param name="colors"></param>
 		public void DrawRect(int lineSize, Color[] colors)
 		{
 			_type = 1;
@@ -48,6 +65,10 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="fillColor"></param>
 		public void DrawEllipse(Color fillColor)
 		{
 			_type = 2;
@@ -58,6 +79,10 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="colors"></param>
 		public void DrawEllipse(Color[] colors)
 		{
 			_type = 2;
@@ -67,6 +92,11 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="fillColor"></param>
 		public void DrawPolygon(Vector2[] points, Color fillColor)
 		{
 			_type = 3;
@@ -78,6 +108,11 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="colors"></param>
 		public void DrawPolygon(Vector2[] points, Color[] colors)
 		{
 			_type = 3;
@@ -88,6 +123,9 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Clear()
 		{
 			_type = 0;
@@ -95,6 +133,10 @@ namespace FairyGUI
 			graphics.ClearMesh();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="context"></param>
 		public override void Update(UpdateContext context)
 		{
 			if (_requireUpdateMesh)

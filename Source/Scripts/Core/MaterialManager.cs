@@ -8,7 +8,14 @@ namespace FairyGUI
 	/// </summary>
 	public class MaterialManager
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public NTexture texture { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public string shaderName { get; private set; }
 
 		MaterialPool[] _pools;
@@ -27,6 +34,13 @@ namespace FairyGUI
 		static string[] SOFT_CLIPPED_GRAYED = new string[] { "SOFT_CLIPPED", "GRAYED" };
 		static string[] ALPHA_MASK = new string[] { "ALPHA_MASK" };
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="shaderName"></param>
+		/// <param name="keywords"></param>
+		/// <returns></returns>
 		public static MaterialManager GetInstance(NTexture texture, string shaderName, string[] keywords)
 		{
 			NTexture rootTexture = texture.root;
@@ -52,6 +66,10 @@ namespace FairyGUI
 			return mm;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="texture"></param>
 		public MaterialManager(NTexture texture)
 		{
 			this.texture = texture;
@@ -66,6 +84,12 @@ namespace FairyGUI
 			_pools[6] = new MaterialPool(this, ALPHA_MASK, true); //stencil mask
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="grahpics"></param>
+		/// <param name="context"></param>
+		/// <returns></returns>
 		public NMaterial GetMaterial(NGraphics grahpics, UpdateContext context)
 		{
 			frameId = UpdateContext.frameId;
@@ -114,6 +138,10 @@ namespace FairyGUI
 			return _pools[pool].Get();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public NMaterial CreateMaterial()
 		{
 			NMaterial nm = new NMaterial(ShaderConfig.GetShader(shaderName));
@@ -134,12 +162,18 @@ namespace FairyGUI
 			return nm;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Dispose()
 		{
 			foreach (MaterialPool pool in _pools)
 				pool.Dispose();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Release()
 		{
 			if (_keywords != null)

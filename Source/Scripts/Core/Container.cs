@@ -36,9 +36,14 @@ namespace FairyGUI
 		/// </summary>
 		public IHitTest hitArea;
 
-		///
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool touchChildren;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public EventCallback0 onUpdate;
 
 		List<DisplayObject> _children;
@@ -50,9 +55,8 @@ namespace FairyGUI
 		bool _fBatching;
 		List<DisplayObject> _descendants;
 
-		internal int _panelOrder;
 		internal bool _disabled;
-		bool _ownsGameObject;
+		internal int _panelOrder;
 
 		/// <summary>
 		/// 
@@ -60,8 +64,6 @@ namespace FairyGUI
 		public Container()
 			: base()
 		{
-			_ownsGameObject = true;
-
 			CreateGameObject("Container");
 			Init();
 		}
@@ -73,8 +75,6 @@ namespace FairyGUI
 		public Container(string gameObjectName)
 			: base()
 		{
-			_ownsGameObject = true;
-
 			CreateGameObject(gameObjectName);
 			Init();
 		}
@@ -86,11 +86,7 @@ namespace FairyGUI
 		public Container(GameObject attachTarget)
 			: base()
 		{
-			_ownsGameObject = false;
-
-			this.gameObject = attachTarget;
-			cachedTransform = gameObject.transform;
-
+			SetGameObject(attachTarget);
 			Init();
 		}
 
@@ -376,8 +372,11 @@ namespace FairyGUI
 			get { return _clipRect; }
 			set
 			{
-				_clipRect = value;
-				UpdateBatchingFlags();
+				if (_clipRect != value)
+				{
+					_clipRect = value;
+					UpdateBatchingFlags();
+				}
 			}
 		}
 
@@ -389,8 +388,11 @@ namespace FairyGUI
 			get { return _mask; }
 			set
 			{
-				_mask = value;
-				UpdateBatchingFlags();
+				if (_mask != value)
+				{
+					_mask = value;
+					UpdateBatchingFlags();
+				}
 			}
 		}
 
@@ -581,6 +583,11 @@ namespace FairyGUI
 			return target;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
 		public bool IsAncestorOf(DisplayObject obj)
 		{
 			if (obj == null)
@@ -597,13 +604,19 @@ namespace FairyGUI
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool fairyBatching
 		{
 			get { return _fBatching; }
 			set
 			{
-				_fBatching = value;
-				UpdateBatchingFlags();
+				if (_fBatching != value)
+				{
+					_fBatching = value;
+					UpdateBatchingFlags();
+				}
 			}
 		}
 
@@ -662,33 +675,10 @@ namespace FairyGUI
 			}
 		}
 
-		override protected void UpdateHierarchy()
-		{
-			if (_ownsGameObject)
-				base.UpdateHierarchy();
-			else if (gameObject != null)
-			{
-				//we dont change transform parent of this object
-				if (parent != null && visible)
-					gameObject.SetActive(true);
-				else
-					gameObject.SetActive(false);
-			}
-		}
-
-		override protected void DestroyGameObject()
-		{
-			if (_ownsGameObject)
-				base.DestroyGameObject();
-		}
-
 		override public void Update(UpdateContext context)
 		{
 			if (_disabled)
 				return;
-
-			if (onUpdate != null)
-				onUpdate();
 
 			base.Update(context);
 
@@ -758,6 +748,9 @@ namespace FairyGUI
 
 			if (_paintingMode > 0 && paintingGraphics.texture != null)
 				UpdateContext.OnEnd += _captureDelegate;
+
+			if (onUpdate != null)
+				onUpdate();
 		}
 
 		private void SetRenderingOrder(UpdateContext context)

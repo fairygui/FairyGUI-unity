@@ -55,7 +55,7 @@ namespace FairyGUI
 
 		public PackageItem packageItem;
 
-		virtual public void SetFormat(TextFormat format)
+		virtual public void SetFormat(TextFormat format, float fontSizeScale)
 		{
 		}
 
@@ -70,9 +70,9 @@ namespace FairyGUI
 			return false;
 		}
 
-		virtual public GlyphInfo GetGlyph(char ch)
+		virtual public bool GetGlyph(char ch, GlyphInfo glyph)
 		{
-			return null;
+			return false;
 		}
 
 		public BaseFont()

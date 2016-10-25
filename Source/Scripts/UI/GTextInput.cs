@@ -35,7 +35,7 @@ namespace FairyGUI
 			onChanged = new EventListener(this, "onChanged");
 
 			this.focusable = true;
-			_textField.autoSize = false;
+			_textField.autoSize = AutoSizeType.None;
 			_textField.wordWrap = false;
 		}
 

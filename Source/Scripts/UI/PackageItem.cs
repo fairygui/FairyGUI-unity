@@ -23,6 +23,7 @@ namespace FairyGUI
 		//image
 		public Rect? scale9Grid;
 		public bool scaleByTile;
+		public int tileGridIndice;
 		public NTexture texture;
 
 		//movieclip

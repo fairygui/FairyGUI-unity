@@ -16,7 +16,7 @@ namespace FairyGUI
 		TextFormat _textFormat;
 		bool _input;
 		string _text;
-		bool _autoSize;
+		AutoSizeType _autoSize;
 		bool _wordWrap;
 		bool _singleLine;
 		bool _html;
@@ -27,7 +27,7 @@ namespace FairyGUI
 
 		List<HtmlElement> _elements;
 		List<LineInfo> _lines;
-		List<int> _charPositions;
+		List<CharPosition> _charPositions;
 
 		BaseFont _font;
 		float _textWidth;
@@ -36,6 +36,7 @@ namespace FairyGUI
 		int _yOffset;
 		string _alternativeText;
 		bool _alternatvieHtml;
+		float _fontSizeScale;
 
 		RichTextField _richTextField;
 
@@ -61,6 +62,7 @@ namespace FairyGUI
 			_textFormat.size = 12;
 			_textFormat.lineSpacing = 3;
 			_strokeColor = new Color(0, 0, 0, 1);
+			_fontSizeScale = 1;
 
 			_wordWrap = true;
 			_text = string.Empty;
@@ -77,8 +79,17 @@ namespace FairyGUI
 			_richTextField = richTextField;
 			if (richTextField is InputTextField)
 			{
-				_charPositions = new List<int>();
 				_input = true;
+				EnableCharPositionSupport();
+			}
+		}
+
+		public void EnableCharPositionSupport()
+		{
+			if (_charPositions == null)
+			{
+				_charPositions = new List<CharPosition>();
+				_requireUpdateMesh = true;
 			}
 		}
 
@@ -171,7 +182,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool autoSize
+		public AutoSizeType autoSize
 		{
 			get { return _autoSize; }
 			set
@@ -190,9 +201,9 @@ namespace FairyGUI
 		public bool wordWrap
 		{
 			get { return _wordWrap; }
-			set 
-			{ 
-				_wordWrap = value; 
+			set
+			{
+				_wordWrap = value;
 				_textChanged = true;
 			}
 		}
@@ -203,8 +214,8 @@ namespace FairyGUI
 		public bool singleLine
 		{
 			get { return _singleLine; }
-			set 
-			{ 
+			set
+			{
 				_singleLine = value;
 				_textChanged = true;
 			}
@@ -292,7 +303,7 @@ namespace FairyGUI
 			}
 		}
 
-		internal List<HtmlElement> htmlElements
+		public List<HtmlElement> htmlElements
 		{
 			get
 			{
@@ -303,7 +314,7 @@ namespace FairyGUI
 			}
 		}
 
-		internal List<LineInfo> lines
+		public List<LineInfo> lines
 		{
 			get
 			{
@@ -314,7 +325,7 @@ namespace FairyGUI
 			}
 		}
 
-		internal List<int> charPositions
+		public List<CharPosition> charPositions
 		{
 			get
 			{
@@ -326,6 +337,11 @@ namespace FairyGUI
 
 				return _charPositions;
 			}
+		}
+
+		public RichTextField richTextField
+		{
+			get { return _richTextField; }
 		}
 
 		/// <summary>
@@ -417,23 +433,24 @@ namespace FairyGUI
 
 		override protected void OnSizeChanged(bool widthChanged, bool heightChanged)
 		{
-			if (_wordWrap && widthChanged)
-				_textChanged = true;
-			else if (!_autoSize)
-				_requireUpdateMesh = true;
+			if (!_updatingSize)
+			{
+				if (_wordWrap && widthChanged)
+					_textChanged = true;
+				else if (_autoSize != AutoSizeType.None)
+					_requireUpdateMesh = true;
 
-			if (_verticalAlign != VertAlignType.Top)
-				ApplyVertAlign();
+				if (_verticalAlign != VertAlignType.Top)
+					ApplyVertAlign();
+			}
 
 			base.OnSizeChanged(widthChanged, heightChanged);
 		}
 
-		public override Rect GetBounds(DisplayObject targetSpace)
+		protected override void EnsureSizeCorrect()
 		{
-			if (_textChanged && _autoSize)
+			if (_textChanged && _autoSize != AutoSizeType.None)
 				BuildLines();
-
-			return base.GetBounds(targetSpace);
 		}
 
 		public override void Update(UpdateContext context)
@@ -458,7 +475,9 @@ namespace FairyGUI
 			base.Update(context);
 		}
 
-		//准备字体纹理
+		/// <summary>
+		/// 准备字体纹理
+		/// </summary>
 		void RequestText()
 		{
 			int count = _elements.Count;
@@ -467,7 +486,7 @@ namespace FairyGUI
 				HtmlElement element = _elements[i];
 				if (element.type == HtmlElementType.Text)
 				{
-					_font.SetFormat(element.format);
+					_font.SetFormat(element.format, _fontSizeScale);
 					_font.PrepareCharacters(element.text);
 					_font.PrepareCharacters("_-*");
 				}
@@ -528,6 +547,7 @@ namespace FairyGUI
 
 				_textWidth = 0;
 				_textHeight = 0;
+				_fontSizeScale = 1;
 
 				BuildLinesFinal();
 
@@ -550,7 +570,7 @@ namespace FairyGUI
 			bool wordPossible = false;
 			float lastLineHeight = 0;
 			TextFormat format = _textFormat;
-			_font.SetFormat(format);
+			_font.SetFormat(format, _fontSizeScale);
 			bool wrap;
 			if (_input)
 			{
@@ -560,6 +580,7 @@ namespace FairyGUI
 			else
 				wrap = _wordWrap && !_singleLine;
 			float lineY = GUTTER_Y;
+			_fontSizeScale = 1;
 
 			RequestText();
 
@@ -581,7 +602,7 @@ namespace FairyGUI
 				if (element.type == HtmlElementType.Text)
 				{
 					format = element.format;
-					_font.SetFormat(format);
+					_font.SetFormat(format, _fontSizeScale);
 
 					int textLength = element.text.Length;
 					for (int offset = 0; offset < textLength; ++offset)
@@ -790,20 +811,53 @@ namespace FairyGUI
 			_textWidth = Mathf.CeilToInt(_textWidth);
 			_textHeight = Mathf.CeilToInt(_textHeight);
 
+			if (_autoSize == AutoSizeType.Shrink && _textWidth > rectWidth)
+			{
+				_fontSizeScale = rectWidth / _textWidth;
+				_textWidth = rectWidth;
+				_textHeight = Mathf.CeilToInt(_textHeight * _fontSizeScale);
+
+				//调整各行的大小
+				int lineCount = _lines.Count;
+				for (int i = 0; i < lineCount; ++i)
+				{
+					line = _lines[i];
+					line.y *= _fontSizeScale;
+					line.y2 *= _fontSizeScale;
+					line.height *= _fontSizeScale;
+					line.width *= _fontSizeScale;
+					line.textHeight *= _fontSizeScale;
+				}
+			}
+			else
+				_fontSizeScale = 1;
+
 			BuildLinesFinal();
 		}
 
+		bool _updatingSize; //防止重复调用BuildLines
 		void BuildLinesFinal()
 		{
-			if (_autoSize)
+			if (!_input)
 			{
-				if (_richTextField != null)
-					_richTextField.SetSize(_textWidth, _textHeight);
-				else
-					SetSize(_textWidth, _textHeight);
-
-				//因为OnSizeChanged里有设置_textChanged，这里加一句保证不会重复进入。
-				_textChanged = false;
+				if (_autoSize == AutoSizeType.Both)
+				{
+					_updatingSize = true;
+					if (_richTextField != null)
+						_richTextField.SetSize(_textWidth, _textHeight);
+					else
+						SetSize(_textWidth, _textHeight);
+					_updatingSize = false;
+				}
+				else if (_autoSize == AutoSizeType.Height)
+				{
+					_updatingSize = true;
+					if (_richTextField != null)
+						_richTextField.height = _textHeight;
+					else
+						this.height = _textHeight;
+					_updatingSize = false;
+				}
 			}
 
 			_yOffset = 0;
@@ -903,6 +957,9 @@ namespace FairyGUI
 		static List<Vector3> sCachedVerts = new List<Vector3>();
 		static List<Vector2> sCachedUVs = new List<Vector2>();
 		static List<Color32> sCachedCols = new List<Color32>();
+		static GlyphInfo glyph = new GlyphInfo();
+		static GlyphInfo glyph2 = new GlyphInfo();
+
 		void BuildMesh()
 		{
 			_requireUpdateMesh = false;
@@ -912,17 +969,18 @@ namespace FairyGUI
 				graphics.ClearMesh();
 
 				if (_charPositions != null && _charPositions.Count == 0)
-					_charPositions.Add(0);
+					_charPositions.Add(new CharPosition());
 
 				if (_richTextField != null)
 					_richTextField.RefreshObjects();
+
 				return;
 			}
 
 			int letterSpacing = _textFormat.letterSpacing;
 			float rectWidth = _contentRect.width - GUTTER_X * 2;
 			TextFormat format = _textFormat;
-			_font.SetFormat(format);
+			_font.SetFormat(format, _fontSizeScale);
 			Color32 color = format.color;
 			Color32[] gradientColor = format.gradientColor;
 			bool boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
@@ -930,6 +988,9 @@ namespace FairyGUI
 				letterSpacing++;
 			if (_charPositions != null)
 				_charPositions.Clear();
+
+			if (_fontSizeScale != 1) //不为1，表示在Shrink的作用下，字体变小了，所以要重新请求
+				RequestText();
 
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0, u1, u2, u3;
@@ -947,10 +1008,9 @@ namespace FairyGUI
 			int linkStartLine = 0;
 
 			float charX = 0;
-			float tmpX;
 			float xIndent;
 			float yIndent = 0;
-			bool clipped = !_input && !_autoSize;
+			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
 
 			int lineCount = _lines.Count;
@@ -981,7 +1041,7 @@ namespace FairyGUI
 						if (element.type == HtmlElementType.Text)
 						{
 							format = element.format;
-							_font.SetFormat(format);
+							_font.SetFormat(format, _fontSizeScale);
 							color = format.color;
 							gradientColor = format.gradientColor;
 							boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
@@ -1011,7 +1071,15 @@ namespace FairyGUI
 							if (htmlObj != null)
 							{
 								if (_charPositions != null)
-									_charPositions.Add(((int)charX << 16) + i);
+								{
+									CharPosition cp = new CharPosition();
+									cp.lineIndex = (short)i;
+									cp.charIndex = (short)j;
+									cp.caretIndex = _charPositions.Count;
+									cp.vertCount = -1-elementIndex; //借用
+									cp.offsetX = (int)charX;
+									_charPositions.Add(cp);
+								}
 								element.position = new Vector2(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
 								htmlObj.SetPosition(element.position.x, element.position.y);
 								element.hidden = lineClipped || clipped && charX + htmlObj.width > _contentRect.width - GUTTER_X;
@@ -1021,11 +1089,7 @@ namespace FairyGUI
 						continue;
 					}
 
-					if (_charPositions != null)
-						_charPositions.Add(((int)charX << 16) + i);
-
-					GlyphInfo glyph = _font.GetGlyph(ch);
-					if (glyph != null)
+					if (_font.GetGlyph(ch, glyph))
 					{
 						if (lineClipped || clipped && charX != 0 && charX + glyph.width > _contentRect.width - GUTTER_X) //超出区域，剪裁
 						{
@@ -1033,7 +1097,6 @@ namespace FairyGUI
 							continue;
 						}
 
-						tmpX = charX;
 						yIndent = (int)((line.height + line.textHeight) / 2) - glyph.height;
 						v0.x = charX + glyph.vert.xMin;
 						v0.y = -line.y - yIndent + glyph.vert.yMin;
@@ -1125,54 +1188,85 @@ namespace FairyGUI
 							}
 						}
 
-						charX += letterSpacing + glyph.width;
-
 						if (format.underline)
 						{
-							glyph = _font.GetGlyph('_');
-							if (glyph == null)
-								continue;
+							if (_font.GetGlyph('_', glyph2))
+							{
+								//取中点的UV
+								if (glyph2.uvBottomLeft.x != glyph2.uvBottomRight.x)
+									u0.x = (glyph2.uvBottomLeft.x + glyph2.uvBottomRight.x) * 0.5f;
+								else
+									u0.x = (glyph2.uvBottomLeft.x + glyph2.uvTopLeft.x) * 0.5f;
+								u0.x += specFlag;
 
-							//取中点的UV
-							if (glyph.uvBottomLeft.x != glyph.uvBottomRight.x)
-								u0.x = (glyph.uvBottomLeft.x + glyph.uvBottomRight.x) * 0.5f;
+								if (glyph2.uvBottomLeft.y != glyph2.uvTopLeft.y)
+									u0.y = (glyph2.uvBottomLeft.y + glyph2.uvTopLeft.y) * 0.5f;
+								else
+									u0.y = (glyph2.uvBottomLeft.y + glyph2.uvBottomRight.y) * 0.5f;
+
+								uvList.Add(u0);
+								uvList.Add(u0);
+								uvList.Add(u0);
+								uvList.Add(u0);
+
+								v0.y = -line.y - yIndent + glyph2.vert.yMin - 1;
+								v1.y = -line.y - yIndent + glyph2.vert.yMax - 1;
+
+								float tmpX = charX + letterSpacing + glyph.width;
+
+								vertList.Add(new Vector3(charX, v0.y));
+								vertList.Add(new Vector3(charX, v1.y));
+								vertList.Add(new Vector3(tmpX, v1.y));
+								vertList.Add(new Vector3(tmpX, v0.y));
+
+								colList.Add(color);
+								colList.Add(color);
+								colList.Add(color);
+								colList.Add(color);
+							}
 							else
-								u0.x = (glyph.uvBottomLeft.x + glyph.uvTopLeft.x) * 0.5f;
-							u0.x += specFlag;
-
-							if (glyph.uvBottomLeft.y != glyph.uvTopLeft.y)
-								u0.y = (glyph.uvBottomLeft.y + glyph.uvTopLeft.y) * 0.5f;
-							else
-								u0.y = (glyph.uvBottomLeft.y + glyph.uvBottomRight.y) * 0.5f;
-
-							uvList.Add(u0);
-							uvList.Add(u0);
-							uvList.Add(u0);
-							uvList.Add(u0);
-
-							v0.y = -line.y - yIndent + glyph.vert.yMin - 1;
-							v1.y = -line.y - yIndent + glyph.vert.yMax - 1;
-
-							vertList.Add(new Vector3(tmpX, v0.y));
-							vertList.Add(new Vector3(tmpX, v1.y));
-							vertList.Add(new Vector3(charX, v1.y));
-							vertList.Add(new Vector3(charX, v0.y));
-
-							colList.Add(color);
-							colList.Add(color);
-							colList.Add(color);
-							colList.Add(color);
+								format.underline = false;
 						}
+
+						if (_charPositions != null)
+						{
+							CharPosition cp = new CharPosition();
+							cp.lineIndex = (short)i;
+							cp.charIndex = (short)j;
+							cp.caretIndex = _charPositions.Count;
+							cp.vertCount = ((boldVertice ? 4 : 1) + (format.underline ? 1 : 0)) * 4;
+							cp.offsetX = (int)charX;
+							_charPositions.Add(cp);
+						}
+
+						charX += letterSpacing + glyph.width;
 					}
-					else //if (glyph != null)
+					else //if GetGlyph failed
 					{
+						if (_charPositions != null)
+						{
+							CharPosition cp = new CharPosition();
+							cp.lineIndex = (short)i;
+							cp.charIndex = (short)j;
+							cp.caretIndex = _charPositions.Count;
+							cp.vertCount = 0;
+							cp.offsetX = (int)charX;
+							_charPositions.Add(cp);
+						}
+
 						charX += letterSpacing;
 					}
 				}//text loop
 			}//line loop
 
 			if (_charPositions != null)
-				_charPositions.Add(((int)charX << 16) + lineCount - 1);
+			{
+				CharPosition cp = new CharPosition();
+				cp.lineIndex = (short)(lineCount - 1);
+				cp.caretIndex = _charPositions.Count;
+				cp.offsetX = (int)charX;
+				_charPositions.Add(cp);
+			}
 
 			bool hasShadow = _shadowOffset.x != 0 || _shadowOffset.y != 0;
 			if ((_stroke != 0 || hasShadow) && _font.canOutline)
@@ -1206,9 +1300,9 @@ namespace FairyGUI
 				Color32 strokeColor = _strokeColor;
 				if (_stroke != 0)
 				{
+					start = allocCount - count * 5;
 					for (int j = 0; j < 4; j++)
 					{
-						start = j * count;
 						for (int i = 0; i < count; i++)
 						{
 							Vector3 vert = vertList[i];
@@ -1227,7 +1321,6 @@ namespace FairyGUI
 
 				if (hasShadow)
 				{
-					start = allocCount - count - count;
 					for (int i = 0; i < count; i++)
 					{
 						Vector3 vert = vertList[i];
@@ -1236,10 +1329,9 @@ namespace FairyGUI
 						//使用这个特殊的设置告诉着色器这个是描边
 						if (_font.canOutline)
 							u.y = 10 + u.y;
-						uvBuf[start] = u;
-						vertBuf[start] = new Vector3(vert.x + _shadowOffset.x, vert.y - _shadowOffset.y, 0);
-						colBuf[start] = strokeColor;
-						start++;
+						uvBuf[i] = u;
+						vertBuf[i] = new Vector3(vert.x + _shadowOffset.x, vert.y - _shadowOffset.y, 0);
+						colBuf[i] = strokeColor;
 					}
 				}
 			}
@@ -1249,23 +1341,21 @@ namespace FairyGUI
 				graphics.Alloc(count);
 				vertList.CopyTo(0, graphics.vertices, 0, count);
 				uvList.CopyTo(0, graphics.uv, 0, count);
+				Color32[] colors = graphics.colors;
 				if (_font.canTint)
 				{
 					for (int i = 0; i < count; i++)
-						graphics.colors[i] = colList[i];
+						colors[i] = colList[i];
 				}
 				else
 				{
 					for (int i = 0; i < count; i++)
-						graphics.colors[i] = Color.white;
+						colors[i] = Color.white;
 				}
 			}
 
 			graphics.FillTriangles();
 			graphics.UpdateMesh();
-
-			if (_charPositions != null && _charPositions.Count == 0)
-				_charPositions.Add(0);
 
 			if (_richTextField != null)
 				_richTextField.RefreshObjects();
@@ -1287,7 +1377,8 @@ namespace FairyGUI
 		void ApplyVertAlign()
 		{
 			int oldOffset = _yOffset;
-			if (_autoSize || _verticalAlign == VertAlignType.Top)
+			if (_autoSize == AutoSizeType.Both || _autoSize == AutoSizeType.Height
+				|| _verticalAlign == VertAlignType.Top)
 				_yOffset = 0;
 			else
 			{
@@ -1313,17 +1404,43 @@ namespace FairyGUI
 			}
 		}
 
-		internal class LineInfo
+		/// <summary>
+		/// 
+		/// </summary>
+		public class LineInfo
 		{
+			/// <summary>
+			/// 
+			/// </summary>
 			public float width;
+
+			/// <summary>
+			/// 
+			/// </summary>
 			public float height;
+			/// <summary>
+			/// 
+			/// </summary>
 			public float textHeight;
+
+			/// <summary>
+			/// 
+			/// </summary>
 			public string text;
+
+			/// <summary>
+			/// 
+			/// </summary>
 			public float y;
-			public float y2;
+
+			internal float y2;
 
 			static Stack<LineInfo> pool = new Stack<LineInfo>();
 
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <returns></returns>
 			public static LineInfo Borrow()
 			{
 				if (pool.Count > 0)
@@ -1340,11 +1457,19 @@ namespace FairyGUI
 					return new LineInfo();
 			}
 
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="value"></param>
 			public static void Return(LineInfo value)
 			{
 				pool.Push(value);
 			}
 
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="values"></param>
 			public static void Return(List<LineInfo> values)
 			{
 				int cnt = values.Count;
@@ -1353,6 +1478,34 @@ namespace FairyGUI
 
 				values.Clear();
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public struct CharPosition
+		{
+			/// <summary>
+			/// 字符所在的行索引
+			/// </summary>
+			public short lineIndex;
+
+			/// <summary>
+			/// 字符在所在行的索引
+			/// </summary>
+			public short charIndex;
+
+			/// <summary>
+			/// 字符的x偏移
+			/// </summary>
+			public int offsetX;
+
+			/// <summary>
+			/// 字符占用的顶点数量。如果小于0，用于表示一个图片。对应的图片索引为-vertCount-1
+			/// </summary>
+			public int vertCount;
+
+			internal int caretIndex;
 		}
 	}
 }

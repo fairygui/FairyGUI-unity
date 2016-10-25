@@ -9,22 +9,79 @@ namespace FairyGUI
 	/// </summary>
 	public class NGraphics
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public Vector3[] vertices { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Vector2[] uv { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Color32[] colors { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int[] triangles { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int vertCount { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public MeshFilter meshFilter { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public MeshRenderer meshRenderer { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Mesh mesh { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public GameObject gameObject { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool grayed;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public BlendMode blendMode;
-		public bool dontClip; //不参与剪裁
+
+		/// <summary>
+		/// 不参与剪裁
+		/// </summary>
+		public bool dontClip;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public uint maskFrameId;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Matrix4x4? vertexMatrix;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public Vector3? cameraPosition;
 
 		NTexture _texture;
@@ -32,7 +89,6 @@ namespace FairyGUI
 		Material _material;
 		bool _customMatarial;
 		MaterialManager _manager;
-		Mesh mesh;
 		string[] _materialKeywords;
 
 		float _alpha;
@@ -41,12 +97,17 @@ namespace FairyGUI
 
 		StencilEraser _stencilEraser;
 
-		//写死的一些三角形顶点组合，避免每次new
-		/** 1---2
-		 *  | / |
-		 *  0---3
-		 */
+		/// <summary>
+		/// 写死的一些三角形顶点组合，避免每次new
+		/// 1---2
+		/// | / |
+		/// 0---3
+		/// </summary>
 		public static int[] TRIANGLES = new int[] { 0, 1, 2, 2, 3, 0 };
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int[] TRIANGLES_9_GRID = new int[] { 
 			4,0,1,1,5,4,
 			5,1,2,2,6,5,
@@ -59,6 +120,10 @@ namespace FairyGUI
 			14,10,11,
 			11,15,14
         };
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public static int[] TRIANGLES_4_GRID = new int[] { 
 			4, 0, 5,
 			4, 5, 1, 
@@ -70,6 +135,10 @@ namespace FairyGUI
 			4, 8, 0
 		};
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="gameObject"></param>
 		public NGraphics(GameObject gameObject)
 		{
 			this.gameObject = gameObject;
@@ -94,6 +163,9 @@ namespace FairyGUI
 			Stats.LatestGraphicsCreation++;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public NTexture texture
 		{
 			get { return _texture; }
@@ -109,6 +181,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string shader
 		{
 			get { return _shader; }
@@ -119,6 +194,11 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="shader"></param>
+		/// <param name="texture"></param>
 		public void SetShaderAndTexture(string shader, NTexture texture)
 		{
 			_shader = shader;
@@ -128,6 +208,9 @@ namespace FairyGUI
 			UpdateManager();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Material material
 		{
 			get { return _material; }
@@ -157,6 +240,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string[] materialKeywords
 		{
 			get { return _materialKeywords; }
@@ -178,24 +264,37 @@ namespace FairyGUI
 				_manager = null;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool enabled
 		{
 			get { return meshRenderer.enabled; }
 			set { meshRenderer.enabled = value; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int sortingOrder
 		{
 			get { return meshRenderer.sortingOrder; }
 			set { meshRenderer.sortingOrder = value; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public void SetStencilEraserOrder(int value)
 		{
 			if (_stencilEraser != null)
 				_stencilEraser.meshRenderer.sortingOrder = value;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Dispose()
 		{
 			if (mesh != null)
@@ -224,6 +323,10 @@ namespace FairyGUI
 			_stencilEraser = null;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="context"></param>
 		public void UpdateMaterial(UpdateContext context)
 		{
 			Stats.GraphicsCount++;
@@ -337,6 +440,10 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vertCount"></param>
 		public void Alloc(int vertCount)
 		{
 			if (vertices == null || vertices.Length != vertCount)
@@ -347,6 +454,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void UpdateMesh()
 		{
 			vertCount = vertices.Length;
@@ -403,6 +513,13 @@ namespace FairyGUI
 				_stencilEraser.meshFilter.mesh = mesh;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="drawRect"></param>
+		/// <param name="uvRect"></param>
+		/// <param name="color"></param>
+		/// <param name="allColors"></param>
 		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color, Color[] allColors = null)
 		{
 			//当四边形发生形变时，只用两个三角面表达会造成图形的变形较严重，这里做一个优化，自动增加更多的面
@@ -455,6 +572,14 @@ namespace FairyGUI
 			UpdateMesh();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vertRect"></param>
+		/// <param name="lineSize"></param>
+		/// <param name="lineColor"></param>
+		/// <param name="fillColor"></param>
+		/// <param name="allColors"></param>
 		public void DrawRect(Rect vertRect, int lineSize, Color lineColor, Color fillColor, Color[] allColors)
 		{
 			if (lineSize == 0)
@@ -510,6 +635,12 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vertRect"></param>
+		/// <param name="fillColor"></param>
+		/// <param name="allColors"></param>
 		public void DrawEllipse(Rect vertRect, Color fillColor, Color[] allColors)
 		{
 			float radiusX = vertRect.width / 2;
@@ -559,6 +690,13 @@ namespace FairyGUI
 		}
 
 		static List<int> sRestIndices = new List<int>();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="fillColor"></param>
+		/// <param name="allColors"></param>
 		public void DrawPolygon(Vector2[] points, Color fillColor, Color[] allColors)
 		{
 			int numVertices = points.Length;
@@ -655,6 +793,15 @@ namespace FairyGUI
 			UpdateMesh();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="method"></param>
+		/// <param name="amount"></param>
+		/// <param name="origin"></param>
+		/// <param name="clockwise"></param>
+		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
 		public void Fill(FillMethod method, float amount, int origin, bool clockwise, Rect vertRect, Rect uvRect)
 		{
 			amount = Mathf.Clamp01(amount);
@@ -687,6 +834,11 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 从当前顶点缓冲区位置开始填入一个矩形的四个顶点
+		/// </summary>
+		/// <param name="index">填充位置顶点索引</param>
+		/// <param name="rect"></param>
 		public void FillVerts(int index, Rect rect)
 		{
 			vertices[index] = new Vector3(rect.xMin, -rect.yMax, 0f);
@@ -695,6 +847,11 @@ namespace FairyGUI
 			vertices[index + 3] = new Vector3(rect.xMax, -rect.yMax, 0f);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="rect"></param>
 		public void FillUV(int index, Rect rect)
 		{
 			uv[index] = new Vector2(rect.xMin, rect.yMin);
@@ -703,6 +860,10 @@ namespace FairyGUI
 			uv[index + 3] = new Vector2(rect.xMax, rect.yMin);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public void FillColors(Color value)
 		{
 			Color32[] arr = this.colors;
@@ -722,6 +883,9 @@ namespace FairyGUI
 				this.triangles = new int[requestSize];
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void FillTriangles()
 		{
 			int vertCount = this.vertices.Length;
@@ -740,11 +904,18 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="triangles"></param>
 		public void FillTriangles(int[] triangles)
 		{
 			this.triangles = triangles;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void ClearMesh()
 		{
 			if (vertCount > 0)
@@ -756,6 +927,10 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public void Tint(Color value)
 		{
 			if (this.colors == null || vertCount == 0)
@@ -787,6 +962,9 @@ namespace FairyGUI
 			mesh.colors32 = this.colors;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public float alpha
 		{
 			get { return _alpha; }
@@ -811,6 +989,12 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="verts"></param>
+		/// <param name="index"></param>
+		/// <param name="rect"></param>
 		public static void FillVertsOfQuad(Vector3[] verts, int index, Rect rect)
 		{
 			verts[index] = new Vector3(rect.xMin, -rect.yMax, 0f);
@@ -819,6 +1003,12 @@ namespace FairyGUI
 			verts[index + 3] = new Vector3(rect.xMax, -rect.yMax, 0f);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="uv"></param>
+		/// <param name="index"></param>
+		/// <param name="rect"></param>
 		public static void FillUVOfQuad(Vector2[] uv, int index, Rect rect)
 		{
 			uv[index] = new Vector2(rect.xMin, rect.yMin);

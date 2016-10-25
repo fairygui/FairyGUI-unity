@@ -12,9 +12,6 @@ namespace FairyGUI
 		protected TextField _textField;
 		protected string _text;
 		protected bool _ubbEnabled;
-		protected AutoSizeType _autoSize;
-		protected bool _widthAutoSize;
-		protected bool _heightAutoSize;
 		protected TextFormat _textFormat;
 		protected bool _updatingSize;
 
@@ -33,10 +30,7 @@ namespace FairyGUI
 			_textField.textFormat = tf;
 
 			_text = string.Empty;
-			_autoSize = AutoSizeType.Both;
-			_widthAutoSize = true;
-			_heightAutoSize = true;
-			_textField.autoSize = true;
+			_textField.autoSize = AutoSizeType.Both;
 			_textField.wordWrap = false;
 		}
 
@@ -185,46 +179,28 @@ namespace FairyGUI
 		/// </summary>
 		public AutoSizeType autoSize
 		{
-			get
-			{
-				return _autoSize;
-			}
+			get { return _textField.autoSize; }
 			set
 			{
-				if (_autoSize != value)
+				_textField.autoSize = value;
+				if (value == AutoSizeType.Both)
 				{
-					_autoSize = value;
+					_textField.wordWrap = false;
 
-					_widthAutoSize = value == AutoSizeType.Both;
-					_heightAutoSize = value == AutoSizeType.Both || value == AutoSizeType.Height;
+					if (!underConstruct)
+						this.SetSize(_textField.textWidth, _textField.textHeight);
+				}
+				else
+				{
+					_textField.wordWrap = true;
 
-					if (this is GTextInput)
+					if (value == AutoSizeType.Height)
 					{
-						_widthAutoSize = false;
-						_heightAutoSize = false;
-					}
-
-					if (_widthAutoSize)
-					{
-						_textField.autoSize = true;
-						_textField.wordWrap = false;
-
 						if (!underConstruct)
-							this.SetSize(_textField.textWidth, _textField.textHeight);
+							this.height = _textField.textHeight;
 					}
 					else
-					{
-						_textField.autoSize = false;
-						_textField.wordWrap = true;
-
-						if (_heightAutoSize)
-						{
-							if (!underConstruct)
-								this.height = _textField.textHeight;
-						}
-						else
-							displayObject.SetSize(this.width, this.height);
-					}
+						displayObject.SetSize(this.width, this.height);
 				}
 			}
 		}
@@ -252,10 +228,10 @@ namespace FairyGUI
 
 			_updatingSize = true;
 
-			if (_widthAutoSize)
-				this.size = displayObject.size = new Vector2(_textField.textWidth, _textField.textHeight);
-			else if (_heightAutoSize)
-				this.height = displayObject.height = _textField.textHeight;
+			if (_textField.autoSize == AutoSizeType.Both)
+				this.size = displayObject.size;
+			else if (_textField.autoSize == AutoSizeType.Height)
+				this.height = displayObject.height;
 
 			_updatingSize = false;
 		}
@@ -279,14 +255,13 @@ namespace FairyGUI
 
 			if (underConstruct)
 				displayObject.SetSize(this.width, this.height);
-			else if (!_widthAutoSize)
+			else if (_textField.autoSize != AutoSizeType.Both)
 			{
-				if (_heightAutoSize)
+				if (_textField.autoSize == AutoSizeType.Height)
 				{
 					if (this._text != string.Empty) //文本为空时，1是本来就不需要调整， 2是为了防止改掉文本为空时的默认高度，造成关联错误
 					{
 						displayObject.width = this.width;//先调整宽度，让文本重排
-						displayObject.height = _textField.textHeight;
 						SetSizeDirectly(this.width, displayObject.height);
 					}
 				}

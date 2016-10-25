@@ -14,6 +14,12 @@ namespace FairyGUI
 		string[] _variants;
 		bool _notShared;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="manager"></param>
+		/// <param name="variants"></param>
+		/// <param name="notShared"></param>
 		public MaterialPool(MaterialManager manager, string[] variants, bool notShared)
 		{
 			_manager = manager;
@@ -21,6 +27,10 @@ namespace FairyGUI
 			_notShared = notShared;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public NMaterial Get()
 		{
 			List<NMaterial> items;
@@ -75,6 +85,9 @@ namespace FairyGUI
 			return result;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Clear()
 		{
 			if (_items != null)
@@ -84,6 +97,9 @@ namespace FairyGUI
 				_blendItems.Clear();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Dispose()
 		{
 			if (_items != null)

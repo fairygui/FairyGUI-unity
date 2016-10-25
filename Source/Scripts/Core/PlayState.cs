@@ -7,10 +7,25 @@ namespace FairyGUI
 	/// </summary>
 	public class PlayState
 	{
-		public bool reachEnding { get; private set; } //是否已播放到结尾
-		public bool reversed { get; private set; } //是否已反向播放
-		public int repeatedCount { get; private set; } //重复次数
-		public bool ignoreTimeScale; //是否忽略TimeScale的影响，即在TimeScale改变后依然保持原有的播放速度
+		/// <summary>
+		/// 是否已播放到结尾
+		/// </summary>
+		public bool reachEnding { get; private set; }
+
+		/// <summary>
+		/// 是否已反向播放
+		/// </summary>
+		public bool reversed { get; private set; }
+
+		/// <summary>
+		/// 重复次数
+		/// </summary>
+		public int repeatedCount { get; private set; }
+
+		/// <summary>
+		/// 是否忽略TimeScale的影响，即在TimeScale改变后依然保持原有的播放速度
+		/// </summary>
+		public bool ignoreTimeScale;
 
 		int _curFrame; //当前帧
 		float _lastTime;
@@ -21,6 +36,11 @@ namespace FairyGUI
 		{
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="mc"></param>
+		/// <param name="context"></param>
 		public void Update(MovieClip mc, UpdateContext context)
 		{
 			if (_lastUpdateFrameId == UpdateContext.frameId) //PlayState may be shared, only update once per frame
@@ -76,12 +96,18 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int currrentFrame
 		{
 			get { return _curFrame; }
 			set { _curFrame = value; _curFrameDelay = 0; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Rewind()
 		{
 			_curFrame = 0;
@@ -90,6 +116,9 @@ namespace FairyGUI
 			reachEnding = false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Reset()
 		{
 			_curFrame = 0;
@@ -99,6 +128,10 @@ namespace FairyGUI
 			reversed = false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="src"></param>
 		public void Copy(PlayState src)
 		{
 			_curFrame = src._curFrame;

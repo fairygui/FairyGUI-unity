@@ -109,6 +109,7 @@ namespace FairyGUI
 						_owner.internalVisible--;
 						if (b)
 							_owner.InvalidateBatchingState();
+						_owner.OnGearStop.Call(this);
 					});
 
 					if (delay > 0)

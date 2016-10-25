@@ -3,8 +3,14 @@ using UnityEngine;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class BitmapFont : BaseFont
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public class BMGlyph
 		{
 			public int offsetX;
@@ -17,12 +23,18 @@ namespace FairyGUI
 			public int channel;//0-n/a, 1-r,2-g,3-b,4-alpha
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int size;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool resizable;
+
 		Dictionary<int, BMGlyph> _dict;
 		float scale;
-
-		static GlyphInfo glyhInfo = new GlyphInfo();
 
 		public BitmapFont(PackageItem item)
 		{
@@ -43,10 +55,10 @@ namespace FairyGUI
 			_dict[ch] = glyph;
 		}
 
-		override public void SetFormat(TextFormat format)
+		override public void SetFormat(TextFormat format, float fontSizeScale)
 		{
 			if (resizable)
-				this.scale = (float)format.size / size;
+				this.scale = (float)format.size / size * fontSizeScale;
 		}
 
 		override public bool GetGlyphSize(char ch, out int width, out int height)
@@ -72,41 +84,41 @@ namespace FairyGUI
 			}
 		}
 
-		override public GlyphInfo GetGlyph(char ch)
+		override public bool GetGlyph(char ch, GlyphInfo glyph)
 		{
 			BMGlyph bg;
 			if (ch == ' ')
 			{
-				glyhInfo.width = Mathf.CeilToInt(size * scale / 2);
-				glyhInfo.height = Mathf.CeilToInt(size * scale);
-				glyhInfo.vert.xMin = 0;
-				glyhInfo.vert.xMax = glyhInfo.width * scale;
-				glyhInfo.vert.yMin = -glyhInfo.height * scale;
-				glyhInfo.vert.yMax = 0;
-				glyhInfo.uvTopLeft = Vector2.zero;
-				glyhInfo.uvBottomLeft = Vector2.zero;
-				glyhInfo.uvTopRight = Vector2.zero;
-				glyhInfo.uvBottomRight = Vector2.zero;
-				glyhInfo.channel = 0;
-				return glyhInfo;
+				glyph.width = Mathf.CeilToInt(size * scale / 2);
+				glyph.height = Mathf.CeilToInt(size * scale);
+				glyph.vert.xMin = 0;
+				glyph.vert.xMax = glyph.width * scale;
+				glyph.vert.yMin = -glyph.height * scale;
+				glyph.vert.yMax = 0;
+				glyph.uvTopLeft = Vector2.zero;
+				glyph.uvBottomLeft = Vector2.zero;
+				glyph.uvTopRight = Vector2.zero;
+				glyph.uvBottomRight = Vector2.zero;
+				glyph.channel = 0;
+				return true;
 			}
 			else if (_dict.TryGetValue((int)ch, out bg))
 			{
-				glyhInfo.width = Mathf.CeilToInt(bg.advance * scale);
-				glyhInfo.height = Mathf.CeilToInt(bg.lineHeight * scale);
-				glyhInfo.vert.xMin = bg.offsetX * scale;
-				glyhInfo.vert.xMax = (bg.offsetX + bg.width) * scale;
-				glyhInfo.vert.yMin = -bg.height * scale;
-				glyhInfo.vert.yMax = 0;
-				glyhInfo.uvBottomLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMin);
-				glyhInfo.uvTopLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMax);
-				glyhInfo.uvTopRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMax);
-				glyhInfo.uvBottomRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMin);
-				glyhInfo.channel = bg.channel;
-				return glyhInfo;
+				glyph.width = Mathf.CeilToInt(bg.advance * scale);
+				glyph.height = Mathf.CeilToInt(bg.lineHeight * scale);
+				glyph.vert.xMin = bg.offsetX * scale;
+				glyph.vert.xMax = (bg.offsetX + bg.width) * scale;
+				glyph.vert.yMin = -bg.height * scale;
+				glyph.vert.yMax = 0;
+				glyph.uvBottomLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMin);
+				glyph.uvTopLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMax);
+				glyph.uvTopRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMax);
+				glyph.uvBottomRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMin);
+				glyph.channel = bg.channel;
+				return true;
 			}
 			else
-				return null;
+				return false;
 		}
 	}
 }

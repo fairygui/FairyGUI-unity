@@ -9,6 +9,9 @@ namespace FairyGUI
 	[AddComponentMenu("FairyGUI/UI Camera")]
 	public class StageCamera : MonoBehaviour
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool constantSize = true;
 
 		[System.NonSerialized]
@@ -23,9 +26,15 @@ namespace FairyGUI
 		[System.NonSerialized]
 		bool isMain;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[System.NonSerialized]
 		public static Camera main;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[System.NonSerialized]
 		public static int screenSizeVer = 1;
 
@@ -116,6 +125,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static void CheckCaptureCamera()
 		{
 			if (GameObject.Find(Name) == null)
@@ -125,6 +137,12 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="cullingMask"></param>
+		/// <returns></returns>
 		public static Camera CreateCamera(string name, int cullingMask)
 		{
 			GameObject cameraObject = new GameObject(name);

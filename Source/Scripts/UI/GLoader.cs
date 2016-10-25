@@ -324,6 +324,7 @@ namespace FairyGUI
 					_content.texture = _contentItem.texture;
 					_content.scale9Grid = _contentItem.scale9Grid;
 					_content.scaleByTile = _contentItem.scaleByTile;
+					_content.tileGridIndice = _contentItem.tileGridIndice;
 
 					_contentSourceWidth = _contentItem.width;
 					_contentSourceHeight = _contentItem.height;

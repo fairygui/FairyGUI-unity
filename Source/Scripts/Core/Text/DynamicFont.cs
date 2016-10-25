@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace FairyGUI
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class DynamicFont : BaseFont
 	{
 		protected Font _font;
@@ -15,7 +18,6 @@ namespace FairyGUI
 		FontStyle _style;
 
 		static CharacterInfo sTempChar;
-		static GlyphInfo glyhInfo = new GlyphInfo();
 
 		internal static bool textRebuildFlag;
 
@@ -100,9 +102,12 @@ namespace FairyGUI
 			this.mainTexture = new NTexture(_font.material.mainTexture);
 		}
 
-		override public void SetFormat(TextFormat format)
+		override public void SetFormat(TextFormat format, float fontSizeScale)
 		{
-			_size = format.size;
+			if (fontSizeScale == 1)
+				_size = format.size;
+			else
+				_size = Mathf.FloorToInt((float)format.size * fontSizeScale);
 			if (format.bold && !customBold)
 			{
 				if (format.italic)
@@ -151,7 +156,7 @@ namespace FairyGUI
 			}
 		}
 
-		override public GlyphInfo GetGlyph(char ch)
+		override public bool GetGlyph(char ch, GlyphInfo glyph)
 		{
 			if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
 			{
@@ -165,52 +170,52 @@ namespace FairyGUI
 					_lastBaseLine = baseline;
 				}
 #if UNITY_5
-				glyhInfo.vert.xMin = sTempChar.minX;
-				glyhInfo.vert.yMin = sTempChar.minY - baseline;
-				glyhInfo.vert.xMax = sTempChar.maxX;
+				glyph.vert.xMin = sTempChar.minX;
+				glyph.vert.yMin = sTempChar.minY - baseline;
+				glyph.vert.xMax = sTempChar.maxX;
 				if (sTempChar.glyphWidth == 0) //zero width, space etc
-					glyhInfo.vert.xMax = glyhInfo.vert.xMin + _size / 2;
-				glyhInfo.vert.yMax = sTempChar.maxY - baseline;
-				glyhInfo.uvTopLeft = sTempChar.uvTopLeft;
-				glyhInfo.uvBottomLeft = sTempChar.uvBottomLeft;
-				glyhInfo.uvTopRight = sTempChar.uvTopRight;
-				glyhInfo.uvBottomRight = sTempChar.uvBottomRight;
+					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
+				glyph.vert.yMax = sTempChar.maxY - baseline;
+				glyph.uvTopLeft = sTempChar.uvTopLeft;
+				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
+				glyph.uvTopRight = sTempChar.uvTopRight;
+				glyph.uvBottomRight = sTempChar.uvBottomRight;
 
-				glyhInfo.width = sTempChar.advance;
-				glyhInfo.height = sTempChar.size;
+				glyph.width = sTempChar.advance;
+				glyph.height = sTempChar.size;
 				if (customBold)
-					glyhInfo.width++;
+					glyph.width++;
 #else
-				glyhInfo.vert.xMin = sTempChar.vert.xMin;
-				glyhInfo.vert.yMin = sTempChar.vert.yMax - baseline;
-				glyhInfo.vert.xMax = sTempChar.vert.xMax;
+				glyph.vert.xMin = sTempChar.vert.xMin;
+				glyph.vert.yMin = sTempChar.vert.yMax - baseline;
+				glyph.vert.xMax = sTempChar.vert.xMax;
 				if (sTempChar.vert.width == 0) //zero width, space etc
-					glyhInfo.vert.xMax = glyhInfo.vert.xMin + _size / 2;
-				glyhInfo.vert.yMax = sTempChar.vert.yMin - baseline;
+					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
+				glyph.vert.yMax = sTempChar.vert.yMin - baseline;
 				if (!sTempChar.flipped)
 				{
-					glyhInfo.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyhInfo.uvTopLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
-					glyhInfo.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyhInfo.uvBottomRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
 				}
 				else
 				{
-					glyhInfo.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyhInfo.uvTopLeft = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
-					glyhInfo.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyhInfo.uvBottomRight = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
 				}
 
-				glyhInfo.width = Mathf.CeilToInt(sTempChar.width);
-				glyhInfo.height = sTempChar.size;
+				glyph.width = Mathf.CeilToInt(sTempChar.width);
+				glyph.height = sTempChar.size;
 				if (customBold)
-					glyhInfo.width++;
+					glyph.width++;
 #endif
-				return glyhInfo;
+				return true;
 			}
 			else
-				return null;
+				return false;
 		}
 
 #if (UNITY_5 || UNITY_4_7)

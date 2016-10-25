@@ -136,6 +136,7 @@ namespace FairyGUI
 			initHeight = sourceHeight;
 			_content.scale9Grid = packageItem.scale9Grid;
 			_content.scaleByTile = packageItem.scaleByTile;
+			_content.tileGridIndice = packageItem.tileGridIndice;
 
 			_content.texture = packageItem.texture;
 
