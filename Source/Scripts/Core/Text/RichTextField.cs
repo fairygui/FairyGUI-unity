@@ -140,6 +140,11 @@ namespace FairyGUI
 			}
 		}
 
+		public override void EnsureSizeCorrect()
+		{
+			textField.EnsureSizeCorrect();
+		}
+
 		override protected void OnSizeChanged(bool widthChanged, bool heightChanged)
 		{
 			textField.size = this.size;

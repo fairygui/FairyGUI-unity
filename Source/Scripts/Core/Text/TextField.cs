@@ -447,7 +447,7 @@ namespace FairyGUI
 			base.OnSizeChanged(widthChanged, heightChanged);
 		}
 
-		protected override void EnsureSizeCorrect()
+		public override void EnsureSizeCorrect()
 		{
 			if (_textChanged && _autoSize != AutoSizeType.None)
 				BuildLines();

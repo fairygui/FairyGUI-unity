@@ -397,7 +397,7 @@ namespace FairyGUI
 			}
 		}
 
-		virtual protected void EnsureSizeCorrect()
+		virtual public void EnsureSizeCorrect()
 		{
 		}
 
