@@ -16,7 +16,8 @@ namespace FairyGUI
 		public enum ScaleMode
 		{
 			ConstantPixelSize,
-			ScaleWithScreenSize
+			ScaleWithScreenSize,
+			ConstantPhysicalSize
 		}
 
 		/// <summary>
@@ -49,6 +50,21 @@ namespace FairyGUI
 		/// </summary>
 		public int designResolutionY;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public int fallbackScreenDPI  = 96;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int defaultSpriteDPI = 96;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int constantScaleFactor = 1;
+
 		[System.NonSerialized]
 		public static float scaleFactor = 1;
 
@@ -59,8 +75,29 @@ namespace FairyGUI
 		{
 			if (Application.isPlaying)
 			{
-				if (scaleMode == ScaleMode.ScaleWithScreenSize)
-					GRoot.inst.SetContentScaleFactor(designResolutionX, designResolutionY, screenMatchMode);
+				//播放模式下都是通过Stage自带的UIContentScaler实现调整的，所以这里只是把参数传过去
+				UIContentScaler scaler = Stage.inst.gameObject.GetComponent<UIContentScaler>();
+				if (scaler != this)
+				{
+					scaler.scaleMode = scaleMode;
+					if (scaleMode == ScaleMode.ScaleWithScreenSize)
+					{
+						scaler.designResolutionX = designResolutionX;
+						scaler.designResolutionY = designResolutionY;
+						scaler.screenMatchMode = screenMatchMode;
+					}
+					else if (scaleMode == ScaleMode.ConstantPhysicalSize)
+					{
+						scaler.fallbackScreenDPI = fallbackScreenDPI;
+						scaler.defaultSpriteDPI = defaultSpriteDPI;
+					}
+					else
+					{
+						scaler.constantScaleFactor = constantScaleFactor;
+					}
+					scaler.ApplyChange();
+					GRoot.inst.ApplyContentScaleFactor();
+				}
 			}
 			else //Screen width/height is not reliable in OnEnable in editmode
 				_changed = true;
@@ -95,21 +132,21 @@ namespace FairyGUI
 		/// </summary>
 		public void ApplyChange()
 		{
-			if (designResolutionX == 0 || designResolutionY == 0)
-				return;
-
-			int dx = designResolutionX;
-			int dy = designResolutionY;
-			if (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy) 
-			{
-				//scale should not change when orientation change
-				int tmp = dx;
-				dx = dy;
-				dy = tmp;
-			}
-
 			if (scaleMode == ScaleMode.ScaleWithScreenSize)
 			{
+				if (designResolutionX == 0 || designResolutionY == 0)
+					return;
+
+				int dx = designResolutionX;
+				int dy = designResolutionY;
+				if (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy)
+				{
+					//scale should not change when orientation change
+					int tmp = dx;
+					dx = dy;
+					dy = tmp;
+				}
+
 				if (screenMatchMode == ScreenMatchMode.MatchWidthOrHeight)
 				{
 					float s1 = (float)Screen.width / dx;
@@ -121,8 +158,18 @@ namespace FairyGUI
 				else
 					scaleFactor = (float)Screen.height / dy;
 			}
+			else if (scaleMode == ScaleMode.ConstantPhysicalSize)
+			{
+				float dpi = Screen.dpi;
+				dpi = 0;
+				if (dpi == 0)
+					dpi = fallbackScreenDPI;
+				if (dpi == 0)
+					dpi = 96;
+				scaleFactor = dpi / (defaultSpriteDPI == 0 ? 96 : defaultSpriteDPI);
+			}
 			else
-				scaleFactor = 1;
+				scaleFactor = constantScaleFactor;
 
 			StageCamera.screenSizeVer++;
 		}
