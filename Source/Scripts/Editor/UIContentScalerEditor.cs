@@ -32,8 +32,10 @@ namespace FairyGUIEditor
 			defaultSpriteDPI = serializedObject.FindProperty("defaultSpriteDPI");
 			constantScaleFactor = serializedObject.FindProperty("constantScaleFactor");
 
+#if UNITY_5
 			propertyToExclude = new string[] { "m_Script", "scaleMode", "screenMatchMode", "designResolutionX", "designResolutionY",
 					"fallbackScreenDPI", "defaultSpriteDPI", "constantScaleFactor"};
+#endif
 		}
 
 		public override void OnInspectorGUI()
