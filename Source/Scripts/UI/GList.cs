@@ -35,6 +35,11 @@ namespace FairyGUI
 		public bool autoResizeItem;
 
 		/// <summary>
+		/// 如果true，当item不可见时自动折叠，否则依然占位
+		/// </summary>
+		public bool foldInvisibleItems = false;
+
+		/// <summary>
 		/// List selection mode
 		/// </summary>
 		/// <seealso cref="ListSelectionMode"/>
@@ -863,12 +868,15 @@ namespace FairyGUI
 			{
 				int i = itemCount - 1;
 				GObject obj = null;
-				while (i >= 0)
+				if (foldInvisibleItems)
 				{
-					obj = this.GetChildAt(i);
-					if (obj.visible)
-						break;
-					i--;
+					while (i >= 0)
+					{
+						obj = this.GetChildAt(i);
+						if (obj.visible)
+							break;
+						i--;
+					}
 				}
 				if (i < 0)
 				{
@@ -1716,7 +1724,7 @@ namespace FairyGUI
 				for (int i = 0; i < cnt; i++)
 				{
 					GObject obj = GetChildAt(i);
-					if (obj.visible)
+					if (!foldInvisibleItems || obj.visible)
 					{
 						dist = Mathf.Abs(mid - obj.y - obj.height / 2);
 						if (dist < minDist)
@@ -1741,7 +1749,7 @@ namespace FairyGUI
 				for (int i = 0; i < cnt; i++)
 				{
 					GObject obj = GetChildAt(i);
-					if (obj.visible)
+					if (!foldInvisibleItems || obj.visible)
 					{
 						dist = Mathf.Abs(mid - obj.x - obj.width / 2);
 						if (dist < minDist)
@@ -1830,7 +1838,7 @@ namespace FairyGUI
 				for (i = 0; i < cnt; i++)
 				{
 					child = GetChildAt(i);
-					if (!child.visible)
+					if (foldInvisibleItems && !child.visible)
 						continue;
 
 					sw = Mathf.CeilToInt(child.width);
@@ -1851,7 +1859,7 @@ namespace FairyGUI
 				for (i = 0; i < cnt; i++)
 				{
 					child = GetChildAt(i);
-					if (!child.visible)
+					if (foldInvisibleItems && !child.visible)
 						continue;
 
 					sw = Mathf.CeilToInt(child.width);
@@ -1874,7 +1882,7 @@ namespace FairyGUI
 				for (i = 0; i < cnt; i++)
 				{
 					child = GetChildAt(i);
-					if (!child.visible)
+					if (foldInvisibleItems && !child.visible)
 						continue;
 
 					sw = Mathf.CeilToInt(child.width);
@@ -1911,7 +1919,7 @@ namespace FairyGUI
 				for (i = 0; i < cnt; i++)
 				{
 					child = GetChildAt(i);
-					if (!child.visible)
+					if (foldInvisibleItems && !child.visible)
 						continue;
 
 					sw = Mathf.CeilToInt(child.width);
