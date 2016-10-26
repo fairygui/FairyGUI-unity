@@ -1508,7 +1508,7 @@ namespace FairyGUI
 
 			arr = xml.GetAttributeArray("skew");
 			if (arr != null)
-				this.skew = new Vector2(int.Parse(arr[0]), int.Parse(arr[1]));
+				this.skew = new Vector2(float.Parse(arr[0]), float.Parse(arr[1]));
 
 			str = xml.GetAttribute("rotation");
 			if (str != null)

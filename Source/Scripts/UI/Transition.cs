@@ -158,6 +158,7 @@ namespace FairyGUI
 				times = int.MaxValue;
 			_totalTimes = times;
 			_reversed = reverse;
+
 			InternalPlay(delay);
 			_playing = _totalTasks > 0;
 			if (_playing)
@@ -235,11 +236,11 @@ namespace FairyGUI
 
 		void StopItem(TransitionItem item, bool setToComplete)
 		{
-			if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0)
-			{
-				if (item.target != _owner)
-					item.target.internalVisible--;
-			}
+			if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0 && item.target != _owner)
+				item.target.internalVisible--;
+
+			if (item.type == TransitionActionType.ColorFilter)
+				item.target.filter = null;
 
 			if (item.completed)
 				return;
@@ -326,6 +327,7 @@ namespace FairyGUI
 					case TransitionActionType.Size:
 					case TransitionActionType.Pivot:
 					case TransitionActionType.Scale:
+					case TransitionActionType.Skew:
 						value.b1 = true;
 						value.b2 = true;
 						value.f1 = Convert.ToSingle(aParams[0]);
@@ -370,6 +372,13 @@ namespace FairyGUI
 						value.f1 = Convert.ToSingle(aParams[0]);
 						if (aParams.Length > 1)
 							value.f2 = Convert.ToSingle(aParams[1]);
+						break;
+
+					case TransitionActionType.ColorFilter:
+						value.f1 = Convert.ToSingle(aParams[0]);
+						value.f2 = Convert.ToSingle(aParams[1]);
+						value.f3 = Convert.ToSingle(aParams[2]);
+						value.f4 = Convert.ToSingle(aParams[3]);
 						break;
 				}
 			}
@@ -558,6 +567,7 @@ namespace FairyGUI
 							break;
 
 						case TransitionActionType.Scale:
+						case TransitionActionType.Skew:
 							{
 								_totalTasks++;
 								Vector2 endValue;
@@ -578,20 +588,8 @@ namespace FairyGUI
 									{
 										item.value.f1 = val.x;
 										item.value.f2 = val.y;
-									}, endValue, item.duration)
-									.SetEase(item.easeType)
-									.SetUpdate(true)
-									.OnStart(() => { if (item.hook != null) item.hook(); })
-									.OnUpdate(() => { ApplyValue(item, item.value); })
-									.OnComplete(() => { tweenComplete(item); });
-								if (startTime > 0)
-									item.tweener.SetDelay(startTime);
-								else
-									ApplyValue(item, item.value);
-								if (item.repeat != 0)
-									item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-								if (_timeScale != 1)
-									item.tweener.timeScale = _timeScale;
+									}, endValue, item.duration);
+								SetupTween(item, startTime);
 								break;
 							}
 
@@ -609,20 +607,8 @@ namespace FairyGUI
 									item.value.f1 = item.startValue.f1;
 									endValue = item.endValue.f1;
 								}
-								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration)
-									.SetEase(item.easeType)
-									.SetUpdate(true)
-									.OnStart(() => { if (item.hook != null) item.hook(); })
-									.OnUpdate(() => { ApplyValue(item, item.value); })
-									.OnComplete(() => { tweenComplete(item); });
-								if (startTime > 0)
-									item.tweener.SetDelay(startTime);
-								else
-									ApplyValue(item, item.value);
-								if (item.repeat != 0)
-									item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-								if (_timeScale != 1)
-									item.tweener.timeScale = _timeScale;
+								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration);
+								SetupTween(item, startTime);
 								break;
 							}
 
@@ -640,20 +626,8 @@ namespace FairyGUI
 									item.value.f1 = item.startValue.i;
 									endValue = item.endValue.i;
 								}
-								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration)
-									.SetEase(item.easeType)
-									.SetUpdate(true)
-									.OnStart(() => { if (item.hook != null) item.hook(); })
-									.OnUpdate(() => { ApplyValue(item, item.value); })
-									.OnComplete(() => { tweenComplete(item); });
-								if (startTime > 0)
-									item.tweener.SetDelay(startTime);
-								else
-									ApplyValue(item, item.value);
-								if (item.repeat != 0)
-									item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-								if (_timeScale != 1)
-									item.tweener.timeScale = _timeScale;
+								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration);
+								SetupTween(item, startTime);
 								break;
 							}
 
@@ -671,20 +645,41 @@ namespace FairyGUI
 									item.value.c = item.startValue.c;
 									endValue = item.endValue.c;
 								}
-								item.tweener = DOTween.To(() => item.value.c, v => item.value.c = v, endValue, item.duration)
-									.SetEase(item.easeType)
-									.SetUpdate(true)
-									.OnStart(() => { if (item.hook != null) item.hook(); })
-									.OnUpdate(() => { ApplyValue(item, item.value); })
-									.OnComplete(() => { tweenComplete(item); });
-								if (startTime > 0)
-									item.tweener.SetDelay(startTime);
+								item.tweener = DOTween.To(() => item.value.c, v => item.value.c = v, endValue, item.duration);
+								SetupTween(item, startTime);
+								break;
+							}
+
+						case TransitionActionType.ColorFilter:
+							{
+								_totalTasks++;
+								Vector4 endValue;
+								if (_reversed)
+								{
+									item.value.f1 = item.endValue.f1;
+									item.value.f2 = item.endValue.f2;
+									item.value.f3 = item.endValue.f3;
+									item.value.f4 = item.endValue.f4;
+									endValue = new Vector4(item.startValue.f1, item.startValue.f2, item.startValue.f3, item.startValue.f4);
+								}
 								else
-									ApplyValue(item, item.value);
-								if (item.repeat != 0)
-									item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-								if (_timeScale != 1)
-									item.tweener.timeScale = _timeScale;
+								{
+									item.value.f1 = item.startValue.f1;
+									item.value.f2 = item.startValue.f2;
+									item.value.f3 = item.startValue.f3;
+									item.value.f4 = item.startValue.f4;
+									endValue = new Vector4(item.endValue.f1, item.endValue.f2, item.endValue.f3, item.endValue.f4);
+								}
+								item.tweener = DOTween.To(() => new Vector4(item.value.f1, item.value.f2, item.value.f3, item.value.f4),
+									v =>
+									{
+										item.value.f1 = v.x;
+										item.value.f2 = v.y;
+										item.value.f3 = v.z;
+										item.value.f4 = v.w;
+									},
+									endValue, item.duration);
+								SetupTween(item, startTime);
 								break;
 							}
 					}
@@ -719,6 +714,23 @@ namespace FairyGUI
 					}
 				}
 			}
+		}
+
+		void SetupTween(TransitionItem item, float startTime)
+		{
+			item.tweener.SetEase(item.easeType)
+				.SetUpdate(true)
+				.OnStart(() => { if (item.hook != null) item.hook(); })
+				.OnUpdate(() => { ApplyValue(item, item.value); })
+				.OnComplete(() => { tweenComplete(item); });
+			if (startTime > 0)
+				item.tweener.SetDelay(startTime);
+			else
+				ApplyValue(item, item.value);
+			if (item.repeat != 0)
+				item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
+			if (_timeScale != 1)
+				item.tweener.timeScale = _timeScale;
 		}
 
 		void StartTween(TransitionItem item)
@@ -773,17 +785,8 @@ namespace FairyGUI
 						{
 							item.value.f1 = val.x;
 							item.value.f2 = val.y;
-						}, endValue, item.duration)
-					.SetEase(item.easeType)
-					.SetUpdate(true)
-					.OnUpdate(() => { ApplyValue(item, item.value); })
-					.OnComplete(() => { tweenComplete(item); });
-			if (item.repeat != 0)
-				item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-			if (_timeScale != 1)
-				item.tweener.timeScale = _timeScale;
-
-			ApplyValue(item, item.value);
+						}, endValue, item.duration);
+			SetupTween(item, 0);
 
 			if (item.hook != null)
 				item.hook();
@@ -829,14 +832,20 @@ namespace FairyGUI
 						_playing = false;
 						_owner.internalVisible--;
 
-						if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0)
+						int cnt = _items.Count;
+						for (int i = 0; i < cnt; i++)
 						{
-							int cnt = _items.Count;
-							for (int i = 0; i < cnt; i++)
+							TransitionItem item = _items[i];
+							if (item.target != null)
 							{
-								TransitionItem item = _items[i];
-								if (item.target != null && item.target != _owner)
+								if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0 && item.target != _owner)
 									item.target.internalVisible--;
+
+								if (item.filterCreated)
+								{
+									item.filterCreated = false;
+									item.target.filter = null;
+								}
 							}
 						}
 
@@ -915,6 +924,12 @@ namespace FairyGUI
 						_owner.InvalidateBatchingState();
 					break;
 
+				case TransitionActionType.Skew:
+					item.target.skew = new Vector2(value.f1, value.f2);
+					if (invalidateBatchingEveryFrame)
+						_owner.InvalidateBatchingState();
+					break;
+
 				case TransitionActionType.Color:
 					((IColorGear)item.target).color = value.c;
 					break;
@@ -965,6 +980,24 @@ namespace FairyGUI
 					Timers.inst.AddUpdate(item.__Shake, this);
 					_totalTasks++;
 					item.completed = false;
+					break;
+
+				case TransitionActionType.ColorFilter:
+					ColorFilter cf = item.target.filter as ColorFilter;
+					if (cf == null)
+					{
+						cf = new ColorFilter();
+						item.target.filter = cf;
+						item.filterCreated = true;
+					}
+					else
+					{
+						cf.Reset();
+					}
+					cf.AdjustBrightness(value.f1);
+					cf.AdjustContrast(value.f2);
+					cf.AdjustSaturation(value.f3);
+					cf.AdjustHue(value.f4);
 					break;
 			}
 
@@ -1065,6 +1098,7 @@ namespace FairyGUI
 				case TransitionActionType.XY:
 				case TransitionActionType.Size:
 				case TransitionActionType.Pivot:
+				case TransitionActionType.Skew:
 					arr = str.Split(',');
 					if (arr[0] == "-")
 					{
@@ -1151,6 +1185,14 @@ namespace FairyGUI
 					value.f1 = float.Parse(arr[0]);
 					value.f2 = float.Parse(arr[1]);
 					break;
+
+				case TransitionActionType.ColorFilter:
+					arr = str.Split(',');
+					value.f1 = float.Parse(arr[0]);
+					value.f2 = float.Parse(arr[1]);
+					value.f3 = float.Parse(arr[2]);
+					value.f4 = float.Parse(arr[3]);
+					break;
 			}
 		}
 	}
@@ -1179,6 +1221,7 @@ namespace FairyGUI
 		public Tween tweener;
 		public bool completed;
 		public GObject target;
+		public bool filterCreated;
 
 		public TransitionItem()
 		{
@@ -1218,6 +1261,7 @@ namespace FairyGUI
 		public float f1;//x, scalex, pivotx,alpha,shakeAmplitude
 		public float f2;//y, scaley, pivoty, shakePeriod
 		public float f3;
+		public float f4;
 		public int i;//rotation,frame
 		public Color c;//color
 		public bool b;//playing
@@ -1237,6 +1281,7 @@ namespace FairyGUI
 			this.f1 = source.f1;
 			this.f2 = source.f2;
 			this.f3 = source.f3;
+			this.f4 = source.f4;
 			this.i = source.i;
 			this.c = source.c;
 			this.b = source.b;

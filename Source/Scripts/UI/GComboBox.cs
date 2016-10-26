@@ -24,7 +24,8 @@ namespace FairyGUI
 		/// </summary>
 		public GComponent dropdown;
 
-		protected GTextField _titleObject;
+		protected GObject _titleObject;
+		protected GObject _iconObject;
 		protected GList _list;
 
 		protected string[] _items;
@@ -52,16 +53,37 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// Text display in combobox.
+		/// Icon of the combobox.
 		/// </summary>
-		override public string text
+		override public string icon
+		{
+			get
+			{
+				if (_iconObject != null)
+					return _iconObject.icon;
+				else
+					return null;
+			}
+
+			set
+			{
+				if (_iconObject != null)
+					_iconObject.icon = value;
+				UpdateGear(7);
+			}
+		}
+
+		/// <summary>
+		/// Title of the combobox.
+		/// </summary>
+		public string title
 		{
 			get
 			{
 				if (_titleObject != null)
 					return _titleObject.text;
 				else
-					return string.Empty;
+					return null;
 			}
 			set
 			{
@@ -72,21 +94,38 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// Same of the title.
+		/// </summary>
+		override public string text
+		{
+			get { return this.title; }
+			set { this.title = value; }
+		}
+
+		/// <summary>
 		/// Text color
 		/// </summary>
 		public Color titleColor
 		{
 			get
 			{
-				if (_titleObject != null)
-					return _titleObject.color;
+				if (_titleObject is GTextField)
+					return ((GTextField)_titleObject).color;
+				else if (_titleObject is GLabel)
+					return ((GLabel)_titleObject).titleColor;
+				else if (_titleObject is GButton)
+					return ((GButton)_titleObject).titleColor;
 				else
 					return Color.black;
 			}
 			set
 			{
-				if (_titleObject != null)
-					_titleObject.color = value;
+				if (_titleObject is GTextField)
+					((GTextField)_titleObject).color = value;
+				else if (_titleObject is GLabel)
+					((GLabel)_titleObject).titleColor = value;
+				else if (_titleObject is GButton)
+					((GButton)_titleObject).titleColor = value;
 			}
 		}
 
@@ -237,7 +276,8 @@ namespace FairyGUI
 			string str;
 
 			_buttonController = GetController("button");
-			_titleObject = GetChild("title") as GTextField;
+			_titleObject = GetChild("title");
+			_iconObject = GetChild("icon");
 
 			str = xml.GetAttribute("dropdown");
 			if (str != null && str.Length > 0)

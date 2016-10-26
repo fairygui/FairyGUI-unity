@@ -35,6 +35,22 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public Color color
+		{
+			get { return _fillColor; }
+			set
+			{
+				if (!_fillColor.Equals(value))
+				{
+					_fillColor = value;
+					_requireUpdateMesh = true;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="lineSize"></param>
 		/// <param name="lineColor"></param>
 		/// <param name="fillColor"></param>

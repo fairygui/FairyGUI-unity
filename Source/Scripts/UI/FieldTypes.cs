@@ -143,6 +143,8 @@ namespace FairyGUI
 		Sound,
 		Transition,
 		Shake,
+		ColorFilter,
+		Skew,
 		Unknown
 	}
 
@@ -453,6 +455,10 @@ namespace FairyGUI
 					return TransitionActionType.Transition;
 				case "Shake":
 					return TransitionActionType.Shake;
+				case "ColorFilter":
+					return TransitionActionType.ColorFilter;
+				case "Skew":
+					return TransitionActionType.Skew;
 				default:
 					return TransitionActionType.Unknown;
 			}

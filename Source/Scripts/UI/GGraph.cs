@@ -10,7 +10,7 @@ namespace FairyGUI
 	/// 可以将本对象替换为其他对象，或者在它的前后添加其他对象，相当于一个位置和深度的占位；还可以直接将内容设置
 	/// 为原生对象。
 	/// </summary>
-	public class GGraph : GObject
+	public class GGraph : GObject, IColorGear
 	{
 		Shape _shape;
 
@@ -107,6 +107,28 @@ namespace FairyGUI
 			if (parent != null)
 				parent.ChildStateChanged(this);
 			HandlePositionChanged();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Color color
+		{
+			get
+			{
+				if (_shape != null)
+					return _shape.color;
+				else
+					return Color.clear;
+			}
+			set
+			{
+				if (_shape != null && !_shape.color.Equals(value))
+				{
+					_shape.color = value;
+					UpdateGear(4);
+				}
+			}
 		}
 
 		/// <summary>
