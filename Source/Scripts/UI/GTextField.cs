@@ -164,14 +164,8 @@ namespace FairyGUI
 		/// </summary>
 		public bool UBBEnabled
 		{
-			get
-			{
-				return _ubbEnabled;
-			}
-			set
-			{
-				_ubbEnabled = value;
-			}
+			get { return _ubbEnabled; }
+			set { _ubbEnabled = value; }
 		}
 
 		/// <summary>

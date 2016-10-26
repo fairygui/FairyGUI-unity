@@ -147,7 +147,7 @@ namespace FairyGUI
 
 		override protected void OnSizeChanged(bool widthChanged, bool heightChanged)
 		{
-			textField.size = this.size;
+			textField.size = _contentRect.size; //千万不可以调用this.size,后者会触发EnsureSizeCorrect
 
 			base.OnSizeChanged(widthChanged, heightChanged);
 		}

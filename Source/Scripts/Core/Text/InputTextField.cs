@@ -294,7 +294,7 @@ namespace FairyGUI
 
 		void UpdateAlternativeText()
 		{
-			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText) )
+			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
 			{
 				textField.SetAlternativeText(_decodedPromptText, true);
 			}
@@ -402,20 +402,23 @@ namespace FairyGUI
 
 			pos += MoveContent(newPos - pos);
 
-			if (line.height > 0) //将光标居中
-				pos.y += (int)(line.height - textField.textFormat.size) / 2;
+			if (_editing)
+			{
+				if (line.height > 0) //将光标居中
+					pos.y += (int)(line.height - textField.textFormat.size) / 2;
 
-			_caret.SetPosition(pos.x, pos.y, 0);
+				_caret.SetPosition(pos.x, pos.y, 0);
 
-			Vector2 cursorPos = _caret.LocalToGlobal(new Vector2(0, _caret.height));
-			cursorPos.y = Stage.inst.stageHeight - cursorPos.y;
-			Input.compositionCursorPos = cursorPos;
+				Vector2 cursorPos = _caret.LocalToGlobal(new Vector2(0, _caret.height));
+				cursorPos.y = Stage.inst.stageHeight - cursorPos.y;
+				Input.compositionCursorPos = cursorPos;
 
-			_nextBlink = Time.time + 0.5f;
-			_caret.graphics.enabled = true;
+				_nextBlink = Time.time + 0.5f;
+				_caret.graphics.enabled = true;
 
-			if (_selectionStart != null)
-				UpdateSelection(cp);
+				if (_selectionStart != null)
+					UpdateSelection(cp);
+			}
 		}
 
 		Vector2 MoveContent(Vector2 delta)
@@ -541,7 +544,16 @@ namespace FairyGUI
 						firstInLine = i;
 					if (v.offsetX > location.x)
 					{
-						result.caretIndex = i > firstInLine ? i - 1 : firstInLine;
+						if (i > firstInLine)
+						{
+							//最后一个字符有点难点
+							if (v.offsetX - location.x < 2)
+								result.caretIndex = i;
+							else
+								result.caretIndex = i - 1;
+						}
+						else
+							result.caretIndex = firstInLine;
 						return result;
 					}
 				}
@@ -631,14 +643,12 @@ namespace FairyGUI
 
 			if (_editing)
 			{
-				TextField.CharPosition cp = GetCharPosition(_caretPosition);
-				AdjustCaret(cp);
-
 				SetChildIndex(_selectionShape, this.numChildren - 1);
 				SetChildIndex(_caret, this.numChildren - 2);
 			}
-			else
-				MoveContent(Vector2.zero);
+
+			TextField.CharPosition cp = GetCharPosition(_caretPosition);
+			AdjustCaret(cp);
 		}
 
 		protected override void OnSizeChanged(bool widthChanged, bool heightChanged)
