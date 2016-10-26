@@ -1,0 +1,70 @@
+c5529.xml|239|<component size="350,191">
+  <displayList>
+    <graph id="n3" name="box" xy="0,0" size="350,191" type="rect" fillColor="#ff006633">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+  </displayList>
+</component>n38w0.xml|975|<component size="1136,640">
+  <displayList>
+    <graph id="n0" name="n0" xy="0,0" size="474,640" type="rect" lineSize="2" lineColor="#ff999999">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <list id="n1" name="list" xy="1,1" size="472,638" overflow="scroll" margin="0,0,0,0" defaultItem="ui://8rugjhhlqujq2">
+      <relation target="" sidePair="width-width,height-height"/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <component id="n7" name="box" src="c5529" xy="652,354"/>
+    <text id="n5" name="n5" xy="518,32" size="557,111" fontSize="24" color="#ffffff" autoSize="none" strokeColor="#000000" text="* Drag vertically to scroll the whole list.&#xA;* Drag horizontally to scroll single item.&#xA;* Hold and drag one item to the green box."/>
+    <text id="n6" name="txt" xy="705,411" size="252,28" fontSize="24" color="#ffffff" autoSize="height" strokeColor="#000000" text=""/>
+  </displayList>
+</component>package.xml|614|<packageDescription id="8rugjhhl" name="ScrollPane">
+  <resources>
+    <atlas id="atlas0" size="128,128" file="atlas0.png"/>
+    <atlas id="atlas1" size="64,32" file="atlas1.png"/>
+    <component id="c5529" name="Box" size="350,191"/>
+    <component id="n38w0" name="Main" exported="true" size="1136,640"/>
+    <component id="qujq2" name="item" size="720,88"/>
+    <component id="qujq5" name="Button1" size="140,85"/>
+    <component id="qujq7" name="Button2" size="140,86"/>
+    <image id="dliz8" name="logo" size="86,86"/>
+    <image id="qujq4" name="Seperator1" size="39,2"/>
+  </resources>
+</packageDescription>qujq2.xml|1292|<component size="720,88" overflow="scroll" scroll="horizontal" scrollBarFlags="648" scrollBar="hidden" extention="Button">
+  <displayList>
+    <loader id="n0" name="icon" xy="7,8" size="64,64" url="ui://8rugjhhldliz8" align="center" vAlign="middle" fill="scaleFree"/>
+    <image id="n3" name="n3" src="qujq4" xy="0,86" size="1000,2">
+      <relation target="" sidePair="width-width,bottom-bottom"/>
+    </image>
+    <component id="n9" name="b0" src="qujq5" xy="720,0">
+      <relation target="" sidePair="left-right"/>
+    </component>
+    <component id="n10" name="b1" src="qujq7" xy="860,0">
+      <relation target="" sidePair="left-right"/>
+    </component>
+    <text id="n4" name="title" xy="80,7" size="530,28" fontSize="24" autoSize="height" singleLine="true" text="Item">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <text id="n5" name="desc" xy="80,44" size="553,28" fontSize="24" color="#babcbf" autoSize="height" singleLine="true" text="Message">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <text id="n6" name="time" xy="626,7" size="83,28" fontSize="24" color="#babcbf" align="right" autoSize="none" singleLine="true" text="21:03">
+      <relation target="" sidePair="right-right"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>qujq5.xml|334|<component size="140,85" extention="Button">
+  <displayList>
+    <graph id="n7" name="n7" xy="0,0" size="140,87" type="rect" lineSize="0" fillColor="#ff666666"/>
+    <text id="n8" name="title" xy="0,26" size="140,32" fontSize="28" color="#ffffff" align="center" autoSize="none" text="Stick"/>
+  </displayList>
+  <Button/>
+</component>qujq7.xml|335|<component size="140,86" extention="Button">
+  <displayList>
+    <graph id="n7" name="n7" xy="0,0" size="140,87" type="rect" lineSize="0" fillColor="#ffff3300"/>
+    <text id="n8" name="title" xy="0,26" size="140,32" fontSize="28" color="#ffffff" align="center" autoSize="none" text="Delete"/>
+  </displayList>
+  <Button/>
+</component>
