@@ -868,15 +868,12 @@ namespace FairyGUI
 			{
 				int i = itemCount - 1;
 				GObject obj = null;
-				if (foldInvisibleItems)
+				while (i >= 0)
 				{
-					while (i >= 0)
-					{
-						obj = this.GetChildAt(i);
-						if (obj.visible)
-							break;
-						i--;
-					}
+					obj = this.GetChildAt(i);
+					if (!foldInvisibleItems || obj.visible)
+						break;
+					i--;
 				}
 				if (i < 0)
 				{
