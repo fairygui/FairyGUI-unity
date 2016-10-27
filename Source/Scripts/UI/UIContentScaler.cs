@@ -161,7 +161,6 @@ namespace FairyGUI
 			else if (scaleMode == ScaleMode.ConstantPhysicalSize)
 			{
 				float dpi = Screen.dpi;
-				dpi = 0;
 				if (dpi == 0)
 					dpi = fallbackScreenDPI;
 				if (dpi == 0)
