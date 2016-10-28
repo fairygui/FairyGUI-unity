@@ -1205,7 +1205,11 @@ namespace FairyGUI
 					else if (_lineItemCount != 0)
 						_curLineItemCount = _lineItemCount;
 					else
+					{
 						_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewWidth + _columnGap) / (_itemSize.x + _columnGap));
+						if (_curLineItemCount == 0)
+							_curLineItemCount = 1;
+					}
 				}
 				else
 				{
@@ -1214,7 +1218,11 @@ namespace FairyGUI
 					else if (_lineItemCount != 0)
 						_curLineItemCount = _lineItemCount;
 					else
+					{
 						_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewHeight + _lineGap) / (_itemSize.y + _lineGap));
+						if (_curLineItemCount == 0)
+							_curLineItemCount = 1;
+					}
 				}
 			}
 
