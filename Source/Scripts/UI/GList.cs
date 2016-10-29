@@ -1259,11 +1259,15 @@ namespace FairyGUI
 			HandleScroll(false);
 		}
 
-		int GetIndexOnPos1(ref float pos)
+		int GetIndexOnPos1(ref float pos, bool forceUpdate)
 		{
-			int result = 0;
+			if (_realNumItems < _curLineItemCount)
+			{
+				pos = 0;
+				return 0;
+			}
 
-			if (numChildren > 0)
+			if (numChildren > 0 && !forceUpdate)
 			{
 				float pos2 = this.GetChildAt(0).y;
 				if (pos2 > pos)
@@ -1271,53 +1275,61 @@ namespace FairyGUI
 					for (int i = _firstIndex - _curLineItemCount; i >= 0; i -= _curLineItemCount)
 					{
 						pos2 -= (_virtualItems[i].size.y + _lineGap);
-						if (pos2 - pos < 0.001)
+						if (pos2 <= pos)
 						{
-							result = i;
 							pos = pos2;
-							break;
+							return i;
 						}
 					}
+
+					pos = 0;
+					return 0;
 				}
 				else
 				{
 					for (int i = _firstIndex; i < _realNumItems; i += _curLineItemCount)
 					{
 						float pos3 = pos2 + _virtualItems[i].size.y + _lineGap;
-						if (pos3 - pos > 0.001)
+						if (pos3 > pos)
 						{
-							result = i;
 							pos = pos2;
-							break;
+							return i;
 						}
 						pos2 = pos3;
 					}
+
+					pos = pos2;
+					return _realNumItems - _curLineItemCount;
 				}
 			}
 			else
 			{
 				float pos2 = 0;
-				for (int i = 0; i < _realNumItems; i++)
+				for (int i = 0; i < _realNumItems; i += _curLineItemCount)
 				{
 					float pos3 = pos2 + _virtualItems[i].size.y + _lineGap;
 					if (pos3 > pos)
 					{
-						result = i;
 						pos = pos2;
-						break;
+						return i;
 					}
 					pos2 = pos3;
 				}
-			}
 
-			return result;
+				pos = pos2;
+				return _realNumItems - _curLineItemCount;
+			}
 		}
 
-		int GetIndexOnPos2(ref float pos)
+		int GetIndexOnPos2(ref float pos, bool forceUpdate)
 		{
-			int result = 0;
+			if (_realNumItems < _curLineItemCount)
+			{
+				pos = 0;
+				return 0;
+			}
 
-			if (numChildren > 0)
+			if (numChildren > 0 && !forceUpdate)
 			{
 				float pos2 = this.GetChildAt(0).x;
 				if (pos2 > pos)
@@ -1327,11 +1339,13 @@ namespace FairyGUI
 						pos2 -= (_virtualItems[i].size.x + _columnGap);
 						if (pos2 <= pos)
 						{
-							result = i;
 							pos = pos2;
-							break;
+							return i;
 						}
 					}
+
+					pos = 0;
+					return 0;
 				}
 				else
 				{
@@ -1340,31 +1354,33 @@ namespace FairyGUI
 						float pos3 = pos2 + _virtualItems[i].size.x + _columnGap;
 						if (pos3 > pos)
 						{
-							result = i;
 							pos = pos2;
-							break;
+							return i;
 						}
 						pos2 = pos3;
 					}
+
+					pos = pos2;
+					return _realNumItems - _curLineItemCount;
 				}
 			}
 			else
 			{
 				float pos2 = 0;
-				for (int i = 0; i < _realNumItems; i++)
+				for (int i = 0; i < _realNumItems; i += _curLineItemCount)
 				{
 					float pos3 = pos2 + _virtualItems[i].size.x + _columnGap;
 					if (pos3 > pos)
 					{
-						result = i;
 						pos = pos2;
-						break;
+						return i;
 					}
 					pos2 = pos3;
 				}
-			}
 
-			return result;
+				pos = pos2;
+				return _realNumItems - _curLineItemCount;
+			}
 		}
 
 		void HandleScroll(bool forceUpdate)
@@ -1419,7 +1435,7 @@ namespace FairyGUI
 			bool end = max == scrollPane.contentHeight;//这个标志表示当前需要滚动到最末，无论内容变化大小
 
 			//寻找当前位置的第一条项目
-			int newFirstIndex = GetIndexOnPos1(ref pos);
+			int newFirstIndex = GetIndexOnPos1(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
 			{
 				enterCounter--;
@@ -1574,7 +1590,7 @@ namespace FairyGUI
 			bool end = pos == scrollPane.contentWidth;//这个标志表示当前需要滚动到最末，无论内容变化大小
 
 			//寻找当前位置的第一条项目
-			int newFirstIndex = GetIndexOnPos2(ref pos);
+			int newFirstIndex = GetIndexOnPos2(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
 			{
 				enterCounter--;
@@ -1775,14 +1791,14 @@ namespace FairyGUI
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 				{
 					float saved = yValue;
-					int index = GetIndexOnPos1(ref yValue);
+					int index = GetIndexOnPos1(ref yValue, false);
 					if (index < _virtualItems.Count && saved - yValue > _virtualItems[index].size.y / 2 && index < _realNumItems)
 						yValue += _virtualItems[index].size.y + _lineGap;
 				}
 				else
 				{
 					float saved = xValue;
-					int index = GetIndexOnPos2(ref xValue);
+					int index = GetIndexOnPos2(ref xValue, false);
 					if (index < _virtualItems.Count && saved - xValue > _virtualItems[index].size.x / 2 && index < _realNumItems)
 						xValue += _virtualItems[index].size.x + _columnGap;
 				}
