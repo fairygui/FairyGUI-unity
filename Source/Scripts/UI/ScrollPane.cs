@@ -994,7 +994,11 @@ namespace FairyGUI
 						_yPos = -_container.y;
 					}
 					else
+					{
+						if (_yPos > _yOverlap)
+							_yPos = _yOverlap;
 						_yPerc = _yPos / _yOverlap;
+					}
 				}
 				else
 				{
@@ -1010,7 +1014,11 @@ namespace FairyGUI
 						_xPos = -_container.x;
 					}
 					else
+					{
+						if (_xPos > _xOverlap)
+							_xPos = _xOverlap;
 						_xPerc = _xPos / _xOverlap;
+					}
 				}
 				else
 				{
@@ -1023,6 +1031,8 @@ namespace FairyGUI
 				//保持位置不变，修改percent
 				if (_yOverlap > 0)
 				{
+					if (_yPos > _yOverlap)
+						_yPos = _yOverlap;
 					_yPerc = _yPos / _yOverlap;
 				}
 				else
@@ -1033,6 +1043,8 @@ namespace FairyGUI
 
 				if (_xOverlap > 0)
 				{
+					if (_xPos > _xOverlap)
+						_xPos = _xOverlap;
 					_xPerc = _xPos / _xOverlap;
 				}
 				else
