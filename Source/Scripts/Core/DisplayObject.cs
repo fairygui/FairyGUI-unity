@@ -118,7 +118,6 @@ namespace FairyGUI
 		bool _grayed;
 		BlendMode _blendMode;
 		IFilter _filter;
-		bool _disposed;
 
 		bool _perspective;
 		int _focalLength;
@@ -135,6 +134,7 @@ namespace FairyGUI
 		protected Matrix4x4? _transformMatrix;
 		protected bool _ownsGameObject;
 
+		internal bool _disposed;
 		internal protected bool _touchDisabled;
 		internal Rect _internal_bounds;
 		internal protected bool _skipInFairyBatching;
@@ -779,7 +779,7 @@ namespace FairyGUI
 		/// </summary>
 		public bool isDisposed
 		{
-			get { return gameObject == null; }
+			get { return _disposed || gameObject == null; }
 		}
 
 		protected internal void SetParent(Container value)

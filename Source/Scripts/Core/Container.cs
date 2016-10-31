@@ -254,7 +254,7 @@ namespace FairyGUI
 			{
 				DisplayObject child = _children[index];
 
-				if (stage != null)
+				if (stage != null && !child._disposed)
 				{
 					if (child is Container)
 						child.onRemovedFromStage.BroadcastCall();
