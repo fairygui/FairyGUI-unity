@@ -74,6 +74,13 @@ namespace FairyGUI
 
 		override public void Dispose()
 		{
+			int transCnt = _transitions.Count;
+			for (int i = 0; i < transCnt; ++i)
+			{
+				Transition trans = _transitions[i];
+				trans.Dispose();
+			}
+
 			base.Dispose(); //Dispose native tree first, avoid DisplayObject.RemoveFromParent call
 
 			int numChildren = _children.Count;

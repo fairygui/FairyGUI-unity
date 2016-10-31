@@ -284,6 +284,38 @@ namespace FairyGUI
 			}
 		}
 
+		public void Dispose()
+		{
+			if (!_playing)
+				return;
+
+			_playing = false;
+			int cnt = _items.Count;
+			for (int i = 0; i < cnt; i++)
+			{
+				TransitionItem item = _items[i];
+				if (item.target == null || item.completed)
+					continue;
+
+				if (item.tweener != null)
+				{
+					item.tweener.Kill();
+					item.tweener = null;
+				}
+
+				if (item.type == TransitionActionType.Transition)
+				{
+					Transition trans = ((GComponent)item.target).GetTransition(item.value.s);
+					if (trans != null)
+						trans.Stop(false, false);
+				}
+				else if (item.type == TransitionActionType.Shake)
+				{
+					Timers.inst.Remove(item.__Shake);
+				}
+			}
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
