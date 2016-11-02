@@ -39,6 +39,8 @@ namespace FairyGUI
 	{
 		None,
 		Scale,
+		ScaleMatchHeight,
+		ScaleMatchWidth,
 		ScaleFree
 	}
 
@@ -259,6 +261,10 @@ namespace FairyGUI
 					return FillType.None;
 				case "scale":
 					return FillType.Scale;
+				case "scaleMatchHeight":
+					return FillType.ScaleMatchHeight;
+				case "scaleMatchWidth":
+					return FillType.ScaleMatchWidth;
 				case "scaleFree":
 					return FillType.ScaleFree;
 				default:
