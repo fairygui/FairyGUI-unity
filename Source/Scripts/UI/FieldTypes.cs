@@ -103,7 +103,8 @@ namespace FairyGUI
 		SingleColumn,
 		SingleRow,
 		FlowHorizontal,
-		FlowVertical
+		FlowVertical,
+		Pagination
 	}
 
 	public enum ListSelectionMode
@@ -294,6 +295,8 @@ namespace FairyGUI
 					return ListLayoutType.FlowHorizontal;
 				case "flow_vt":
 					return ListLayoutType.FlowVertical;
+				case "pagination":
+					return ListLayoutType.Pagination;
 				default:
 					return ListLayoutType.SingleColumn;
 			}

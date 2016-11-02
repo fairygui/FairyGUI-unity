@@ -451,14 +451,42 @@ namespace FairyGUI
 			_SetChildIndex(child, oldIndex, index);
 		}
 
-		void _SetChildIndex(GObject child, int oldIndex, int index)
+		/// <summary>
+		/// Moves a child to a certain position which is in front of the child previously at given index.
+		/// 与SetChildIndex不同的是，如果child原来在index的前面，那么child插入的位置是index-1，即保证排在原来占据index的对象的前面。
+		/// </summary>
+		/// <param name="child"></param>
+		/// <param name="index"></param>
+		public int SetChildIndexBefore(GObject child, int index)
+		{
+			int oldIndex = _children.IndexOf(child);
+			if (oldIndex == -1)
+				throw new ArgumentException("Not a child of this container");
+
+			if (child.sortingOrder != 0) //no effect
+				return oldIndex;
+
+			int cnt = _children.Count;
+			if (_sortingChildCount > 0)
+			{
+				if (index > (cnt - _sortingChildCount - 1))
+					index = cnt - _sortingChildCount - 1;
+			}
+
+			if (oldIndex < index)
+				return _SetChildIndex(child, oldIndex, index - 1);
+			else
+				return _SetChildIndex(child, oldIndex, index);
+		}
+
+		int _SetChildIndex(GObject child, int oldIndex, int index)
 		{
 			int cnt = _children.Count;
 			if (index > cnt)
 				index = cnt;
 
 			if (oldIndex == index)
-				return;
+				return oldIndex;
 
 			_children.RemoveAt(oldIndex);
 			if (index >= cnt)
@@ -497,6 +525,8 @@ namespace FairyGUI
 
 				SetBoundsChangedFlag();
 			}
+
+			return index;
 		}
 
 		/// <summary>

@@ -413,6 +413,12 @@ namespace FairyGUI
 			}
 		}
 
+		public void SetCurrentPageX(int value, bool ani)
+		{
+			if (_xOverlap > 0)
+				this.SetPosX(value * _pageSize.x, ani);
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -424,6 +430,12 @@ namespace FairyGUI
 				if (_yOverlap > 0)
 					this.SetPosY(value * _pageSize.y, false);
 			}
+		}
+
+		public void SetCurrentPageY(int value, bool ani)
+		{
+			if (_yOverlap > 0)
+				this.SetPosY(value * _pageSize.y, ani);
 		}
 
 		/// <summary>
@@ -1293,7 +1305,7 @@ namespace FairyGUI
 				if (mx > 0)
 					_xPos = 0;
 				else if (mx < -_xOverlap)
-					_xPos = -_xOverlap;
+					_xPos = _xOverlap;
 				else
 					_xPos = -mx;
 
@@ -1306,7 +1318,7 @@ namespace FairyGUI
 				if (my > 0)
 					_yPos = 0;
 				else if (my < -_yOverlap)
-					_yPos = -_yOverlap;
+					_yPos = _yOverlap;
 				else
 					_yPos = -my;
 

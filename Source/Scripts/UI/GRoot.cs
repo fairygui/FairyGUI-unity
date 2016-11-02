@@ -293,7 +293,6 @@ namespace FairyGUI
 			}
 
 			int cnt = this.numChildren;
-			bool modalLayerIsTop = false;
 
 			if (_modalWaitPane != null && _modalWaitPane.parent != null)
 				SetChildIndex(_modalWaitPane, cnt - 1);
@@ -301,21 +300,12 @@ namespace FairyGUI
 			for (int i = cnt - 1; i >= 0; i--)
 			{
 				GObject g = this.GetChildAt(i);
-				if (g == _modalLayer)
-					modalLayerIsTop = true;
-				else if ((g is Window) && (g as Window).modal)
+				if ((g is Window) && (g as Window).modal)
 				{
 					if (_modalLayer.parent == null)
 						AddChildAt(_modalLayer, i);
-					else if (i > 0)
-					{
-						if (modalLayerIsTop)
-							SetChildIndex(_modalLayer, i);
-						else
-							SetChildIndex(_modalLayer, i - 1);
-					}
 					else
-						AddChildAt(_modalLayer, 0);
+						SetChildIndexBefore(_modalLayer, i);
 					return;
 				}
 			}
