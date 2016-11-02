@@ -253,11 +253,9 @@ namespace FairyGUI
 			{
 				if (_textField.autoSize == AutoSizeType.Height)
 				{
+					displayObject.width = this.width;//先调整宽度，让文本重排
 					if (this._text != string.Empty) //文本为空时，1是本来就不需要调整， 2是为了防止改掉文本为空时的默认高度，造成关联错误
-					{
-						displayObject.width = this.width;//先调整宽度，让文本重排
 						SetSizeDirectly(this.width, displayObject.height);
-					}
 				}
 				else
 					displayObject.SetSize(this.width, this.height);
