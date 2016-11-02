@@ -603,7 +603,7 @@ namespace FairyGUI
 			}
 
 			if (!_descPack.TryGetValue("package.xml", out str))
-				throw new Exception("FairyGUI: invalid package '" + _assetNamePrefix + "'");
+				throw new Exception("FairyGUI: invalid package '" + _assetNamePrefix + "', if the files is checked out from git, make sure to disable autocrlf option!");
 
 			XML xml = new XML(str);
 
