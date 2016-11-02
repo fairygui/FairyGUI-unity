@@ -80,6 +80,7 @@ namespace FairyGUI
 		public void Cancel()
 		{
 			Timers.inst.Remove(__timer);
+			_started = false;
 		}
 
 		void __touchBegin(EventContext context)
@@ -101,18 +102,27 @@ namespace FairyGUI
 				Timers.inst.Remove(__timer);
 				return;
 			}
-
-			onAction.Call();
-			if (!_started && !once)
+			if (!_started)
 			{
 				_started = true;
-				Timers.inst.Add(interval, 0, __timer);
+				onBegin.Call();
+
+				if(!once)
+					Timers.inst.Add(interval, 0, __timer);
 			}
+
+			onAction.Call();
 		}
 
 		void __touchEnd(EventContext context)
 		{
-			Timers.inst.Remove(__timer);
+			if (_started)
+			{
+				_started = false;
+				Timers.inst.Remove(__timer);
+
+				onEnd.Call();
+			}
 		}
 	}
 }
