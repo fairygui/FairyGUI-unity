@@ -8,9 +8,9 @@ namespace FairyGUI
 	public class DisplayOptions
 	{
 		/// <summary>
-		/// use only in edit mode. use array to avoid unity null reference checking
+		/// use only in edit mode. 
 		/// </summary>
-		public static Transform[] defaultRoot;
+		public static Transform defaultRoot;
 
 		/// <summary>
 		/// 

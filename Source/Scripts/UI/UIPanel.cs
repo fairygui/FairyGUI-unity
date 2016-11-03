@@ -346,7 +346,7 @@ namespace FairyGUI
 			UIObjectFactory.packageItemExtensions.Clear();
 			UIObjectFactory.loaderConstructor = null;
 			DisplayOptions.SetEditModeHideFlags();
-			DisplayOptions.defaultRoot = new Transform[] { this.transform };
+			DisplayOptions.defaultRoot = this.transform;
 			_ui = (GComponent)UIPackage.CreateObject(packageName, componentName);
 			DisplayOptions.defaultRoot = null;
 
@@ -556,9 +556,14 @@ namespace FairyGUI
 
 		public void EM_Update(UpdateContext context)
 		{
-			container.Update(context);
+            DisplayOptions.SetEditModeHideFlags();
+            DisplayOptions.defaultRoot = this.transform;
 
-			if (setNativeChildrenOrder)
+            container.Update(context);
+
+            DisplayOptions.defaultRoot = null;
+
+            if (setNativeChildrenOrder)
 			{
 				CacheNativeChildrenRenderers();
 

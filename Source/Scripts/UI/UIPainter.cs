@@ -238,9 +238,8 @@ namespace FairyGUI
 			UIObjectFactory.packageItemExtensions.Clear();
 			UIObjectFactory.loaderConstructor = null;
 			DisplayOptions.SetEditModeHideFlags();
-			DisplayOptions.defaultRoot = new Transform[] { tempGo.transform };
+			DisplayOptions.defaultRoot = tempGo.transform;
 			GComponent view = (GComponent)UIPackage.CreateObject(packageName, componentName);
-			DisplayOptions.defaultRoot = null;
 
 			if (view != null)
 			{
@@ -293,7 +292,9 @@ namespace FairyGUI
 				if (_renderer != null)
 					_renderer.sharedMaterial.mainTexture = _texture;
 			}
-		}
+
+            DisplayOptions.defaultRoot = null;
+        }
 
 		public void ApplyModifiedProperties(bool sortingOrderChanged)
 		{

@@ -168,8 +168,8 @@ namespace FairyGUI
 		{
 			gameObject = new GameObject(gameObjectName);
 			cachedTransform = gameObject.transform;
-			if (DisplayOptions.defaultRoot != null)
-				FairyGUI.Utils.ToolSet.SetParent(cachedTransform, DisplayOptions.defaultRoot[0]);
+			if ((object)DisplayOptions.defaultRoot != null)
+				FairyGUI.Utils.ToolSet.SetParent(cachedTransform, DisplayOptions.defaultRoot);
 			else
 				Object.DontDestroyOnLoad(gameObject);
 			gameObject.hideFlags = DisplayOptions.hideFlags | HideFlags.HideInHierarchy;
