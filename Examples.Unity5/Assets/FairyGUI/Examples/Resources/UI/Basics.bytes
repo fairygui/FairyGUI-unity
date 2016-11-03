@@ -288,7 +288,7 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
     <movieclip id="n19" name="n19" src="t9fj5f" xy="172,111"/>
     <movieclip id="n22" name="n22" src="hixt1v" xy="176,243" grayed="true"/>
   </displayList>
-</component>hixt1v.xml|558|<movieclip pivot="30,29" interval="125" frameCount="15">
+</component>hixt1v.xml|544|<movieclip interval="125" frameCount="15">
   <frames>
     <frame rect="0,0,59,56"/>
     <frame rect="0,0,59,56"/>
@@ -421,7 +421,7 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
     </image>
   </displayList>
   <Button mode="Check"/>
-</component>iwqq89.xml|661|<movieclip pivot="0,0" interval="41" frameCount="13">
+</component>iwqq89.xml|649|<movieclip interval="41" frameCount="13">
   <frames>
     <frame rect="0,0,24,24" addDelay="41"/>
     <frame rect="0,0,24,24" addDelay="41"/>
@@ -1501,7 +1501,7 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
     </loader>
   </displayList>
   <ProgressBar titleType="valueAndmax"/>
-</component>t9fj5f.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+</component>t9fj5f.xml|316|<movieclip interval="83" frameCount="8">
   <frames>
     <frame rect="9,0,74,65"/>
     <frame rect="7,5,74,64"/>

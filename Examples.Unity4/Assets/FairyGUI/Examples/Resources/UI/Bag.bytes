@@ -48,12 +48,13 @@ dwwc3.xml|693|<component size="615,387" extention="Label">
     <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
   </displayList>
   <Button mode="Radio"/>
-</component>kcy10.xml|1119|<component size="640,582">
+</component>kcy10.xml|1766|<component size="640,582">
+  <controller name="page" pages="0,,1,,2," selected="2"/>
   <displayList>
     <component id="n7" name="frame" src="dwwc3" xy="0,0" size="640,582">
       <Label title="Bag"/>
     </component>
-    <list id="n8" name="list" xy="53,76" size="521,328" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="5" colGap="5" defaultItem="ui://rbw1tv9tjlmg7">
+    <list id="n8" name="list" xy="54,71" size="525,332" layout="pagination" overflow="scroll" scroll="horizontal" scrollBarFlags="8" margin="0,0,0,0" clipSoftness="0,20" lineGap="5" colGap="5" defaultItem="ui://rbw1tv9tjlmg7">
       <item/>
       <item/>
       <item/>
@@ -80,6 +81,12 @@ dwwc3.xml|693|<component size="615,387" extention="Label">
     <loader id="n11" name="n11" xy="67,432" size="120,110" align="center" vAlign="middle"/>
     <text id="n12" name="n12" xy="205,461" size="113,28" fontSize="24" color="#ff0099" text="Selected:"/>
     <text id="n13" name="n13" xy="336,461" size="119,28" fontSize="24" color="#ff0099" autoSize="height" text=""/>
+    <graph id="n19" name="n19" xy="265,399" size="15,15" type="eclipse" lineSize="0" fillColor="#ff3f5b5f"/>
+    <graph id="n20" name="n20" xy="312,399" size="15,15" type="eclipse" lineSize="0" fillColor="#ff3f5b5f"/>
+    <graph id="n21" name="n21" xy="359,399" size="15,15" type="eclipse" lineSize="0" fillColor="#ff3f5b5f"/>
+    <graph id="n22" name="n22" xy="359,399" size="15,15" type="eclipse" lineSize="0" fillColor="#ff849da4">
+      <gearXY controller="page" pages="0,1,2" values="265,399|312,399|359,399" default="305,501"/>
+    </graph>
   </displayList>
 </component>package.xml|1096|<packageDescription id="rbw1tv9t" name="Bag">
   <resources>
@@ -109,7 +116,7 @@ dwwc3.xml|693|<component size="615,387" extention="Label">
     <movieclip id="n2" name="n2" src="thi7j" xy="-13,-6"/>
   </displayList>
   <Button/>
-</component>thi7j.xml|476|<movieclip pivot="60,60" interval="166" frameCount="12">
+</component>thi7j.xml|462|<movieclip interval="166" frameCount="12">
   <frames>
     <frame rect="17,18,86,85"/>
     <frame rect="18,18,84,84"/>

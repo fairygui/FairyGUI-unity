@@ -7,6 +7,7 @@ using DG.Tweening;
 public class BagWindow : Window
 {
 	GList _list;
+	Controller _page;
 
 	public BagWindow()
 	{
@@ -18,8 +19,25 @@ public class BagWindow : Window
 		this.Center();
 		this.modal = true;
 
+		_page = this.contentPane.GetController("page");
+
 		_list = this.contentPane.GetChild("list").asList;
-		_list.onClickItem.Add(__clickItem);		
+		_list.onClickItem.Add(__clickItem);
+		_list.itemRenderer = RenderListItem;
+		_list.scrollPane.onScroll.Add(OnScroll);
+		_list.numItems = 45;
+	}
+
+	void RenderListItem(int index, GObject obj)
+	{
+		GButton button = (GButton)obj;
+		button.icon = "i" + UnityEngine.Random.Range(0, 10);
+		button.title = "" + UnityEngine.Random.Range(0, 100);
+	}
+
+	void OnScroll()
+	{
+		_page.selectedIndex = _list.scrollPane.currentPageX;
 	}
 
 	override protected void DoShowAnimation()
@@ -32,16 +50,6 @@ public class BagWindow : Window
 	override protected void DoHideAnimation()
 	{
 		this.TweenScale(new Vector2(0.1f, 0.1f), 0.3f).SetEase(Ease.OutQuad).OnComplete(this.HideImmediately);
-	}
-
-	override protected void OnShown()
-	{
-		for (int i = 0; i < 10; i++)
-		{
-			GButton button = _list.GetChildAt(i).asButton;
-			button.icon = "i" + UnityEngine.Random.Range(0, 10);
-			button.title = "" + UnityEngine.Random.Range(0, 100);
-		}
 	}
 
 	void __clickItem(EventContext context)
