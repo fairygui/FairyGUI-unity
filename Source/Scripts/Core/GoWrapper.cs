@@ -12,62 +12,62 @@ namespace FairyGUI
 		protected GameObject _wrapTarget;
 		protected Renderer[] _renders;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public GoWrapper()
-        {
-            this._skipInFairyBatching = true;
-            CreateGameObject("GoWrapper");
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		public GoWrapper()
+		{
+			this._skipInFairyBatching = true;
+			CreateGameObject("GoWrapper");
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="go"></param>
-        public GoWrapper(GameObject go)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="go"></param>
+		public GoWrapper(GameObject go)
 		{
 			this._skipInFairyBatching = true;
 			CreateGameObject("GoWrapper");
 
-            this.wrapTarget = go;
+			this.wrapTarget = go;
 		}
 
-        /// <summary>
-        /// 设置包装对象。注意如果原来有包装对象，设置新的包装对象后，原来的包装对象只会被删除引用，但不会被销毁。
-        /// </summary>
-        public GameObject wrapTarget
-        {
-            get
-            {
-                return _wrapTarget;
-            }
+		/// <summary>
+		/// 设置包装对象。注意如果原来有包装对象，设置新的包装对象后，原来的包装对象只会被删除引用，但不会被销毁。
+		/// </summary>
+		public GameObject wrapTarget
+		{
+			get
+			{
+				return _wrapTarget;
+			}
 
-            set
-            {
-                if (_wrapTarget != null)
-                    _wrapTarget.transform.parent = null;
+			set
+			{
+				if (_wrapTarget != null)
+					_wrapTarget.transform.parent = null;
 
-                _wrapTarget = value;
-                if (_wrapTarget != null)
-                {
-                    ToolSet.SetParent(_wrapTarget.transform, this.cachedTransform);
-                    CacheRenderers();
+				_wrapTarget = value;
+				if (_wrapTarget != null)
+				{
+					ToolSet.SetParent(_wrapTarget.transform, this.cachedTransform);
+					CacheRenderers();
 
-                    Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
-                    int lv = this.layer;
-                    foreach (Transform t in transforms)
-                    {
-                        t.gameObject.layer = lv;
-                    }
-                }
-                else
-                {
-                    _renders = null;
-                    _wrapTarget = null;
-                }
-            }
-        }
+					Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
+					int lv = this.layer;
+					foreach (Transform t in transforms)
+					{
+						t.gameObject.layer = lv;
+					}
+				}
+				else
+				{
+					_renders = null;
+					_wrapTarget = null;
+				}
+			}
+		}
 
 		/// <summary>
 		/// GoWrapper will cache all renderers of your gameobject on constructor. 
@@ -100,16 +100,16 @@ namespace FairyGUI
 			set
 			{
 				base.renderingOrder = value;
-                if (_renders != null)
-                {
-                    int cnt = _renders.Length;
-                    for (int i = 0; i < cnt; i++)
-                    {
-                        Renderer r = _renders[i];
-                        if (r != null)
-                            r.sortingOrder = value;
-                    }
-                }
+				if (_renders != null)
+				{
+					int cnt = _renders.Length;
+					for (int i = 0; i < cnt; i++)
+					{
+						Renderer r = _renders[i];
+						if (r != null)
+							r.sortingOrder = value;
+					}
+				}
 			}
 		}
 
@@ -123,26 +123,26 @@ namespace FairyGUI
 			{
 				base.layer = value;
 
-                if (_renders != null)
-                {
-                    Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
-                    foreach (Transform t in transforms)
-                    {
-                        t.gameObject.layer = value;
-                    }
-                }
+				if (_renders != null)
+				{
+					Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
+					foreach (Transform t in transforms)
+					{
+						t.gameObject.layer = value;
+					}
+				}
 			}
 		}
 
 		public override void Dispose()
 		{
-            if (_wrapTarget != null)
-            {
-                Object.Destroy(_wrapTarget);
-                _wrapTarget = null;
-            }
+			if (_wrapTarget != null)
+			{
+				Object.Destroy(_wrapTarget);
+				_wrapTarget = null;
+			}
 
-            base.Dispose();
+			base.Dispose();
 		}
 	}
 }
