@@ -282,8 +282,13 @@ namespace FairyGUI
 				if (_font.GetCharacterInfo('j', out charInfo, size, FontStyle.Normal))
 					y1 = Mathf.Min(y1, charInfo.vert.yMax);
 #endif
-
-				result = (int)(y0 + (y0 - y1 - size) * 0.5f);
+				float dh = y0 - y1 - size;
+				if (dh > 3) //5.4版本后部分字体的渲染位置开始偏低
+				{
+					y0 -= Mathf.Ceil(dh / 2);
+					dh = y0 - y1 - size;
+				}
+				result = (int)(y0 + (int)(dh * 0.5f));
 				_cachedBaseline.Add(size, result);
 			}
 

@@ -410,7 +410,6 @@ namespace FairyGUI
 				_caret.SetPosition(pos.x, pos.y, 0);
 
 				Vector2 cursorPos = _caret.LocalToGlobal(new Vector2(0, _caret.height));
-				cursorPos.y = Stage.inst.stageHeight - cursorPos.y;
 				Input.compositionCursorPos = cursorPos;
 
 				_nextBlink = Time.time + 0.5f;
@@ -776,7 +775,7 @@ namespace FairyGUI
 				if (!string.IsNullOrEmpty(_promptText))
 					UpdateAlternativeText();
 
-				Input.imeCompositionMode = IMECompositionMode.Off;
+				Input.imeCompositionMode = IMECompositionMode.Auto;
 				_caret.RemoveFromParent();
 				_selectionShape.RemoveFromParent();
 			}
