@@ -1312,21 +1312,16 @@ namespace FairyGUI
 			{
 				DisplayListItem di = displayList[i];
 				if (objectPool != null)
-				{
 					child = objectPool[poolIndex + i];
+				else if (di.packageItem != null)
+				{
+					di.packageItem.Load();
+					child = UIObjectFactory.NewObject(di.packageItem);
+					child.packageItem = di.packageItem;
+					child.ConstructFromResource();
 				}
 				else
-				{
-					if (di.packageItem != null)
-					{
-						di.packageItem.Load();
-						child = UIObjectFactory.NewObject(di.packageItem);
-						child.packageItem = di.packageItem;
-						child.ConstructFromResource();
-					}
-					else
-						child = UIObjectFactory.NewObject(di.type);
-				}
+					child = UIObjectFactory.NewObject(di.type);
 
 				child.underConstruct = true;
 				child.Setup_BeforeAdd(di.desc);

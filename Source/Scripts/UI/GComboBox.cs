@@ -151,8 +151,8 @@ namespace FairyGUI
 					else if (_selectedIndex == -1)
 						_selectedIndex = 0;
 					this.text = _items[_selectedIndex];
-					if (_icons != null && selectedIndex < _icons.Length)
-						this.icon = _icons[selectedIndex];
+					if (_icons != null && _selectedIndex < _icons.Length)
+						this.icon = _icons[_selectedIndex];
 				}
 				else
 				{
@@ -171,8 +171,8 @@ namespace FairyGUI
 			set
 			{
 				_icons = value;
-				if (_icons != null && selectedIndex != -1 && selectedIndex < _icons.Length)
-					this.icon = _icons[selectedIndex];
+				if (_icons != null && _selectedIndex != -1 && _selectedIndex < _icons.Length)
+					this.icon = _icons[_selectedIndex];
 			}
 		}
 
@@ -255,6 +255,27 @@ namespace FairyGUI
 		{
 			if (_buttonController != null)
 				_buttonController.selectedPage = value;
+		}
+
+		protected void SetCurrentState()
+		{
+			if (this.grayed && _buttonController != null && _buttonController.HasPage(GButton.DISABLED))
+				SetState(GButton.DISABLED);
+			else
+				SetState(_over ? GButton.OVER : GButton.UP);
+		}
+
+		override protected void HandleGrayedChanged()
+		{
+			if (_buttonController != null && _buttonController.HasPage(GButton.DISABLED))
+			{
+				if (this.grayed)
+					SetState(GButton.DISABLED);
+				else
+					SetState(GButton.UP);
+			}
+			else
+				base.HandleGrayedChanged();
 		}
 
 		public override void Dispose()
@@ -403,10 +424,7 @@ namespace FairyGUI
 		private void __popupWinClosed(object obj)
 		{
 			dropdown.displayObject.onRemovedFromStage.Remove(__popupWinClosed);
-			if (_over)
-				SetState(GButton.OVER);
-			else
-				SetState(GButton.UP);
+			SetCurrentState();
 		}
 
 		private void __clickItem(EventContext context)
@@ -425,7 +443,7 @@ namespace FairyGUI
 			if (_down || dropdown != null && dropdown.parent != null)
 				return;
 
-			SetState(GButton.OVER);
+			SetCurrentState();
 		}
 
 		private void __rollout()
@@ -434,7 +452,7 @@ namespace FairyGUI
 			if (_down || dropdown != null && dropdown.parent != null)
 				return;
 
-			SetState(GButton.UP);
+			SetCurrentState();
 		}
 
 		private void __touchBegin(EventContext context)
@@ -459,12 +477,7 @@ namespace FairyGUI
 
 				_down = false;
 				if (dropdown != null && dropdown.parent != null)
-				{
-					if (_over)
-						SetState(GButton.OVER);
-					else
-						SetState(GButton.UP);
-				}
+					SetCurrentState();
 			}
 		}
 	}

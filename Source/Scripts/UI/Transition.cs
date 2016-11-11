@@ -336,9 +336,6 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
-				if (item.label == null && item.label2 == null)
-					continue;
-
 				if (item.label == label)
 				{
 					if (item.tween)
@@ -427,16 +424,15 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
-				if (item.label == null && item.label2 == null)
-					continue;
-
 				if (item.label == label)
 				{
 					item.hook = callback;
+					break;
 				}
 				else if (item.label2 == label)
 				{
 					item.hook2 = callback;
+					break;
 				}
 			}
 		}
@@ -466,10 +462,8 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
-				if (item.label == null && item.label2 == null)
-					continue;
-
-				item.targetId = newTarget.id;
+				if (item.label == label)
+					item.targetId = newTarget.id;
 			}
 		}
 

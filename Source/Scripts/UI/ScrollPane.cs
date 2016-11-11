@@ -445,16 +445,7 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_xOverlap == 0)
-					return 0;
-
-				float mx = _container.x;
-				if (mx > 0)
-					return 0;
-				else if (mx < -_xOverlap)
-					return _xOverlap;
-				else
-					return -mx;
+				return Mathf.Clamp(-_container.x, 0, _xOverlap);
 			}
 		}
 
@@ -465,16 +456,7 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_yOverlap == 0)
-					return 0;
-
-				float my = _container.y;
-				if (my > 0)
-					return 0;
-				else if (my < -_yOverlap)
-					return _yOverlap;
-				else
-					return -my;
+				return Mathf.Clamp(-_container.y, 0, _yOverlap);
 			}
 		}
 
@@ -980,93 +962,31 @@ namespace FairyGUI
 			else
 				_yOverlap = 0;
 
-			if (_tweening == 2)
+			if (_tweening == 0 && onScrolling)
 			{
-				//如果是在缓动过程中，除发生边界改变，这里不做任何操作，让缓动处理去设置正确的percent和pos
-				if (_yOverlap == 0)
+				//如果原来是在边缘，且不在缓动状态，那么尝试继续贴边。（如果在缓动状态，需要修改tween的终值，暂时未支持）
+				if (_xPerc == 0 || _xPerc == 1)
 				{
-					_yPos = 0;
-					_yPerc = 0;
+					_xPos = _xPerc * _xOverlap;
+					_container.x = -_xPos;
 				}
-
-				if (_xOverlap == 0)
+				if (_yPerc == 0 || _yPerc == 1)
 				{
-					_xPos = 0;
-					_xPerc = 0;
-				}
-			}
-			else if (onScrolling)
-			{
-				//如果改变大小是在滚动的过程中发生的，那么保持位置不变，修改percent，但边界位置除外
-				if (_yOverlap > 0)
-				{
-					if (_yPerc == 0 || _yPerc == 1)
-					{
-						_container.y = -_yPerc * _yOverlap;
-						_yPos = -_container.y;
-					}
-					else
-					{
-						if (_yPos > _yOverlap)
-							_yPos = _yOverlap;
-						_yPerc = _yPos / _yOverlap;
-					}
-				}
-				else
-				{
-					_yPos = 0;
-					_yPerc = 0;
-				}
-
-				if (_xOverlap > 0)
-				{
-					if (_xPerc == 0 || _xPerc == 1)
-					{
-						_container.x = -_xPerc * _xOverlap;
-						_xPos = -_container.x;
-					}
-					else
-					{
-						if (_xPos > _xOverlap)
-							_xPos = _xOverlap;
-						_xPerc = _xPos / _xOverlap;
-					}
-				}
-				else
-				{
-					_xPos = 0;
-					_xPerc = 0;
+					_yPos = _yPerc * _yOverlap;
+					_container.y = -_yPos;
 				}
 			}
 			else
 			{
-				//保持位置不变，修改percent
-				if (_yOverlap > 0)
-				{
-					if (_yPos > _yOverlap)
-						_yPos = _yOverlap;
-					_yPerc = _yPos / _yOverlap;
-				}
-				else
-				{
-					_yPos = 0;
-					_yPerc = 0;
-				}
+				//边界检查
+				_xPos = Mathf.Clamp(_xPos, 0, _xOverlap);
+				_xPerc = _xOverlap > 0 ? _xPos / _xOverlap : 0;
 
-				if (_xOverlap > 0)
-				{
-					if (_xPos > _xOverlap)
-						_xPos = _xOverlap;
-					_xPerc = _xPos / _xOverlap;
-				}
-				else
-				{
-					_xPos = 0;
-					_xPerc = 0;
-				}
-
-				ValidateHolderPos();
+				_yPos = Mathf.Clamp(_yPos, 0, _yOverlap);
+				_yPerc = _yOverlap > 0 ? _yPos / _yOverlap : 0;
 			}
+
+			ValidateHolderPos();
 
 			if (_vtScrollBar != null)
 				_vtScrollBar.scrollPerc = _yPerc;
@@ -1078,15 +998,7 @@ namespace FairyGUI
 
 		void ValidateHolderPos()
 		{
-			if (_yOverlap == 0 || _container.y > 0)
-				_container.y = 0;
-			else if (_container.y < -_yOverlap)
-				_container.y = -_yOverlap;
-
-			if (_xOverlap == 0 || _container.x > 0)
-				_container.x = 0;
-			else if (_container.x < -_xOverlap)
-				_container.x = -_xOverlap;
+			_container.SetXY(Mathf.Clamp(_container.x, -_xOverlap, 0), Mathf.Clamp(_container.y, -_yOverlap, 0));
 		}
 
 		internal void UpdateClipSoft()
@@ -1135,7 +1047,8 @@ namespace FairyGUI
 				_tweening = 0;
 
 				ValidateHolderPos();
-				OnScrollEnd();
+				syncScrollBar(true);
+
 				onScrollEnd.Call();
 			}
 		}
@@ -1301,97 +1214,52 @@ namespace FairyGUI
 		{
 			if (_xOverlap > 0)
 			{
-				float mx = _container.x;
-				if (mx > 0)
-					_xPos = 0;
-				else if (mx < -_xOverlap)
-					_xPos = _xOverlap;
-				else
-					_xPos = -mx;
-
-				_xPerc = Mathf.Clamp01(_xPos / _xOverlap);
+				_xPos = Mathf.Clamp(-_container.x, 0, _xOverlap);
+				_xPerc = _xPos / _xOverlap;
 			}
 
 			if (_yOverlap > 0)
 			{
-				float my = _container.y;
-				if (my > 0)
-					_yPos = 0;
-				else if (my < -_yOverlap)
-					_yPos = _yOverlap;
-				else
-					_yPos = -my;
-
-				_yPerc = Mathf.Clamp01(_yPos / _yOverlap);
+				_yPos = Mathf.Clamp(-_container.y, 0, _yOverlap);
+				_yPerc = _yPos / _yOverlap;
 			}
 		}
 
-		private float CalcYPerc()
+		private void syncScrollBar(bool end = false)
 		{
-			if (_yOverlap == 0)
-				return 0;
+			if (end) //滚动结束
+			{
+				if (_vtScrollBar != null)
+				{
+					if (_scrollBarDisplayAuto)
+						ShowScrollBar(false);
+				}
+				if (_hzScrollBar != null)
+				{
+					if (_scrollBarDisplayAuto)
+						ShowScrollBar(false);
+				}
 
-			float my = _container.y;
-			float currY;
-			if (my > 0)
-				currY = 0;
-			else if (my < -_yOverlap)
-				currY = _yOverlap;
+				UpdateClipSoft();
+			}
 			else
-				currY = -my;
-			return currY / _yOverlap;
-		}
-
-		private float CalcXPerc()
-		{
-			if (_xOverlap == 0)
-				return 0;
-
-			float mx = _container.x;
-			float currX;
-			if (mx > 0)
-				currX = 0;
-			else if (mx < -_xOverlap)
-				currX = _xOverlap;
-			else
-				currX = -mx;
-
-			return currX / _xOverlap;
-		}
-
-		private void OnScrolling()
-		{
-			//这里不能直接使用_xPerc或者_yPerc，因为滚动可能处于过渡状态
-			if (_vtScrollBar != null)
 			{
-				_vtScrollBar.scrollPerc = CalcYPerc();
-				if (_scrollBarDisplayAuto)
-					ShowScrollBar(true);
-			}
-			if (_hzScrollBar != null)
-			{
-				_hzScrollBar.scrollPerc = CalcXPerc();
-				if (_scrollBarDisplayAuto)
-					ShowScrollBar(true);
-			}
+				//这里不能直接使用_xPerc或者_yPerc，因为滚动可能处于过渡状态
+				if (_vtScrollBar != null)
+				{
+					_vtScrollBar.scrollPerc = _yOverlap == 0 ? 0 : Mathf.Clamp(-_container.y, 0, _yOverlap) / _yOverlap;
+					if (_scrollBarDisplayAuto)
+						ShowScrollBar(true);
+				}
+				if (_hzScrollBar != null)
+				{
+					_hzScrollBar.scrollPerc = _xOverlap == 0 ? 0 : Mathf.Clamp(-_container.x, 0, _xOverlap) / _xOverlap;
+					if (_scrollBarDisplayAuto)
+						ShowScrollBar(true);
+				}
 
-			UpdateClipSoft();
-		}
-
-		private void OnScrollEnd()
-		{
-			if (_vtScrollBar != null)
-			{
-				if (_scrollBarDisplayAuto)
-					ShowScrollBar(false);
+				UpdateClipSoft();
 			}
-			if (_hzScrollBar != null)
-			{
-				if (_scrollBarDisplayAuto)
-					ShowScrollBar(false);
-			}
-
-			UpdateClipSoft();
 		}
 
 		private void __touchBegin(EventContext context)
@@ -1574,12 +1442,12 @@ namespace FairyGUI
 				}
 			}
 
-			SyncPos();
-
 			draggingPane = this;
 			_isHoldAreaDone = true;
 			_isMouseMoved = true;
-			OnScrolling();
+
+			SyncPos();
+			syncScrollBar();
 
 			onScroll.Call();
 		}
@@ -1808,7 +1676,8 @@ namespace FairyGUI
 
 		private void __tweenUpdate()
 		{
-			OnScrolling();
+			syncScrollBar();
+
 			onScroll.Call();
 		}
 
@@ -1817,7 +1686,8 @@ namespace FairyGUI
 			_tweener = null;
 			_tweening = 0;
 
-			OnScrollEnd();
+			syncScrollBar(true);
+
 			onScroll.Call();
 		}
 
@@ -1826,7 +1696,8 @@ namespace FairyGUI
 			_throwTween.Update(_container);
 
 			SyncPos();
-			OnScrolling();
+			syncScrollBar();
+
 			onScroll.Call();
 		}
 
@@ -1837,7 +1708,8 @@ namespace FairyGUI
 
 			ValidateHolderPos();
 			SyncPos();
-			OnScrollEnd();
+			syncScrollBar(true);
+
 			onScroll.Call();
 			onScrollEnd.Call();
 		}
