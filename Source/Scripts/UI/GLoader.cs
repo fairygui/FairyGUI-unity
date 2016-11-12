@@ -367,6 +367,8 @@ namespace FairyGUI
 			_content.texture = texture;
 			_contentSourceWidth = texture.width;
 			_contentSourceHeight = texture.height;
+			_content.scale9Grid = null;
+			_content.scaleByTile = false;
 			UpdateLayout();
 		}
 
