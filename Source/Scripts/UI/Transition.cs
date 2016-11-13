@@ -239,7 +239,7 @@ namespace FairyGUI
 			if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0 && item.target != _owner)
 				item.target.internalVisible--;
 
-			if (item.type == TransitionActionType.ColorFilter)
+			if (item.type == TransitionActionType.ColorFilter && item.filterCreated)
 				item.target.filter = null;
 
 			if (item.completed)
