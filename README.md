@@ -50,6 +50,16 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
 Version History
 ====
+1.7.2
+- NEW: Add GoWrapper.wrapTarget.
+- FIXED: Small displacement of text rendering on Unity 5.4 or later.
+- FIXED: Movieclip playing in runtime is a little slower than in editor.
+
+1.7.1
+- NEW: Add ListLayoutType.Pagination.
+- NEW: Add FillType.ScaleMatchWidth and FillType.ScaleMatchHeight.
+- FIXED: Transitions on UIPanel is not stopped after UIPanel is destroyed.
+
 1.7.0
 - NEW: Add UIContentScaler.ScaleMode.ConstantPhysicalSize
 - NEW: Add GGraph color gear support.
