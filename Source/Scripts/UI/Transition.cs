@@ -797,8 +797,6 @@ namespace FairyGUI
 
 				item.value.f1 = item.startValue.f1;
 				item.value.f2 = item.startValue.f2;
-				item.value.b1 = item.startValue.b1;
-				item.value.b2 = item.startValue.b2;
 
 				if (!item.endValue.b1)
 					item.endValue.f1 = item.value.f1;
