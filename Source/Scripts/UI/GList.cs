@@ -1561,7 +1561,7 @@ namespace FairyGUI
 
 					if (ii.obj != null && ii.obj.resourceURL != url)
 					{
-						RemoveChild(ii.obj);
+						RemoveChildToPool(ii.obj);
 						ii.obj = null;
 					}
 				}
@@ -1656,7 +1656,7 @@ namespace FairyGUI
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
 				{
-					RemoveChild(ii.obj);
+					RemoveChildToPool(ii.obj);
 					ii.obj = null;
 				}
 			}
@@ -1717,7 +1717,7 @@ namespace FairyGUI
 
 					if (ii.obj != null && ii.obj.resourceURL != url)
 					{
-						RemoveChild(ii.obj);
+						RemoveChildToPool(ii.obj);
 						ii.obj = null;
 					}
 				}
@@ -1811,7 +1811,7 @@ namespace FairyGUI
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
 				{
-					RemoveChild(ii.obj);
+					RemoveChildToPool(ii.obj);
 					ii.obj = null;
 				}
 			}
@@ -1947,7 +1947,7 @@ namespace FairyGUI
 				ItemInfo ii = _virtualItems[i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
 				{
-					RemoveChild(ii.obj);
+					RemoveChildToPool(ii.obj);
 					ii.obj = null;
 				}
 			}

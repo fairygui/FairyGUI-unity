@@ -396,8 +396,14 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; i++)
 			{
 				TreeNode node = folderNode.GetChildAt(i);
-				if (node.cell != null && node.cell.parent != null)
-					list.RemoveChild(node.cell);
+				if (node.cell != null)
+				{
+					if(node.cell.parent != null)
+						list.RemoveChild(node.cell);
+					list.itemPool.ReturnObject(node.cell);
+					node.cell.data = null;
+					node.cell = null;
+				}
 				if (node.isFolder && node.expanded)
 					HideFolderNode(node);
 			}
