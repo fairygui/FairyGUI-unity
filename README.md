@@ -50,6 +50,12 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
 Version History
 ====
+1.7.3
+- NEW: Add UIConfig.defaultTouchScrollSpeedRatio.
+- FIXED: Potential memory leak problem of virutal list.
+- FIXED: Inertia some time get disabled of scrollpane.
+- IMPROVE: A complicated case of relation system.
+
 1.7.2
 - NEW: Add GoWrapper.wrapTarget.
 - FIXED: Small displacement of text rendering on Unity 5.4 or later.
