@@ -68,9 +68,6 @@ namespace FairyGUI
 
 		public void CallInternal(EventContext context)
 		{
-			if (_dispatching)
-				return;
-
 			_dispatching = true;
 			context.sender = owner;
 			try
@@ -89,9 +86,6 @@ namespace FairyGUI
 		public void CallCaptureInternal(EventContext context)
 		{
 			if (_captureCallback == null)
-				return;
-
-			if (_dispatching)
 				return;
 
 			_dispatching = true;
