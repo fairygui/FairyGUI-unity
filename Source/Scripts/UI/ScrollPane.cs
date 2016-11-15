@@ -856,8 +856,13 @@ namespace FairyGUI
 				_xOffset += deltaPosX;
 				_yOffset += deltaPosY;
 
-				_y1 = _y2 = _container.y;
-				_x1 = _x2 = _container.x;
+				float tmp = _y2 - _y1;
+				_y1 = _container.y;
+				_y2 = _y1 + tmp;
+
+				tmp = _x2 - _x1;
+				_x1 = _container.x;
+				_x2 = _x1 + tmp;
 
 				_yPos = -_container.y;
 				_xPos = -_container.x;
@@ -1477,8 +1482,8 @@ namespace FairyGUI
 			float time = Time.time - _time2;
 			if (time == 0)
 				time = 0.001f;
-			float yVelocity = (_container.y - _y2) / time;
-			float xVelocity = (_container.x - _x2) / time;
+			float yVelocity = (_container.y - _y2) / time * 2 * UIConfig.defaultTouchScrollSpeedRatio;
+			float xVelocity = (_container.x - _x2) / time * 2 * UIConfig.defaultTouchScrollSpeedRatio;
 			float duration = 0.3f;
 
 			_throwTween.start.x = _container.x;
