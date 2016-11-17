@@ -13,7 +13,7 @@ namespace FairyGUI
 	{
 		protected TextField _textField;
 
-		protected List<Color> _backupColors;
+		protected List<Vector3> _backupVerts;
 		protected bool _stroke;
 		protected bool _shadow;
 
@@ -23,6 +23,8 @@ namespace FairyGUI
 		protected int _vertIndex;
 		protected int _mainLayerVertCount;
 
+		protected bool _started;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -31,7 +33,7 @@ namespace FairyGUI
 		{
 			_textField = textField;
 			_textField.EnableCharPositionSupport();
-			_backupColors = new List<Color>();
+			_backupVerts = new List<Vector3>();
 		}
 
 		/// <summary>
@@ -45,7 +47,7 @@ namespace FairyGUI
 			else
 				_textField = (TextField)textField.displayObject;
 			_textField.EnableCharPositionSupport();
-			_backupColors = new List<Color>();
+			_backupVerts = new List<Vector3>();
 		}
 
 		/// <summary>
@@ -53,27 +55,30 @@ namespace FairyGUI
 		/// </summary>
 		public void Start()
 		{
+			_textField.graphics.meshModifier -= OnMeshModified;
 			_textField.Redraw();
+			_textField.graphics.meshModifier += OnMeshModified;
 
-			_backupColors.Clear();
+			_backupVerts.Clear();
 			_stroke = false;
 			_shadow = false;
 			_mainLayerStart = 0;
 			_mainLayerVertCount = 0;
 			_printIndex = 0;
 			_vertIndex = 0;
+			_started = true;
 
 			int vertCount = _textField.graphics.vertCount;
 
-			//全部置为透明（不可见）
-			Color32[] colors = _textField.graphics.colors;
-			Color32 clear = Color.clear;
+			//备份所有顶点后将顶点置0
+			Vector3[] vertices = _textField.graphics.vertices;
+			Vector3 zero = Vector3.zero;
 			for (int i = 0; i < vertCount; i++)
 			{
-				_backupColors.Add(colors[i]);
-				colors[i] = clear;
+				_backupVerts.Add(vertices[i]);
+				vertices[i] = zero;
 			}
-			_textField.graphics.mesh.colors32 = colors;
+			_textField.graphics.mesh.vertices = vertices;
 
 			//隐藏所有混排的对象
 			if (_textField.richTextField != null)
@@ -122,6 +127,9 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool Print()
 		{
+			if (!_started)
+				return false;
+
 			TextField.CharPosition cp;
 			List<TextField.CharPosition> charPositions = _textField.charPositions;
 			List<TextField.LineInfo> lines = _textField.lines;
@@ -146,19 +154,23 @@ namespace FairyGUI
 				else if (cp.vertCount > 0) //空白
 					output(cp.vertCount);
 			}
-			
+
+			Cancel();
 			return false;
 		}
 
 		private void output(int vertCount)
 		{
-			Color32[] colors = _textField.graphics.colors;
+			Vector3[] vertices = _textField.graphics.vertices;
 			int start, end;
 
 			start = _mainLayerStart + _vertIndex;
 			end = start + vertCount;
 			for (int i = start; i < end; i++)
-				colors[i] = _backupColors[i];
+			{
+				vertices[i] = _backupVerts[i];
+				_backupVerts[i] = Vector3.zero;
+			}
 
 			if (_stroke)
 			{
@@ -166,10 +178,12 @@ namespace FairyGUI
 				end = start + vertCount;
 				for (int i = start; i < end; i++)
 				{
-					colors[i] = _backupColors[i];
-					colors[i + _mainLayerVertCount] = _backupColors[i + _mainLayerVertCount];
-					colors[i + _mainLayerVertCount * 2] = _backupColors[i + _mainLayerVertCount * 2];
-					colors[i + _mainLayerVertCount * 3] = _backupColors[i + _mainLayerVertCount * 3];
+					for (int j = 0; j < 4; j++)
+					{
+						int k = i + _mainLayerVertCount * j;
+						vertices[k] = _backupVerts[k];
+						_backupVerts[k] = Vector3.zero;
+					}
 				}
 			}
 
@@ -178,16 +192,19 @@ namespace FairyGUI
 				start = _vertIndex;
 				end = start + vertCount;
 				for (int i = start; i < end; i++)
-					colors[i] = _backupColors[i];
+				{
+					vertices[i] = _backupVerts[i];
+					_backupVerts[i] = Vector3.zero;
+				}
 			}
 
-			_textField.graphics.mesh.colors32 = colors;
+			_textField.graphics.mesh.vertices = vertices;
 
 			_vertIndex += vertCount;
 		}
 
 		/// <summary>
-		/// 启动一个自动打印的协程。
+		/// 打印的协程。
 		/// </summary>
 		/// <param name="interval">每个字符输出的时间间隔</param>
 		/// <returns></returns>
@@ -195,6 +212,50 @@ namespace FairyGUI
 		{
 			while (Print())
 				yield return new WaitForSeconds(interval);
+		}
+
+		/// <summary>
+		/// 使用固定时间间隔完成整个打印过程。
+		/// </summary>
+		/// <param name="interval"></param>
+		public void PrintAll(float interval)
+		{
+			Timers.inst.StartCoroutine(Print(interval));
+		}
+
+		public void Cancel()
+		{
+			if (!_started)
+				return;
+
+			_started = false;
+			_textField.graphics.meshModifier -= OnMeshModified;
+		}
+
+		/// <summary>
+		/// 当打字过程中，文本可能会由于字体纹理更改而发生字体重建，要处理这种情况。
+		/// 图片对象不需要处理，因为HtmlElement.status里设定的隐藏标志不会因为Mesh更新而被冲掉。
+		/// </summary>
+		void OnMeshModified()
+		{
+			Vector3[] vertices = _textField.graphics.vertices;
+
+			if (vertices.Length != _backupVerts.Count) //可能文字都改了
+			{
+				Cancel();
+				return;
+			}
+
+			int vertCount = vertices.Length;
+			Vector3 zero = Vector3.zero;
+			for (int i = 0; i < vertCount; i++)
+			{
+				if (_backupVerts[i] != zero) //not output yet
+				{
+					_backupVerts[i] = vertices[i];
+					vertices[i] = Vector3.zero;
+				}
+			}
 		}
 	}
 }

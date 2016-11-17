@@ -12,7 +12,7 @@ namespace FairyGUI
 		GObject _owner;
 		List<RelationItem> _items;
 
-		internal GObject handling;
+		public GObject handling;
 
 		public Relations(GObject owner)
 		{

@@ -1082,7 +1082,10 @@ namespace FairyGUI
 								}
 								element.position = new Vector2(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
 								htmlObj.SetPosition(element.position.x, element.position.y);
-								element.hidden = lineClipped || clipped && charX + htmlObj.width > _contentRect.width - GUTTER_X;
+								if (lineClipped || clipped && charX + htmlObj.width > _contentRect.width - GUTTER_X)
+									element.status |= 1;
+								else
+									element.status &= 254;
 								charX += htmlObj.width + letterSpacing + 2;
 							}
 						}

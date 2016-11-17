@@ -31,8 +31,7 @@ namespace FairyGUI.Utils
 		public TextFormat format;
 
 		public IHtmlObject htmlObject;
-		public bool added;
-		public bool hidden;
+		public int status; //1 hidden 2 clipped 4 added
 		public int space;
 		public Vector2 position;
 
@@ -168,8 +167,7 @@ namespace FairyGUI.Utils
 			element.name = null;
 			element.text = null;
 			element.htmlObject = null;
-			element.added = false;
-			element.hidden = false;
+			element.status = 0;
 			if (element.attributes != null)
 				element.attributes.Clear();
 			elementPool.Push(element);

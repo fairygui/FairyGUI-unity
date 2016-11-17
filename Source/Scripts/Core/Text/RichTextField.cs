@@ -119,21 +119,27 @@ namespace FairyGUI
 		public void ShowHtmlObject(int index, bool show)
 		{
 			HtmlElement element = textField.htmlElements[index];
-			if (!element.hidden && element.htmlObject != null && element.type != HtmlElementType.Link)
+			if (element.htmlObject != null && element.type != HtmlElementType.Link)
 			{
+				//set hidden flag
 				if (show)
+					element.status &= 253; //~(1<<1)
+				else
+					element.status |= 2;
+
+				if ((element.status & 3) == 0) //not (hidden and clipped)
 				{
-					if (!element.added)
+					if ((element.status & 4) == 0) //not added
 					{
-						element.added = true;
+						element.status |= 4;
 						element.htmlObject.Add();
 					}
 				}
 				else
 				{
-					if (element.added)
+					if ((element.status & 4) != 0) //added
 					{
-						element.added = false;
+						element.status &= 251;
 						element.htmlObject.Remove();
 					}
 				}
@@ -206,20 +212,20 @@ namespace FairyGUI
 				HtmlElement element = elements[i];
 				if (element.htmlObject != null)
 				{
-					if (element.hidden)
+					if ((element.status & 3) == 0) //not (hidden and clipped)
 					{
-						if (element.added)
+						if ((element.status & 4) == 0) //not added
 						{
-							element.added = false;
-							element.htmlObject.Remove();
+							element.status |= 4;
+							element.htmlObject.Add();
 						}
 					}
 					else
 					{
-						if (!element.added)
+						if ((element.status & 4) != 0) //added
 						{
-							element.added = true;
-							element.htmlObject.Add();
+							element.status &= 251;
+							element.htmlObject.Remove();
 						}
 					}
 				}
