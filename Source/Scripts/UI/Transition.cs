@@ -368,7 +368,7 @@ namespace FairyGUI
 						break;
 
 					case TransitionActionType.Rotation:
-						value.i = Convert.ToInt32(aParams[0]);
+						value.f1 = Convert.ToInt32(aParams[0]);
 						break;
 
 					case TransitionActionType.Color:
@@ -572,143 +572,22 @@ namespace FairyGUI
 						startTime += (_maxTime - item.time - item.duration);
 					else
 						startTime += item.time;
-					item.completed = false;
-					switch (item.type)
+					if (startTime > 0 && (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size))
 					{
-						case TransitionActionType.XY:
-						case TransitionActionType.Size:
-							_totalTasks++;
-							if (startTime == 0)
-								StartTween(item);
-							else
-							{
-								item.tweener = DOVirtual.DelayedCall(startTime, () =>
-								{
-									item.tweener = null;
-									StartTween(item);
-								}, true);
-								if (_timeScale != 1)
-									item.tweener.timeScale = _timeScale;
-							}
-							break;
+						_totalTasks++;
+						item.completed = false;
+						item.tweener = DOVirtual.DelayedCall(startTime, () =>
+						{
+							item.tweener = null;
+							_totalTasks--;
 
-						case TransitionActionType.Scale:
-						case TransitionActionType.Skew:
-							{
-								_totalTasks++;
-								Vector2 endValue;
-								if (_reversed)
-								{
-									item.value.f1 = item.endValue.f1;
-									item.value.f2 = item.endValue.f2;
-									endValue = new Vector2(item.startValue.f1, item.startValue.f2);
-								}
-								else
-								{
-									item.value.f1 = item.startValue.f1;
-									item.value.f2 = item.startValue.f2;
-									endValue = new Vector2(item.endValue.f1, item.endValue.f2);
-								}
-								item.tweener = DOTween.To(() => new Vector2(item.value.f1, item.value.f2),
-									val =>
-									{
-										item.value.f1 = val.x;
-										item.value.f2 = val.y;
-									}, endValue, item.duration);
-								SetupTween(item, startTime);
-								break;
-							}
-
-						case TransitionActionType.Alpha:
-							{
-								_totalTasks++;
-								float endValue;
-								if (_reversed)
-								{
-									item.value.f1 = item.endValue.f1;
-									endValue = item.startValue.f1;
-								}
-								else
-								{
-									item.value.f1 = item.startValue.f1;
-									endValue = item.endValue.f1;
-								}
-								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration);
-								SetupTween(item, startTime);
-								break;
-							}
-
-						case TransitionActionType.Rotation:
-							{
-								_totalTasks++;
-								int endValue;
-								if (_reversed)
-								{
-									item.value.f1 = item.endValue.i;
-									endValue = item.startValue.i;
-								}
-								else
-								{
-									item.value.f1 = item.startValue.i;
-									endValue = item.endValue.i;
-								}
-								item.tweener = DOTween.To(() => item.value.f1, v => item.value.f1 = v, endValue, item.duration);
-								SetupTween(item, startTime);
-								break;
-							}
-
-						case TransitionActionType.Color:
-							{
-								_totalTasks++;
-								Color endValue;
-								if (_reversed)
-								{
-									item.value.c = item.endValue.c;
-									endValue = item.startValue.c;
-								}
-								else
-								{
-									item.value.c = item.startValue.c;
-									endValue = item.endValue.c;
-								}
-								item.tweener = DOTween.To(() => item.value.c, v => item.value.c = v, endValue, item.duration);
-								SetupTween(item, startTime);
-								break;
-							}
-
-						case TransitionActionType.ColorFilter:
-							{
-								_totalTasks++;
-								Vector4 endValue;
-								if (_reversed)
-								{
-									item.value.f1 = item.endValue.f1;
-									item.value.f2 = item.endValue.f2;
-									item.value.f3 = item.endValue.f3;
-									item.value.f4 = item.endValue.f4;
-									endValue = new Vector4(item.startValue.f1, item.startValue.f2, item.startValue.f3, item.startValue.f4);
-								}
-								else
-								{
-									item.value.f1 = item.startValue.f1;
-									item.value.f2 = item.startValue.f2;
-									item.value.f3 = item.startValue.f3;
-									item.value.f4 = item.startValue.f4;
-									endValue = new Vector4(item.endValue.f1, item.endValue.f2, item.endValue.f3, item.endValue.f4);
-								}
-								item.tweener = DOTween.To(() => new Vector4(item.value.f1, item.value.f2, item.value.f3, item.value.f4),
-									v =>
-									{
-										item.value.f1 = v.x;
-										item.value.f2 = v.y;
-										item.value.f3 = v.z;
-										item.value.f4 = v.w;
-									},
-									endValue, item.duration);
-								SetupTween(item, startTime);
-								break;
-							}
+							StartTween(item, 0);
+						}, true);
+						if (_timeScale != 1)
+							item.tweener.timeScale = _timeScale;
 					}
+					else
+						StartTween(item, startTime);
 				}
 				else
 				{
@@ -742,80 +621,136 @@ namespace FairyGUI
 			}
 		}
 
-		void SetupTween(TransitionItem item, float startTime)
+		void StartTween(TransitionItem item, float delay)
 		{
+			TransitionValue startValue;
+			TransitionValue endValue;
+
+			if (_reversed)
+			{
+				startValue = item.endValue;
+				endValue = item.startValue;
+			}
+			else
+			{
+				startValue = item.startValue;
+				endValue = item.endValue;
+			}
+
+			switch (item.type)
+			{
+				case TransitionActionType.XY:
+				case TransitionActionType.Size:
+					{
+						if (item.type == TransitionActionType.XY)
+						{
+							if (item.target == _owner)
+							{
+								if (!startValue.b1)
+									startValue.f1 = 0;
+								if (!startValue.b2)
+									startValue.f2 = 0;
+							}
+							else
+							{
+								if (!startValue.b1)
+									startValue.f1 = item.target.x;
+								if (!startValue.b2)
+									startValue.f2 = item.target.y;
+							}
+						}
+						else
+						{
+							if (!startValue.b1)
+								startValue.f1 = item.target.width;
+							if (!startValue.b2)
+								startValue.f2 = item.target.height;
+						}
+
+						item.value.f1 = startValue.f1;
+						item.value.f2 = startValue.f2;
+
+						if (!endValue.b1)
+							endValue.f1 = item.value.f1;
+						if (!endValue.b2)
+							endValue.f2 = item.value.f2;
+
+						item.value.b1 = startValue.b1 || endValue.b1;
+						item.value.b2 = startValue.b2 || endValue.b2;
+
+						item.tweener = DOTween.To(() => new Vector2(startValue.f1, startValue.f2),
+									val =>
+									{
+										item.value.f1 = val.x;
+										item.value.f2 = val.y;
+									}, new Vector2(endValue.f1, endValue.f2), item.duration);
+					}
+					break;
+
+				case TransitionActionType.Scale:
+				case TransitionActionType.Skew:
+					{
+						item.value.f1 = startValue.f1;
+						item.value.f2 = startValue.f2;
+						item.tweener = DOTween.To(() => new Vector2(startValue.f1, startValue.f2),
+							val =>
+							{
+								item.value.f1 = val.x;
+								item.value.f2 = val.y;
+							}, new Vector2(endValue.f1, endValue.f2), item.duration);
+						break;
+					}
+
+				case TransitionActionType.Alpha:
+				case TransitionActionType.Rotation:
+					{
+						item.value.f1 = startValue.f1;
+						item.tweener = DOTween.To(() => startValue.f1, v => item.value.f1 = v, endValue.f1, item.duration);
+						break;
+					}
+
+				case TransitionActionType.Color:
+					{
+						item.value.c = startValue.c;
+						item.tweener = DOTween.To(() => startValue.c, v => item.value.c = v, endValue.c, item.duration);
+						break;
+					}
+
+				case TransitionActionType.ColorFilter:
+					{
+						item.value.f1 = startValue.f1;
+						item.value.f2 = startValue.f2;
+						item.value.f3 = startValue.f3;
+						item.value.f4 = startValue.f4;
+						item.tweener = DOTween.To(() => new Vector4(startValue.f1, startValue.f2, startValue.f3, startValue.f4),
+							v =>
+							{
+								item.value.f1 = v.x;
+								item.value.f2 = v.y;
+								item.value.f3 = v.z;
+								item.value.f4 = v.w;
+							},
+							new Vector4(endValue.f1, endValue.f2, endValue.f3, endValue.f4), item.duration);
+						break;
+					}
+			}
+
 			item.tweener.SetEase(item.easeType)
 				.SetUpdate(true)
 				.OnStart(() => { if (item.hook != null) item.hook(); })
 				.OnUpdate(() => { ApplyValue(item, item.value); })
 				.OnComplete(() => { tweenComplete(item); });
-			if (startTime > 0)
-				item.tweener.SetDelay(startTime);
+			if (delay > 0)
+				item.tweener.SetDelay(delay);
 			else
 				ApplyValue(item, item.value);
 			if (item.repeat != 0)
 				item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
 			if (_timeScale != 1)
 				item.tweener.timeScale = _timeScale;
-		}
 
-		void StartTween(TransitionItem item)
-		{
-			Vector2 endValue;
-			if (_reversed)
-			{
-				item.value.f1 = item.endValue.f1;
-				item.value.f2 = item.endValue.f2;
-				endValue = new Vector2(item.startValue.f1, item.startValue.f2);
-			}
-			else
-			{
-				if (item.type == TransitionActionType.XY)
-				{
-					if (item.target == _owner)
-					{
-						if (!item.startValue.b1)
-							item.startValue.f1 = 0;
-						if (!item.startValue.b2)
-							item.startValue.f2 = 0;
-					}
-					else
-					{
-						if (!item.startValue.b1)
-							item.startValue.f1 = item.target.x;
-						if (!item.startValue.b2)
-							item.startValue.f2 = item.target.y;
-					}
-				}
-				else
-				{
-					if (!item.startValue.b1)
-						item.startValue.f1 = item.target.width;
-					if (!item.startValue.b2)
-						item.startValue.f2 = item.target.height;
-				}
-
-				item.value.f1 = item.startValue.f1;
-				item.value.f2 = item.startValue.f2;
-
-				if (!item.endValue.b1)
-					item.endValue.f1 = item.value.f1;
-				if (!item.endValue.b2)
-					item.endValue.f2 = item.value.f2;
-
-				endValue = new Vector2(item.endValue.f1, item.endValue.f2);
-			}
-
-			item.tweener = DOTween.To(() => new Vector2(item.value.f1, item.value.f2),
-						val =>
-						{
-							item.value.f1 = val.x;
-							item.value.f2 = val.y;
-						}, endValue, item.duration);
-			SetupTween(item, 0);
-
-			if (item.hook != null)
-				item.hook();
+			_totalTasks++;
+			item.completed = false;
 		}
 
 		void tweenComplete(TransitionItem item)
@@ -823,6 +758,7 @@ namespace FairyGUI
 			item.tweener = null;
 			item.completed = true;
 			_totalTasks--;
+
 			if (item.hook2 != null)
 				item.hook2();
 
@@ -837,6 +773,7 @@ namespace FairyGUI
 		{
 			_totalTasks--;
 			item.completed = true;
+
 			CheckAllComplete();
 		}
 
@@ -1151,7 +1088,7 @@ namespace FairyGUI
 					break;
 
 				case TransitionActionType.Rotation:
-					value.i = int.Parse(str);
+					value.f1 = int.Parse(str);
 					break;
 
 				case TransitionActionType.Scale:
@@ -1284,11 +1221,11 @@ namespace FairyGUI
 
 	public class TransitionValue
 	{
-		public float f1;//x, scalex, pivotx,alpha,shakeAmplitude
+		public float f1;//x, scalex, pivotx,alpha,shakeAmplitude,rotation
 		public float f2;//y, scaley, pivoty, shakePeriod
 		public float f3;
 		public float f4;
-		public int i;//rotation,frame
+		public int i;//frame
 		public Color c;//color
 		public bool b;//playing
 		public string s;//sound,transName
