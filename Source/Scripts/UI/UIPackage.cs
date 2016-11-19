@@ -1388,7 +1388,8 @@ namespace FairyGUI
 				for (int j = 1; j < arr2.Length; j++)
 				{
 					string[] arr3 = arr2[j].Split(splitter1, StringSplitOptions.RemoveEmptyEntries);
-					kv[arr3[0]] = arr3[1];
+					if (arr3.Length >= 2)
+						kv[arr3[0]] = arr3[1];
 				}
 
 				str = arr2[0];
