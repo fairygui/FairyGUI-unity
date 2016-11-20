@@ -50,6 +50,11 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
 Version History
 ====
+1.7.4
+- IMPROVE: Add i18n support for gearText.
+- FIXED: A bitmap font loading bug.
+- FIXED: If font texture changed while TypingEffect is running, TypingEffect will continue to play normally.
+
 1.7.3
 - NEW: Add UIConfig.defaultTouchScrollSpeedRatio.
 - FIXED: Potential memory leak problem of virutal list.
