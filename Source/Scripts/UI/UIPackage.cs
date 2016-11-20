@@ -900,9 +900,12 @@ namespace FairyGUI
 			if (!item.decoded)
 				LoadComponent(item);
 			if (item.displayList == null)
+			{
 				LoadComponentChildren(item);
+				TranslateComponent(item);
+			}
 
-			int cnt = item.displayList.Length;
+				int cnt = item.displayList.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				DisplayListItem di = item.displayList[i];
@@ -1037,7 +1040,10 @@ namespace FairyGUI
 						LoadComponent(item);
 					}
 					if (!_loadingPackage && item.displayList == null)
+					{
 						LoadComponentChildren(item);
+						TranslateComponent(item);
+					}
 					return item.componentData;
 
 				default:
@@ -1117,15 +1123,7 @@ namespace FairyGUI
 		void LoadComponent(PackageItem item)
 		{
 			string str = _descPack[item.id + ".xml"];
-			XML xml = new XML(str);
-			item.componentData = xml;
-
-			if (_stringsSource != null)
-			{
-				Dictionary<string, string> strings;
-				if (_stringsSource.TryGetValue(this.id + item.id, out strings))
-					TranslateComponent(xml, strings);
-			}
+			item.componentData = new XML(str);
 		}
 
 		void LoadComponentChildren(PackageItem item)
@@ -1173,23 +1171,37 @@ namespace FairyGUI
 				item.displayList = new DisplayListItem[0];
 		}
 
-		void TranslateComponent(XML xml, Dictionary<string, string> strings)
+		void TranslateComponent(PackageItem item)
 		{
-			XML listNode = xml.GetNode("displayList");
-			if (listNode == null)
+			if (_stringsSource == null)
+				return;
+
+			Dictionary<string, string> strings;
+			if (!_stringsSource.TryGetValue(this.id + item.id, out strings))
 				return;
 
 			string ename, elementId, value;
-			XMLList.Enumerator nodes = listNode.GetEnumerator();
-			while (nodes.MoveNext())
+			XML cxml, dxml;
+			int dcnt = item.displayList.Length;
+			for (int i = 0; i < dcnt; i++)
 			{
-				XML cxml = nodes.Current;
+				cxml = item.displayList[i].desc;
 				ename = cxml.name;
 				elementId = cxml.GetAttribute("id");
 				if (cxml.HasAttribute("tooltips"))
 				{
 					if (strings.TryGetValue(elementId + "-tips", out value))
 						cxml.SetAttribute("tooltips", value);
+				}
+
+				dxml = cxml.GetNode("gearText");
+				if (dxml != null)
+				{
+					if (strings.TryGetValue(elementId + "-texts", out value))
+						dxml.SetAttribute("values", value);
+
+					if (strings.TryGetValue(elementId + "-texts_def", out value))
+						dxml.SetAttribute("default", value);
 				}
 
 				if (ename == "text" || ename == "richtext")
@@ -1212,40 +1224,40 @@ namespace FairyGUI
 				}
 				else if (ename == "component")
 				{
-					XML dxml = cxml.GetNode("Button");
+					dxml = cxml.GetNode("Button");
 					if (dxml != null)
 					{
 						if (strings.TryGetValue(elementId, out value))
 							dxml.SetAttribute("title", value);
 						if (strings.TryGetValue(elementId + "-0", out value))
 							dxml.SetAttribute("selectedTitle", value);
+						continue;
 					}
-					else
-					{
-						dxml = cxml.GetNode("Label");
-						if (dxml != null)
-						{
-							if (strings.TryGetValue(elementId, out value))
-								dxml.SetAttribute("title", value);
-						}
-						else
-						{
-							dxml = cxml.GetNode("ComboBox");
-							if (dxml != null)
-							{
-								if (strings.TryGetValue(elementId, out value))
-									dxml.SetAttribute("title", value);
 
-								XMLList.Enumerator et = dxml.GetEnumerator("item");
-								int j = 0;
-								while (et.MoveNext())
-								{
-									if (strings.TryGetValue(elementId + "-" + j, out value))
-										et.Current.SetAttribute("title", value);
-									j++;
-								}
-							}
+					dxml = cxml.GetNode("Label");
+					if (dxml != null)
+					{
+						if (strings.TryGetValue(elementId, out value))
+							dxml.SetAttribute("title", value);
+						continue;
+					}
+
+					dxml = cxml.GetNode("ComboBox");
+					if (dxml != null)
+					{
+						if (strings.TryGetValue(elementId, out value))
+							dxml.SetAttribute("title", value);
+
+						XMLList.Enumerator et = dxml.GetEnumerator("item");
+						int j = 0;
+						while (et.MoveNext())
+						{
+							if (strings.TryGetValue(elementId + "-" + j, out value))
+								et.Current.SetAttribute("title", value);
+							j++;
 						}
+
+						continue;
 					}
 				}
 			}
