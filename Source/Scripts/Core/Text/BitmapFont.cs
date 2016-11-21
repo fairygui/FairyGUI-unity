@@ -61,7 +61,7 @@ namespace FairyGUI
 				this.scale = (float)format.size / size * fontSizeScale;
 		}
 
-		override public bool GetGlyphSize(char ch, out int width, out int height)
+		override public bool GetGlyphSize(char ch, out float width, out float height)
 		{
 			BMGlyph bg;
 			if (ch == ' ')

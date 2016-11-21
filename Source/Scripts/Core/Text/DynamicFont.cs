@@ -27,6 +27,7 @@ namespace FairyGUI
 			this.canTint = true;
 			this.canOutline = true;
 			this.hasChannel = false;
+			this.keepCrisp = true;
 
 			if (UIConfig.renderingTextBrighterOnDesktop && !Application.isMobilePlatform)
 			{
@@ -108,6 +109,9 @@ namespace FairyGUI
 				_size = format.size;
 			else
 				_size = Mathf.FloorToInt((float)format.size * fontSizeScale);
+			if (keepCrisp)
+				_size = Mathf.FloorToInt(_size * UIContentScaler.scaleFactor);
+
 			if (format.bold && !customBold)
 			{
 				if (format.italic)
@@ -134,7 +138,7 @@ namespace FairyGUI
 			_font.RequestCharactersInTexture(text, _size, _style);
 		}
 
-		override public bool GetGlyphSize(char ch, out int width, out int height)
+		override public bool GetGlyphSize(char ch, out float width, out float height)
 		{
 			if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
 			{
@@ -146,6 +150,13 @@ namespace FairyGUI
 				height = sTempChar.size;
 				if (customBold)
 					width++;
+
+				if (keepCrisp)
+				{
+					width /= UIContentScaler.scaleFactor;
+					height /= UIContentScaler.scaleFactor;
+				}
+
 				return true;
 			}
 			else
@@ -176,6 +187,7 @@ namespace FairyGUI
 				if (sTempChar.glyphWidth == 0) //zero width, space etc
 					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
 				glyph.vert.yMax = sTempChar.maxY - baseline;
+
 				glyph.uvTopLeft = sTempChar.uvTopLeft;
 				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
 				glyph.uvTopRight = sTempChar.uvTopRight;
@@ -192,6 +204,7 @@ namespace FairyGUI
 				if (sTempChar.vert.width == 0) //zero width, space etc
 					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
 				glyph.vert.yMax = sTempChar.vert.yMin - baseline;
+
 				if (!sTempChar.flipped)
 				{
 					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
@@ -212,6 +225,16 @@ namespace FairyGUI
 				if (customBold)
 					glyph.width++;
 #endif
+				if (keepCrisp)
+				{
+					glyph.vert.xMin /= UIContentScaler.scaleFactor;
+					glyph.vert.yMin /= UIContentScaler.scaleFactor;
+					glyph.vert.xMax /= UIContentScaler.scaleFactor;
+					glyph.vert.yMax /= UIContentScaler.scaleFactor;
+					glyph.width /= UIContentScaler.scaleFactor;
+					glyph.height /= UIContentScaler.scaleFactor;
+				}
+
 				return true;
 			}
 			else

@@ -53,6 +53,11 @@ namespace FairyGUI
 		/// </summary>
 		public string shader;
 
+		/// <summary>
+		/// Keep text crisp.
+		/// </summary>
+		public bool keepCrisp;
+
 		public PackageItem packageItem;
 
 		virtual public void SetFormat(TextFormat format, float fontSizeScale)
@@ -63,7 +68,7 @@ namespace FairyGUI
 		{
 		}
 
-		virtual public bool GetGlyphSize(char ch, out int width, out int height)
+		virtual public bool GetGlyphSize(char ch, out float width, out float height)
 		{
 			width = 0;
 			height = 0;
@@ -90,8 +95,8 @@ namespace FairyGUI
 		public Vector2 uvBottomRight;
 		public Vector2 uvTopLeft;
 		public Vector2 uvTopRight;
-		public int width;
-		public int height;
+		public float width;
+		public float height;
 		public int channel;
 	}
 }
