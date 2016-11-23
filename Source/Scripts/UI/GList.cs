@@ -943,11 +943,11 @@ namespace FairyGUI
 		/// <param name="setFirst">If true, scroll to make the target on the top/left; If false, scroll to make the target any position in view.</param>
 		public void ScrollToView(int index, bool ani, bool setFirst)
 		{
-			if (_numItems == 0)
-				return;
-
 			if (_virtual)
 			{
+				if (_numItems == 0)
+					return;
+
 				CheckVirtualList();
 
 				if (index >= _virtualItems.Count)
