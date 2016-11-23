@@ -16,7 +16,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public Container parent { get; internal set; }
+		public Container parent { get; private set; }
 
 		/// <summary>
 		/// 
@@ -782,12 +782,17 @@ namespace FairyGUI
 			get { return _disposed || gameObject == null; }
 		}
 
-		protected internal void SetParent(Container value)
+		internal void InternalSetParent(Container value)
 		{
 			if (parent != value)
 			{
-				parent = value;
-				UpdateHierarchy();
+				if (value == null && parent._disposed)
+					parent = value;
+				else
+				{
+					parent = value;
+					UpdateHierarchy();
+				}
 			}
 		}
 

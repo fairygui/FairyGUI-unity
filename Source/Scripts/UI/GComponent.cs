@@ -87,7 +87,7 @@ namespace FairyGUI
 			for (int i = numChildren - 1; i >= 0; --i)
 			{
 				GObject obj = _children[i];
-				obj.parent = null; //Avoid GObject.RemoveParent call
+				obj.InternalSetParent(null); //Avoid GObject.RemoveParent call
 				obj.Dispose();
 			}
 		}
@@ -185,7 +185,7 @@ namespace FairyGUI
 				else
 				{
 					child.RemoveFromParent();
-					child.parent = this;
+					child.InternalSetParent(this);
 
 					int cnt = _children.Count;
 					if (child.sortingOrder != 0)
@@ -279,7 +279,7 @@ namespace FairyGUI
 			{
 				GObject child = _children[index];
 
-				child.parent = null;
+				child.InternalSetParent(null);
 
 				if (child.sortingOrder != 0)
 					_sortingChildCount--;
@@ -820,7 +820,7 @@ namespace FairyGUI
 			}
 		}
 
-		internal void ApplyAllControllers()
+		void ApplyAllControllers()
 		{
 			int cnt = _controllers.Count;
 			for (int i = 0; i < cnt; ++i)
@@ -1325,7 +1325,7 @@ namespace FairyGUI
 
 				child.underConstruct = true;
 				child.Setup_BeforeAdd(di.desc);
-				child.parent = this;
+				child.InternalSetParent(this);
 				_children.Add(child);
 			}
 

@@ -11,7 +11,7 @@ namespace FairyGUI
 		/// GObject的id，仅作为内部使用。与name不同，id值是不会相同的。
 		/// id is for internal use only.
 		/// </summary>
-		public string id { get; internal set; }
+		public string id { get; private set; }
 
 		/// <summary>
 		/// Name of the object.
@@ -26,22 +26,22 @@ namespace FairyGUI
 		/// <summary>
 		/// The source width of the object.
 		/// </summary>
-		public int sourceWidth { get; internal set; }
+		public int sourceWidth { get; protected set; }
 
 		/// <summary>
 		/// The source height of the object.
 		/// </summary>
-		public int sourceHeight { get; internal set; }
+		public int sourceHeight { get; protected set; }
 
 		/// <summary>
 		/// The initial width of the object.
 		/// </summary>
-		public int initWidth { get; internal set; }
+		public int initWidth { get; protected set; }
 
 		/// <summary>
 		/// The initial height of the object.
 		/// </summary>
-		public int initHeight { get; internal set; }
+		public int initHeight { get; protected set; }
 
 		/// <summary>
 		/// Relations Object.
@@ -61,7 +61,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Parent object.
 		/// </summary>
-		public GComponent parent { get; internal set; }
+		public GComponent parent { get; private set; }
 
 		/// <summary>
 		/// Lowlevel display object.
@@ -1428,6 +1428,11 @@ namespace FairyGUI
 
 		virtual protected void CreateDisplayObject()
 		{
+		}
+
+		internal void InternalSetParent(GComponent value)
+		{
+			parent = value;
 		}
 
 		virtual protected void HandlePositionChanged()

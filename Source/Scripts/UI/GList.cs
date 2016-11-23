@@ -943,12 +943,18 @@ namespace FairyGUI
 		/// <param name="setFirst">If true, scroll to make the target on the top/left; If false, scroll to make the target any position in view.</param>
 		public void ScrollToView(int index, bool ani, bool setFirst)
 		{
+			if (_numItems == 0)
+				return;
+
 			if (_virtual)
 			{
 				CheckVirtualList();
 
 				if (index >= _virtualItems.Count)
 					throw new Exception("Invalid child index: " + index + ">" + _virtualItems.Count);
+
+				if (_loop)
+					index = Mathf.FloorToInt(_firstIndex / _numItems) * _numItems + index;
 
 				Rect rect;
 				ItemInfo ii = _virtualItems[index];
@@ -2069,6 +2075,9 @@ namespace FairyGUI
 
 		override protected void UpdateBounds()
 		{
+			if (_virtual)
+				return;
+
 			int cnt = _children.Count;
 			int i;
 			GObject child;

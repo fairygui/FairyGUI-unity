@@ -137,7 +137,7 @@ namespace FairyGUI
 						_children.Add(child);
 					else
 						_children.Insert(index, child);
-					child.SetParent(this);
+					child.InternalSetParent(this);
 
 					if (stage != null)
 					{
@@ -264,7 +264,7 @@ namespace FairyGUI
 				_children.Remove(child);
 				if (!dispose)
 				{
-					child.SetParent(null);
+					child.InternalSetParent(null);
 					InvalidateBatchingState(true);
 				}
 				else
@@ -873,7 +873,7 @@ namespace FairyGUI
 			for (int i = numChildren - 1; i >= 0; --i)
 			{
 				DisplayObject obj = _children[i];
-				obj.parent = null; //Avoid RemoveParent call
+				obj.InternalSetParent(null); //Avoid RemoveParent call
 				obj.Dispose();
 			}
 		}

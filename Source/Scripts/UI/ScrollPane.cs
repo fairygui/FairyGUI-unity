@@ -352,9 +352,12 @@ namespace FairyGUI
 		/// <param name="ani"></param>
 		public void SetPosX(float value, bool ani)
 		{
+			_owner.EnsureBoundsCorrect();
+
+			value = Mathf.Clamp(value, 0, _xOverlap);
 			if (value != _xPos)
 			{
-				_xPos = Mathf.Clamp(value, 0, _xOverlap);
+				_xPos = value;
 				_xPerc = _xOverlap == 0 ? 0 : _xPos / _xOverlap;
 				PosChanged(ani);
 			}
@@ -376,9 +379,12 @@ namespace FairyGUI
 		/// <param name="ani"></param>
 		public void SetPosY(float value, bool ani)
 		{
+			_owner.EnsureBoundsCorrect();
+
+			value = Mathf.Clamp(value, 0, _yOverlap);
 			if (value != _yPos)
 			{
-				_yPos = Mathf.Clamp(value, 0, _yOverlap);
+				_yPos = value;
 				_yPerc = _yOverlap == 0 ? 0 : _yPos / _yOverlap;
 				PosChanged(ani);
 			}

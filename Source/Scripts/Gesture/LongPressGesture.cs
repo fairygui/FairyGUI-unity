@@ -116,11 +116,11 @@ namespace FairyGUI
 
 		void __touchEnd(EventContext context)
 		{
+			Timers.inst.Remove(__timer);
+
 			if (_started)
 			{
 				_started = false;
-				Timers.inst.Remove(__timer);
-
 				onEnd.Call();
 			}
 		}
