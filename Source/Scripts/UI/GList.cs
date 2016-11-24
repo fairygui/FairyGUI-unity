@@ -1279,7 +1279,11 @@ namespace FairyGUI
 						ch += _virtualItems[i].size.y + _lineGap;
 					if (ch > 0)
 						ch -= _lineGap;
-					cw = this.scrollPane.contentWidth;
+
+					for (int i = 0; i < _curLineItemCount; i++)
+						cw += _virtualItems[i].size.x + _columnGap;
+					if (cw > 0)
+						cw -= _columnGap;
 				}
 				else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
 				{
@@ -1288,6 +1292,11 @@ namespace FairyGUI
 					if (cw > 0)
 						cw -= _columnGap;
 					ch = this.scrollPane.contentHeight;
+
+					for (int i = 0; i < _curLineItemCount; i++)
+						ch += _virtualItems[i].size.y + _lineGap;
+					if (ch > 0)
+						ch -= _lineGap;
 				}
 				else
 				{
