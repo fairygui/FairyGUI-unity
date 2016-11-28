@@ -377,6 +377,12 @@ namespace FairyGUI
 
 		void HandleScreenSizeChanged()
 		{
+			if (!Application.isPlaying)
+			{
+				DisplayOptions.SetEditModeHideFlags();
+				DisplayOptions.defaultRoot = this.transform;
+			}
+
 			screenSizeVer = StageCamera.screenSizeVer;
 
 			if (this.container != null)
@@ -556,14 +562,14 @@ namespace FairyGUI
 
 		public void EM_Update(UpdateContext context)
 		{
-            DisplayOptions.SetEditModeHideFlags();
-            DisplayOptions.defaultRoot = this.transform;
+			DisplayOptions.SetEditModeHideFlags();
+			DisplayOptions.defaultRoot = this.transform;
 
-            container.Update(context);
+			container.Update(context);
 
-            DisplayOptions.defaultRoot = null;
+			DisplayOptions.defaultRoot = null;
 
-            if (setNativeChildrenOrder)
+			if (setNativeChildrenOrder)
 			{
 				CacheNativeChildrenRenderers();
 
