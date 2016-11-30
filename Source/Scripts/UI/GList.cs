@@ -1953,7 +1953,7 @@ namespace FairyGUI
 					itemRenderer(i % _numItems, ii.obj);
 
 				ii.obj.SetXY((int)(i / pageSize) * viewWidth + col * (ii.size.x + _columnGap),
-					(i / _curLineItemCount) % _curLineItemCount2 * (ii.size.y + _lineGap));
+					(int)(i / _curLineItemCount) % _curLineItemCount2 * (ii.size.y + _lineGap));
 			}
 
 			//释放未使用的

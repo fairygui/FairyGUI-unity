@@ -37,6 +37,11 @@ namespace FairyGUI
 		/// </summary>
 		public bool once;
 
+		/// <summary>
+		/// 手指按住后，移动超出此半径范围则手势停止。
+		/// </summary>
+		public int holdRangeRadius;
+
 		GObject _host;
 		Vector2 _startPoint;
 		bool _started;
@@ -49,6 +54,7 @@ namespace FairyGUI
 			_host = host;
 			trigger = TRIGGER;
 			interval = INTERVAL;
+			holdRangeRadius = 50;
 			Enable(true);
 
 			onBegin = new EventListener(this, "onLongPressBegin");
@@ -95,9 +101,8 @@ namespace FairyGUI
 
 		void __timer(object param)
 		{
-			Vector2 pt = Stage.inst.touchPosition;
-			pt = _host.GlobalToLocal(pt) - _startPoint;
-			if (Mathf.Abs(pt.x) > UIConfig.touchDragSensitivity || Mathf.Abs(pt.y) > UIConfig.touchDragSensitivity)
+			Vector2 pt = _host.GlobalToLocal(Stage.inst.touchPosition);
+			if (Mathf.Pow(pt.x - _startPoint.x, 2) + Mathf.Pow(pt.y - _startPoint.y, 2) > Mathf.Pow(holdRangeRadius, 2))
 			{
 				Timers.inst.Remove(__timer);
 				return;
@@ -107,7 +112,7 @@ namespace FairyGUI
 				_started = true;
 				onBegin.Call();
 
-				if(!once)
+				if (!once)
 					Timers.inst.Add(interval, 0, __timer);
 			}
 

@@ -7,7 +7,6 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
 using FairyGUI;
-using FairyGUI.Utils;
 
 namespace FairyGUIEditor
 {

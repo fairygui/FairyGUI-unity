@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 #if UNITY_5_3_OR_NEWER
 using UnityEditor.SceneManagement;
 #endif
 using UnityEditor;
-using FairyGUI;
 
 namespace FairyGUIEditor
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	[CustomEditor(typeof(UIPanel))]
+	[CustomEditor(typeof(FairyGUI.UIPanel))]
 	public class UIPanelEditor : Editor
 	{
 		SerializedProperty packageName;
@@ -61,7 +58,7 @@ namespace FairyGUIEditor
 		{
 			serializedObject.Update();
 
-			UIPanel panel = target as UIPanel;
+			FairyGUI.UIPanel panel = target as FairyGUI.UIPanel;
 #if UNITY_5
 			DrawPropertiesExcluding(serializedObject, propertyToExclude);
 #endif
@@ -107,21 +104,21 @@ namespace FairyGUIEditor
 			EditorGUILayout.PropertyField(scale);
 			EditorGUILayout.Space();
 
-			FitScreen oldFitScreen = (FitScreen)fitScreen.enumValueIndex;
+			FairyGUI.FitScreen oldFitScreen = (FairyGUI.FitScreen)fitScreen.enumValueIndex;
 			EditorGUILayout.PropertyField(fitScreen);
 
 			if (serializedObject.ApplyModifiedProperties())
 			{
 				if (PrefabUtility.GetPrefabType(panel) != PrefabType.Prefab)
 				{
-					panel.ApplyModifiedProperties(sortingOrder.intValue != oldSortingOrder, (FitScreen)fitScreen.enumValueIndex != oldFitScreen);
+					panel.ApplyModifiedProperties(sortingOrder.intValue != oldSortingOrder, (FairyGUI.FitScreen)fitScreen.enumValueIndex != oldFitScreen);
 				}
 			}
 		}
 
 		void OnSceneGUI()
 		{
-			UIPanel panel = (target as UIPanel);
+			FairyGUI.UIPanel panel = (target as FairyGUI.UIPanel);
 			if (panel.container == null)
 				return;
 

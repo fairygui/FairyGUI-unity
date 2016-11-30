@@ -42,7 +42,7 @@ namespace FairyGUIEditor
 				int layer = LayerMask.NameToLayer(StageCamera.LayerName);
 				panelObject.layer = layer;
 			}
-			panelObject.AddComponent<UIPanel>();
+			panelObject.AddComponent<FairyGUI.UIPanel>();
 			Selection.objects = new Object[] { panelObject };
 		}
 

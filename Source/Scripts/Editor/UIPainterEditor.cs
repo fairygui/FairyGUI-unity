@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 #if UNITY_5_3_OR_NEWER
 using UnityEditor.SceneManagement;
 #endif
