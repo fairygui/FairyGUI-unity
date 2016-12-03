@@ -50,6 +50,13 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
 Version History
 ====
+1.7.5
+- NEW: Add LongPressGesture.holdRangeRadius
+- IMRPOVE: Improve game object manage strategy, display object will not hide its game object in hierarchy when it is not in display list now. That makes easier to track objects life cycle.
+- IMPROVE: Make text crisp when content is scaled.
+- FIXED: GList.scrollToView failed when the list is virtual and loop.
+- FIXED: Allow virtual list to enable scrolling in two directions.
+
 1.7.4
 - IMPROVE: Add i18n support for gearText.
 - FIXED: A bitmap font loading bug.
