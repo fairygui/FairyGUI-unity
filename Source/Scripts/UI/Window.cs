@@ -46,7 +46,8 @@ namespace FairyGUI
 			displayObject.onRemovedFromStage.Add(__onHide);
 			displayObject.onTouchBegin.AddCapture(__touchBegin);
 
-			this.rootContainer.gameObject.name = "Window";
+			this.gameObjectName = "Window";
+			SetHome(GRoot.inst);
 		}
 
 		/// <summary>
@@ -75,6 +76,8 @@ namespace FairyGUI
 					_contentPane = value;
 					if (_contentPane != null)
 					{
+						this.gameObjectName = _contentPane.gameObjectName;
+
 						AddChild(_contentPane);
 						this.SetSize(_contentPane.width, _contentPane.height);
 						_contentPane.AddRelation(this, RelationType.Size);
@@ -281,7 +284,10 @@ namespace FairyGUI
 			if (UIConfig.windowModalWaiting != null)
 			{
 				if (_modalWaitPane == null)
+				{
 					_modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.windowModalWaiting);
+					_modalWaitPane.SetHome(this);
+				}
 
 				LayoutModalWaitPane();
 

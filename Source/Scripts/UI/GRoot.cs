@@ -174,7 +174,10 @@ namespace FairyGUI
 			if (UIConfig.globalModalWaiting != null)
 			{
 				if (_modalWaitPane == null)
+				{
 					_modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.globalModalWaiting);
+					_modalWaitPane.SetHome(this);
+				}
 				_modalWaitPane.SetSize(this.width, this.height);
 				_modalWaitPane.AddRelation(this, RelationType.Size);
 
@@ -290,6 +293,8 @@ namespace FairyGUI
 				_modalLayer = new GGraph();
 				_modalLayer.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
 				_modalLayer.AddRelation(this, RelationType.Size);
+				_modalLayer.gameObjectName = "ModalLayer";
+				_modalLayer.SetHome(this);
 			}
 
 			int cnt = this.numChildren;
@@ -514,6 +519,7 @@ namespace FairyGUI
 				}
 
 				_defaultTooltipWin = UIPackage.CreateObjectFromURL(resourceURL);
+				_defaultTooltipWin.SetHome(this);
 				_defaultTooltipWin.touchable = false;
 			}
 

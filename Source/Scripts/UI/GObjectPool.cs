@@ -1,5 +1,6 @@
-﻿using System;
+﻿using UnityEngine;
 using System.Collections.Generic;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -20,9 +21,15 @@ namespace FairyGUI
 		public InitCallbackDelegate initCallback;
 
 		Dictionary<string, Queue<GObject>> _pool;
+		Transform _manager;
 
-		public GObjectPool()
+		/// <summary>
+		/// 需要设置一个manager，加入池里的对象都成为这个manager的孩子
+		/// </summary>
+		/// <param name="manager"></param>
+		public GObjectPool(Transform manager)
 		{
+			_manager = manager;
 			_pool = new Dictionary<string, Queue<GObject>>();
 		}
 
@@ -90,7 +97,8 @@ namespace FairyGUI
 				arr = new Queue<GObject>();
 				_pool.Add(url, arr);
 			}
-			
+
+			ToolSet.SetParent(obj.displayObject.cachedTransform, _manager);
 			arr.Enqueue(obj);
 		}
 	}

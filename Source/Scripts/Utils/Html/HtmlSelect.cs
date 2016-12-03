@@ -33,6 +33,11 @@ namespace FairyGUI.Utils
 				Debug.LogWarning("FairyGUI: Set HtmlSelect.resource first");
 		}
 
+		public DisplayObject displayObject
+		{
+			get { return comboBox.displayObject; }
+		}
+
 		public HtmlElement element
 		{
 			get { return _element; }

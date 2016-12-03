@@ -8,11 +8,6 @@ namespace FairyGUI
 	public class DisplayOptions
 	{
 		/// <summary>
-		/// use only in edit mode. 
-		/// </summary>
-		public static Transform defaultRoot;
-
-		/// <summary>
 		/// 
 		/// </summary>
 		public static HideFlags hideFlags = HideFlags.None;
@@ -26,10 +21,10 @@ namespace FairyGUI
 	#if SHOW_HIERARCHY_EDIT_MODE
 			hideFlags = HideFlags.DontSaveInEditor;
 	#else
-			hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSaveInEditor;
+			hideFlags = HideFlags.DontSaveInEditor;
 	#endif
 #else
-			hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+			hideFlags = HideFlags.DontSave;
 #endif
 		}
 	}

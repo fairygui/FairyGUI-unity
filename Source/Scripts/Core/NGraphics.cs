@@ -1043,13 +1043,13 @@ namespace FairyGUI
 		public StencilEraser(Transform parent)
 		{
 			gameObject = new GameObject("Eraser");
-			FairyGUI.Utils.ToolSet.SetParent(gameObject.transform, parent);
+			ToolSet.SetParent(gameObject.transform, parent);
 			meshFilter = gameObject.AddComponent<MeshFilter>();
 			meshRenderer = gameObject.AddComponent<MeshRenderer>();
 #if UNITY_5
 			meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 #else
-            meshRenderer.castShadows = false;
+			meshRenderer.castShadows = false;
 #endif
 			meshRenderer.receiveShadows = false;
 

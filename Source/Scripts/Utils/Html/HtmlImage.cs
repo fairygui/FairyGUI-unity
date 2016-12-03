@@ -18,8 +18,14 @@ namespace FairyGUI.Utils
 		public HtmlImage()
 		{
 			loader = (GLoader)UIObjectFactory.NewObject("loader");
+			loader.gameObjectName = "HtmlImage";
 			loader.fill = FillType.ScaleFree;
 			loader.touchable = false;
+		}
+
+		public DisplayObject displayObject
+		{
+			get { return loader.displayObject; }
 		}
 
 		public HtmlElement element

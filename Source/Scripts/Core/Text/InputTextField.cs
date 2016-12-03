@@ -99,6 +99,7 @@ namespace FairyGUI
 			 * 是使用ClipRect的，那会造成无法点击四周的空白区域。所以这里自定义了一个HitArea
 			 */
 			this.hitArea = new RectHitTest();
+			this.touchChildren = false;
 
 			_touchMoveDelegate = __touchMove;
 
@@ -710,15 +711,18 @@ namespace FairyGUI
 		static void CreateCaret()
 		{
 			_caret = new Shape();
-			_caret.gameObject.name = "Caret";
+			_caret.gameObject.name = "InputCaret";
 			_caret.touchable = false;
 			_caret._skipInFairyBatching = true;
 			_caret.graphics.dontClip = true;
+			_caret.home = Stage.inst.cachedTransform;
 
 			_selectionShape = new SelectionShape();
+			_selectionShape.gameObject.name = "InputSelection";
 			_selectionShape.color = UIConfig.inputHighlightColor;
 			_selectionShape._skipInFairyBatching = true;
 			_selectionShape.touchable = false;
+			_selectionShape.home = Stage.inst.cachedTransform;
 		}
 
 		void __focusIn(EventContext context)

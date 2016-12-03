@@ -34,7 +34,7 @@ namespace FairyGUI
 
 		public RichTextField()
 		{
-			CreateGameObject("RichTextField");
+			gameObject.name = "RichTextField";
 			this.opaque = true;
 
 			htmlPageContext = HtmlPageContext.inst;

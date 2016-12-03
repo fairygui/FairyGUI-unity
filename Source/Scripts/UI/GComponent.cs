@@ -1208,6 +1208,8 @@ namespace FairyGUI
 
 		internal void ConstructFromResource(List<GObject> objectPool, int poolIndex)
 		{
+			this.gameObjectName = packageItem.name;
+
 			XML xml = packageItem.componentData;
 
 			string str;
@@ -1339,6 +1341,8 @@ namespace FairyGUI
 				child = _children[i];
 				child.Setup_AfterAdd(displayList[i].desc);
 				child.underConstruct = false;
+				if (child.displayObject != null)
+					ToolSet.SetParent(child.displayObject.cachedTransform, this.displayObject.cachedTransform);
 			}
 
 			str = xml.GetAttribute("mask");

@@ -744,7 +744,7 @@ namespace FairyGUI
 					IHtmlObject htmlObject = null;
 					if (_richTextField != null)
 					{
-						element.space = (int)(rectWidth - lineWidth);
+						element.space = (int)(rectWidth - lineWidth - 4);
 						htmlObject = _richTextField.htmlPageContext.CreateObject(_richTextField, element);
 						element.htmlObject = htmlObject;
 					}

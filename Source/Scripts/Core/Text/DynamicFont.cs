@@ -308,7 +308,7 @@ namespace FairyGUI
 				float dh = y0 - y1 - size;
 				if (dh > 3) //5.4版本后部分字体的渲染位置开始偏低
 				{
-					y0 -= Mathf.Ceil(dh / 2);
+					y0 -= Mathf.Floor(dh / 2);
 					dh = y0 - y1 - size;
 				}
 				result = (int)(y0 + (int)(dh * 0.5f));

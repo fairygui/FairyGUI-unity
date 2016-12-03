@@ -323,6 +323,8 @@ namespace FairyGUI
 
 				dropdown.AddRelation(_list, RelationType.Height);
 				dropdown.RemoveRelation(_list, RelationType.Width);
+
+				dropdown.SetHome(this);
 			}
 
 			displayObject.onRollOver.Add(__rollover);

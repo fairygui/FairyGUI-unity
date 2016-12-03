@@ -11,6 +11,7 @@ namespace FairyGUI.Utils
 	{
 		float width { get; }
 		float height { get; }
+		DisplayObject displayObject { get; }
 		HtmlElement element { get; }
 
 		void Create(RichTextField owner, HtmlElement element);

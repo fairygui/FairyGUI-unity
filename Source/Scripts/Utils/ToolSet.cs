@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Reflection;
+﻿using UnityEngine;
 
 namespace FairyGUI.Utils
 {
@@ -151,8 +149,11 @@ namespace FairyGUI.Utils
 
 		public static void SetParent(Transform t, Transform parent)
 		{
+			if ((object)t.parent == (object)t)
+				return;
+
 #if (UNITY_4_6 || UNITY_4_7 || UNITY_5)
-			t.SetParent(parent, false);
+				t.SetParent(parent, false);
 #else
 			Vector3 p = t.localPosition;
 			Vector3 s = t.localScale;

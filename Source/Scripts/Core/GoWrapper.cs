@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using FairyGUI;
 using FairyGUI.Utils;
 
 namespace FairyGUI

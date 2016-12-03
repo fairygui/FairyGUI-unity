@@ -33,6 +33,11 @@ namespace FairyGUI.Utils
 				Debug.LogWarning("FairyGUI: Set HtmlButton.resource first");
 		}
 
+		public DisplayObject displayObject
+		{
+			get { return button != null ? button.displayObject : null; }
+		}
+
 		public HtmlElement element
 		{
 			get { return _element; }

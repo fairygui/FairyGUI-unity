@@ -99,7 +99,6 @@ namespace FairyGUI
 		public GList()
 			: base()
 		{
-			_pool = new GObjectPool();
 			_trackBounds = true;
 			autoResizeItem = true;
 			this.opaque = true;
@@ -107,6 +106,9 @@ namespace FairyGUI
 
 			container = new Container();
 			rootContainer.AddChild(container);
+			rootContainer.gameObject.name = "GList";
+
+			_pool = new GObjectPool(container.cachedTransform);
 
 			onClickItem = new EventListener(this, "onClickItem");
 		}
@@ -1208,6 +1210,9 @@ namespace FairyGUI
 
 		public void RefreshVirtualList()
 		{
+			if (!_virtual)
+				throw new Exception("FairyGUI: not virtual list");
+
 			SetVirtualListChangedFlag(false);
 		}
 

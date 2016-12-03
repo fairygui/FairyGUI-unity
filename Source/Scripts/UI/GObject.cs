@@ -880,18 +880,6 @@ namespace FairyGUI
 			}
 		}
 
-		virtual public IFilter filter
-		{
-			get { return displayObject != null ? displayObject.filter : null; }
-			set { if (displayObject != null) displayObject.filter = value; }
-		}
-
-		virtual public BlendMode blendMode
-		{
-			get { return displayObject != null ? displayObject.blendMode : BlendMode.None; }
-			set { if (displayObject != null) displayObject.blendMode = value; }
-		}
-
 		private void __rollOver()
 		{
 			this.root.ShowTooltips(tooltips);
@@ -900,6 +888,54 @@ namespace FairyGUI
 		private void __rollOut()
 		{
 			this.root.HideTooltips();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		virtual public IFilter filter
+		{
+			get { return displayObject != null ? displayObject.filter : null; }
+			set { if (displayObject != null) displayObject.filter = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		virtual public BlendMode blendMode
+		{
+			get { return displayObject != null ? displayObject.blendMode : BlendMode.None; }
+			set { if (displayObject != null) displayObject.blendMode = value; }
+		}
+
+		/// <summary>
+		/// 设定GameObject的名称
+		/// </summary>
+		public string gameObjectName
+		{
+			get
+			{
+				if (displayObject != null)
+					return displayObject.gameObject.name;
+				else
+					return null;
+			}
+
+			set
+			{
+				if (displayObject != null)
+					displayObject.gameObject.name = value;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="obj"></param>
+		public void SetHome(GObject obj)
+		{
+			if (displayObject != null && obj.displayObject != null)
+				displayObject.home = obj.displayObject.cachedTransform;
 		}
 
 		/// <summary>
@@ -1344,7 +1380,7 @@ namespace FairyGUI
 			RemoveFromParent();
 			RemoveEventListeners();
 			relations.Dispose();
-			if (displayObject != null && !displayObject.isDisposed)
+			if (displayObject != null)
 			{
 				displayObject.gOwner = null;
 				displayObject.Dispose();

@@ -232,13 +232,11 @@ namespace FairyGUI
 				return;
 
 			_captured = true;
-			GameObject tempGo = new GameObject("Temp Object");
-			tempGo.layer = CaptureCamera.layer;
 
 			UIObjectFactory.packageItemExtensions.Clear();
 			UIObjectFactory.loaderConstructor = null;
 			DisplayOptions.SetEditModeHideFlags();
-			DisplayOptions.defaultRoot = tempGo.transform;
+
 			GComponent view = (GComponent)UIPackage.CreateObject(packageName, componentName);
 
 			if (view != null)
@@ -287,14 +285,11 @@ namespace FairyGUI
 				camera.targetTexture = null;
 				view.Dispose();
 				GameObject.DestroyImmediate(cameraObject);
-				GameObject.DestroyImmediate(tempGo);
 
 				if (_renderer != null)
 					_renderer.sharedMaterial.mainTexture = _texture;
 			}
-
-            DisplayOptions.defaultRoot = null;
-        }
+		}
 
 		public void ApplyModifiedProperties(bool sortingOrderChanged)
 		{

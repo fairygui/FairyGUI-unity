@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using FairyGUI.Utils;
 using System.Text;
+using FairyGUI.Utils;
 
 #if UNITY_5_3_OR_NEWER
 using UnityEngine.SceneManagement;
@@ -141,21 +141,16 @@ namespace FairyGUI
 
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
-				this.gameObject = engine.gameObject;
-			else
-			{
-				int layer = LayerMask.NameToLayer(StageCamera.LayerName);
+				Object.Destroy(engine.gameObject);
 
-				this.gameObject = new GameObject("Stage");
-				this.gameObject.hideFlags = HideFlags.None;
-				this.gameObject.layer = layer;
-				this.gameObject.AddComponent<StageEngine>();
-				this.gameObject.AddComponent<UIContentScaler>();
-			}
-			this.cachedTransform = gameObject.transform;
-			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
+			this.gameObject.name = "Stage";
+			this.gameObject.layer = LayerMask.NameToLayer(StageCamera.LayerName);
+			this.gameObject.AddComponent<StageEngine>();
+			this.gameObject.AddComponent<UIContentScaler>();
 			this.gameObject.SetActive(true);
-			UnityEngine.Object.DontDestroyOnLoad(this.gameObject);
+			Object.DontDestroyOnLoad(this.gameObject);
+
+			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
 
 			EnableSound();
 
@@ -1117,6 +1112,17 @@ namespace FairyGUI
 			}
 			if (touch.touchEndMonitors.IndexOf(target) == -1)
 				touch.touchEndMonitors.Add(target);
+		}
+
+		internal Transform CreatePoolManager(string name)
+		{
+			GameObject go = new GameObject("["+ name+"]");
+			go.SetActive(false);
+
+			Transform t = go.transform;
+			ToolSet.SetParent(t, cachedTransform);
+
+			return t;
 		}
 	}
 

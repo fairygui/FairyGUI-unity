@@ -9,10 +9,9 @@ namespace FairyGUI.Utils
 	/// </summary>
 	public class HtmlLink : IHtmlObject
 	{
-		public SelectionShape shape { get; private set; }
-
 		RichTextField _owner;
 		HtmlElement _element;
+		SelectionShape _shape;
 
 		EventCallback1 _clickHandler;
 		EventCallback1 _rolloverHandler;
@@ -20,7 +19,8 @@ namespace FairyGUI.Utils
 
 		public HtmlLink()
 		{
-			shape = new SelectionShape();
+			_shape = new SelectionShape();
+			_shape.gameObject.name = "HtmlLink";
 
 			_clickHandler = (EventContext context) =>
 			{
@@ -30,13 +30,18 @@ namespace FairyGUI.Utils
 			{
 				context.CaptureTouch();
 				if (_owner.htmlParseOptions.linkHoverBgColor.a > 0)
-					shape.color = _owner.htmlParseOptions.linkHoverBgColor;
+					_shape.color = _owner.htmlParseOptions.linkHoverBgColor;
 			};
 			_rolloutHandler = () =>
 			{
 				if (_owner.htmlParseOptions.linkHoverBgColor.a > 0)
-					shape.color = _owner.htmlParseOptions.linkBgColor;
+					_shape.color = _owner.htmlParseOptions.linkBgColor;
 			};
+		}
+
+		public DisplayObject displayObject
+		{
+			get { return _shape; }
 		}
 
 		public HtmlElement element
@@ -58,49 +63,49 @@ namespace FairyGUI.Utils
 		{
 			_owner = owner;
 			_element = element;
-			shape.onClick.Add(_clickHandler);
+			_shape.onClick.Add(_clickHandler);
 			if (!Stage.touchScreen)
 			{
-				shape.onRollOver.Add(_rolloverHandler);
-				shape.onRollOut.Add(_rolloutHandler);
+				_shape.onRollOver.Add(_rolloverHandler);
+				_shape.onRollOut.Add(_rolloutHandler);
 			}
 			else
 			{
-				shape.onTouchBegin.Add(_rolloverHandler);
-				shape.onTouchEnd.Add(_rolloutHandler);
+				_shape.onTouchBegin.Add(_rolloverHandler);
+				_shape.onTouchEnd.Add(_rolloutHandler);
 			}
-			shape.color = _owner.htmlParseOptions.linkBgColor;
+			_shape.color = _owner.htmlParseOptions.linkBgColor;
 		}
 
 		public void SetArea(int startLine, float startCharX, int endLine, float endCharX)
 		{
-			List<Rect> rects = shape.rects;
+			List<Rect> rects = _shape.rects;
 			if (rects == null)
 				rects = new List<Rect>(2);
 			_owner.textField.GetLinesShape(startLine, startCharX, endLine, endCharX, true, rects);
-			shape.rects = rects;
+			_shape.rects = rects;
 		}
 
 		public void SetPosition(float x, float y)
 		{
-			shape.SetXY(x, y);
+			_shape.SetXY(x, y);
 		}
 
 		public void Add()
 		{
-			//add below text
-			_owner.AddChildAt(shape, 0);
+			//add below _shape
+			_owner.AddChildAt(_shape, 0);
 		}
 
 		public void Remove()
 		{
-			if (shape.parent != null)
-				_owner.RemoveChild(shape);
+			if (_shape.parent != null)
+				_owner.RemoveChild(_shape);
 		}
 
 		public void Release()
 		{
-			shape.RemoveEventListeners();
+			_shape.RemoveEventListeners();
 
 			_owner = null;
 			_element = null;
@@ -108,7 +113,8 @@ namespace FairyGUI.Utils
 
 		public void Dispose()
 		{
-			shape.Dispose();
+			_shape.Dispose();
+			_shape = null;
 		}
 	}
 }

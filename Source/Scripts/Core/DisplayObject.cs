@@ -118,13 +118,13 @@ namespace FairyGUI
 		bool _grayed;
 		BlendMode _blendMode;
 		IFilter _filter;
+		Transform _home;
 
 		bool _perspective;
 		int _focalLength;
 		Vector3 _rotation; //由于万向锁，单独旋转一个轴是会影响到其他轴的，所以这里需要单独保存
 
 		protected EventCallback0 _captureDelegate; //缓存这个delegate，可以防止Capture状态下每帧104B的GC
-		//painting mode
 		protected int _paintingMode; //1-滤镜，2-blendMode，3-transformMatrix
 		protected Margin _paintingMargin;
 		protected int _paintingFlag;
@@ -168,11 +168,9 @@ namespace FairyGUI
 		{
 			gameObject = new GameObject(gameObjectName);
 			cachedTransform = gameObject.transform;
-			if ((object)DisplayOptions.defaultRoot != null)
-				FairyGUI.Utils.ToolSet.SetParent(cachedTransform, DisplayOptions.defaultRoot);
-			else
+			if (Application.isPlaying)
 				Object.DontDestroyOnLoad(gameObject);
-			gameObject.hideFlags = DisplayOptions.hideFlags | HideFlags.HideInHierarchy;
+			gameObject.hideFlags = DisplayOptions.hideFlags;
 			gameObject.SetActive(false);
 			_ownsGameObject = true;
 		}
@@ -257,7 +255,7 @@ namespace FairyGUI
 		/// </summary>
 		public float y
 		{
-			get { return -cachedTransform.localPosition.y ; }
+			get { return -cachedTransform.localPosition.y; }
 			set
 			{
 				Vector3 v = cachedTransform.localPosition;
@@ -331,7 +329,7 @@ namespace FairyGUI
 			get
 			{
 				EnsureSizeCorrect();
-				return _contentRect.width; 
+				return _contentRect.width;
 			}
 			set
 			{
@@ -348,10 +346,10 @@ namespace FairyGUI
 		/// </summary>
 		public float height
 		{
-			get 
+			get
 			{
 				EnsureSizeCorrect();
-				return _contentRect.height; 
+				return _contentRect.height;
 			}
 			set
 			{
@@ -368,14 +366,14 @@ namespace FairyGUI
 		/// </summary>
 		public Vector2 size
 		{
-			get 
+			get
 			{
 				EnsureSizeCorrect();
-				return _contentRect.size; 
+				return _contentRect.size;
 			}
-			set 
+			set
 			{
-				SetSize(value.x, value.y); 
+				SetSize(value.x, value.y);
 			}
 		}
 
@@ -874,7 +872,7 @@ namespace FairyGUI
 					{
 						GameObject go = new GameObject(this.gameObject.name + " (Painter)");
 						go.layer = this.gameObject.layer;
-						FairyGUI.Utils.ToolSet.SetParent(go.transform, cachedTransform);
+						ToolSet.SetParent(go.transform, cachedTransform);
 						go.hideFlags = DisplayOptions.hideFlags;
 						paintingGraphics = new NGraphics(go);
 					}
@@ -1330,6 +1328,20 @@ namespace FairyGUI
 				onPaint();
 		}
 
+		/// <summary>
+		/// 为对象设置一个默认的父Transform。当对象不在显示列表里时，它的GameObject挂到哪里。
+		/// </summary>
+		public Transform home
+		{
+			get { return _home; }
+			set
+			{
+				_home = value;
+				if ((object)value != null && (object)cachedTransform.parent == null)
+					ToolSet.SetParent(cachedTransform, value);
+			}
+		}
+
 		void UpdateHierarchy()
 		{
 			if (!_ownsGameObject)
@@ -1345,20 +1357,8 @@ namespace FairyGUI
 			}
 			else if (parent != null)
 			{
-#if (UNITY_4_6 || UNITY_4_7 || UNITY_5)
-				cachedTransform.SetParent(parent.cachedTransform, false);
-#else
-				Vector3 v1 = cachedTransform.localPosition;
-				Vector3 v2 = cachedTransform.localScale;
-				Vector3 v3 = cachedTransform.localEulerAngles;
+				ToolSet.SetParent(cachedTransform, parent.cachedTransform);
 
-				cachedTransform.parent = parent.cachedTransform;
-
-				cachedTransform.localPosition = v1;
-				cachedTransform.localScale = v2;
-				cachedTransform.localEulerAngles = v3;
-#endif
-				gameObject.hideFlags = DisplayOptions.hideFlags;
 				if (_visible)
 					gameObject.SetActive(true);
 
@@ -1375,13 +1375,14 @@ namespace FairyGUI
 			{
 				if (Application.isPlaying)
 				{
-#if (UNITY_4_6 || UNITY_4_7 || UNITY_5)
-					cachedTransform.SetParent(null, false);
-#else
-					cachedTransform.parent = null;
-#endif
+					if (gOwner == null || gOwner.parent == null)//如果gOwner还有parent的话，说明只是暂时的隐藏
+					{
+						ToolSet.SetParent(cachedTransform, _home);
+						if (_home == null)
+							Object.DontDestroyOnLoad(this.gameObject);
+					}
 				}
-				gameObject.hideFlags |= HideFlags.HideInHierarchy;
+
 				gameObject.SetActive(false);
 			}
 		}

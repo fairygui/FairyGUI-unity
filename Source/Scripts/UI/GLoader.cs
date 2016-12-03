@@ -29,7 +29,7 @@ namespace FairyGUI
 		MovieClip _content;
 		GObject _errorSign;
 
-		static GObjectPool errorSignPool = new GObjectPool();
+		static GObjectPool errorSignPool;
 
 		public GLoader()
 		{
@@ -55,6 +55,8 @@ namespace FairyGUI
 				if (_contentItem == null)
 					FreeExternal(image.texture);
 			}
+			if (_errorSign != null)
+				_errorSign.Dispose();
 			_content.Dispose();
 			base.Dispose();
 		}
@@ -379,13 +381,20 @@ namespace FairyGUI
 
 		private void SetErrorState()
 		{
-			if (!showErrorSign)
+			if (!showErrorSign || !Application.isPlaying)
 				return;
 
 			if (_errorSign == null)
 			{
 				if (UIConfig.loaderErrorSign != null)
+				{
+					if (errorSignPool == null)
+						errorSignPool = new GObjectPool(Stage.inst.CreatePoolManager("LoaderErrorSignPool"));
+
 					_errorSign = errorSignPool.GetObject(UIConfig.loaderErrorSign);
+				}
+				else
+					return;
 			}
 
 			if (_errorSign != null)

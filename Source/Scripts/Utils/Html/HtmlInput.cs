@@ -24,9 +24,17 @@ namespace FairyGUI.Utils
 		public HtmlInput()
 		{
 			textInput = (GTextInput)UIObjectFactory.NewObject("inputtext");
+			textInput.gameObjectName = "HtmlInput";
 			textInput.verticalAlign = VertAlignType.Middle;
 
 			_border = new Shape();
+			_border.graphics.dontClip = true;
+			((InputTextField)textInput.displayObject).AddChildAt(_border, 0);
+		}
+
+		public DisplayObject displayObject
+		{
+			get { return textInput.displayObject; }
 		}
 
 		public HtmlElement element
@@ -63,7 +71,7 @@ namespace FairyGUI.Utils
 
 				if (width == 0)
 				{
-					width = element.space - _borderSize * 2;
+					width = element.space;
 					if (width > _owner.width / 2 || width < 100)
 						width = (int)_owner.width / 2;
 				}
@@ -74,7 +82,9 @@ namespace FairyGUI.Utils
 				textInput.displayAsPassword = type == "password";
 				textInput.SetSize(width - _borderSize * 2, height - _borderSize * 2);
 				textInput.maxLength = element.GetInt("maxlength", int.MaxValue);
-				_border.size = new Vector2(width, height);
+
+				_border.SetXY(-_borderSize, -_borderSize);
+				_border.SetSize(width, height);
 				_border.DrawRect(_borderSize, borderColor, new Color(0, 0, 0, 0));
 			}
 			textInput.text = element.GetString("value");
@@ -83,28 +93,19 @@ namespace FairyGUI.Utils
 		public void SetPosition(float x, float y)
 		{
 			if (!_hidden)
-			{
-				_border.SetXY(x, y);
 				textInput.SetXY(x + _borderSize, y + _borderSize);
-			}
 		}
 
 		public void Add()
 		{
 			if (!_hidden)
-			{
-				_owner.AddChild(_border);
 				_owner.AddChild(textInput.displayObject);
-			}
 		}
 
 		public void Remove()
 		{
 			if (!_hidden && textInput.displayObject.parent != null)
-			{
-				_owner.RemoveChild(_border);
 				_owner.RemoveChild(textInput.displayObject);
-			}
 		}
 
 		public void Release()
@@ -119,7 +120,6 @@ namespace FairyGUI.Utils
 		public void Dispose()
 		{
 			textInput.Dispose();
-			_border.Dispose();
 		}
 	}
 }

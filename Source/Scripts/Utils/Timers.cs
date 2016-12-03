@@ -37,7 +37,7 @@ namespace FairyGUI
 		public Timers()
 		{
 			_inst = this;
-			gameObject = new GameObject();
+			gameObject = new GameObject("[Timers]");
 			gameObject.hideFlags = HideFlags.HideInHierarchy;
 			gameObject.SetActive(true);
 			Object.DontDestroyOnLoad(gameObject);

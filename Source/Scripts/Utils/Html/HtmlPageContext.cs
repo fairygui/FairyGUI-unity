@@ -16,6 +16,8 @@ namespace FairyGUI.Utils
 
 		public static HtmlPageContext inst = new HtmlPageContext();
 
+		static Transform _poolManager;
+
 		public HtmlPageContext()
 		{
 			_imagePool = new Stack<IHtmlObject>();
@@ -71,7 +73,11 @@ namespace FairyGUI.Utils
 			}
 
 			if (ret != null)
+			{
 				ret.Create(owner, element);
+				if (ret.displayObject != null)
+					ret.displayObject.home = owner.cachedTransform;
+			}
 
 			return ret;
 		}
@@ -85,6 +91,10 @@ namespace FairyGUI.Utils
 				return;
 			}
 
+			//可能已经被GameObject tree deleted了，不再回收
+			if (obj.displayObject != null && obj.displayObject.isDisposed)
+				return;
+
 			if (obj is HtmlImage)
 				_imagePool.Push(obj);
 			else if (obj is HtmlInput)
@@ -93,6 +103,14 @@ namespace FairyGUI.Utils
 				_buttonPool.Push(obj);
 			else if (obj is HtmlLink)
 				_linkPool.Push(obj);
+
+			if (obj.displayObject != null)
+			{
+				if (_poolManager == null)
+					_poolManager = Stage.inst.CreatePoolManager("HtmlObjectPool");
+
+				ToolSet.SetParent(obj.displayObject.cachedTransform, _poolManager);
+			}
 		}
 
 		virtual public NTexture GetImageTexture(HtmlImage image)
