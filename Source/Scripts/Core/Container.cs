@@ -531,6 +531,9 @@ namespace FairyGUI
 			if (_disabled)
 				return null;
 
+			if (this.cachedTransform.localScale.x == 0 || this.cachedTransform.localScale.y == 0)
+				return null;
+
 			Vector2 localPoint = new Vector2();
 			Vector3 savedWorldPoint = HitTestContext.worldPoint;
 			Vector3 savedDirection = HitTestContext.direction;
