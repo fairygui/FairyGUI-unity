@@ -233,7 +233,7 @@ namespace FairyGUI
 
 					oldFocus.onRemovedFromStage.RemoveCapture(_focusRemovedDelegate);
 				}
-				
+
 				if (_focused != null)
 				{
 					if (_focused is InputTextField)
@@ -708,6 +708,20 @@ namespace FairyGUI
 			}
 		}
 
+		DisplayObject clickTest(TouchInfo touch)
+		{
+			if (!touch.clickCancelled
+					&& Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50)
+			{
+				if (touch.downTarget != null && touch.downTarget.stage != null)
+					return touch.downTarget;
+				else
+					return touch.target;
+			}
+			else
+				return null;
+		}
+
 		void HandleCustomInput()
 		{
 			Vector2 pos = _customInputPos;
@@ -754,7 +768,8 @@ namespace FairyGUI
 					touch.UpdateEvent();
 					touch.CallTouchEnd();
 
-					if (clickTest(touch))
+					DisplayObject clickTarget = clickTest(touch);
+					if (clickTarget != null)
 					{
 						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
 						{
@@ -767,18 +782,10 @@ namespace FairyGUI
 							touch.clickCount = 1;
 						touch.lastClickTime = Time.realtimeSinceStartup;
 						touch.UpdateEvent();
-						touch.downTarget.onClick.BubbleCall(touch.evt);
+						clickTarget.onClick.BubbleCall(touch.evt);
 					}
 				}
 			}
-		}
-
-		bool clickTest(TouchInfo touch)
-		{
-			return !touch.clickCancelled
-					&& Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50
-					&& touch.downTarget != null
-					&& touch.downTarget.stage != null;
 		}
 
 		void HandleMouseEvents()
@@ -828,7 +835,8 @@ namespace FairyGUI
 						touch.CallTouchEnd();
 					}
 
-					if (clickTest(touch))
+					DisplayObject clickTarget = clickTest(touch);
+					if (clickTarget != null)
 					{
 						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
 						{
@@ -843,9 +851,9 @@ namespace FairyGUI
 						touch.UpdateEvent();
 
 						if (Input.GetMouseButtonUp(1))
-							touch.downTarget.onRightClick.BubbleCall(touch.evt);
+							clickTarget.onRightClick.BubbleCall(touch.evt);
 						else
-							touch.downTarget.onClick.BubbleCall(touch.evt);
+							clickTarget.onClick.BubbleCall(touch.evt);
 					}
 				}
 			}
@@ -918,11 +926,12 @@ namespace FairyGUI
 							touch.CallTouchEnd();
 						}
 
-						if (clickTest(touch))
+						DisplayObject clickTarget = clickTest(touch);
+						if (clickTarget != null)
 						{
 							touch.clickCount = uTouch.tapCount;
 							touch.UpdateEvent();
-							touch.downTarget.onClick.BubbleCall(touch.evt);
+							clickTarget.onClick.BubbleCall(touch.evt);
 						}
 					}
 
@@ -1127,7 +1136,7 @@ namespace FairyGUI
 
 		internal Transform CreatePoolManager(string name)
 		{
-			GameObject go = new GameObject("["+ name+"]");
+			GameObject go = new GameObject("[" + name + "]");
 			go.SetActive(false);
 
 			Transform t = go.transform;
