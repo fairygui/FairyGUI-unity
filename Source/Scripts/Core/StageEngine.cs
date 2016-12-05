@@ -32,5 +32,11 @@ namespace FairyGUI
 			StageCamera.CheckMainCamera();
 		}
 #endif
+
+		void OnApplicationQuit()
+		{
+			if (Application.isEditor)
+				UIPackage.RemoveAllPackages(true);
+		}
 	}
 }

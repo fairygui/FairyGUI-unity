@@ -286,13 +286,22 @@ namespace FairyGUI
 		/// </summary>
 		public static void RemoveAllPackages()
 		{
+			RemoveAllPackages(false);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="allowDestroyAssets"></param>
+		public static void RemoveAllPackages(bool allowDestroyAssets)
+		{
 			if (_packageInstById.Count > 0)
 			{
 				UIPackage[] pkgs = _packageList.ToArray();
 
 				foreach (UIPackage pkg in pkgs)
 				{
-					pkg.Dispose(false);
+					pkg.Dispose(allowDestroyAssets);
 				}
 			}
 			_packageList.Clear();
@@ -729,7 +738,7 @@ namespace FairyGUI
 					if (allowDestroyingAssets)
 					{
 						if (_fromBundle)
-							AudioClip.DestroyImmediate(pi.audioClip);
+							AudioClip.DestroyImmediate(pi.audioClip, true);
 						else
 							Resources.UnloadAsset(pi.audioClip);
 					}

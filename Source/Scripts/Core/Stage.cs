@@ -734,6 +734,7 @@ namespace FairyGUI
 					touch.clickCancelled = false;
 					touch.downX = touch.x;
 					touch.downY = touch.y;
+					touch.downTarget = touch.target;
 					this.focus = touch.target;
 
 					if (touch.target != null)
@@ -753,7 +754,7 @@ namespace FairyGUI
 					touch.UpdateEvent();
 					touch.CallTouchEnd();
 
-					if (!touch.clickCancelled && Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50)
+					if (clickTest(touch))
 					{
 						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
 						{
@@ -766,10 +767,18 @@ namespace FairyGUI
 							touch.clickCount = 1;
 						touch.lastClickTime = Time.realtimeSinceStartup;
 						touch.UpdateEvent();
-						touch.target.onClick.BubbleCall(touch.evt);
+						touch.downTarget.onClick.BubbleCall(touch.evt);
 					}
 				}
 			}
+		}
+
+		bool clickTest(TouchInfo touch)
+		{
+			return !touch.clickCancelled
+					&& Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50
+					&& touch.downTarget != null
+					&& touch.downTarget.stage != null;
 		}
 
 		void HandleMouseEvents()
@@ -795,6 +804,7 @@ namespace FairyGUI
 					touch.clickCancelled = false;
 					touch.downX = touch.x;
 					touch.downY = touch.y;
+					touch.downTarget = touch.target;
 					touch.button = Input.GetMouseButtonDown(2) ? 2 : (Input.GetMouseButtonDown(1) ? 1 : 0);
 					this.focus = touch.target;
 
@@ -816,26 +826,26 @@ namespace FairyGUI
 					{
 						touch.UpdateEvent();
 						touch.CallTouchEnd();
+					}
 
-						if (!touch.clickCancelled && Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50)
+					if (clickTest(touch))
+					{
+						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
 						{
-							if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
-							{
-								if (touch.clickCount == 2)
-									touch.clickCount = 1;
-								else
-									touch.clickCount++;
-							}
-							else
+							if (touch.clickCount == 2)
 								touch.clickCount = 1;
-							touch.lastClickTime = Time.realtimeSinceStartup;
-							touch.UpdateEvent();
-
-							if (Input.GetMouseButtonUp(1))
-								touch.target.onRightClick.BubbleCall(touch.evt);
 							else
-								touch.target.onClick.BubbleCall(touch.evt);
+								touch.clickCount++;
 						}
+						else
+							touch.clickCount = 1;
+						touch.lastClickTime = Time.realtimeSinceStartup;
+						touch.UpdateEvent();
+
+						if (Input.GetMouseButtonUp(1))
+							touch.downTarget.onRightClick.BubbleCall(touch.evt);
+						else
+							touch.downTarget.onClick.BubbleCall(touch.evt);
 					}
 				}
 			}
@@ -885,6 +895,7 @@ namespace FairyGUI
 						touch.clickCancelled = false;
 						touch.downX = touch.x;
 						touch.downY = touch.y;
+						touch.downTarget = touch.target;
 						this.focus = touch.target;
 
 						if (touch.target != null)
@@ -905,13 +916,13 @@ namespace FairyGUI
 						{
 							touch.UpdateEvent();
 							touch.CallTouchEnd();
+						}
 
-							if (!touch.clickCancelled && Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50)
-							{
-								touch.clickCount = uTouch.tapCount;
-								touch.UpdateEvent();
-								touch.target.onClick.BubbleCall(touch.evt);
-							}
+						if (clickTest(touch))
+						{
+							touch.clickCount = uTouch.tapCount;
+							touch.UpdateEvent();
+							touch.downTarget.onClick.BubbleCall(touch.evt);
 						}
 					}
 
@@ -1143,6 +1154,7 @@ namespace FairyGUI
 		public bool clickCancelled;
 		public float lastClickTime;
 		public DisplayObject target;
+		public DisplayObject downTarget;
 		public DisplayObject lastRollOver;
 		public List<EventDispatcher> touchEndMonitors;
 
@@ -1168,6 +1180,7 @@ namespace FairyGUI
 			lastClickTime = 0;
 			began = false;
 			target = null;
+			downTarget = null;
 			lastRollOver = null;
 			clickCancelled = false;
 			touchEndMonitors.Clear();
