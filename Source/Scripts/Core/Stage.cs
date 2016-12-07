@@ -708,20 +708,6 @@ namespace FairyGUI
 			}
 		}
 
-		DisplayObject clickTest(TouchInfo touch)
-		{
-			if (!touch.clickCancelled
-					&& Mathf.Abs(touch.x - touch.downX) < 50 && Mathf.Abs(touch.y - touch.downY) < 50)
-			{
-				if (touch.downTarget != null && touch.downTarget.stage != null)
-					return touch.downTarget;
-				else
-					return touch.target;
-			}
-			else
-				return null;
-		}
-
 		void HandleCustomInput()
 		{
 			Vector2 pos = _customInputPos;
@@ -743,12 +729,8 @@ namespace FairyGUI
 			{
 				if (!touch.began)
 				{
-					touch.began = true;
 					_touchCount = 1;
-					touch.clickCancelled = false;
-					touch.downX = touch.x;
-					touch.downY = touch.y;
-					touch.downTarget = touch.target;
+					touch.begin();
 					this.focus = touch.target;
 
 					if (touch.target != null)
@@ -760,30 +742,14 @@ namespace FairyGUI
 			}
 			else if (touch.began)
 			{
-				touch.began = false;
 				_touchCount = 0;
+				touch.end();
 
-				if (touch.target != null)
+				DisplayObject clickTarget = touch.ClickTest();
+				if (clickTarget != null)
 				{
 					touch.UpdateEvent();
-					touch.CallTouchEnd();
-
-					DisplayObject clickTarget = clickTest(touch);
-					if (clickTarget != null)
-					{
-						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
-						{
-							if (touch.clickCount == 2)
-								touch.clickCount = 1;
-							else
-								touch.clickCount++;
-						}
-						else
-							touch.clickCount = 1;
-						touch.lastClickTime = Time.realtimeSinceStartup;
-						touch.UpdateEvent();
-						clickTarget.onClick.BubbleCall(touch.evt);
-					}
+					clickTarget.onClick.BubbleCall(touch.evt);
 				}
 			}
 		}
@@ -806,12 +772,8 @@ namespace FairyGUI
 			{
 				if (!touch.began)
 				{
-					touch.began = true;
 					_touchCount = 1;
-					touch.clickCancelled = false;
-					touch.downX = touch.x;
-					touch.downY = touch.y;
-					touch.downTarget = touch.target;
+					touch.begin();
 					touch.button = Input.GetMouseButtonDown(2) ? 2 : (Input.GetMouseButtonDown(1) ? 1 : 0);
 					this.focus = touch.target;
 
@@ -826,28 +788,12 @@ namespace FairyGUI
 			{
 				if (touch.began)
 				{
-					touch.began = false;
 					_touchCount = 0;
+					touch.end();
 
-					if (touch.target != null)
-					{
-						touch.UpdateEvent();
-						touch.CallTouchEnd();
-					}
-
-					DisplayObject clickTarget = clickTest(touch);
+					DisplayObject clickTarget = touch.ClickTest();
 					if (clickTarget != null)
 					{
-						if (Time.realtimeSinceStartup - touch.lastClickTime < 0.35f)
-						{
-							if (touch.clickCount == 2)
-								touch.clickCount = 1;
-							else
-								touch.clickCount++;
-						}
-						else
-							touch.clickCount = 1;
-						touch.lastClickTime = Time.realtimeSinceStartup;
 						touch.UpdateEvent();
 
 						if (Input.GetMouseButtonUp(1))
@@ -898,12 +844,8 @@ namespace FairyGUI
 				{
 					if (!touch.began)
 					{
-						touch.began = true;
 						_touchCount++;
-						touch.clickCancelled = false;
-						touch.downX = touch.x;
-						touch.downY = touch.y;
-						touch.downTarget = touch.target;
+						touch.begin();
 						this.focus = touch.target;
 
 						if (touch.target != null)
@@ -917,16 +859,10 @@ namespace FairyGUI
 				{
 					if (touch.began)
 					{
-						touch.began = false;
 						_touchCount--;
+						touch.end();
 
-						if (touch.target != null)
-						{
-							touch.UpdateEvent();
-							touch.CallTouchEnd();
-						}
-
-						DisplayObject clickTarget = clickTest(touch);
+						DisplayObject clickTarget = touch.ClickTest();
 						if (clickTarget != null)
 						{
 							touch.clickCount = uTouch.tapCount;
@@ -1163,15 +1099,18 @@ namespace FairyGUI
 		public bool clickCancelled;
 		public float lastClickTime;
 		public DisplayObject target;
-		public DisplayObject downTarget;
+		public List<DisplayObject> downTargets;
 		public DisplayObject lastRollOver;
 		public List<EventDispatcher> touchEndMonitors;
 
 		public InputEvent evt;
 
+		static List<EventBridge> sHelperChain = new List<EventBridge>();
+
 		public TouchInfo()
 		{
 			evt = new InputEvent();
+			downTargets = new List<DisplayObject>();
 			touchEndMonitors = new List<EventDispatcher>();
 			Reset();
 		}
@@ -1189,7 +1128,7 @@ namespace FairyGUI
 			lastClickTime = 0;
 			began = false;
 			target = null;
-			downTarget = null;
+			downTargets.Clear();
 			lastRollOver = null;
 			clickCancelled = false;
 			touchEndMonitors.Clear();
@@ -1207,20 +1146,82 @@ namespace FairyGUI
 			evt.button = this.button;
 		}
 
-		static List<EventBridge> sHelperChain = new List<EventBridge>();
-		public void CallTouchEnd()
+		public void begin()
 		{
-			if (touchEndMonitors.Count > 0)
+			began = true;
+			clickCancelled = false;
+			downX = x;
+			downY = y;
+
+			downTargets.Clear();
+			if (target != null)
 			{
-				int len = touchEndMonitors.Count;
-				for (int i = 0; i < len; i++)
-					touchEndMonitors[i].GetChainBridges("onTouchEnd", sHelperChain, false);
-				target.BubbleEvent("onTouchEnd", evt, sHelperChain);
-				touchEndMonitors.Clear();
-				sHelperChain.Clear();
+				downTargets.Add(target);
+				DisplayObject obj = target;
+				while (obj != null)
+				{
+					downTargets.Add(obj);
+					obj = obj.parent;
+				}
+			}
+		}
+
+		public void end()
+		{
+			began = false;
+
+			if (target != null)
+			{
+				UpdateEvent();
+
+				if (touchEndMonitors.Count > 0)
+				{
+					int len = touchEndMonitors.Count;
+					for (int i = 0; i < len; i++)
+						touchEndMonitors[i].GetChainBridges("onTouchEnd", sHelperChain, false);
+					target.BubbleEvent("onTouchEnd", evt, sHelperChain);
+					sHelperChain.Clear();
+				}
+				else
+					target.onTouchEnd.BubbleCall(evt);
+			}
+
+			touchEndMonitors.Clear();
+
+			if (Time.realtimeSinceStartup - lastClickTime < 0.35f)
+			{
+				if (clickCount == 2)
+					clickCount = 1;
+				else
+					clickCount++;
 			}
 			else
-				target.onTouchEnd.BubbleCall(evt);
+				clickCount = 1;
+			lastClickTime = Time.realtimeSinceStartup;
+		}
+
+		public DisplayObject ClickTest()
+		{
+			if (downTargets.Count == 0
+				|| clickCancelled
+				|| Mathf.Abs(x - downX) > 50 || Mathf.Abs(y - downY) > 50)
+				return null;
+
+			DisplayObject obj = downTargets[0];
+			if (obj.stage != null) //依然派发到原来的downTarget，虽然可能它已经偏离当前位置，主要是为了正确处理点击缩放的效果
+				return obj;
+
+			obj = target;
+			while (obj != null)
+			{
+				int i = downTargets.IndexOf(obj);
+				if (i != -1 && obj.stage != null)
+					return obj;
+
+				obj = obj.parent;
+			}
+
+			return obj;
 		}
 	}
 }
