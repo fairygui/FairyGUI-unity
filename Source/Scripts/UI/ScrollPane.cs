@@ -208,6 +208,15 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public void Dispose()
+		{
+			if (_tweener != null)
+				_tweener.Kill();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public GComponent owner
 		{
 			get { return _owner; }

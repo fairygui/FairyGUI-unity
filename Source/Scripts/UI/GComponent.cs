@@ -81,6 +81,9 @@ namespace FairyGUI
 				trans.Dispose();
 			}
 
+			if (scrollPane != null)
+				scrollPane.Dispose();
+
 			base.Dispose(); //Dispose native tree first, avoid DisplayObject.RemoveFromParent call
 
 			int numChildren = _children.Count;
