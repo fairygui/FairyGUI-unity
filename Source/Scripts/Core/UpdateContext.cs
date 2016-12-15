@@ -76,6 +76,7 @@ namespace FairyGUI
 			{
 				_tmpBegin.Invoke();
 				_tmpBegin = OnBegin;
+				OnBegin = null;
 			}
 
 			working = true;
