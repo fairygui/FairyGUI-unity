@@ -89,16 +89,6 @@ namespace FairyGUI
 		public void ShowWindow(Window win)
 		{
 			AddChild(win);
-
-			if (win.x > this.width)
-				win.x = this.width - win.width;
-			else if (win.x + win.width < 0)
-				win.x = 0;
-			if (win.y > this.height)
-				win.y = this.height - win.height;
-			else if (win.y + win.height < 0)
-				win.y = 0;
-
 			AdjustModalLayer();
 		}
 

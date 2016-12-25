@@ -136,8 +136,9 @@ namespace FairyGUI
 
 		internal bool _disposed;
 		internal protected bool _touchDisabled;
-		internal Rect _internal_bounds;
+		internal float[] _internal_bounds;
 		internal protected bool _skipInFairyBatching;
+		internal bool _outlineChanged;
 
 		internal static uint _gInstanceCounter;
 
@@ -150,6 +151,8 @@ namespace FairyGUI
 			_blendMode = BlendMode.Normal;
 			_focalLength = 2000;
 			_captureDelegate = Capture;
+			_outlineChanged = true;
+			_internal_bounds = new float[4];
 
 			onClick = new EventListener(this, "onClick");
 			onRightClick = new EventListener(this, "onRightClick");
@@ -247,6 +250,7 @@ namespace FairyGUI
 				Vector3 v = cachedTransform.localPosition;
 				v.x = value;
 				cachedTransform.localPosition = v;
+				_outlineChanged = true;
 			}
 		}
 
@@ -261,6 +265,7 @@ namespace FairyGUI
 				Vector3 v = cachedTransform.localPosition;
 				v.y = -value;
 				cachedTransform.localPosition = v;
+				_outlineChanged = true;
 			}
 		}
 
@@ -275,6 +280,7 @@ namespace FairyGUI
 				Vector3 v = cachedTransform.localPosition;
 				v.z = value;
 				cachedTransform.localPosition = v;
+				_outlineChanged = true;
 			}
 		}
 
@@ -319,6 +325,7 @@ namespace FairyGUI
 			v.y = -yv;
 			v.z = zv;
 			cachedTransform.localPosition = v;
+			_outlineChanged = true;
 		}
 
 		/// <summary>
@@ -405,6 +412,7 @@ namespace FairyGUI
 			_paintingFlag = 1;
 			if (graphics != null)
 				_requireUpdateMesh = true;
+			_outlineChanged = true;
 		}
 
 		/// <summary>
@@ -627,6 +635,8 @@ namespace FairyGUI
 				this.graphics.vertexMatrix = _transformMatrix;
 				_requireUpdateMesh = true;
 			}
+
+			_outlineChanged = true;
 		}
 
 		/// <summary>
@@ -645,6 +655,7 @@ namespace FairyGUI
 				Vector3 v = cachedTransform.localPosition;
 				v += oldOffset - _pivotOffset + deltaPivot;
 				cachedTransform.localPosition = v;
+				_outlineChanged = true;
 
 				if (_transformMatrix != null)
 					UpdateTransformMatrix();
@@ -671,6 +682,7 @@ namespace FairyGUI
 				Vector3 v = cachedTransform.localPosition;
 				v += oldOffset - _pivotOffset;
 				cachedTransform.localPosition = v;
+				_outlineChanged = true;
 			}
 		}
 
@@ -791,6 +803,7 @@ namespace FairyGUI
 					parent = value;
 					UpdateHierarchy();
 				}
+				_outlineChanged = true;
 			}
 		}
 
