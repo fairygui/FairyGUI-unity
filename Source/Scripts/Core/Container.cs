@@ -685,6 +685,13 @@ namespace FairyGUI
 
 			base.Update(context);
 
+			if (_cacheAsBitmap && _paintingMode != 0 && _paintingFlag == 2)
+			{
+				if (onUpdate != null)
+					onUpdate();
+				return;
+			}
+
 			if (_mask != null)
 				context.EnterClipping(this.id, null, null);
 			else if (_clipRect != null)

@@ -125,9 +125,10 @@ namespace FairyGUI
 		Vector3 _rotation; //由于万向锁，单独旋转一个轴是会影响到其他轴的，所以这里需要单独保存
 
 		protected EventCallback0 _captureDelegate; //缓存这个delegate，可以防止Capture状态下每帧104B的GC
-		protected int _paintingMode; //1-滤镜，2-blendMode，3-transformMatrix
+		protected int _paintingMode; //1-滤镜，2-blendMode，4-transformMatrix, 8-cacheAsBitmap
 		protected Margin _paintingMargin;
 		protected int _paintingFlag;
+		protected bool _cacheAsBitmap;
 
 		protected Rect _contentRect;
 		protected bool _requireUpdateMesh;
@@ -615,12 +616,12 @@ namespace FairyGUI
 			if (_transformMatrix != null)
 			{
 				if (this is Container)
-					this.EnterPaintingMode(3, null);
+					this.EnterPaintingMode(4, null);
 			}
 			else
 			{
 				if (this is Container)
-					this.LeavePaintingMode(3);
+					this.LeavePaintingMode(4);
 			}
 
 			if (this._paintingMode > 0)
@@ -946,6 +947,24 @@ namespace FairyGUI
 		public bool paintingMode
 		{
 			get { return _paintingMode > 0; }
+		}
+
+		/// <summary>
+		/// 将整个显示对象（如果是容器，则容器包含的整个显示列表）静态化，所有内容被缓冲到一张纹理上。
+		/// DC将保持为1。CPU消耗将降到最低。但对象的任何变化不会更新。
+		/// 当cacheAsBitmap已经为true时，再次调用cacheAsBitmap=true将会刷新一次。
+		/// </summary>
+		public bool cacheAsBitmap
+		{
+			get { return _cacheAsBitmap;  }
+			set
+			{
+				_cacheAsBitmap = value;
+				if (value)
+					EnterPaintingMode(8, null);
+				else
+					LeavePaintingMode(8);
+			}
 		}
 
 		/// <summary>
@@ -1318,7 +1337,8 @@ namespace FairyGUI
 				{
 					paintingTexture.lastActive = Time.time;
 
-					if (!(this is Container)) //如果是容器，这句移到Container.Update的最后执行，因为容器中可能也有需要Capture的内容，要等他们完成后再进行容器的Capture。
+					if (!(this is Container) //如果是容器，这句移到Container.Update的最后执行，因为容器中可能也有需要Capture的内容，要等他们完成后再进行容器的Capture。
+						&& (_paintingFlag != 2 || !_cacheAsBitmap))
 						UpdateContext.OnEnd += _captureDelegate;
 				}
 
