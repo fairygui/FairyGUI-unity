@@ -11,7 +11,7 @@ namespace FairyGUI
 
 		public bool done
 		{
-			get { return _keyboard != null && _keyboard.done; }
+			get { return _keyboard == null || _keyboard.done; }
 		}
 
 		public string GetInput()

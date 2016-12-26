@@ -410,6 +410,7 @@ namespace FairyGUI
 		/// <param name="alert"></param>
 		/// <param name="textPlaceholder"></param>
 		/// <param name="keyboardType"></param>
+		/// <param name="hideInput"></param>
 		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType, bool hideInput)
 		{
 			if (_keyboard != null)
