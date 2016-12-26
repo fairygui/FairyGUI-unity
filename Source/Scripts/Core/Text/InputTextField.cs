@@ -45,6 +45,11 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public bool hideInput { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="textField"></param>
 		/// <param name="text"></param>
 		public delegate void CopyHandler(InputTextField textField, string text);
@@ -733,7 +738,7 @@ namespace FairyGUI
 			if (Stage.keyboardInput)
 			{
 				Stage.inst.OpenKeyboard(textField.text, false, _displayAsPassword ? false : !textField.singleLine,
-					_displayAsPassword, false, null, keyboardType);
+					_displayAsPassword, false, null, keyboardType, hideInput);
 			}
 			else
 			{

@@ -410,10 +410,10 @@ namespace FairyGUI
 		/// <param name="alert"></param>
 		/// <param name="textPlaceholder"></param>
 		/// <param name="keyboardType"></param>
-		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType)
+		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType, bool hideInput)
 		{
 			if (_keyboard != null)
-				_keyboard.Open(text, autocorrection, multiline, secure, alert, textPlaceholder, keyboardType);
+				_keyboard.Open(text, autocorrection, multiline, secure, alert, textPlaceholder, keyboardType, hideInput);
 		}
 
 		/// <summary>

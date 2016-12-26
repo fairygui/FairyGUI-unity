@@ -64,6 +64,15 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public bool hideInput
+		{
+			get { return inputTextField.hideInput; }
+			set { inputTextField.hideInput = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int maxLength
 		{
 			get { return inputTextField.maxLength; }

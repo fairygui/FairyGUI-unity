@@ -29,11 +29,12 @@ namespace FairyGUI
 				return null;
 		}
 
-		public void Open(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType)
+		public void Open(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType, bool hideInput)
 		{
 			if (_keyboard != null)
 				return;
 
+			UnityEngine.TouchScreenKeyboard.hideInput = hideInput;
 			_keyboard = UnityEngine.TouchScreenKeyboard.Open(text, (TouchScreenKeyboardType)keyboardType, autocorrection, multiline, secure, alert, textPlaceholder);
 		}
 
