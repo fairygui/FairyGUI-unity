@@ -1278,6 +1278,7 @@ namespace FairyGUI
 			if (_realNumItems > 0)
 			{
 				int len = Mathf.CeilToInt((float)_realNumItems / _curLineItemCount) * _curLineItemCount;
+				int len2 = Math.Min(_curLineItemCount, _realNumItems);
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 				{
 					for (int i = 0; i < len; i += _curLineItemCount)
@@ -1285,7 +1286,7 @@ namespace FairyGUI
 					if (ch > 0)
 						ch -= _lineGap;
 
-					for (int i = 0; i < _curLineItemCount; i++)
+					for (int i = 0; i < len2; i++)
 						cw += _virtualItems[i].size.x + _columnGap;
 					if (cw > 0)
 						cw -= _columnGap;
@@ -1298,7 +1299,7 @@ namespace FairyGUI
 						cw -= _columnGap;
 					ch = this.scrollPane.contentHeight;
 
-					for (int i = 0; i < _curLineItemCount; i++)
+					for (int i = 0; i < len2; i++)
 						ch += _virtualItems[i].size.y + _lineGap;
 					if (ch > 0)
 						ch -= _lineGap;
