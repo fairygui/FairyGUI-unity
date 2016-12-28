@@ -142,6 +142,8 @@ namespace FairyGUI
 				_DoHideAnimation.PCall();
 				_DoHideAnimation.EndPCall();
 			}
+			else
+				base.DoHideAnimation();
 		}
 
 		protected override void DoShowAnimation()
@@ -153,6 +155,8 @@ namespace FairyGUI
 				_DoShowAnimation.PCall();
 				_DoShowAnimation.EndPCall();
 			}
+			else
+				base.DoShowAnimation();
 		}
 
 		protected override void OnShown()
