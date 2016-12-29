@@ -2,6 +2,9 @@ EventContext  = FairyGUI.EventContext
 EventListener = FairyGUI.EventListener
 EventDispatcher = FairyGUI.EventDispatcher
 InputEvent = FairyGUI.InputEvent
+NTexture = FairyGUI.NTexture
+Container = FairyGUI.Container
+Image = FairyGUI.Image
 Stage = FairyGUI.Stage
 Controller = FairyGUI.Controller
 GObject = FairyGUI.GObject
@@ -33,6 +36,7 @@ Relations = FairyGUI.Relations
 RelationType = FairyGUI.RelationType
 UIPanel = FairyGUI.UIPanel
 UIPainter = FairyGUI.UIPainter
+TypingEffect = FairyGUI.TypingEffect
 
 fgui = {}
 
@@ -97,7 +101,7 @@ end
 
 --[[
 用于继承FairyGUI原来的组件类，例如
-MyComponent = fgui_extension(GComponent)
+MyComponent = fgui.extension_class(GComponent)
 function MyComponent:ctor() --当组件构建完成时此方法被调用
 	print(self:GetChild("n1"))
 end
@@ -111,13 +115,13 @@ function fgui.extension_class(base)
 	o.Extend = function(ins)
 		local t = {}
 	    setmetatable(t, o)
-	    tolua.setpeer(ins, t)
+	    tolua.setpeer(ins,t)
 	    ins.EventDelegates = {}
 	    if t.ctor then
 	    	t.ctor(ins)
 	   	end
 	    
-	    return ins
+	    return t
 	end
 
 	return o
