@@ -78,7 +78,7 @@ namespace FairyGUI
 			else
 			{
 				_host.onTouchBegin.Remove(__touchBegin);
-				_host.onTouchEnd.Remove(__touchBegin);
+				_host.onTouchEnd.Remove(__touchEnd);
 				Timers.inst.Remove(__timer);
 			}
 		}
