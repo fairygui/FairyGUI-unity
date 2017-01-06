@@ -1100,7 +1100,7 @@ namespace FairyGUI
 
 					if (_font.GetGlyph(ch, glyph))
 					{
-						if (lineClipped || clipped && charX != 0 && charX + glyph.width > _contentRect.width - GUTTER_X) //超出区域，剪裁
+						if (lineClipped || clipped && charX != 0 && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
 						{
 							charX += letterSpacing + glyph.width;
 							continue;
