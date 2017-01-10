@@ -272,7 +272,7 @@ namespace FairyGUI
 					throw new Exception("FairyGUI: '" + packageIdOrName + "' is not a valid package id or name.");
 			}
 			pkg.Dispose(allowDestroyingAssets);
-			_packageInstById.Remove(packageIdOrName);
+			_packageInstById.Remove(pkg.id);
 			if (pkg._customId != null)
 				_packageInstById.Remove(pkg._customId);
 			if (pkg.assetPath != null)
