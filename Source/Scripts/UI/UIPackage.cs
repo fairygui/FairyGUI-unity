@@ -849,6 +849,7 @@ namespace FairyGUI
 			GObject obj;
 			DisplayListItem di;
 			float t = Time.realtimeSinceStartup;
+			bool alreadyNextFrame = false;
 
 			for (int i = 0; i < cnt; i++)
 			{
@@ -893,8 +894,12 @@ namespace FairyGUI
 				{
 					yield return null;
 					t = Time.realtimeSinceStartup;
+					alreadyNextFrame = true;
 				}
 			}
+
+			if (!alreadyNextFrame) //强制至至少下一帧才调用callback，避免调用者逻辑出错
+				yield return null;
 
 			callback(objectPool[0]);
 		}
