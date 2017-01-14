@@ -816,7 +816,6 @@ namespace FairyGUI
 
 			_textWidth = Mathf.CeilToInt(_textWidth);
 			_textHeight = Mathf.CeilToInt(_textHeight);
-
 			if (_autoSize == AutoSizeType.Shrink && _textWidth > rectWidth)
 			{
 				_fontSizeScale = rectWidth / _textWidth;
@@ -1106,7 +1105,7 @@ namespace FairyGUI
 							continue;
 						}
 
-						yIndent = (int)((line.height + line.textHeight) / 2) - glyph.height;
+						yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
 						v0.x = charX + glyph.vert.xMin;
 						v0.y = -line.y - yIndent + glyph.vert.yMin;
 						v1.x = charX + glyph.vert.xMax;

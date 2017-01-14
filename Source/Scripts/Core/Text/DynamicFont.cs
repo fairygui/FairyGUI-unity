@@ -10,9 +10,14 @@ namespace FairyGUI
 	public class DynamicFont : BaseFont
 	{
 		protected Font _font;
-		protected Dictionary<int, int> _cachedBaseline;
+		protected class RenderInfo
+		{
+			public int yIndent;//越大，字显示越偏下
+			public int height;
+		}
+		protected Dictionary<int, RenderInfo> _renderInfo;
 
-		float _lastBaseLine;
+		RenderInfo _lastRenderInfo;
 		int _lastFontSize;
 		int _size;
 		FontStyle _style;
@@ -41,7 +46,7 @@ namespace FairyGUI
 			if (name.ToLower().IndexOf("bold") == -1)
 				this.customBold = Application.isMobilePlatform;
 
-			_cachedBaseline = new Dictionary<int, int>();
+			_renderInfo = new Dictionary<int, RenderInfo>();
 
 			LoadFont();
 		}
@@ -105,12 +110,17 @@ namespace FairyGUI
 
 		override public void SetFormat(TextFormat format, float fontSizeScale)
 		{
-			if (fontSizeScale == 1)
-				_size = format.size;
-			else
-				_size = Mathf.FloorToInt((float)format.size * fontSizeScale);
 			if (keepCrisp)
-				_size = Mathf.FloorToInt(_size * UIContentScaler.scaleFactor);
+			{
+				_size = Mathf.FloorToInt((float)format.size * fontSizeScale * UIContentScaler.scaleFactor);
+			}
+			else
+			{
+				if (fontSizeScale == 1)
+					_size = format.size;
+				else
+					_size = Mathf.FloorToInt((float)format.size * fontSizeScale);
+			}
 
 			if (format.bold && !customBold)
 			{
@@ -142,12 +152,20 @@ namespace FairyGUI
 		{
 			if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
 			{
+				RenderInfo ri;
+				if (_lastFontSize == _size)
+					ri = _lastRenderInfo;
+				else
+				{
+					_lastFontSize = _size;
+					ri = _lastRenderInfo = GetRenderInfo(_size);
+				}
 #if UNITY_5
 				width = sTempChar.advance;
 #else
 				width = Mathf.CeilToInt(sTempChar.width);
 #endif
-				height = sTempChar.size;
+				height = ri.height;
 				if (customBold)
 					width++;
 
@@ -171,22 +189,21 @@ namespace FairyGUI
 		{
 			if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
 			{
-				float baseline;
-				if (_lastFontSize == _size)
-					baseline = _lastBaseLine;
+				RenderInfo ri;
+				if (_lastFontSize == _size) //避免一次查表
+					ri = _lastRenderInfo;
 				else
 				{
 					_lastFontSize = _size;
-					baseline = GetBaseLine(_size);
-					_lastBaseLine = baseline;
+					ri = _lastRenderInfo = GetRenderInfo(_size);
 				}
 #if UNITY_5
 				glyph.vert.xMin = sTempChar.minX;
-				glyph.vert.yMin = sTempChar.minY - baseline;
+				glyph.vert.yMin = sTempChar.minY - ri.yIndent;
 				glyph.vert.xMax = sTempChar.maxX;
 				if (sTempChar.glyphWidth == 0) //zero width, space etc
 					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
-				glyph.vert.yMax = sTempChar.maxY - baseline;
+				glyph.vert.yMax = sTempChar.maxY - ri.yIndent;
 
 				glyph.uvTopLeft = sTempChar.uvTopLeft;
 				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
@@ -194,16 +211,16 @@ namespace FairyGUI
 				glyph.uvBottomRight = sTempChar.uvBottomRight;
 
 				glyph.width = sTempChar.advance;
-				glyph.height = sTempChar.size;
+				glyph.height = ri.height;
 				if (customBold)
 					glyph.width++;
 #else
 				glyph.vert.xMin = sTempChar.vert.xMin;
-				glyph.vert.yMin = sTempChar.vert.yMax - baseline;
+				glyph.vert.yMin = sTempChar.vert.yMax - ri.yIndent;
 				glyph.vert.xMax = sTempChar.vert.xMax;
 				if (sTempChar.vert.width == 0) //zero width, space etc
 					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
-				glyph.vert.yMax = sTempChar.vert.yMin - baseline;
+				glyph.vert.yMax = sTempChar.vert.yMin - ri.yIndent;
 
 				if (!sTempChar.flipped)
 				{
@@ -262,57 +279,45 @@ namespace FairyGUI
 		}
 #endif
 
-		int GetBaseLine(int size)
+		const string TEST_STRING = "fj|_我案愛爱";
+		RenderInfo GetRenderInfo(int size)
 		{
-			int result;
-			if (!_cachedBaseline.TryGetValue(size, out result))
+			RenderInfo result;
+			if (!_renderInfo.TryGetValue(size, out result))
 			{
+				result = new RenderInfo();
+
 				CharacterInfo charInfo;
-				_font.RequestCharactersInTexture("f|体_j", size, FontStyle.Normal);
+				_font.RequestCharactersInTexture(TEST_STRING, size, FontStyle.Normal);
 
-#if UNITY_5
 				float y0 = float.MinValue;
-				if (_font.GetCharacterInfo('f', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.maxY);
-				if (_font.GetCharacterInfo('|', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.maxY);
-				if (_font.GetCharacterInfo('体', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.maxY);
-
-				//find the most bottom position
 				float y1 = float.MaxValue;
-				if (_font.GetCharacterInfo('_', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.minY);
-				if (_font.GetCharacterInfo('|', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.minY);
-				if (_font.GetCharacterInfo('j', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.minY);
-#else
-				float y0 = float.MinValue;
-				if (_font.GetCharacterInfo('f', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.vert.yMin);
-				if (_font.GetCharacterInfo('|', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.vert.yMin);
-				if (_font.GetCharacterInfo('体', out charInfo, size, FontStyle.Normal))
-					y0 = Mathf.Max(y0, charInfo.vert.yMin);
+				int glyphHeight = size;
+				int cnt = TEST_STRING.Length;
 
-				//find the most bottom position
-				float y1 = float.MaxValue;
-				if (_font.GetCharacterInfo('_', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.vert.yMax);
-				if (_font.GetCharacterInfo('|', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.vert.yMax);
-				if (_font.GetCharacterInfo('j', out charInfo, size, FontStyle.Normal))
-					y1 = Mathf.Min(y1, charInfo.vert.yMax);
-#endif
-				float dh = y0 - y1 - size;
-				if (dh > 3) //5.4版本后部分字体的渲染位置开始偏低
+				for (int i = 0; i < cnt; i++)
 				{
-					y0 -= Mathf.Floor(dh / 2);
-					dh = y0 - y1 - size;
+					char ch = TEST_STRING[i];
+					if (_font.GetCharacterInfo(ch, out charInfo, size, FontStyle.Normal))
+					{
+#if UNITY_5
+						y0 = Mathf.Max(y0, charInfo.maxY);
+						y1 = Mathf.Min(y1, charInfo.minY);
+						glyphHeight = Math.Max(glyphHeight, charInfo.glyphHeight);
+#else
+						y0 = Mathf.Max(y0, charInfo.vert.yMin);
+						y1 = Mathf.Min(y1, charInfo.vert.yMax);
+#endif
+					}
 				}
-				result = (int)(y0 + (int)(dh * 0.5f));
-				_cachedBaseline.Add(size, result);
+
+				int displayHeight = (int)(y0 - y1);
+				result.height = Math.Max(glyphHeight, displayHeight);
+				result.yIndent = (int)y0;
+				if (displayHeight < glyphHeight)
+					result.yIndent++;
+
+				_renderInfo.Add(size, result);
 			}
 
 			return result;
