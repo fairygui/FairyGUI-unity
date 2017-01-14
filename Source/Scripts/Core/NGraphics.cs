@@ -129,7 +129,7 @@ namespace FairyGUI
 			13,9,10,10,14,13,
 			14,10,11,
 			11,15,14
-        };
+		};
 
 		/// <summary>
 		/// 
@@ -160,7 +160,7 @@ namespace FairyGUI
 			meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 #else
-            meshRenderer.castShadows = false;
+		meshRenderer.castShadows = false;
 #endif
 			meshRenderer.receiveShadows = false;
 			mesh = new Mesh();
@@ -319,13 +319,6 @@ namespace FairyGUI
 			{
 				_manager.Release();
 				_manager = null;
-			}
-			if (_customMatarial && _material != null)
-			{
-				if (Application.isPlaying)
-					Material.Destroy(_material);
-				else
-					Material.DestroyImmediate(_material);
 			}
 			_material = null;
 			meshRenderer = null;
