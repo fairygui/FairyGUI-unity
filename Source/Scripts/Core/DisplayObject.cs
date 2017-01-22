@@ -956,7 +956,7 @@ namespace FairyGUI
 		/// </summary>
 		public bool cacheAsBitmap
 		{
-			get { return _cacheAsBitmap;  }
+			get { return _cacheAsBitmap; }
 			set
 			{
 				_cacheAsBitmap = value;
@@ -1404,7 +1404,7 @@ namespace FairyGUI
 
 				this.layer = layerValue;
 			}
-			else if (!_disposed)
+			else if (!_disposed && this.gameObject != null)
 			{
 				if (Application.isPlaying)
 				{
