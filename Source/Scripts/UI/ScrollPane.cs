@@ -11,21 +11,33 @@ namespace FairyGUI
 	{
 		/// <summary>
 		/// Dispatched when scrolling.
+		/// 在滚动时派发该事件。
 		/// </summary>
 		public EventListener onScroll { get; private set; }
+
+		/// <summary>
+		/// 在滚动结束时派发该事件。
+		/// </summary>
 		public EventListener onScrollEnd { get; private set; }
+
+		/// <summary>
+		/// 向下拉过上边缘后释放则派发该事件。
+		/// </summary>
 		public EventListener onPullDownRelease { get; private set; }
+
+		/// <summary>
+		/// 向上拉过下边缘后释放则派发该事件。
+		/// </summary>
 		public EventListener onPullUpRelease { get; private set; }
 
+		/// <summary>
+		/// 当前被拖拽的滚动面板。同一时间只能有一个在进行此操作。
+		/// </summary>
 		public static ScrollPane draggingPane { get; private set; }
 
-		float _viewWidth;
-		float _viewHeight;
-		float _contentWidth;
-		float _contentHeight;
 		ScrollType _scrollType;
-		float _scrollSpeed;
-		float _mouseWheelSpeed;
+		float _scrollStep;
+		float _mouseWheelStep;
 		Margin _scrollBarMargin;
 		bool _bouncebackEffect;
 		bool _touchEffect;
@@ -43,32 +55,36 @@ namespace FairyGUI
 		Vector2 _pageSize;
 		bool _inertiaDisabled;
 		bool _maskDisabled;
+		float _decelerationRate;
 
-		float _yPerc;
-		float _xPerc;
 		float _xPos;
 		float _yPos;
-		int _xOverlap;
-		int _yOverlap;
 
-		float _time1, _time2;
-		float _y1, _y2;
-		float _x1, _x2;
-		float _xOffset, _yOffset;
+		Vector2 _viewSize;
+		Vector2 _contentSize;
+		Vector2 _overlapSize;
+		Vector2 _containerPos;
+		Vector2 _lastContainerPos;
+		Vector2 _beginTouchPos;
+		Vector2 _velocity;
+		float _lastMoveTime;
 		bool _isMouseMoved;
-		Vector2 _holdAreaPoint;
 		bool _isHoldAreaDone;
 		int _aniFlag;
 		bool _scrollBarVisible;
 		int _touchId;
+		internal int _loop;
 
-		ThrowTween _throwTween;
-		Tweener _tweener;
 		int _tweening;
+		Vector2 _tweenStart;
+		Vector2 _tweenChange;
+		Vector2 _tweenTime;
+		Vector2 _tweenDuration;
 
 		EventCallback0 _refreshDelegate;
 		EventCallback1 _touchEndDelegate;
 		EventCallback1 _touchMoveDelegate;
+		TimerCallback _tweenUpdateDelegate;
 
 		GComponent _owner;
 		Container _maskContainer;
@@ -77,6 +93,11 @@ namespace FairyGUI
 		GScrollBar _vtScrollBar;
 
 		static int _gestureFlag;
+
+		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
+		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
+		const float MIN_VELOCITY = 600; //触发惯性滚动的最小速度
+		const float PULL_RATIO = 0.3f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
 
 		public ScrollPane(GComponent owner,
 									ScrollType scrollType,
@@ -92,25 +113,25 @@ namespace FairyGUI
 			onPullUpRelease = new EventListener(this, "onPullUpRelease");
 
 			_refreshDelegate = Refresh;
+			_tweenUpdateDelegate = TweenUpdate;
 			_touchEndDelegate = __touchEnd;
 			_touchMoveDelegate = __touchMove;
 
-			_throwTween = new ThrowTween();
 			_owner = owner;
 
 			_maskContainer = new Container();
 			_owner.rootContainer.AddChild(_maskContainer);
 
 			_container = _owner.container;
-			_container.x = 0;
-			_container.y = 0;
+			_container.SetXY(0, 0);
 			_maskContainer.AddChild(_container);
 
 			_scrollBarMargin = scrollBarMargin;
 			_scrollType = scrollType;
-			_scrollSpeed = UIConfig.defaultScrollSpeed;
-			_mouseWheelSpeed = _scrollSpeed * 2;
+			_scrollStep = UIConfig.defaultScrollStep;
+			_mouseWheelStep = _scrollStep * 2;
 			_softnessOnTopOrLeftSide = UIConfig.allowSoftnessOnTopOrLeftSide;
+			_decelerationRate = UIConfig.defaultScrollDecelerationRate;
 
 			_displayOnLeft = (flags & 1) != 0;
 			_snapToItem = (flags & 2) != 0;
@@ -133,7 +154,6 @@ namespace FairyGUI
 
 			_scrollBarVisible = true;
 			_mouseWheelEnabled = true;
-			_holdAreaPoint = new Vector2();
 			_pageSize = Vector2.one;
 
 			if (scrollBarDisplay == ScrollBarDisplayType.Default)
@@ -210,8 +230,8 @@ namespace FairyGUI
 		/// </summary>
 		public void Dispose()
 		{
-			if (_tweener != null)
-				_tweener.Kill();
+			if (_tweening != 0)
+				Timers.inst.Remove(_tweenUpdateDelegate);
 		}
 
 		/// <summary>
@@ -223,7 +243,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 滚动到达边缘时是否允许回弹效果。
 		/// </summary>
 		public bool bouncebackEffect
 		{
@@ -232,7 +252,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 是否允许拖拽内容区域进行滚动。
 		/// </summary>
 		public bool touchEffect
 		{
@@ -241,7 +261,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 是否允许惯性滚动。
 		/// </summary>
 		public bool inertiaDisabled
 		{
@@ -250,7 +270,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 是否允许在左/上边缘显示虚化效果。
 		/// </summary>
 		public bool softnessOnTopOrLeftSide
 		{
@@ -258,23 +278,31 @@ namespace FairyGUI
 			set { _softnessOnTopOrLeftSide = value; }
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
+		[Obsolete("ScrollPane.scrollSpeed is deprecated. Use scrollStep instead.")]
 		public float scrollSpeed
 		{
-			get { return _scrollSpeed; }
+			get { return this.scrollStep; }
+			set { this.scrollStep = value; }
+		}
+
+		/// <summary>
+		/// 当调用ScrollPane.scrollUp/Down/Left/Right时，或者点击滚动条的上下箭头时，滑动的距离。
+		/// 鼠标滚轮触发一次滚动的距离设定为defaultScrollStep*2
+		/// </summary>
+		public float scrollStep
+		{
+			get { return _scrollStep; }
 			set
 			{
-				_scrollSpeed = value;
-				if (_scrollSpeed == 0)
-					_scrollSpeed = UIConfig.defaultScrollSpeed;
-				_mouseWheelSpeed = _scrollSpeed * 2;
+				_scrollStep = value;
+				if (_scrollStep == 0)
+					_scrollStep = UIConfig.defaultScrollStep;
+				_mouseWheelStep = _scrollStep * 2;
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 滚动位置是否保持贴近在某个元件的边缘。
 		/// </summary>
 		public bool snapToItem
 		{
@@ -283,7 +311,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 是否允许使用鼠标滚轮进行滚动。
 		/// </summary>
 		public bool mouseWheelEnabled
 		{
@@ -292,61 +320,57 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 当处于惯性滚动时减速的速率。默认值是UIConfig.defaultScrollDecelerationRate。
+		/// 越接近1，减速越慢，意味着滑动的时间和距离更长。
+		/// </summary>
+		public float decelerationRate
+		{
+			get { return _decelerationRate; }
+			set { _decelerationRate = value; }
+		}
+
+		/// <summary>
+		/// 当前X轴滚动位置百分比，0~1（包含）。
 		/// </summary>
 		public float percX
 		{
-			get { return _xPerc; }
+			get { return _overlapSize.x == 0 ? 0 : _xPos / _overlapSize.x; }
 			set { SetPercX(value, false); }
 		}
 
 		/// <summary>
-		/// 
+		/// 设置当前X轴滚动位置百分比，0~1（包含）。
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="ani"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetPercX(float value, bool ani)
 		{
 			_owner.EnsureBoundsCorrect();
-
-			value = Mathf.Clamp01(value);
-			if (value != _xPerc)
-			{
-				_xPerc = value;
-				_xPos = _xPerc * _xOverlap;
-				PosChanged(ani);
-			}
+			SetPosX(_overlapSize.x * Mathf.Clamp01(value), ani);
 		}
 
 		/// <summary>
-		/// 
+		/// 当前Y轴滚动位置百分比，0~1（包含）。
 		/// </summary>
 		public float percY
 		{
-			get { return _yPerc; }
+			get { return _overlapSize.y == 0 ? 0 : _yPos / _overlapSize.y; }
 			set { SetPercY(value, false); }
 		}
 
 		/// <summary>
-		/// 
+		/// 设置当前Y轴滚动位置百分比，0~1（包含）。
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="ani"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetPercY(float value, bool ani)
 		{
 			_owner.EnsureBoundsCorrect();
-
-			value = Mathf.Clamp01(value);
-			if (value != _yPerc)
-			{
-				_yPerc = value;
-				_yPos = _yPerc * _yOverlap;
-				PosChanged(ani);
-			}
+			SetPosY(_overlapSize.y * Mathf.Clamp01(value), ani);
 		}
 
 		/// <summary>
-		/// 
+		/// 当前X轴滚动位置，值范围是viewWidth与contentWidth之差。
 		/// </summary>
 		public float posX
 		{
@@ -355,25 +379,24 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 设置当前X轴滚动位置。
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="ani"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetPosX(float value, bool ani)
 		{
 			_owner.EnsureBoundsCorrect();
 
-			value = Mathf.Clamp(value, 0, _xOverlap);
+			value = Mathf.Clamp(value, 0, _overlapSize.x);
 			if (value != _xPos)
 			{
 				_xPos = value;
-				_xPerc = _xOverlap == 0 ? 0 : _xPos / _xOverlap;
 				PosChanged(ani);
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 当前Y轴滚动位置，值范围是viewHeight与contentHeight之差。
 		/// </summary>
 		public float posY
 		{
@@ -382,74 +405,83 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 设置当前Y轴滚动位置。
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="ani"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetPosY(float value, bool ani)
 		{
 			_owner.EnsureBoundsCorrect();
 
-			value = Mathf.Clamp(value, 0, _yOverlap);
+			value = Mathf.Clamp(value, 0, _overlapSize.y);
 			if (value != _yPos)
 			{
 				_yPos = value;
-				_yPerc = _yOverlap == 0 ? 0 : _yPos / _yOverlap;
 				PosChanged(ani);
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 返回当前滚动位置是否在最下边。
 		/// </summary>
 		public bool isBottomMost
 		{
-			get { return _yPerc == 1 || _yOverlap == 0; }
+			get { return _yPos == _overlapSize.y || _overlapSize.y == 0; }
 		}
 
 		/// <summary>
-		/// 
+		/// 返回当前滚动位置是否在最右边。
 		/// </summary>
 		public bool isRightMost
 		{
-			get { return _xPerc == 1 || _xOverlap == 0; }
+			get { return _xPos == _overlapSize.x || _overlapSize.x == 0; }
 		}
 
 		/// <summary>
-		/// 
+		/// 如果处于分页模式，返回当前在X轴的页码。
 		/// </summary>
 		public int currentPageX
 		{
 			get { return _pageMode ? Mathf.FloorToInt(_xPos / _pageSize.x) : 0; }
 			set
 			{
-				if (_xOverlap > 0)
+				if (_overlapSize.x > 0)
 					this.SetPosX(value * _pageSize.x, false);
 			}
 		}
 
+		/// <summary>
+		/// 如果处于分页模式，可设置X轴的页码。
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetCurrentPageX(int value, bool ani)
 		{
-			if (_xOverlap > 0)
+			if (_overlapSize.x > 0)
 				this.SetPosX(value * _pageSize.x, ani);
 		}
 
 		/// <summary>
-		/// 
+		/// 如果处于分页模式，返回当前在Y轴的页码。
 		/// </summary>
 		public int currentPageY
 		{
 			get { return _pageMode ? Mathf.FloorToInt(_yPos / _pageSize.y) : 0; }
 			set
 			{
-				if (_yOverlap > 0)
+				if (_overlapSize.y > 0)
 					this.SetPosY(value * _pageSize.y, false);
 			}
 		}
 
+		/// <summary>
+		/// 如果处于分页模式，可设置Y轴的页码。
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetCurrentPageY(int value, bool ani)
 		{
-			if (_yOverlap > 0)
+			if (_overlapSize.y > 0)
 				this.SetPosY(value * _pageSize.y, ani);
 		}
 
@@ -460,7 +492,7 @@ namespace FairyGUI
 		{
 			get
 			{
-				return Mathf.Clamp(-_container.x, 0, _xOverlap);
+				return Mathf.Clamp(-_container.x, 0, _overlapSize.x);
 			}
 		}
 
@@ -471,38 +503,38 @@ namespace FairyGUI
 		{
 			get
 			{
-				return Mathf.Clamp(-_container.y, 0, _yOverlap);
+				return Mathf.Clamp(-_container.y, 0, _overlapSize.y);
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 显示内容宽度。
 		/// </summary>
 		public float contentWidth
 		{
 			get
 			{
-				return _contentWidth;
+				return _contentSize.x;
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 显示内容高度。
 		/// </summary>
 		public float contentHeight
 		{
 			get
 			{
-				return _contentHeight;
+				return _contentSize.y;
 			}
 		}
 
 		/// <summary>
-		/// 
+		/// 显示区域宽度。
 		/// </summary>
 		public float viewWidth
 		{
-			get { return _viewWidth; }
+			get { return _viewSize.x; }
 			set
 			{
 				value = value + _owner.margin.left + _owner.margin.right;
@@ -513,11 +545,11 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 显示区域高度。
 		/// </summary>
 		public float viewHeight
 		{
-			get { return _viewHeight; }
+			get { return _viewSize.y; }
 			set
 			{
 				value = value + _owner.margin.top + _owner.margin.bottom;
@@ -572,14 +604,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="speed"></param>
+		/// <param name="ratio"></param>
 		/// <param name="ani"></param>
-		public void ScrollUp(float speed, bool ani)
+		public void ScrollUp(float ratio, bool ani)
 		{
 			if (_pageMode)
-				SetPosY(_yPos - _pageSize.y * speed, ani);
+				SetPosY(_yPos - _pageSize.y * ratio, ani);
 			else
-				SetPosY(_yPos - _scrollSpeed * speed, ani);
+				SetPosY(_yPos - _scrollStep * ratio, ani);
 		}
 
 		/// <summary>
@@ -593,14 +625,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="speed"></param>
+		/// <param name="ratio"></param>
 		/// <param name="ani"></param>
-		public void ScrollDown(float speed, bool ani)
+		public void ScrollDown(float ratio, bool ani)
 		{
 			if (_pageMode)
-				SetPosY(_yPos + _pageSize.y * speed, ani);
+				SetPosY(_yPos + _pageSize.y * ratio, ani);
 			else
-				SetPosY(_yPos + _scrollSpeed * speed, ani);
+				SetPosY(_yPos + _scrollStep * ratio, ani);
 		}
 
 		/// <summary>
@@ -616,12 +648,12 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="speed"></param>
 		/// <param name="ani"></param>
-		public void ScrollLeft(float speed, bool ani)
+		public void ScrollLeft(float ratio, bool ani)
 		{
 			if (_pageMode)
-				SetPosX(_xPos - _pageSize.x * speed, ani);
+				SetPosX(_xPos - _pageSize.x * ratio, ani);
 			else
-				SetPosX(_xPos - _scrollSpeed * speed, ani);
+				SetPosX(_xPos - _scrollStep * ratio, ani);
 		}
 
 		/// <summary>
@@ -635,14 +667,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="speed"></param>
+		/// <param name="ratio"></param>
 		/// <param name="ani"></param>
-		public void ScrollRight(float speed, bool ani)
+		public void ScrollRight(float ratio, bool ani)
 		{
 			if (_pageMode)
-				SetPosX(_xPos + _pageSize.x * speed, ani);
+				SetPosX(_xPos + _pageSize.x * ratio, ani);
 			else
-				SetPosX(_xPos + _scrollSpeed * speed, ani);
+				SetPosX(_xPos + _scrollStep * ratio, ani);
 		}
 
 		/// <summary>
@@ -694,10 +726,10 @@ namespace FairyGUI
 			if (_needRefresh)
 				Refresh();
 
-			if (_yOverlap > 0)
+			if (_overlapSize.y > 0)
 			{
-				float bottom = _yPos + _viewHeight;
-				if (setFirst || rect.y <= _yPos || rect.height >= _viewHeight)
+				float bottom = _yPos + _viewSize.y;
+				if (setFirst || rect.y <= _yPos || rect.height >= _viewSize.y)
 				{
 					if (_pageMode)
 						this.SetPosY(Mathf.Floor(rect.y / _pageSize.y) * _pageSize.y, ani);
@@ -708,16 +740,16 @@ namespace FairyGUI
 				{
 					if (_pageMode)
 						this.SetPosY(Mathf.Floor(rect.y / _pageSize.y) * _pageSize.y, ani);
-					else if (rect.height <= _viewHeight / 2)
-						SetPosY(rect.y + rect.height * 2 - _viewHeight, ani);
+					else if (rect.height <= _viewSize.y / 2)
+						SetPosY(rect.y + rect.height * 2 - _viewSize.y, ani);
 					else
-						SetPosY(rect.y + rect.height - _viewHeight, ani);
+						SetPosY(rect.y + rect.height - _viewSize.y, ani);
 				}
 			}
-			if (_xOverlap > 0)
+			if (_overlapSize.x > 0)
 			{
-				float right = _xPos + _viewWidth;
-				if (setFirst || rect.x <= _xPos || rect.width >= _viewWidth)
+				float right = _xPos + _viewSize.x;
+				if (setFirst || rect.x <= _xPos || rect.width >= _viewSize.x)
 				{
 					if (_pageMode)
 						this.SetPosX(Mathf.Floor(rect.x / _pageSize.x) * _pageSize.x, ani);
@@ -727,10 +759,10 @@ namespace FairyGUI
 				{
 					if (_pageMode)
 						this.SetPosX(Mathf.Floor(rect.x / _pageSize.x) * _pageSize.x, ani);
-					else if (rect.width <= _viewWidth / 2)
-						SetPosX(rect.x + rect.width * 2 - _viewWidth, ani);
+					else if (rect.width <= _viewSize.x / 2)
+						SetPosX(rect.x + rect.width * 2 - _viewSize.x, ani);
 					else
-						SetPosX(rect.x + rect.width - _viewWidth, ani);
+						SetPosX(rect.x + rect.width - _viewSize.x, ani);
 				}
 			}
 
@@ -745,16 +777,16 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool IsChildInView(GObject obj)
 		{
-			if (_yOverlap > 0)
+			if (_overlapSize.y > 0)
 			{
 				float dist = obj.y + _container.y;
-				if (dist < -obj.height - 20 || dist > _viewHeight + 20)
+				if (dist < -obj.height - 20 || dist > _viewSize.y + 20)
 					return false;
 			}
-			if (_xOverlap > 0)
+			if (_overlapSize.x > 0)
 			{
 				float dist = obj.x + _container.x;
-				if (dist < -obj.width - 20 || dist > _viewWidth + 20)
+				if (dist < -obj.width - 20 || dist > _viewSize.x + 20)
 					return false;
 			}
 
@@ -762,7 +794,7 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 当滚动面板处于拖拽滚动状态或即将进入进入拖拽状态时，可以调用此方法停止或禁止本次拖拽。
+		/// 当滚动面板处于拖拽滚动状态或即将进入拖拽状态时，可以调用此方法停止或禁止本次拖拽。
 		/// </summary>
 		public void CancelDragging()
 		{
@@ -828,89 +860,126 @@ namespace FairyGUI
 				_vtScrollBar.y = _scrollBarMargin.top;
 			}
 
-			_viewWidth = aWidth;
-			_viewHeight = aHeight;
+			_viewSize.x = aWidth;
+			_viewSize.y = aHeight;
 			if (_hzScrollBar != null && !_hScrollNone)
-				_viewHeight -= _hzScrollBar.height;
+				_viewSize.y -= _hzScrollBar.height;
 			if (_vtScrollBar != null && !_vScrollNone)
-				_viewWidth -= _vtScrollBar.width;
-			_viewWidth -= (_owner.margin.left + _owner.margin.right);
-			_viewHeight -= (_owner.margin.top + _owner.margin.bottom);
+				_viewSize.x -= _vtScrollBar.width;
+			_viewSize.x -= (_owner.margin.left + _owner.margin.right);
+			_viewSize.y -= (_owner.margin.top + _owner.margin.bottom);
 
-			_viewWidth = Mathf.Max(1, _viewWidth);
-			_viewHeight = Mathf.Max(1, _viewHeight);
-			_pageSize = new Vector2(_viewWidth, _viewHeight);
+			_viewSize.x = Mathf.Max(1, _viewSize.x);
+			_viewSize.y = Mathf.Max(1, _viewSize.y);
+			_pageSize.x = _viewSize.x;
+			_pageSize.y = _viewSize.y;
 
 			HandleSizeChanged();
 		}
 
 		internal void SetContentSize(float aWidth, float aHeight)
 		{
-			if (Mathf.Approximately(_contentWidth, aWidth) && Mathf.Approximately(_contentHeight, aHeight))
+			if (Mathf.Approximately(_contentSize.x, aWidth) && Mathf.Approximately(_contentSize.y, aHeight))
 				return;
 
-			_contentWidth = aWidth;
-			_contentHeight = aHeight;
+			_contentSize.x = aWidth;
+			_contentSize.y = aHeight;
 			HandleSizeChanged();
 		}
 
+		/// <summary>
+		/// 内部使用。由虚拟列表调用。在滚动时修改显示内容的大小，需要进行修正，避免滚动跳跃。
+		/// </summary>
+		/// <param name="deltaWidth"></param>
+		/// <param name="deltaHeight"></param>
+		/// <param name="deltaPosX"></param>
+		/// <param name="deltaPosY"></param>
 		internal void ChangeContentSizeOnScrolling(float deltaWidth, float deltaHeight, float deltaPosX, float deltaPosY)
 		{
-			_contentWidth += deltaWidth;
-			_contentHeight += deltaHeight;
+			bool isRightmost = _xPos == _overlapSize.x;
+			bool isBottom = _yPos == _overlapSize.y;
 
-			if (_isMouseMoved)
+			_contentSize.x += deltaWidth;
+			_contentSize.y += deltaHeight;
+			HandleSizeChanged();
+
+			if (_tweening == 1)
 			{
-				if (deltaPosX != 0)
-					_container.x -= deltaPosX;
-				if (deltaPosY != 0)
-					_container.y -= deltaPosY;
+				//如果原来滚动位置是贴边，加入处理继续贴边。
+				if (deltaWidth != 0 && isRightmost && _tweenChange.x < 0)
+				{
+					_xPos = _overlapSize.x;
+					_tweenChange.x = -_xPos - _tweenStart.x;
+				}
 
-				ValidateHolderPos();
-
-				_xOffset += deltaPosX;
-				_yOffset += deltaPosY;
-
-				float tmp = _y2 - _y1;
-				_y1 = _container.y;
-				_y2 = _y1 + tmp;
-
-				tmp = _x2 - _x1;
-				_x1 = _container.x;
-				_x2 = _x1 + tmp;
-
-				_yPos = -_container.y;
-				_xPos = -_container.x;
+				if (deltaHeight != 0 && isBottom && _tweenChange.y < 0)
+				{
+					_yPos = _overlapSize.y;
+					_tweenChange.y = -_yPos - _tweenStart.y;
+				}
 			}
 			else if (_tweening == 2)
 			{
+				//重新调整起始位置，确保能够顺滑滚下去
 				if (deltaPosX != 0)
 				{
 					_container.x -= deltaPosX;
-					_throwTween.start.x -= deltaPosX;
+					_tweenStart.x -= deltaPosX;
+					_xPos = -_container.x;
 				}
 				if (deltaPosY != 0)
 				{
 					_container.y -= deltaPosY;
-					_throwTween.start.y -= deltaPosY;
+					_tweenStart.y -= deltaPosY;
+					_yPos = -_container.y;
 				}
 			}
+			else if (_isMouseMoved)
+			{
+				if (deltaPosX != 0)
+				{
+					_container.x -= deltaPosX;
+					_containerPos.x -= deltaPosX;
+					_lastContainerPos.x -= deltaPosX;
+					_xPos = -_container.x;
+				}
+				if (deltaPosY != 0)
+				{
+					_container.y -= deltaPosY;
+					_containerPos.y -= deltaPosY;
+					_lastContainerPos.y -= deltaPosY;
+					_yPos = -_container.y;
+				}
+			}
+			else
+			{
+				//如果原来滚动位置是贴边，加入处理继续贴边。
+				if (deltaWidth != 0 && isRightmost)
+				{
+					_xPos = _overlapSize.x;
+					_container.x = -_xPos;
+				}
 
-			HandleSizeChanged(true);
+				if (deltaHeight != 0 && isBottom)
+				{
+					_yPos = _overlapSize.y;
+					_container.y = -_yPos;
+				}
+			}
 		}
 
-		void HandleSizeChanged(bool onScrolling = false)
+		void HandleSizeChanged()
 		{
 			if (_displayInDemand)
 			{
 				if (_vtScrollBar != null)
 				{
-					if (_contentHeight <= _viewHeight)
+					if (_contentSize.y <= _viewSize.y)
 					{
 						if (!_vScrollNone)
 						{
 							_vScrollNone = true;
-							_viewWidth += _vtScrollBar.width;
+							_viewSize.x += _vtScrollBar.width;
 						}
 					}
 					else
@@ -918,18 +987,18 @@ namespace FairyGUI
 						if (_vScrollNone)
 						{
 							_vScrollNone = false;
-							_viewWidth -= _vtScrollBar.width;
+							_viewSize.x -= _vtScrollBar.width;
 						}
 					}
 				}
 				if (_hzScrollBar != null)
 				{
-					if (_contentWidth <= _viewWidth)
+					if (_contentSize.x <= _viewSize.x)
 					{
 						if (!_hScrollNone)
 						{
 							_hScrollNone = true;
-							_viewHeight += _hzScrollBar.height;
+							_viewSize.y += _hzScrollBar.height;
 						}
 					}
 					else
@@ -937,7 +1006,7 @@ namespace FairyGUI
 						if (_hScrollNone)
 						{
 							_hScrollNone = false;
-							_viewHeight -= _hzScrollBar.height;
+							_viewSize.y -= _hzScrollBar.height;
 						}
 					}
 				}
@@ -945,100 +1014,54 @@ namespace FairyGUI
 
 			if (_vtScrollBar != null)
 			{
-				if (_viewHeight < _vtScrollBar.minSize)
+				if (_viewSize.y < _vtScrollBar.minSize)
 					_vtScrollBar.displayObject.visible = false;
 				else
 				{
 					_vtScrollBar.displayObject.visible = _scrollBarVisible && !_vScrollNone;
-					if (_contentHeight == 0)
+					if (_contentSize.y == 0)
 						_vtScrollBar.displayPerc = 0;
 					else
-						_vtScrollBar.displayPerc = Math.Min(1, _viewHeight / _contentHeight);
+						_vtScrollBar.displayPerc = Math.Min(1, _viewSize.y / _contentSize.y);
 				}
 			}
 			if (_hzScrollBar != null)
 			{
-				if (_viewWidth < _hzScrollBar.minSize)
+				if (_viewSize.x < _hzScrollBar.minSize)
 					_hzScrollBar.displayObject.visible = false;
 				else
 				{
 					_hzScrollBar.displayObject.visible = _scrollBarVisible && !_hScrollNone;
-					if (_contentWidth == 0)
+					if (_contentSize.x == 0)
 						_hzScrollBar.displayPerc = 0;
 					else
-						_hzScrollBar.displayPerc = Math.Min(1, _viewWidth / _contentWidth);
+						_hzScrollBar.displayPerc = Math.Min(1, _viewSize.x / _contentSize.x);
 				}
 			}
 
 			if (!_maskDisabled)
-				_maskContainer.clipRect = new Rect(-owner._alignOffset.x, -owner._alignOffset.y, _viewWidth, _viewHeight);
+				_maskContainer.clipRect = new Rect(-owner._alignOffset.x, -owner._alignOffset.y, _viewSize.x, _viewSize.y);
 
 			if (_scrollType == ScrollType.Horizontal || _scrollType == ScrollType.Both)
-				_xOverlap = Mathf.CeilToInt(Math.Max(0, _contentWidth - _viewWidth));
+				_overlapSize.x = Mathf.CeilToInt(Math.Max(0, _contentSize.x - _viewSize.x));
 			else
-				_xOverlap = 0;
+				_overlapSize.x = 0;
 			if (_scrollType == ScrollType.Vertical || _scrollType == ScrollType.Both)
-				_yOverlap = Mathf.CeilToInt(Math.Max(0, _contentHeight - _viewHeight));
+				_overlapSize.y = Mathf.CeilToInt(Math.Max(0, _contentSize.y - _viewSize.y));
 			else
-				_yOverlap = 0;
+				_overlapSize.y = 0;
 
-			if (_tweening == 0 && onScrolling)
-			{
-				//如果原来是在边缘，且不在缓动状态，那么尝试继续贴边。（如果在缓动状态，需要修改tween的终值，暂时未支持）
-				if (_xPerc == 0 || _xPerc == 1)
-				{
-					_xPos = _xPerc * _xOverlap;
-					_container.x = -_xPos;
-				}
-				if (_yPerc == 0 || _yPerc == 1)
-				{
-					_yPos = _yPerc * _yOverlap;
-					_container.y = -_yPos;
-				}
-			}
-			else
-			{
-				//边界检查
-				_xPos = Mathf.Clamp(_xPos, 0, _xOverlap);
-				_xPerc = _xOverlap > 0 ? _xPos / _xOverlap : 0;
+			//边界检查
+			_xPos = Mathf.Clamp(_xPos, 0, _overlapSize.x);
+			_yPos = Mathf.Clamp(_yPos, 0, _overlapSize.y);
+			_container.SetXY(Mathf.Clamp(_container.x, -_overlapSize.x, 0), Mathf.Clamp(_container.y, -_overlapSize.y, 0));
 
-				_yPos = Mathf.Clamp(_yPos, 0, _yOverlap);
-				_yPerc = _yOverlap > 0 ? _yPos / _yOverlap : 0;
-			}
-
-			ValidateHolderPos();
-
-			if (_vtScrollBar != null)
-				_vtScrollBar.scrollPerc = _yPerc;
-			if (_hzScrollBar != null)
-				_hzScrollBar.scrollPerc = _xPerc;
-
-			UpdateClipSoft();
-		}
-
-		void ValidateHolderPos()
-		{
-			_container.SetXY(Mathf.Clamp(_container.x, -_xOverlap, 0), Mathf.Clamp(_container.y, -_yOverlap, 0));
-		}
-
-		internal void UpdateClipSoft()
-		{
-			Vector2 softness = _owner.clipSoftness;
-			if (softness.x != 0 || softness.y != 0)
-			{
-				_maskContainer.clipSoftness = new Vector4(
-					//左边缘和上边缘感觉不需要效果，所以注释掉
-					(_xPerc < 0.01 || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
-					(_yPerc < 0.01 || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
-					(_xOverlap == 0 || _xPerc > 0.99) ? 0 : softness.x,
-					(_yOverlap == 0 || _yPerc > 0.99) ? 0 : softness.y);
-			}
-			else
-				_maskContainer.clipSoftness = null;
+			SyncScrollBar();
 		}
 
 		private void PosChanged(bool ani)
 		{
+			//只要有1处要求不要缓动，那就不缓动
 			if (_aniFlag == 0)
 				_aniFlag = ani ? 1 : -1;
 			else if (_aniFlag == 1 && !ani)
@@ -1048,106 +1071,28 @@ namespace FairyGUI
 
 			UpdateContext.OnBegin -= _refreshDelegate;
 			UpdateContext.OnBegin += _refreshDelegate;
-
-			//如果在甩手指滚动过程中用代码重新设置滚动位置，要停止滚动
-			if (_tweening == 2) //kill throw tween only
-				KillTween();
-		}
-
-		private void KillTween()
-		{
-			if (_tweening == 1)
-			{
-				_tweener.Complete();
-			}
-			else
-			{
-				_tweener.Kill();
-				_tweener = null;
-				_tweening = 0;
-
-				ValidateHolderPos();
-				syncScrollBar(true);
-
-				onScrollEnd.Call();
-			}
 		}
 
 		private void Refresh()
 		{
-			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
-				return;
-
 			_needRefresh = false;
 			UpdateContext.OnBegin -= _refreshDelegate;
 
-			if (_pageMode)
-			{
-				int page;
-				float delta;
-				if (_yOverlap > 0 && _yPerc != 1 && _yPerc != 0)
-				{
-					page = Mathf.FloorToInt(_yPos / _pageSize.y);
-					delta = _yPos - page * _pageSize.y;
-					if (delta > _pageSize.y / 2)
-						page++;
-					_yPos = page * _pageSize.y;
-					if (_yPos > _yOverlap)
-					{
-						_yPos = _yOverlap;
-						_yPerc = 1;
-					}
-					else
-						_yPerc = _yPos / _yOverlap;
-				}
+			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
+				return;
 
-				if (_xOverlap > 0 && _xPerc != 1 && _xPerc != 0)
-				{
-					page = Mathf.FloorToInt(_xPos / _pageSize.x);
-					delta = _xPos - page * _pageSize.x;
-					if (delta > _pageSize.x / 2)
-						page++;
-					_xPos = page * _pageSize.x;
-					if (_xPos > _xOverlap)
-					{
-						_xPos = _xOverlap;
-						_xPerc = 1;
-					}
-					else
-						_xPerc = _xPos / _xOverlap;
-				}
-			}
-			else if (_snapToItem)
+			if (_pageMode || _snapToItem)
 			{
-				float tmpX = _xPerc == 1 ? 0 : _xPos;
-				float tmpY = _yPerc == 1 ? 0 : _yPos;
-				_owner.GetSnappingPosition(ref tmpX, ref tmpY);
-				if (_xPerc != 1 && !Mathf.Approximately(tmpX, _xPos))
-				{
-					_xPos = tmpX;
-					_xPerc = _xPos / _xOverlap;
-					if (_xPerc > 1)
-					{
-						_xPerc = 1;
-						_xPos = _xOverlap;
-					}
-				}
-				if (_yPerc != 1 && !Mathf.Approximately(tmpY, _yPos))
-				{
-					_yPos = tmpY;
-					_yPerc = _yPos / _yOverlap;
-					if (_yPerc > 1)
-					{
-						_yPerc = 1;
-						_yPos = _yOverlap;
-					}
-				}
+				Vector2 pos = new Vector2(-_xPos, -_yPos);
+				AlignPosition(ref pos, false);
+				_xPos = -pos.x;
+				_yPos = -pos.y;
 			}
 
 			Refresh2();
 
 			onScroll.Call();
-			if (_needRefresh) //user change scroll pos in on scroll
+			if (_needRefresh) //在onScroll事件里开发者可能修改位置，这里再刷新一次，避免闪烁
 			{
 				_needRefresh = false;
 				UpdateContext.OnBegin -= _refreshDelegate;
@@ -1155,131 +1100,88 @@ namespace FairyGUI
 				Refresh2();
 			}
 
+			SyncScrollBar();
 			_aniFlag = 0;
 		}
 
 		void Refresh2()
 		{
-			float contentXLoc = (int)_xPos;
-			float contentYLoc = (int)_yPos;
-
 			if (_aniFlag == 1 && !_isMouseMoved)
 			{
-				float toX = _container.x;
-				float toY = _container.y;
+				Vector2 pos;
 
-				if (_yOverlap > 0)
-				{
-					toY = -contentYLoc;
-				}
-				else
-				{
-					if (_container.y != 0)
-						_container.y = 0;
-				}
-				if (_xOverlap > 0)
-				{
-					toX = -contentXLoc;
-				}
+				if (_overlapSize.x > 0)
+					pos.x = -(int)_xPos;
 				else
 				{
 					if (_container.x != 0)
 						_container.x = 0;
+					pos.x = _container.x;
 				}
-
-				if (toX != _container.x || toY != _container.y)
+				if (_overlapSize.y > 0)
+					pos.y = -(int)_yPos;
+				else
 				{
-					if (_tweener != null)
-						KillTween();
-
-					_tweener = DOTween.To(() => _container.xy, v => _container.xy = v, new Vector2(toX, toY), 0.5f)
-						.SetEase(Ease.OutCubic)
-						.SetUpdate(true)
-						.OnUpdate(__tweenUpdate)
-						.OnComplete(__tweenComplete);
-					_tweening = 1;
+					if (_container.y != 0)
+						_container.y = 0;
+					pos.y = _container.y;
 				}
+
+				if (pos.x != _container.x || pos.y != _container.y)
+				{
+					_tweening = 1;
+					_tweenTime = Vector2.zero;
+					_tweenDuration = new Vector2(TWEEN_TIME_GO, TWEEN_TIME_GO);
+					_tweenStart = _container.xy;
+					_tweenChange = pos - _tweenStart;
+					Timers.inst.AddUpdate(_tweenUpdateDelegate);
+				}
+				else if (_tweening != 0)
+					KillTween();
 			}
 			else
 			{
-				if (_tweener != null)
+				if (_tweening != 0)
 					KillTween();
 
-				//如果在拖动的过程中Refresh，这里要进行处理，保证拖动继续正常进行
-				if (_isMouseMoved)
-				{
-					_xOffset += _container.x - (-contentXLoc);
-					_yOffset += _container.y - (-contentYLoc);
-				}
+				_container.SetXY((int)-_xPos, (int)-_yPos);
 
-				_container.SetXY(-contentXLoc, -contentYLoc);
-
-				//如果在拖动的过程中Refresh，这里要进行处理，保证手指离开是滚动正常进行
-				if (_isMouseMoved)
-				{
-					_y1 = _y2 = _container.y;
-					_x1 = _x2 = _container.x;
-				}
-
-				if (_vtScrollBar != null)
-					_vtScrollBar.scrollPerc = _yPerc;
-				if (_hzScrollBar != null)
-					_hzScrollBar.scrollPerc = _xPerc;
-
-				UpdateClipSoft();
+				LoopCheckingCurrent();
 			}
 		}
 
-		void SyncPos()
+		internal void UpdateClipSoft()
 		{
-			if (_xOverlap > 0)
+			Vector2 softness = _owner.clipSoftness;
+			if (softness.x != 0 || softness.y != 0)
 			{
-				_xPos = Mathf.Clamp(-_container.x, 0, _xOverlap);
-				_xPerc = _xPos / _xOverlap;
-			}
-
-			if (_yOverlap > 0)
-			{
-				_yPos = Mathf.Clamp(-_container.y, 0, _yOverlap);
-				_yPerc = _yPos / _yOverlap;
-			}
-		}
-
-		private void syncScrollBar(bool end = false)
-		{
-			if (end) //滚动结束
-			{
-				if (_vtScrollBar != null)
-				{
-					if (_scrollBarDisplayAuto)
-						ShowScrollBar(false);
-				}
-				if (_hzScrollBar != null)
-				{
-					if (_scrollBarDisplayAuto)
-						ShowScrollBar(false);
-				}
-
-				UpdateClipSoft();
+				_maskContainer.clipSoftness = new Vector4(
+					//左边缘和上边缘感觉不需要效果，所以注释掉
+					(_xPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
+					(_yPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
+					(_overlapSize.x == 0 || _xPos - _overlapSize.x > -0.01f) ? 0 : softness.x,
+					(_overlapSize.y == 0 || _yPos - _overlapSize.y > -0.01f) ? 0 : softness.y);
 			}
 			else
-			{
-				//这里不能直接使用_xPerc或者_yPerc，因为滚动可能处于过渡状态
-				if (_vtScrollBar != null)
-				{
-					_vtScrollBar.scrollPerc = _yOverlap == 0 ? 0 : Mathf.Clamp(-_container.y, 0, _yOverlap) / _yOverlap;
-					if (_scrollBarDisplayAuto)
-						ShowScrollBar(true);
-				}
-				if (_hzScrollBar != null)
-				{
-					_hzScrollBar.scrollPerc = _xOverlap == 0 ? 0 : Mathf.Clamp(-_container.x, 0, _xOverlap) / _xOverlap;
-					if (_scrollBarDisplayAuto)
-						ShowScrollBar(true);
-				}
+				_maskContainer.clipSoftness = null;
+		}
 
-				UpdateClipSoft();
+		private void SyncScrollBar(bool end = false)
+		{
+			if (_vtScrollBar != null)
+			{
+				_vtScrollBar.scrollPerc = _overlapSize.y == 0 ? 0 : Mathf.Clamp(-_container.y, 0, _overlapSize.y) / _overlapSize.y;
+				if (_scrollBarDisplayAuto)
+					ShowScrollBar(!end);
 			}
+			if (_hzScrollBar != null)
+			{
+				_hzScrollBar.scrollPerc = _overlapSize.x == 0 ? 0 : Mathf.Clamp(-_container.x, 0, _overlapSize.x) / _overlapSize.x;
+				if (_scrollBarDisplayAuto)
+					ShowScrollBar(!end);
+			}
+
+			UpdateClipSoft();
 		}
 
 		private void __touchBegin(EventContext context)
@@ -1290,23 +1192,18 @@ namespace FairyGUI
 			InputEvent evt = context.inputEvent;
 			_touchId = evt.touchId;
 			Vector2 pt = _owner.GlobalToLocal(new Vector2(evt.x, evt.y));
-			if (_tweener != null)
+			if (_tweening != 0)
 			{
 				KillTween();
 				Stage.inst.CancelClick(_touchId);
 			}
 
-			_y1 = _y2 = _container.y;
-			_yOffset = pt.y - _container.y;
-
-			_x1 = _x2 = _container.x;
-			_xOffset = pt.x - _container.x;
-
-			_time1 = _time2 = Time.time;
-			_holdAreaPoint.x = pt.x;
-			_holdAreaPoint.y = pt.y;
+			_containerPos = _lastContainerPos = _container.xy;
+			_beginTouchPos = pt;
 			_isHoldAreaDone = false;
 			_isMouseMoved = false;
+			_velocity = Vector3.zero;
+			_lastMoveTime = Time.unscaledTime;
 
 			Stage.inst.onTouchMove.Add(_touchMoveDelegate);
 			Stage.inst.onTouchEnd.Add(_touchEndDelegate);
@@ -1335,7 +1232,7 @@ namespace FairyGUI
 				sensitivity = 8;
 
 			float diff;
-			bool sv = false, sh = false, st = false;
+			bool sv = false, sh = false;
 
 			if (_scrollType == ScrollType.Vertical)
 			{
@@ -1344,13 +1241,13 @@ namespace FairyGUI
 					//表示正在监测垂直方向的手势
 					_gestureFlag |= 1;
 
-					diff = Mathf.Abs(_holdAreaPoint.y - pt.y);
+					diff = Mathf.Abs(_beginTouchPos.y - pt.y);
 					if (diff < sensitivity)
 						return;
 
 					if ((_gestureFlag & 2) != 0) //已经有水平方向的手势在监测，那么我们用严格的方式检查是不是按垂直方向移动，避免冲突
 					{
-						float diff2 = Mathf.Abs(_holdAreaPoint.x - pt.x);
+						float diff2 = Mathf.Abs(_beginTouchPos.x - pt.x);
 						if (diff < diff2) //不通过则不允许滚动了
 							return;
 					}
@@ -1364,13 +1261,13 @@ namespace FairyGUI
 				{
 					_gestureFlag |= 2;
 
-					diff = Mathf.Abs(_holdAreaPoint.x - pt.x);
+					diff = Mathf.Abs(_beginTouchPos.x - pt.x);
 					if (diff < sensitivity)
 						return;
 
 					if ((_gestureFlag & 1) != 0)
 					{
-						float diff2 = Mathf.Abs(_holdAreaPoint.y - pt.y);
+						float diff2 = Mathf.Abs(_beginTouchPos.y - pt.y);
 						if (diff < diff2)
 							return;
 					}
@@ -1384,10 +1281,10 @@ namespace FairyGUI
 
 				if (!_isHoldAreaDone)
 				{
-					diff = Mathf.Abs(_holdAreaPoint.y - pt.y);
+					diff = Mathf.Abs(_beginTouchPos.y - pt.y);
 					if (diff < sensitivity)
 					{
-						diff = Mathf.Abs(_holdAreaPoint.x - pt.x);
+						diff = Mathf.Abs(_beginTouchPos.x - pt.x);
 						if (diff < sensitivity)
 							return;
 					}
@@ -1396,79 +1293,78 @@ namespace FairyGUI
 				sv = sh = true;
 			}
 
-			float t = Time.time;
-			if (t - _time2 > 0.05f)
-			{
-				_time2 = _time1;
-				_time1 = t;
-				st = true;
-			}
+			Vector2 newPos = _containerPos + pt - _beginTouchPos;
+			newPos.x = (int)newPos.x;
+			newPos.y = (int)newPos.y;
 
 			if (sv)
 			{
-				float y = pt.y - _yOffset;
-				if (y > 0)
+				if (newPos.y > 0)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.y = 0;
 					else
-						_container.y = (int)(y * 0.5f);
+						_container.y = (int)(newPos.y * PULL_RATIO);
 				}
-				else if (y < -_yOverlap)
+				else if (newPos.y < -_overlapSize.y)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
-						_container.y = -(int)_yOverlap;
+						_container.y = -_overlapSize.y;
 					else
-						_container.y = (int)((y - _yOverlap) * 0.5f);
+						_container.y = (int)((newPos.y + _overlapSize.y) * PULL_RATIO - _overlapSize.y);
 				}
 				else
-				{
-					_container.y = y;
-				}
-
-				if (st)
-				{
-					_y2 = _y1;
-					_y1 = _container.y;
-				}
+					_container.y = newPos.y;
 			}
 
 			if (sh)
 			{
-				float x = pt.x - _xOffset;
-				if (x > 0)
+				if (newPos.x > 0)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.x = 0;
 					else
-						_container.x = (int)(x * 0.5f);
+						_container.x = (int)(newPos.x * PULL_RATIO);
 				}
-				else if (x < 0 - _xOverlap)
+				else if (newPos.x < 0 - _overlapSize.x)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
-						_container.x = -(int)_xOverlap;
+						_container.x = -_overlapSize.x;
 					else
-						_container.x = (int)((x - _xOverlap) * 0.5f);
+						_container.x = (int)((newPos.x + _overlapSize.x) * PULL_RATIO - _overlapSize.x);
 				}
 				else
-				{
-					_container.x = x;
-				}
+					_container.x = newPos.x;
+			}
 
-				if (st)
-				{
-					_x2 = _x1;
-					_x1 = _container.x;
-				}
+			//更新速度
+			float deltaTime = Time.unscaledDeltaTime;
+			float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+			if (elapsed > 1) //速度衰减
+				_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+			_velocity = Vector3.Lerp(_velocity, (_container.xy - _lastContainerPos) / deltaTime, deltaTime * 10);
+
+			_lastContainerPos = _container.xy;
+			_lastMoveTime = Time.unscaledTime;
+
+			//同步更新pos值
+			if (_overlapSize.x > 0)
+				_xPos = Mathf.Clamp(-_container.x, 0, _overlapSize.x);
+			if (_overlapSize.y > 0)
+				_yPos = Mathf.Clamp(-_container.y, 0, _overlapSize.y);
+
+			//循环滚动特别检查
+			if (LoopCheckingCurrent())
+			{
+				_containerPos += _container.xy - _lastContainerPos;
+				_lastContainerPos = _container.xy;
 			}
 
 			draggingPane = this;
 			_isHoldAreaDone = true;
 			_isMouseMoved = true;
 
-			SyncPos();
-			syncScrollBar();
-
+			SyncScrollBar();
 			onScroll.Call();
 		}
 
@@ -1494,149 +1390,37 @@ namespace FairyGUI
 			}
 
 			_isMouseMoved = false;
-			float time = Time.time - _time2;
-			if (time == 0)
-				time = 0.001f;
-			float yVelocity = (_container.y - _y2) / time * 2 * UIConfig.defaultTouchScrollSpeedRatio;
-			float xVelocity = (_container.x - _x2) / time * 2 * UIConfig.defaultTouchScrollSpeedRatio;
-			float duration = 0.3f;
 
-			_throwTween.start.x = _container.x;
-			_throwTween.start.y = _container.y;
+			//更新速度
+			float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+			if (elapsed > 1)
+				_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
 
-			Vector2 change1, change2;
-			float endX = 0, endY = 0;
-			int fireRelease = 0;
+			//根据速度计算目标位置和需要时间
+			_tweenStart = _container.xy;
+			Vector2 endPos = UpdateTargetAndDuration(_tweenStart);
 
-			if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Horizontal)
-			{
-				if (_container.x > UIConfig.touchDragSensitivity)
-					fireRelease = 1;
-				else if (_container.x < -_xOverlap - UIConfig.touchDragSensitivity)
-					fireRelease = 2;
+			//调整目标位置
+			LoopCheckingTarget(ref endPos);
+			if (_pageMode || _snapToItem)
+				AlignPosition(ref endPos, true);
 
-				change1.x = ThrowTween.CalculateChange(xVelocity, duration);
-				change2.x = 0;
-				endX = _container.x + change1.x;
+			_tweenChange = endPos - _tweenStart;
+			if (_tweenChange.x == 0 && _tweenChange.y == 0)
+				return;
 
-				if (_pageMode && endX < 0 && endX > -_xOverlap)
-				{
-					int page = Mathf.FloorToInt(-endX / _pageSize.x);
-					float testPageSize = Mathf.Min(_pageSize.x, _contentWidth - (page + 1) * _pageSize.x);
-					float delta = -endX - page * _pageSize.x;
-					//页面吸附策略
-					if (Mathf.Abs(change1.x) > _pageSize.x)//如果滚动距离超过1页,则需要超过页面的一半，才能到更下一页
-					{
-						if (delta > testPageSize * 0.5f)
-							page++;
-					}
-					else //否则只需要页面的1/3，当然，需要考虑到左移和右移的情况
-					{
-						if (delta > testPageSize * (change1.x < 0 ? 0.3f : 0.7f))
-							page++;
-					}
-
-					//重新计算终点
-					endX = -page * _pageSize.x;
-					if (endX < -_xOverlap) //最后一页未必有_pageSizeH那么大
-						endX = -_xOverlap;
-
-					change1.x = endX - _container.x;
-				}
-			}
-			else
-				change1.x = change2.x = 0;
-
-			if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical)
-			{
-				if (_container.y > UIConfig.touchDragSensitivity)
-					fireRelease = 1;
-				else if (_container.y < -_yOverlap - UIConfig.touchDragSensitivity)
-					fireRelease = 2;
-
-				change1.y = ThrowTween.CalculateChange(yVelocity, duration);
-				change2.y = 0;
-				endY = _container.y + change1.y;
-
-				if (_pageMode && endY < 0 && endY > -_yOverlap)
-				{
-					int page = Mathf.FloorToInt(-endY / _pageSize.y);
-					float testPageSize = Mathf.Min(_pageSize.y, _contentHeight - (page + 1) * _pageSize.y);
-					float delta = -endY - page * _pageSize.y;
-					if (Mathf.Abs(change1.y) > _pageSize.y)
-					{
-						if (delta > testPageSize * 0.5f)
-							page++;
-					}
-					else
-					{
-						if (delta > testPageSize * (change1.y < 0 ? 0.3f : 0.7f))
-							page++;
-					}
-
-					endY = -page * _pageSize.y;
-					if (endY < -_yOverlap)
-						endY = -_yOverlap;
-
-					change1.y = endY - _container.y;
-				}
-			}
-			else
-				change1.y = change2.y = 0;
-
-			if (_snapToItem && !_pageMode)
-			{
-				endX = -endX;
-				endY = -endY;
-				_owner.GetSnappingPosition(ref endX, ref endY);
-				endX = -endX;
-				endY = -endY;
-				change1.x = endX - _container.x;
-				change1.y = endY - _container.y;
-			}
-
-			if (_bouncebackEffect)
-			{
-				if (endX > 0)
-					change2.x = 0 - _container.x - change1.x;
-				else if (endX < -_xOverlap)
-					change2.x = -_xOverlap - _container.x - change1.x;
-
-				if (endY > 0)
-					change2.y = 0 - _container.y - change1.y;
-				else if (endY < -_yOverlap)
-					change2.y = -_yOverlap - _container.y - change1.y;
-			}
-			else
-			{
-				if (endX > 0)
-					change1.x = 0 - _container.x;
-				else if (endX < -_xOverlap)
-					change1.x = -_xOverlap - _container.x;
-
-				if (endY > 0)
-					change1.y = 0 - _container.y;
-				else if (endY < -_yOverlap)
-					change1.y = -_yOverlap - _container.y;
-			}
-
-			_throwTween.value = 0;
-			_throwTween.change1 = change1;
-			_throwTween.change2 = change2;
-
-			if (_tweener != null)
-				KillTween();
+			//如果目标位置已调整，随之调整需要时间
+			if (_pageMode || _snapToItem)
+				FixDuration();
 
 			_tweening = 2;
-			_tweener = DOTween.To(() => _throwTween.value, v => _throwTween.value = v, 1, duration)
-				.SetEase(Ease.OutCubic)
-				.SetUpdate(true)
-				.OnUpdate(__tweenUpdate2)
-				.OnComplete(__tweenComplete2);
+			_tweenTime = Vector2.zero;
+			Timers.inst.AddUpdate(_tweenUpdateDelegate);
 
-			if (fireRelease == 1)
+			if (_container.x > UIConfig.touchDragSensitivity || _container.y > UIConfig.touchDragSensitivity)
 				onPullDownRelease.Call();
-			else if (fireRelease == 2)
+			else if (_container.x < -_overlapSize.x - UIConfig.touchDragSensitivity
+				|| _container.y < -_overlapSize.y - UIConfig.touchDragSensitivity)
 				onPullUpRelease.Call();
 		}
 
@@ -1648,28 +1432,28 @@ namespace FairyGUI
 			InputEvent evt = context.inputEvent;
 			int delta = evt.mouseWheelDelta;
 			delta = Math.Sign(delta);
-			if (_xOverlap > 0 && _yOverlap == 0)
+			if (_overlapSize.x > 0 && _overlapSize.y == 0)
 			{
 				if (_pageMode)
 					SetPosX(_xPos + _pageSize.x * delta, false);
 				else
-					SetPosX(_xPos + _mouseWheelSpeed * delta, false);
+					SetPosX(_xPos + _mouseWheelStep * delta, false);
 			}
 			else
 			{
 				if (_pageMode)
 					SetPosY(_yPos + _pageSize.y * delta, false);
 				else
-					SetPosY(_yPos + _mouseWheelSpeed * delta, false);
+					SetPosY(_yPos + _mouseWheelStep * delta, false);
 			}
 		}
 
-		private void __rollOver(object e)
+		private void __rollOver()
 		{
 			ShowScrollBar(true);
 		}
 
-		private void __rollOut(object e)
+		private void __rollOut()
 		{
 			ShowScrollBar(false);
 		}
@@ -1687,75 +1471,361 @@ namespace FairyGUI
 
 		private void __showScrollBar(object obj)
 		{
-			_scrollBarVisible = (bool)obj && _viewWidth > 0 && _viewHeight > 0;
+			_scrollBarVisible = (bool)obj && _viewSize.x > 0 && _viewSize.y > 0;
 			if (_vtScrollBar != null)
 				_vtScrollBar.displayObject.visible = _scrollBarVisible && !_vScrollNone;
 			if (_hzScrollBar != null)
 				_hzScrollBar.displayObject.visible = _scrollBarVisible && !_hScrollNone;
 		}
 
-		private void __tweenUpdate()
+		/// <summary>
+		/// 对当前的滚动位置进行循环滚动边界检查。当到达边界时，回退一半内容区域（循环滚动内容大小通常是真实内容大小的偶数倍）。
+		/// </summary>
+		/// <returns></returns>
+		bool LoopCheckingCurrent()
 		{
-			syncScrollBar();
+			bool changed = false;
+			if (_loop == 1 && _overlapSize.x > 0)
+			{
+				if (_xPos < 0.001f)
+				{
+					_xPos += _contentSize.x / 2;
+					changed = true;
 
-			onScroll.Call();
+				}
+				else if (_xPos >= _overlapSize.x)
+				{
+					_xPos -= _contentSize.x / 2;
+					changed = true;
+				}
+			}
+			else if (_loop == 2 && _overlapSize.y > 0)
+			{
+				if (_yPos < 0.001f)
+				{
+					_yPos += _contentSize.y / 2;
+					changed = true;
+				}
+				else if (_yPos >= _overlapSize.y)
+				{
+					_yPos += _contentSize.y / 2 - _overlapSize.y;
+					changed = true;
+				}
+			}
+
+			if (changed)
+				_container.SetXY((int)-_xPos, (int)-_yPos);
+
+			return changed;
 		}
 
-		private void __tweenComplete()
+		/// <summary>
+		/// 对目标位置进行循环滚动边界检查。当到达边界时，回退一半内容区域（循环滚动内容大小通常是真实内容大小的偶数倍）。
+		/// </summary>
+		/// <param name="endPos"></param>
+		void LoopCheckingTarget(ref Vector2 endPos)
 		{
-			_tweener = null;
+			if (_loop == 1)
+				LoopCheckingTarget(ref endPos, 0);
+
+			if (_loop == 2)
+				LoopCheckingTarget(ref endPos, 1);
+		}
+
+		void LoopCheckingTarget(ref Vector2 endPos, int axis)
+		{
+			if (endPos[axis] > 0)
+			{
+				float tmp = _tweenStart[axis] - _contentSize[axis] / 2;
+				if (tmp <= 0 && tmp >= -_overlapSize[axis])
+				{
+					endPos[axis] -= _contentSize[axis] / 2;
+					_tweenStart[axis] = tmp;
+				}
+			}
+			else if (endPos[axis] < -_overlapSize[axis])
+			{
+				float tmp = _tweenStart[axis] + _contentSize[axis] / 2;
+				if (tmp <= 0 && tmp >= -_overlapSize.x)
+				{
+					endPos[axis] += _contentSize[axis] / 2;
+					_tweenStart[axis] = tmp;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 从oldPos滚动至pos，调整pos位置对齐页面、对齐item等（如果需要）。
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="inertialScrolling"></param>
+		void AlignPosition(ref Vector2 pos, bool inertialScrolling)
+		{
+			if (_pageMode)
+			{
+				pos.x = AlignByPage(pos.x, 0, inertialScrolling);
+				pos.y = AlignByPage(pos.y, 1, inertialScrolling);
+			}
+			else if (_snapToItem)
+			{
+				float tmpX = -pos.x;
+				float tmpY = -pos.y;
+				_owner.GetSnappingPosition(ref tmpX, ref tmpY);
+				if (pos.x < 0 && pos.x > -_overlapSize.x)
+					pos.x = -tmpX;
+				if (pos.y < 0 && pos.y > -_overlapSize.y)
+					pos.y = -tmpY;
+			}
+		}
+
+		/// <summary>
+		/// 从oldPos滚动至pos，调整目标位置到对齐页面。
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="axis"></param>
+		/// <param name="inertialScrolling"></param>
+		/// <returns></returns>
+		float AlignByPage(float pos, int axis, bool inertialScrolling)
+		{
+			int page;
+
+			if (pos > 0)
+				page = 0;
+			else if (pos < -_overlapSize[axis])
+				page = Mathf.CeilToInt(_contentSize[axis] / _pageSize[axis]) - 1;
+			else
+			{
+				page = Mathf.FloorToInt(-pos / _pageSize[axis]);
+				float change = inertialScrolling ? (pos - _containerPos[axis]) : (pos - _container.xy[axis]);
+				float testPageSize = Mathf.Min(_pageSize[axis], _contentSize[axis] - (page + 1) * _pageSize[axis]);
+				float delta = -pos - page * _pageSize[axis];
+
+				//页面吸附策略
+				if (Mathf.Abs(change) > _pageSize[axis])//如果滚动距离超过1页,则需要超过页面的一半，才能到更下一页
+				{
+					if (delta > testPageSize * 0.5f)
+						page++;
+				}
+				else //否则只需要页面的1/3，当然，需要考虑到左移和右移的情况
+				{
+					if (delta > testPageSize * (change < 0 ? 0.3f : 0.7f))
+						page++;
+				}
+
+				//重新计算终点
+				pos = -page * _pageSize[axis];
+				if (pos < -_overlapSize[axis]) //最后一页未必有pageSize那么大
+					pos = -_overlapSize[axis];
+			}
+
+			//惯性滚动模式下，会增加判断尽量不要滚动超过一页
+			if (inertialScrolling)
+			{
+				float oldPos = _tweenStart[axis];
+				int oldPage;
+				if (oldPos > 0)
+					oldPage = 0;
+				else if (oldPos < -_overlapSize[axis])
+					oldPage = Mathf.CeilToInt(_contentSize[axis] / _pageSize[axis]) - 1;
+				else
+					oldPage = Mathf.FloorToInt(-oldPos / _pageSize[axis]);
+				int startPage = Mathf.FloorToInt(-_containerPos[axis] / _pageSize[axis]);
+				if (Mathf.Abs(page - startPage) > 1 && Mathf.Abs(oldPage - startPage) <= 1)
+				{
+					if (page > startPage)
+						page = startPage + 1;
+					else
+						page = startPage - 1;
+					pos = -page * _pageSize[axis];
+				}
+			}
+
+			return pos;
+		}
+
+		/// <summary>
+		/// 根据当前速度，计算滚动的目标位置，以及到达时间。
+		/// </summary>
+		/// <param name="orignPos"></param>
+		/// <returns></returns>
+		Vector2 UpdateTargetAndDuration(Vector2 orignPos)
+		{
+			Vector2 ret = Vector2.zero;
+			ret.x = UpdateTargetAndDuration(orignPos.x, 0);
+			ret.y = UpdateTargetAndDuration(orignPos.y, 1);
+			return ret;
+		}
+
+		float UpdateTargetAndDuration(float pos, int axis)
+		{
+			if (pos > 0)
+			{
+				pos = 0;
+				_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+			}
+			else if (pos < -_overlapSize[axis])
+			{
+				pos = -_overlapSize[axis];
+				_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+			}
+			else if (Mathf.Abs(_velocity[axis]) > MIN_VELOCITY)
+			{
+				float change = (int)((_velocity[axis] / 60 - 1) / (1 - _decelerationRate));
+				pos += change;
+
+				_tweenDuration[axis] = Mathf.Log(1 / Mathf.Abs(_velocity[axis] / 60), _decelerationRate) / 60;
+				if (_tweenDuration[axis] <= TWEEN_TIME_DEFAULT)
+					_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+			}
+			else
+				_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+
+			return pos;
+		}
+
+		/// <summary>
+		/// 根据修改后的tweenChange重新计算减速时间。
+		/// </summary>
+		/// <param name="pos"></param>
+		void FixDuration()
+		{
+			FixDuration(0);
+			FixDuration(1);
+		}
+
+		void FixDuration(int axis)
+		{
+			if (_tweenChange[axis] == 0)
+				return;
+
+			float newDuration;
+			//反向推算减速率
+			float k = 1 - (_velocity[axis] / 60 - 1) / _tweenChange[axis];
+			if (k <= 0 || k >= 1)
+				newDuration = TWEEN_TIME_DEFAULT;
+			else
+			{
+				newDuration = Mathf.Log(1 / Mathf.Abs(_velocity[axis] / 60), k) / 60;
+				if (newDuration <= 0)
+					newDuration = TWEEN_TIME_DEFAULT;
+			}
+
+			//宁快不慢
+			if (newDuration < _tweenDuration[axis])
+				_tweenDuration[axis] = newDuration;
+		}
+
+		void KillTween()
+		{
+			if (_tweening == 1) //取消类型为1的tween需立刻设置到终点
+			{
+				_container.xy = _tweenStart + _tweenChange;
+				onScroll.Call();
+			}
+
 			_tweening = 0;
-
-			syncScrollBar(true);
-
-			onScroll.Call();
-		}
-
-		private void __tweenUpdate2()
-		{
-			_throwTween.Update(_container);
-
-			SyncPos();
-			syncScrollBar();
-
-			onScroll.Call();
-		}
-
-		private void __tweenComplete2()
-		{
-			_tweener = null;
-			_tweening = 0;
-
-			ValidateHolderPos();
-			SyncPos();
-			syncScrollBar(true);
-
-			onScroll.Call();
+			Timers.inst.Remove(_tweenUpdateDelegate);
 			onScrollEnd.Call();
 		}
 
-		class ThrowTween
+		void TweenUpdate(object param)
 		{
-			public float value;
-			public Vector2 start;
-			public Vector2 change1, change2;
-
-			const float checkpoint = 0.05f;
-
-			public void Update(DisplayObject obj)
+			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
 			{
-				obj.SetXY((int)(start.x + change1.x * value + change2.x * value * value), (int)(start.y + change1.y * value + change2.y * value * value));
+				Timers.inst.Remove(_tweenUpdateDelegate);
+				return;
 			}
 
-			static public float CalculateChange(float velocity, float duration)
+			float nx = RunTween(0);
+			float ny = RunTween(1);
+
+			_container.SetXY(nx, ny);
+
+			if (_tweening == 2)
 			{
-				return (duration * checkpoint * velocity) / easeOutCubic(checkpoint, 0, 1, 1);
+				if (_overlapSize.x > 0)
+					_xPos = Mathf.Clamp(-nx, 0, _overlapSize.x);
+				if (_overlapSize.y > 0)
+					_yPos = Mathf.Clamp(-ny, 0, _overlapSize.y);
 			}
 
-			static float easeOutCubic(float t, float b, float c, float d)
+			if (_tweenChange.x == 0 && _tweenChange.y == 0)
 			{
-				return c * ((t = t / d - 1) * t * t + 1) + b;
+				_tweening = 0;
+				Timers.inst.Remove(_tweenUpdateDelegate);
+
+				LoopCheckingCurrent();
+
+				SyncScrollBar(true);
+				onScroll.Call();
+				onScrollEnd.Call();
 			}
+			else
+			{
+				SyncScrollBar(false);
+				onScroll.Call();
+			}
+		}
+
+		float RunTween(int axis)
+		{
+			float newValue;
+			if (_tweenChange[axis] != 0)
+			{
+				_tweenTime[axis] += Time.unscaledDeltaTime;
+				if (_tweenTime[axis] > _tweenDuration[axis])
+				{
+					newValue = _tweenStart[axis] + _tweenChange[axis];
+					_tweenChange[axis] = 0;
+				}
+				else
+				{
+					float ratio = EaseFunc(_tweenTime[axis], _tweenDuration[axis]);
+					newValue = _tweenStart[axis] + (int)(_tweenChange[axis] * ratio);
+				}
+
+				if (_tweening == 2 && _bouncebackEffect)
+				{
+					if (newValue > 20 && _tweenChange[axis] > 0
+						|| newValue > 0 && _tweenChange[axis] == 0)//开始回弹
+					{
+						_tweenTime[axis] = 0;
+						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+						_tweenChange[axis] = -newValue;
+						_tweenStart[axis] = newValue;
+					}
+					else if (newValue < -_overlapSize[axis] - 20 && _tweenChange[axis] < 0
+						|| newValue < -_overlapSize[axis] && _tweenChange[axis] == 0)//开始回弹
+					{
+						_tweenTime[axis] = 0;
+						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+						_tweenChange[axis] = -_overlapSize[axis] - newValue;
+						_tweenStart[axis] = newValue;
+					}
+				}
+				else
+				{
+					if (newValue > 0)
+					{
+						newValue = 0;
+						_tweenChange[axis] = 0;
+					}
+					else if (newValue < -_overlapSize[axis])
+					{
+						newValue = -_overlapSize[axis];
+						_tweenChange[axis] = 0;
+					}
+				}
+			}
+			else
+				newValue = _container.xy[axis];
+
+			return newValue;
+		}
+
+		static float EaseFunc(float t, float d) //cubicOut
+		{
+			return (t = t / d - 1) * t * t + 1;
 		}
 	}
 }

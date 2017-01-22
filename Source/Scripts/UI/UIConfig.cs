@@ -61,12 +61,21 @@ namespace FairyGUI
 
 		/// <summary>
 		/// Scrolling step in pixels
+		/// 当调用ScrollPane.scrollUp/Down/Left/Right时，或者点击滚动条的上下箭头时，滑动的距离。
+		/// 鼠标滚轮触发一次滚动的距离设定为defaultScrollStep*2
 		/// </summary>
+		public static float defaultScrollStep = 25;
+		[Obsolete("UIConfig.defaultScrollSpeed is deprecated. Use defaultScrollStep instead.")]
 		public static float defaultScrollSpeed = 25;
 
 		/// <summary>
-		/// Speed ratio of scrollpane when its touch dragging.
+		/// Deceleration ratio of scrollpane when its in touch dragging.
+		/// 当手指拖动并释放滚动区域后，内容会滑动一定距离后停下，这个速率就是减速的速率。
+		/// 越接近1，减速越慢，意味着滑动的时间和距离更长。
+		/// 这个是全局设置，也可以通过ScrollPane.decelerationRate进行个性设置。
 		/// </summary>
+		public static float defaultScrollDecelerationRate = 0.967f;
+		[Obsolete("UIConfig.defaultTouchScrollSpeedRatio is deprecated. Use defaultScrollDecelerationRate instead.")]
 		public static float defaultTouchScrollSpeedRatio = 1;
 
 		/// <summary>
@@ -156,7 +165,7 @@ namespace FairyGUI
 			ButtonSoundVolumeScale,
 			HorizontalScrollBar,
 			VerticalScrollBar,
-			DefaultScrollSpeed,
+			DefaultScrollStep,
 			DefaultScrollBarDisplay,
 			DefaultScrollTouchEffect,
 			DefaultScrollBounceEffect,
@@ -256,8 +265,8 @@ namespace FairyGUI
 						UIConfig.defaultScrollBounceEffect = value.b;
 						break;
 
-					case ConfigKey.DefaultScrollSpeed:
-						UIConfig.defaultScrollSpeed = value.i;
+					case ConfigKey.DefaultScrollStep:
+						UIConfig.defaultScrollStep = value.i;
 						break;
 
 					case ConfigKey.DefaultScrollTouchEffect:

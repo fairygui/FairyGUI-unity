@@ -56,9 +56,7 @@ namespace FairyGUI
 		GObject _host;
 		Vector2 _startPoint;
 		Vector2 _lastPoint;
-		Vector2 _throwPoint;
 		float _time;
-		float _time2;
 		bool _started;
 
 		public static int ACTION_DISTANCE = 200;
@@ -109,11 +107,10 @@ namespace FairyGUI
 			}
 
 			InputEvent evt = context.inputEvent;
-			_startPoint = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
+			_startPoint = _lastPoint = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
 			_lastPoint = _startPoint;
-			_throwPoint = _startPoint;
 
-			_time2 = _time = Time.time;
+			_time = Time.unscaledTime;
 			_started = false;
 			velocity = Vector2.zero;
 			position = Vector2.zero;
@@ -138,13 +135,14 @@ namespace FairyGUI
 					return;
 			}
 
-			float t = Time.time;
-			if (t - _time2 > 0.05f)
-			{
-				_throwPoint = pt;
-				_time = t;
-			}
-			_time2 = t;
+			float deltaTime = Time.unscaledDeltaTime;
+			float elapsed = (Time.unscaledTime - _time) * 60 - 1;
+			if (elapsed > 1) //速度衰减
+				velocity = velocity * Mathf.Pow(0.833f, elapsed);
+			velocity = Vector3.Lerp(velocity, delta / deltaTime, deltaTime * 10);
+			_time = Time.unscaledTime;
+			position += delta;
+			_lastPoint = pt;
 
 			if (!_started)
 			{ //灵敏度检查，为了和点击区分
@@ -160,9 +158,6 @@ namespace FairyGUI
 				_started = true;
 				onBegin.Call(evt);
 			}
-
-			position += delta;
-			_lastPoint = pt;
 
 			onMove.Call(evt);
 		}
@@ -188,11 +183,10 @@ namespace FairyGUI
 			}
 			position += delta;
 
-			float t = Time.time - _time;
-			if (t < 0.001)
-				velocity = Vector2.zero;
-			else
-				velocity = (pt - _throwPoint) / t;
+			//更新速度
+			float elapsed = (Time.unscaledTime - _time) * 60 - 1;
+			if (elapsed > 1)
+				velocity = velocity * Mathf.Pow(0.833f, elapsed);
 			if (snapping)
 			{
 				velocity.x = Mathf.Round(velocity.x);

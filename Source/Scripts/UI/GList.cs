@@ -1127,9 +1127,17 @@ namespace FairyGUI
 				}
 
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
-					this.scrollPane.scrollSpeed = _itemSize.y;
+				{
+					this.scrollPane.scrollStep = _itemSize.y;
+					if (_loop)
+						this.scrollPane._loop = 2;
+				}
 				else
-					this.scrollPane.scrollSpeed = _itemSize.x;
+				{
+					this.scrollPane.scrollStep = _itemSize.x;
+					if (_loop)
+						this.scrollPane._loop = 1;
+				}
 
 				this.scrollPane.onScroll.AddCapture(__scrolled);
 				SetVirtualListChangedFlag(true);
@@ -1159,7 +1167,7 @@ namespace FairyGUI
 
 					_numItems = value;
 					if (_loop)
-						_realNumItems = _numItems * 5;//设置5倍数量，用于循环滚动
+						_realNumItems = _numItems * 6;//设置6倍数量，用于循环滚动
 					else
 						_realNumItems = _numItems;
 
@@ -1483,49 +1491,16 @@ namespace FairyGUI
 
 			if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 			{
-				if (_loop)
-				{
-					float pos = scrollPane.scrollingPosY;
-					//循环列表的核心实现，滚动到头尾时重新定位
-					float roundSize = _numItems * (_itemSize.y + _lineGap);
-					if (pos == 0)
-						scrollPane.posY = roundSize;
-					else if (pos == scrollPane.contentHeight - scrollPane.viewHeight)
-						scrollPane.posY = scrollPane.contentHeight - roundSize - this.viewHeight;
-				}
-
 				HandleScroll1(forceUpdate);
 				HandleArchOrder1();
 			}
 			else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
 			{
-				if (_loop)
-				{
-					float pos = scrollPane.scrollingPosX;
-					//循环列表的核心实现，滚动到头尾时重新定位
-					float roundSize = _numItems * (_itemSize.x + _columnGap);
-					if (pos == 0)
-						scrollPane.posX = roundSize;
-					else if (pos == scrollPane.contentWidth - scrollPane.viewWidth)
-						scrollPane.posX = scrollPane.contentWidth - roundSize - this.viewWidth;
-				}
-
 				HandleScroll2(forceUpdate);
 				HandleArchOrder2();
 			}
 			else
 			{
-				if (_loop)
-				{
-					float pos = scrollPane.scrollingPosX;
-					//循环列表的核心实现，滚动到头尾时重新定位
-					float roundSize = (int)(_numItems / (_curLineItemCount * _curLineItemCount2)) * viewWidth;
-					if (pos == 0)
-						scrollPane.posX = roundSize;
-					else if (pos == scrollPane.contentWidth - scrollPane.viewWidth)
-						scrollPane.posX = scrollPane.contentWidth - roundSize - this.viewWidth;
-				}
-
 				HandleScroll3(forceUpdate);
 			}
 

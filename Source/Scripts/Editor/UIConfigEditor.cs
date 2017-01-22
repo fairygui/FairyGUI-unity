@@ -101,7 +101,7 @@ namespace FairyGUIEditor
 					{
 						case UIConfig.ConfigKey.ClickDragSensitivity:
 						case UIConfig.ConfigKey.DefaultComboBoxVisibleItemCount:
-						case UIConfig.ConfigKey.DefaultScrollSpeed:
+						case UIConfig.ConfigKey.DefaultScrollStep:
 						case UIConfig.ConfigKey.TouchDragSensitivity:
 						case UIConfig.ConfigKey.TouchScrollSensitivity:
 						case UIConfig.ConfigKey.InputCaretSize:
@@ -238,7 +238,7 @@ namespace FairyGUIEditor
 					value.b = true;
 					break;
 
-				case UIConfig.ConfigKey.DefaultScrollSpeed:
+				case UIConfig.ConfigKey.DefaultScrollStep:
 					value.i = 25;
 					break;
 
