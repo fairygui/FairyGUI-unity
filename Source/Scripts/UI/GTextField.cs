@@ -12,21 +12,17 @@ namespace FairyGUI
 		protected TextField _textField;
 		protected string _text;
 		protected bool _ubbEnabled;
-		protected TextFormat _textFormat;
 		protected bool _updatingSize;
 
 		public GTextField()
 			: base()
 		{
-			_textFormat = new TextFormat();
-			_textFormat.font = UIConfig.defaultFont;
-			_textFormat.size = 12;
-			_textFormat.color = Color.black;
-			_textFormat.lineSpacing = 3;
-			_textFormat.letterSpacing = 0;
-
 			TextFormat tf = _textField.textFormat;
-			tf.CopyFrom(_textFormat);
+			tf.font = UIConfig.defaultFont;
+			tf.size = 12;
+			tf.color = Color.black;
+			tf.lineSpacing = 3;
+			tf.letterSpacing = 0;
 			_textField.textFormat = tf;
 
 			_text = string.Empty;
@@ -76,12 +72,13 @@ namespace FairyGUI
 		{
 			get
 			{
-				return _textFormat;
+				return _textField.textFormat;
 			}
 			set
 			{
-				_textFormat = value;
-				UpdateTextFormat();
+				_textField.textFormat = value;
+				if (!underConstruct)
+					UpdateSize();
 			}
 		}
 
@@ -92,15 +89,16 @@ namespace FairyGUI
 		{
 			get
 			{
-				return _textFormat.color;
+				return _textField.textFormat.color;
 			}
 			set
 			{
-				if (!_textFormat.color.Equals(value))
+				if (!_textField.textFormat.color.Equals(value))
 				{
-					_textFormat.color = value;
+					TextFormat tf = _textField.textFormat;
+					tf.color = value;
+					_textField.textFormat = tf;
 					UpdateGear(4);
-					UpdateTextFormat();
 				}
 			}
 		}
@@ -230,18 +228,6 @@ namespace FairyGUI
 			_updatingSize = false;
 		}
 
-		protected void UpdateTextFormat()
-		{
-			TextFormat tf = _textField.textFormat;
-			tf.CopyFrom(_textFormat);
-			if (_textFormat.font == null || _textFormat.font.Length == 0)
-				tf.font = UIConfig.defaultFont;
-			_textField.textFormat = tf;
-
-			if (!underConstruct)
-				UpdateSize();
-		}
-
 		override protected void HandleSizeChanged()
 		{
 			if (_updatingSize)
@@ -266,18 +252,20 @@ namespace FairyGUI
 		{
 			base.Setup_BeforeAdd(xml);
 
+			TextFormat tf = _textField.textFormat;
+
 			string str;
 			str = xml.GetAttribute("font");
 			if (str != null)
-				_textFormat.font = str;
+				tf.font = str;
 
 			str = xml.GetAttribute("fontSize");
 			if (str != null)
-				_textFormat.size = int.Parse(str);
+				tf.size = int.Parse(str);
 
 			str = xml.GetAttribute("color");
 			if (str != null)
-				_textFormat.color = ToolSet.ConvertFromHtmlColor(str);
+				tf.color = ToolSet.ConvertFromHtmlColor(str);
 
 			str = xml.GetAttribute("align");
 			if (str != null)
@@ -289,11 +277,11 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("leading");
 			if (str != null)
-				_textFormat.lineSpacing = int.Parse(str);
+				tf.lineSpacing = int.Parse(str);
 
 			str = xml.GetAttribute("letterSpacing");
 			if (str != null)
-				_textFormat.letterSpacing = int.Parse(str);
+				tf.letterSpacing = int.Parse(str);
 
 			_ubbEnabled = xml.GetAttributeBool("ubb", false);
 
@@ -301,9 +289,9 @@ namespace FairyGUI
 			if (str != null)
 				this.autoSize = FieldTypes.ParseAutoSizeType(str);
 
-			_textFormat.underline = xml.GetAttributeBool("underline", false);
-			_textFormat.italic = xml.GetAttributeBool("italic", false);
-			_textFormat.bold = xml.GetAttributeBool("bold", false);
+			tf.underline = xml.GetAttributeBool("underline", false);
+			tf.italic = xml.GetAttributeBool("italic", false);
+			tf.bold = xml.GetAttributeBool("bold", false);
 			this.singleLine = xml.GetAttributeBool("singleLine", false);
 			str = xml.GetAttribute("strokeColor");
 			if (str != null)
@@ -318,18 +306,17 @@ namespace FairyGUI
 				this.strokeColor = ToolSet.ConvertFromHtmlColor(str);
 				this.shadowOffset = xml.GetAttributeVector("shadowOffset");
 			}
+
+			_textField.textFormat = tf;
 		}
 
 		override public void Setup_AfterAdd(XML xml)
 		{
 			base.Setup_AfterAdd(xml);
 
-			UpdateTextFormat();
-
 			string str = xml.GetAttribute("text");
 			if (str != null && str.Length > 0)
 				this.text = str;
 		}
 	}
-
 }

@@ -55,6 +55,11 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public AlignType align;
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="value"></param>
 		public void SetColor(uint value)
 		{
@@ -77,7 +82,8 @@ namespace FairyGUI
 			return size == aFormat.size && color.Equals(aFormat.color)
 				&& bold == aFormat.bold && underline == aFormat.underline
 				&& italic == aFormat.italic
-				&& gradientColor == aFormat.gradientColor;
+				&& gradientColor == aFormat.gradientColor
+				&& align == aFormat.align;
 		}
 
 		/// <summary>
@@ -101,6 +107,7 @@ namespace FairyGUI
 			}
 			else
 				this.gradientColor = null;
+			this.align = source.align;
 		}
 	}
 }

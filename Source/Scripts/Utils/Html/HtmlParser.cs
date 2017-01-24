@@ -147,6 +147,7 @@ namespace FairyGUI.Utils
 							HtmlElement element = HtmlElement.GetElement(HtmlElementType.Image);
 							element.FetchAttributes();
 							element.name = element.GetString("name");
+							element.format.align = _format.align;
 							_elements.Add(element);
 						}
 						break;
@@ -163,6 +164,7 @@ namespace FairyGUI.Utils
 							HtmlElement element = HtmlElement.GetElement(HtmlElementType.Link);
 							element.FetchAttributes();
 							element.name = element.GetString("name");
+							element.format.align = _format.align;
 							_elements.Add(element);
 						}
 						else if (XMLIterator.tagType == XMLTagType.End)
@@ -218,6 +220,24 @@ namespace FairyGUI.Utils
 						break;
 
 					case "p":
+						if (XMLIterator.tagType == XMLTagType.Start)
+						{
+							PushTextFormat();
+							string align = XMLIterator.GetAttribute("align");
+							_format.align = FieldTypes.ParseAlign(align);
+
+							if (!IsNewLine())
+								AppendText("\n");
+						}
+						else if (XMLIterator.tagType == XMLTagType.End)
+						{
+							if (!IsNewLine())
+								AppendText("\n");
+
+							PopTextFormat();
+						}
+						break;
+
 					case "ui":
 					case "div":
 					case "li":

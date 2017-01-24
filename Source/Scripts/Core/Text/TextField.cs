@@ -11,7 +11,6 @@ namespace FairyGUI
 	/// </summary>
 	public class TextField : DisplayObject
 	{
-		AlignType _align;
 		VertAlignType _verticalAlign;
 		TextFormat _textFormat;
 		bool _input;
@@ -106,6 +105,8 @@ namespace FairyGUI
 				_textFormat = value;
 
 				string fontName = _textFormat.font;
+				if (string.IsNullOrEmpty(fontName))
+					fontName = UIConfig.defaultFont;
 				if (_font == null || _font.name != fontName)
 				{
 					_font = FontManager.GetFont(fontName);
@@ -122,12 +123,12 @@ namespace FairyGUI
 		/// </summary>
 		public AlignType align
 		{
-			get { return _align; }
+			get { return _textFormat.align; }
 			set
 			{
-				if (_align != value)
+				if (_textFormat.align != value)
 				{
-					_align = value;
+					_textFormat.align = value;
 					if (_alternativeText != null || !string.IsNullOrEmpty(_text))
 						_textChanged = true;
 				}
@@ -1017,16 +1018,27 @@ namespace FairyGUI
 			float yIndent = 0;
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
+			AlignType lineAlign;
 
 			int lineCount = _lines.Count;
 			for (int i = 0; i < lineCount; ++i)
 			{
 				LineInfo line = _lines[i];
-				lineClipped = clipped && i != 0 && line.y + line.height > _contentRect.height; //超出区域，剪裁
+				int textLength = line.text.Length;
+				if (textLength == 0)
+					continue;
 
-				if (_align == AlignType.Center)
+				lineClipped = clipped && i != 0 && line.y + line.height > _contentRect.height; //超出区域，剪裁
+				lineAlign = format.align;
+				if (line.text[0] == E_TAG)
+				{
+					int elementIndex = (int)line.text[1] - 33;
+					HtmlElement element = _elements[elementIndex];
+					lineAlign = element.format.align;
+				}
+				if (lineAlign == AlignType.Center)
 					xIndent = (int)((rectWidth - line.width) / 2);
-				else if (_align == AlignType.Right)
+				else if (lineAlign == AlignType.Right)
 					xIndent = rectWidth - line.width;
 				else
 					xIndent = 0;
@@ -1035,7 +1047,6 @@ namespace FairyGUI
 
 				charX = GUTTER_X + xIndent;
 
-				int textLength = line.text.Length;
 				for (int j = 0; j < textLength; j++)
 				{
 					char ch = line.text[j];

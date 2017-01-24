@@ -32,6 +32,7 @@ namespace FairyGUI.Utils
 			handlers["color"] = onTag_COLOR;
 			handlers["font"] = onTag_FONT;
 			handlers["size"] = onTag_SIZE;
+			handlers["align"] = onTag_ALIGN;
 		}
 
 		protected string onTag_URL(string tagName, bool end, string attr)
@@ -94,6 +95,14 @@ namespace FairyGUI.Utils
 				return "<font size=\"" + attr + "\">";
 			else
 				return "</font>";
+		}
+
+		protected string onTag_ALIGN(string tagName, bool end, string attr)
+		{
+			if (!end)
+				return "<p align=\"" + attr + "\">";
+			else
+				return "</p>";
 		}
 
 		protected string GetTagText(bool remove)
