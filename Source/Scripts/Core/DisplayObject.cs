@@ -1135,8 +1135,8 @@ namespace FairyGUI
 			Vector3 worldPoint = this.cachedTransform.TransformPoint(point.x, -point.y, 0);
 			if (wsc != null)
 			{
-				if (wsc.hitArea is MeshColliderHitTest)
-					Debug.LogError("Not supported for UIPainter, use TransfromPoint instead.");
+				if (wsc.hitArea is MeshColliderHitTest) //Not supported for UIPainter, use TransfromPoint instead.
+					return new Vector2(float.NaN, float.NaN);
 
 				Vector3 screePoint = wsc.GetRenderCamera().WorldToScreenPoint(worldPoint);
 				return new Vector2(screePoint.x, Stage.inst.stageHeight - screePoint.y);
