@@ -9,8 +9,8 @@ namespace FairyGUI
 	/// </summary>
 	public class GSlider : GComponent
 	{
-		float _max;
-		float _value;
+		double _max;
+		double _value;
 		ProgressTitleType _titleType;
 
 		GTextField _titleObject;
@@ -71,7 +71,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public float max
+		public double max
 		{
 			get
 			{
@@ -90,7 +90,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public float value
+		public double value
 		{
 			get
 			{
@@ -108,7 +108,7 @@ namespace FairyGUI
 
 		private void Update()
 		{
-			float percent = Math.Min(_value / _max, 1);
+			float percent = (float)Math.Min(_value / _max, 1);
 			UpdateWidthPercent(percent);
 		}
 
@@ -123,15 +123,15 @@ namespace FairyGUI
 						break;
 
 					case ProgressTitleType.ValueAndMax:
-						_titleObject.text = Mathf.RoundToInt(_value) + "/" + Mathf.RoundToInt(max);
+						_titleObject.text = Math.Round(_value) + "/" + Math.Round(max);
 						break;
 
 					case ProgressTitleType.Value:
-						_titleObject.text = "" + Mathf.RoundToInt(_value);
+						_titleObject.text = "" + Math.Round(_value);
 						break;
 
 					case ProgressTitleType.Max:
-						_titleObject.text = "" + Mathf.RoundToInt(_max);
+						_titleObject.text = "" + Math.Round(_max);
 						break;
 				}
 			}
@@ -215,7 +215,7 @@ namespace FairyGUI
 			_touchId = evt.touchId;
 
 			_clickPos = this.GlobalToLocal(new Vector2(evt.x, evt.y));
-			_clickPercent = (float)_value / _max;
+			_clickPercent = (float)(_value / _max);
 
 			context.CaptureTouch();
 			Stage.inst.onTouchMove.Add(_touchMoveDelegate);
@@ -244,7 +244,7 @@ namespace FairyGUI
 			else if (percent < 0)
 				percent = 0;
 
-			float newValue = percent * _max;
+			double newValue = percent * _max;
 			if (newValue != _value)
 			{
 				_value = newValue;
@@ -264,7 +264,7 @@ namespace FairyGUI
 			if (displayObject == null || displayObject.isDisposed)
 				return;
 
-			float percent = (float)_value / _max;
+			float percent = (float)(_value / _max);
 			UpdateWidthPercent(percent);
 
 			onGripTouchEnd.Call();

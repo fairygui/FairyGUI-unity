@@ -10,8 +10,8 @@ namespace FairyGUI
 	/// </summary>
 	public class GProgressBar : GComponent
 	{
-		float _max;
-		float _value;
+		double _max;
+		double _value;
 		ProgressTitleType _titleType;
 		bool _reverse;
 
@@ -57,7 +57,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public float max
+		public double max
 		{
 			get
 			{
@@ -76,7 +76,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public float value
+		public double value
 		{
 			get
 			{
@@ -99,18 +99,18 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 
+		/// 动态改变进度值。
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="duration"></param>
-		public Tweener TweenValue(float value, float duration)
+		public Tweener TweenValue(double value, float duration)
 		{
-			if (!Mathf.Approximately(_value, value))
+			if (_value != value)
 			{
 				if (_tweener != null)
 					_tweener.Kill(false);
 
-				float oldValue = _value;
+				double oldValue = _value;
 				_value = value;
 				_tweener = DOTween.To(() => oldValue, v => { Update(v); }, value, duration)
 					.SetEase(Ease.Linear).OnComplete(() => { _tweener = null; });
@@ -125,9 +125,9 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="newValue"></param>
-		public void Update(float newValue)
+		public void Update(double newValue)
 		{
-			float percent = Math.Min(newValue / _max, 1);
+			float percent = (float)Math.Min(newValue / _max, 1);
 			if (_titleObject != null)
 			{
 				switch (_titleType)
@@ -137,15 +137,15 @@ namespace FairyGUI
 						break;
 
 					case ProgressTitleType.ValueAndMax:
-						_titleObject.text = Mathf.RoundToInt(newValue) + "/" + Mathf.RoundToInt(max);
+						_titleObject.text = Math.Round(newValue) + "/" + Math.Round(max);
 						break;
 
 					case ProgressTitleType.Value:
-						_titleObject.text = "" + Mathf.RoundToInt(newValue);
+						_titleObject.text = "" + Math.Round(newValue);
 						break;
 
 					case ProgressTitleType.Max:
-						_titleObject.text = "" + Mathf.RoundToInt(_max);
+						_titleObject.text = "" + Math.Round(_max);
 						break;
 				}
 			}
