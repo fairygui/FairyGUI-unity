@@ -10,6 +10,11 @@ namespace FairyGUI
 	public class RotationGesture : EventDispatcher
 	{
 		/// <summary>
+		/// 
+		/// </summary>
+		public GObject host { get; private set; }
+
+		/// <summary>
 		/// 当两个手指开始呈反向操作时派发该事件。
 		/// </summary>
 		public EventListener onBegin { get; private set; }
@@ -36,8 +41,7 @@ namespace FairyGUI
 		/// 是否把变化量强制为整数。默认true。
 		/// </summary>
 		public bool snapping;
-
-		GObject _host;
+		
 		Vector2 _startVector;
 		float _lastRotation;
 		int[] _touches;
@@ -45,7 +49,7 @@ namespace FairyGUI
 
 		public RotationGesture(GObject host)
 		{
-			_host = host;
+			this.host = host;
 			Enable(true);
 
 			_touches = new int[2];
@@ -59,17 +63,17 @@ namespace FairyGUI
 		public void Dispose()
 		{
 			Enable(false);
-			_host = null;
+			host = null;
 		}
 
 		public void Enable(bool value)
 		{
 			if (value)
-				_host.onTouchBegin.Add(__touchBegin);
+				host.onTouchBegin.Add(__touchBegin);
 			else
 			{
 				_started = false;
-				_host.onTouchBegin.Remove(__touchBegin);
+				host.onTouchBegin.Remove(__touchBegin);
 				Stage.inst.onTouchMove.Remove(__touchMove);
 				Stage.inst.onTouchEnd.Remove(__touchEnd);
 			}
@@ -82,8 +86,8 @@ namespace FairyGUI
 				if (!_started)
 				{
 					Stage.inst.GetAllTouch(_touches);
-					Vector2 pt1 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
-					Vector2 pt2 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
+					Vector2 pt1 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
+					Vector2 pt2 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
 					_startVector = pt1 - pt2;
 
 					Stage.inst.onTouchMove.Add(__touchMove);
@@ -95,8 +99,8 @@ namespace FairyGUI
 		void __touchMove(EventContext context)
 		{
 			InputEvent evt = context.inputEvent;
-			Vector2 pt1 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
-			Vector2 pt2 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
+			Vector2 pt1 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
+			Vector2 pt2 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
 			Vector2 vec = pt1 - pt2;
 
 			float rot = Mathf.Rad2Deg * ((Mathf.Atan2(vec.y, vec.x) - Mathf.Atan2(_startVector.y, _startVector.x)));
