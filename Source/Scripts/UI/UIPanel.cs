@@ -342,10 +342,7 @@ namespace FairyGUI
 				return;
 
 #if UNITY_5
-			UIObjectFactory.packageItemExtensions.Clear();
-			UIObjectFactory.loaderConstructor = null;
 			DisplayOptions.SetEditModeHideFlags();
-
 			_ui = (GComponent)UIPackage.CreateObject(packageName, componentName);
 
 			if (_ui != null)

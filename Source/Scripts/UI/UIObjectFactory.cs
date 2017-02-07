@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -10,8 +9,11 @@ namespace FairyGUI
 	/// </summary>
 	public class UIObjectFactory
 	{
-		internal static Dictionary<string, ConstructorInfo> packageItemExtensions = new Dictionary<string, ConstructorInfo>();
-		internal static ConstructorInfo loaderConstructor;
+		public delegate GComponent GComponentCreator();
+		public delegate GLoader GLoaderCreator();
+
+		static Dictionary<string, GComponentCreator> packageItemExtensions = new Dictionary<string, GComponentCreator>();
+		static GLoaderCreator loaderCreator;
 
 		/// <summary>
 		/// 
@@ -20,7 +22,24 @@ namespace FairyGUI
 		/// <param name="type"></param>
 		public static void SetPackageItemExtension(string url, System.Type type)
 		{
-			packageItemExtensions[url.Substring(5)] = type.GetConstructor(System.Type.EmptyTypes);
+			SetPackageItemExtension(url, () => { return (GComponent)Activator.CreateInstance(type); });
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="method"></param>
+		public static void SetPackageItemExtension(string url, GComponentCreator creator)
+		{
+			if (url == null)
+				throw new Exception("Invaild url: " + url);
+
+			PackageItem pi = UIPackage.GetItemByURL(url);
+			if (pi != null)
+				pi.extensionCreator = creator;
+
+			packageItemExtensions[url] = creator;
 		}
 
 		/// <summary>
@@ -29,7 +48,29 @@ namespace FairyGUI
 		/// <param name="type"></param>
 		public static void SetLoaderExtension(System.Type type)
 		{
-			loaderConstructor = type.GetConstructor(System.Type.EmptyTypes);
+			loaderCreator = () => { return (GLoader)Activator.CreateInstance(type); };
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="creator"></param>
+		public static void SetLoaderExtension(GLoaderCreator creator)
+		{
+			loaderCreator = creator;
+		}
+
+		internal static void ResolvePackageItemExtension(PackageItem pi)
+		{
+			if (!packageItemExtensions.TryGetValue("ui://" + pi.owner.id + pi.id, out pi.extensionCreator)
+				&& !packageItemExtensions.TryGetValue("ui://" + pi.owner.name + "/" + pi.name, out pi.extensionCreator))
+				pi.extensionCreator = null;
+		}
+
+		internal static void Clear()
+		{
+			packageItemExtensions.Clear();
+			loaderCreator = null;
 		}
 
 		/// <summary>
@@ -51,15 +92,8 @@ namespace FairyGUI
 
 				case PackageItemType.Component:
 					{
-						ConstructorInfo extentionConstructor;
-						if (packageItemExtensions.TryGetValue(pi.owner.id + pi.id, out extentionConstructor))
-						{
-							GComponent g = (GComponent)extentionConstructor.Invoke(null);
-							if (g == null)
-								throw new Exception("Unable to create instance of '" + extentionConstructor.Name + "'");
-
-							return g;
-						}
+						if (pi.extensionCreator != null)
+							return pi.extensionCreator();
 
 						XML xml = pi.componentData;
 						string extention = xml.GetAttribute("extention");
@@ -135,8 +169,8 @@ namespace FairyGUI
 					return new GGraph();
 
 				case "loader":
-					if (loaderConstructor != null)
-						return (GLoader)loaderConstructor.Invoke(null);
+					if (loaderCreator != null)
+						return loaderCreator();
 					else
 						return new GLoader();
 			}

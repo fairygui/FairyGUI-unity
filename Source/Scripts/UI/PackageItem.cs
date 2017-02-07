@@ -32,9 +32,10 @@ namespace FairyGUI
 		public bool swing;
 		public MovieClip.Frame[] frames;
 
-		//componenet
+		//component
 		public XML componentData;
 		public DisplayListItem[] displayList;
+		public UIObjectFactory.GComponentCreator extensionCreator;
 
 		//font
 		public BitmapFont bitmapFont;

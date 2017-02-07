@@ -446,14 +446,35 @@ namespace FairyGUI
 
 		public static PackageItem GetItemByURL(string url)
 		{
-			if (url.Length > 13)
+			int pos1 = url.IndexOf("//");
+			if (pos1 == -1)
+				return null;
+
+			int pos2 = url.IndexOf('/', pos1 + 2);
+			if (pos2 == -1)
 			{
-				string pkgId = url.Substring(5, 8);
-				string srcId = url.Substring(13);
-				UIPackage pkg = GetById(pkgId);
-				if (pkg != null)
-					return pkg.GetItem(srcId);
+				if (url.Length > 13)
+				{
+					string pkgId = url.Substring(5, 8);
+					UIPackage pkg = GetById(pkgId);
+					if (pkg != null)
+					{
+						string srcId = url.Substring(13);
+						return pkg.GetItem(srcId);
+					}
+				}
 			}
+			else
+			{
+				string pkgName = url.Substring(pos1 + 2, pos2 - pos1 - 2);
+				UIPackage pkg = GetByName(pkgName);
+				if (pkg != null)
+				{
+					string srcName = url.Substring(pos2 + 1);
+					return pkg.GetItemByName(srcName);
+				}
+			}
+
 			return null;
 		}
 
@@ -515,6 +536,9 @@ namespace FairyGUI
 		{
 			_descPack = new Dictionary<string, string>();
 			_resBundle = res;
+
+			if (!Application.isPlaying)
+				UIObjectFactory.Clear();
 
 			DecodeDesc(desc);
 
@@ -676,6 +700,12 @@ namespace FairyGUI
 							FontManager.RegisterFont(pi.bitmapFont, null);
 							break;
 						}
+
+					case PackageItemType.Component:
+						{
+							UIObjectFactory.ResolvePackageItemExtension(pi);
+						}
+						break;
 				}
 				_items.Add(pi);
 				_itemsById[pi.id] = pi;
@@ -919,7 +949,7 @@ namespace FairyGUI
 				TranslateComponent(item);
 			}
 
-				int cnt = item.displayList.Length;
+			int cnt = item.displayList.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				DisplayListItem di = item.displayList[i];

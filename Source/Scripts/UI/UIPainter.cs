@@ -233,10 +233,7 @@ namespace FairyGUI
 
 			_captured = true;
 
-			UIObjectFactory.packageItemExtensions.Clear();
-			UIObjectFactory.loaderConstructor = null;
 			DisplayOptions.SetEditModeHideFlags();
-
 			GComponent view = (GComponent)UIPackage.CreateObject(packageName, componentName);
 
 			if (view != null)
