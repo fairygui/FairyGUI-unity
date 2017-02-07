@@ -10,6 +10,11 @@ namespace FairyGUI
 	public class PinchGesture : EventDispatcher
 	{
 		/// <summary>
+		/// 
+		/// </summary>
+		public GObject host { get; private set; }
+
+		/// <summary>
 		/// 当两个手指开始呈捏手势时派发该事件。
 		/// </summary>
 		public EventListener onBegin { get; private set; }
@@ -32,7 +37,6 @@ namespace FairyGUI
 		/// </summary>
 		public float delta;
 
-		GObject _host;
 		float _startDistance;
 		float _lastScale;
 		int[] _touches;
@@ -40,7 +44,7 @@ namespace FairyGUI
 
 		public PinchGesture(GObject host)
 		{
-			_host = host;
+			this.host = host;
 			Enable(true);
 
 			_touches = new int[2];
@@ -53,17 +57,17 @@ namespace FairyGUI
 		public void Dispose()
 		{
 			Enable(false);
-			_host = null;
+			host = null;
 		}
 
 		public void Enable(bool value)
 		{
 			if (value)
-				_host.onTouchBegin.Add(__touchBegin);
+				host.onTouchBegin.Add(__touchBegin);
 			else
 			{
 				_started = false;
-				_host.onTouchBegin.Remove(__touchBegin);
+				host.onTouchBegin.Remove(__touchBegin);
 				Stage.inst.onTouchMove.Remove(__touchMove);
 				Stage.inst.onTouchEnd.Remove(__touchEnd);
 			}
@@ -76,8 +80,8 @@ namespace FairyGUI
 				if (!_started)
 				{
 					Stage.inst.GetAllTouch(_touches);
-					Vector2 pt1 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
-					Vector2 pt2 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
+					Vector2 pt1 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
+					Vector2 pt2 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
 					_startDistance = Vector2.Distance(pt1, pt2);
 
 					Stage.inst.onTouchMove.Add(__touchMove);
@@ -89,8 +93,8 @@ namespace FairyGUI
 		void __touchMove(EventContext context)
 		{
 			InputEvent evt = context.inputEvent;
-			Vector2 pt1 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
-			Vector2 pt2 = _host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
+			Vector2 pt1 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
+			Vector2 pt2 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
 			float dist = Vector2.Distance(pt1, pt2);
 
 			if (!_started && Mathf.Abs(dist - _startDistance) > UIConfig.touchDragSensitivity)

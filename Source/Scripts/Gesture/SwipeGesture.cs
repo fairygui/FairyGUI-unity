@@ -11,6 +11,11 @@ namespace FairyGUI
 	public class SwipeGesture : EventDispatcher
 	{
 		/// <summary>
+		/// 
+		/// </summary>
+		public GObject host { get; private set; }
+
+		/// <summary>
 		/// 当手指开始扫动时派发该事件。
 		/// </summary>
 		public EventListener onBegin { get; private set; }
@@ -53,7 +58,6 @@ namespace FairyGUI
 		/// </summary>
 		public bool snapping;
 
-		GObject _host;
 		Vector2 _startPoint;
 		Vector2 _lastPoint;
 		float _time;
@@ -63,7 +67,7 @@ namespace FairyGUI
 
 		public SwipeGesture(GObject host)
 		{
-			_host = host;
+			this.host = host;
 			actionDistance = ACTION_DISTANCE;
 			snapping = true;
 			Enable(true);
@@ -77,16 +81,16 @@ namespace FairyGUI
 		public void Dispose()
 		{
 			Enable(false);
-			_host = null;
+			host = null;
 		}
 
 		public void Enable(bool value)
 		{
 			if (value)
-				_host.onTouchBegin.Add(__touchBegin);
+				host.onTouchBegin.Add(__touchBegin);
 			else
 			{
-				_host.onTouchBegin.Remove(__touchBegin);
+				host.onTouchBegin.Remove(__touchBegin);
 				Stage.inst.onTouchMove.Remove(__touchMove);
 				Stage.inst.onTouchEnd.Remove(__touchEnd);
 			}
@@ -107,7 +111,7 @@ namespace FairyGUI
 			}
 
 			InputEvent evt = context.inputEvent;
-			_startPoint = _lastPoint = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
+			_startPoint = _lastPoint = host.GlobalToLocal(new Vector2(evt.x, evt.y));
 			_lastPoint = _startPoint;
 
 			_time = Time.unscaledTime;
@@ -125,7 +129,7 @@ namespace FairyGUI
 				return;
 
 			InputEvent evt = context.inputEvent;
-			Vector2 pt = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
+			Vector2 pt = host.GlobalToLocal(new Vector2(evt.x, evt.y));
 			delta = pt - _lastPoint;
 			if (snapping)
 			{
@@ -174,7 +178,7 @@ namespace FairyGUI
 
 			_started = false;
 
-			Vector2 pt = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
+			Vector2 pt = host.GlobalToLocal(new Vector2(evt.x, evt.y));
 			delta = pt - _lastPoint;
 			if (snapping)
 			{

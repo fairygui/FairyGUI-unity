@@ -10,6 +10,11 @@ namespace FairyGUI
 	public class LongPressGesture : EventDispatcher
 	{
 		/// <summary>
+		/// 
+		/// </summary>
+		public GObject host { get; private set; }
+
+		/// <summary>
 		/// 当手指按下时派发该事件。
 		/// </summary>
 		public EventListener onBegin { get; private set; }
@@ -42,7 +47,6 @@ namespace FairyGUI
 		/// </summary>
 		public int holdRangeRadius;
 
-		GObject _host;
 		Vector2 _startPoint;
 		bool _started;
 
@@ -51,7 +55,7 @@ namespace FairyGUI
 
 		public LongPressGesture(GObject host)
 		{
-			_host = host;
+			this.host = host;
 			trigger = TRIGGER;
 			interval = INTERVAL;
 			holdRangeRadius = 50;
@@ -65,20 +69,20 @@ namespace FairyGUI
 		public void Dispose()
 		{
 			Enable(false);
-			_host = null;
+			host = null;
 		}
 
 		public void Enable(bool value)
 		{
 			if (value)
 			{
-				_host.onTouchBegin.Add(__touchBegin);
-				_host.onTouchEnd.Add(__touchEnd);
+				host.onTouchBegin.Add(__touchBegin);
+				host.onTouchEnd.Add(__touchEnd);
 			}
 			else
 			{
-				_host.onTouchBegin.Remove(__touchBegin);
-				_host.onTouchEnd.Remove(__touchEnd);
+				host.onTouchBegin.Remove(__touchBegin);
+				host.onTouchEnd.Remove(__touchEnd);
 				Timers.inst.Remove(__timer);
 			}
 		}
@@ -92,7 +96,7 @@ namespace FairyGUI
 		void __touchBegin(EventContext context)
 		{
 			InputEvent evt = context.inputEvent;
-			_startPoint = _host.GlobalToLocal(new Vector2(evt.x, evt.y));
+			_startPoint = host.GlobalToLocal(new Vector2(evt.x, evt.y));
 			_started = false;
 
 			Timers.inst.Add(trigger, 1, __timer);
@@ -101,7 +105,7 @@ namespace FairyGUI
 
 		void __timer(object param)
 		{
-			Vector2 pt = _host.GlobalToLocal(Stage.inst.touchPosition);
+			Vector2 pt = host.GlobalToLocal(Stage.inst.touchPosition);
 			if (Mathf.Pow(pt.x - _startPoint.x, 2) + Mathf.Pow(pt.y - _startPoint.y, 2) > Mathf.Pow(holdRangeRadius, 2))
 			{
 				Timers.inst.Remove(__timer);
