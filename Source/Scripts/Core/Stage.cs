@@ -119,12 +119,12 @@ namespace FairyGUI
 			_frameGotHitTarget = -1;
 
 			if (Application.platform == RuntimePlatform.WindowsPlayer
-				|| Application.platform == RuntimePlatform.WindowsPlayer
+				|| Application.platform == RuntimePlatform.WindowsEditor
 				|| Application.platform == RuntimePlatform.OSXPlayer
 				|| Application.platform == RuntimePlatform.OSXEditor)
 				touchScreen = false;
 			else
-				touchScreen = Input.touchSupported;
+				touchScreen = Input.touchSupported && SystemInfo.deviceType != DeviceType.Desktop;
 
 			_touches = new TouchInfo[5];
 			for (int i = 0; i < _touches.Length; i++)
@@ -156,7 +156,7 @@ namespace FairyGUI
 
 			if (touchScreen)
 			{
-#if !(UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR)
+#if !(UNITY_WEBPLAYER || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR)
 				_keyboard = new FairyGUI.TouchScreenKeyboard();
 				keyboardInput = true;
 #endif
