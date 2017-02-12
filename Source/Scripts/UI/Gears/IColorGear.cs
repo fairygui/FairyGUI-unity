@@ -12,4 +12,15 @@ namespace FairyGUI
 		/// </summary>
 		Color color { get; set; }
 	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public interface ITextColorGear : IColorGear
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		Color strokeColor { get; set; }
+	}
 }

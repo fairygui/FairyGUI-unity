@@ -57,7 +57,7 @@ namespace FairyGUI
 		class AtlasSprite
 		{
 			public string atlas;
-			public Rect rect;
+			public Rect rect = new Rect();
 			public bool rotated;
 		}
 		Dictionary<string, AtlasSprite> _sprites;

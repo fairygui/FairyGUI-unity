@@ -8,10 +8,18 @@ namespace FairyGUI
 	class GearColorValue
 	{
 		public Color color;
+		public Color strokeColor;
 
-		public GearColorValue(Color color)
+		public GearColorValue()
+		{
+			//兼容旧版本。如果a值为0，则表示不设置
+			strokeColor = Color.clear;
+		}
+
+		public GearColorValue(Color color, Color strokeColor)
 		{
 			this.color = color;
+			this.strokeColor = strokeColor;
 		}
 	}
 
@@ -33,7 +41,10 @@ namespace FairyGUI
 
 		protected override void Init()
 		{
-			_default = new GearColorValue(((IColorGear)_owner).color);
+			_default = new GearColorValue();
+			_default.color = ((IColorGear)_owner).color;
+			if (_owner is ITextColorGear)
+				_default.strokeColor = ((ITextColorGear)_owner).strokeColor;
 			_storage = new Dictionary<string, GearColorValue>();
 		}
 
@@ -42,24 +53,47 @@ namespace FairyGUI
 			if (value == "-")
 				return;
 
-			Color col = ToolSet.ConvertFromHtmlColor(value);
-			if (pageId == null)
-				_default.color = col;
+			Color col1;
+			Color col2;
+			int pos = value.IndexOf(",");
+			if (pos == -1)
+			{
+				col1 = ToolSet.ConvertFromHtmlColor(value);
+				col2 = Color.clear;
+			}
 			else
-				_storage[pageId] = new GearColorValue(col);
+			{
+				col1 = ToolSet.ConvertFromHtmlColor(value.Substring(0, pos));
+				col2 = ToolSet.ConvertFromHtmlColor(value.Substring(pos + 1));
+			}
+
+			if (pageId == null)
+			{
+				_default.color = col1;
+				_default.strokeColor = col2;
+			}
+			else
+				_storage[pageId] = new GearColorValue(col1, col2);
 		}
 
 		override public void Apply()
 		{
-			GearColorValue cv;
-			if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
-				cv = _default;
+			GearColorValue gv;
+			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
+				gv = _default;
 
 			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
 			{
+				if ((_owner is ITextColorGear) && gv.strokeColor.a > 0)
+				{
+					_owner._gearLocked = true;
+					((ITextColorGear)_owner).strokeColor = gv.strokeColor;
+					_owner._gearLocked = false;
+				}
+
 				if (tweener != null)
 				{
-					if (_tweenTarget.color != cv.color)
+					if (_tweenTarget.color != gv.color)
 					{
 						tweener.Kill(true);
 						tweener = null;
@@ -68,17 +102,17 @@ namespace FairyGUI
 						return;
 				}
 
-				if (((IColorGear)_owner).color != cv.color)
+				if (((IColorGear)_owner).color != gv.color)
 				{
 					_owner.internalVisible++;
-					_tweenTarget = cv;
+					_tweenTarget = gv;
 
 					tweener = DOTween.To(() => ((IColorGear)_owner).color, v =>
 					{
 						_owner._gearLocked = true;
 						((IColorGear)_owner).color = v;
 						_owner._gearLocked = false;
-					}, cv.color, tweenTime)
+					}, gv.color, tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
 					.OnUpdate(() =>
@@ -100,7 +134,9 @@ namespace FairyGUI
 			else
 			{
 				_owner._gearLocked = true;
-				((IColorGear)_owner).color = cv.color;
+				((IColorGear)_owner).color = gv.color;
+				if ((_owner is ITextColorGear) && gv.strokeColor.a > 0)
+					((ITextColorGear)_owner).strokeColor = gv.strokeColor;
 				_owner._gearLocked = false;
 			}
 		}
@@ -110,11 +146,12 @@ namespace FairyGUI
 			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
 				return;
 
-			GearColorValue cv;
-			if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
-				_storage[_controller.selectedPageId] = new GearColorValue(((IColorGear)_owner).color);
-			else
-				cv.color = ((IColorGear)_owner).color;
+			GearColorValue gv;
+			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
+				_storage[_controller.selectedPageId] = gv = new GearColorValue();
+			gv.color = ((IColorGear)_owner).color;
+			if (_owner is ITextColorGear)
+				gv.strokeColor = ((ITextColorGear)_owner).strokeColor;
 		}
 	}
 }

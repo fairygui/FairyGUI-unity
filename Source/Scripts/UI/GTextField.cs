@@ -7,7 +7,7 @@ namespace FairyGUI
 	/// <summary>
 	/// 
 	/// </summary>
-	public class GTextField : GObject, IColorGear
+	public class GTextField : GObject, ITextColorGear
 	{
 		protected TextField _textField;
 		protected string _text;
@@ -145,7 +145,11 @@ namespace FairyGUI
 		public Color strokeColor
 		{
 			get { return _textField.strokeColor; }
-			set { _textField.strokeColor = value; }
+			set
+			{
+				_textField.strokeColor = value;
+				UpdateGear(4);
+			}
 		}
 
 		/// <summary>

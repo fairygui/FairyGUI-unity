@@ -61,7 +61,7 @@ namespace FairyGUI
 			_textFormat = new TextFormat();
 			_textFormat.size = 12;
 			_textFormat.lineSpacing = 3;
-			_strokeColor = new Color(0, 0, 0, 1);
+			_strokeColor = Color.black;
 			_fontSizeScale = 1;
 			_renderScale = UIContentScaler.scaleFactor;
 
