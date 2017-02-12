@@ -6,7 +6,7 @@ namespace FairyGUI
 	/// <summary>
 	/// GLabel class.
 	/// </summary>
-	public class GLabel : GComponent
+	public class GLabel : GComponent, IColorGear
 	{
 		protected GObject _titleObject;
 		protected GObject _iconObject;
@@ -109,6 +109,19 @@ namespace FairyGUI
 					((GLabel)_titleObject).titleColor = value;
 				else if (_titleObject is GButton)
 					((GButton)_titleObject).titleColor = value;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Color color
+		{
+			get { return this.titleColor; }
+			set
+			{
+				this.titleColor = value;
+				UpdateGear(4);
 			}
 		}
 
