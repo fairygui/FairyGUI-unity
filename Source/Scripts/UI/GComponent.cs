@@ -1385,6 +1385,22 @@ namespace FairyGUI
 		{
 		}
 
+		public override void Setup_AfterAdd(XML xml)
+		{
+			base.Setup_AfterAdd(xml);
+
+			string[] arr = xml.GetAttributeArray("controller");
+			if (arr != null)
+			{
+				for (int i = 0; i < arr.Length; i += 2)
+				{
+					Controller cc = GetController(arr[i]);
+					if (cc != null)
+						cc.selectedPageId = arr[i + 1];
+				}
+			}
+		}
+
 		void __addedToStage()
 		{
 			int cnt = _transitions.Count;
