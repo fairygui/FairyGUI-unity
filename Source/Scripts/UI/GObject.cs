@@ -365,6 +365,14 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 设置对象为全屏大小（逻辑屏幕）。
+		/// </summary>
+		public void MakeFullScreen()
+		{
+			this.SetSize(GRoot.inst.width, GRoot.inst.height);
+		}
+
+		/// <summary>
 		/// The width of the object in pixels.
 		/// </summary>
 		public float width
