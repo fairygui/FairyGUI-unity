@@ -1416,10 +1416,7 @@ namespace FairyGUI
 		{
 			int cnt = _transitions.Count;
 			for (int i = 0; i < cnt; ++i)
-			{
-				Transition trans = _transitions[i];
-				trans.Stop(false, false);
-			}
+				_transitions[i].OnOwnerRemovedFromStage();
 		}
 	}
 }

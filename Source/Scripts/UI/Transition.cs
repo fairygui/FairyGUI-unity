@@ -58,6 +58,8 @@ namespace FairyGUI
 		const int FRAME_RATE = 24;
 
 		const int OPTION_IGNORE_DISPLAY_CONTROLLER = 1;
+		const int OPTION_AUTO_STOP_DISABLED = 2;
+		const int OPTION_AUTO_STOP_AT_END = 4;
 
 		public Transition(GComponent owner)
 		{
@@ -546,6 +548,12 @@ namespace FairyGUI
 					}
 				}
 			}
+		}
+
+		internal void OnOwnerRemovedFromStage()
+		{
+			if ((_options & OPTION_AUTO_STOP_DISABLED) == 0)
+				Stop((_options & OPTION_AUTO_STOP_AT_END) != 0 ? true : false, false);
 		}
 
 		void InternalPlay(float delay)
