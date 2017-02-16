@@ -50,6 +50,19 @@ MIT 你可以自由使用FairyGUI在你的商业和非商业项目。
 
 Version History
 ====
+1.8.0
+- NEW: Add DisplayObject.cacheAsBitmap.
+- NEW: Add new URL format support: ui://packageName/resourceName.
+- NEW: Add HTML syntax <p align=''> and UBB syntax [align=] features.
+- NEW: Add GList.onRightClickItem TreeView.onRightClickNode
+- NEW: Add GObject.MakeFullScreen.
+- NEW: Add GLabel color control.
+- NEW: StrokeColor is now involved in color control.
+- IMPROVE: Improve ScrollPane user experience.
+- IMRPOVE: Improve fairy batching performance.
+- IMRPOVE: Change GProgressBar.max/value and GSlider.max/value value type from float to double.
+- FIXED: A text clipping bug.
+
 1.7.5
 - NEW: Add LongPressGesture.holdRangeRadius
 - IMRPOVE: Improve game object manage strategy, display object will not hide its game object in hierarchy when it is not in display list now. That makes easier to track objects life cycle.

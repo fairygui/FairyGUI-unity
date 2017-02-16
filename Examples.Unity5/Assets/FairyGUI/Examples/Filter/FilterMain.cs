@@ -56,10 +56,10 @@ public class FilterMain : MonoBehaviour
 			{
 				ColorFilter filter = (ColorFilter)obj.filter;
 				filter.Reset();
-				filter.AdjustBrightness((_s0.value - 100) / 100f);
-				filter.AdjustContrast((_s1.value - 100) / 100f);
-				filter.AdjustSaturation((_s2.value - 100) / 100f);
-				filter.AdjustHue((_s3.value - 100) / 100f);
+				filter.AdjustBrightness((float)(_s0.value - 100) / 100f);
+				filter.AdjustContrast((float)(_s1.value - 100) / 100f);
+				filter.AdjustSaturation((float)(_s2.value - 100) / 100f);
+				filter.AdjustHue((float)(_s3.value - 100) / 100f);
 			}
 			else if (obj.filter is BlurFilter)
 			{
