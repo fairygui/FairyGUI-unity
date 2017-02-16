@@ -32,6 +32,7 @@ namespace FairyGUI
 
 		protected GObject _owner;
 		protected Controller _controller;
+		protected uint _displayLockToken;
 
 		public GearBase(GObject owner)
 		{

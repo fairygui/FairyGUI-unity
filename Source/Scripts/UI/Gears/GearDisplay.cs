@@ -13,9 +13,12 @@ namespace FairyGUI
 		/// </summary>
 		public string[] pages { get; set; }
 
+		int _visible;
+
 		public GearDisplay(GObject owner)
 			: base(owner)
 		{
+			_displayLockToken = 1;
 		}
 
 		override protected void AddStatus(string pageId, string value)
@@ -29,14 +32,36 @@ namespace FairyGUI
 
 		override public void Apply()
 		{
-			if (_controller == null || pages == null || pages.Length == 0 || Array.IndexOf(pages, _controller.selectedPageId) != -1)
-				_owner.internalVisible++;
+			_displayLockToken++;
+			if (_displayLockToken == 0)
+				_displayLockToken = 1;
+
+			if (pages == null || pages.Length == 0
+				|| Array.IndexOf(pages, _controller.selectedPageId) != -1)
+				_visible = 1;
 			else
-				_owner.internalVisible = 0;
+				_visible = 0;
 		}
 
 		override public void UpdateState()
 		{
+		}
+
+		public uint AddLock()
+		{
+			_visible++;
+			return _displayLockToken;
+		}
+
+		public void ReleaseLock(uint token)
+		{
+			if (token == _displayLockToken)
+				_visible--;
+		}
+
+		public bool connected
+		{
+			get { return _controller == null || _visible > 0; }
 		}
 	}
 }

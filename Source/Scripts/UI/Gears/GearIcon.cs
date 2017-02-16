@@ -46,9 +46,6 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
-				return;
-
 			_storage[_controller.selectedPageId] = _owner.icon;
 		}
 	}

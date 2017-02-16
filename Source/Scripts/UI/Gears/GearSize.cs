@@ -91,14 +91,15 @@ namespace FairyGUI
 				bool b = gv.scaleX != _owner.scaleX || gv.scaleY != _owner.scaleY;
 				if (a || b)
 				{
-					_owner.internalVisible++;
+					if (_owner.CheckGearController(0, _controller))
+						_displayLockToken = _owner.AddDisplayLock();
 					_tweenTarget = gv;
 
 					tweener = DOTween.To(() => new Vector4(_owner.width, _owner.height, _owner.scaleX, _owner.scaleY), v =>
 					{
 						_owner._gearLocked = true;
 						if (a)
-							_owner.SetSize(v.x, v.y, _owner.gearXY.controller == _controller);
+							_owner.SetSize(v.x, v.y, _owner.CheckGearController(1, _controller));
 						if (b)
 							_owner.SetScale(v.z, v.w);
 						_owner._gearLocked = false;
@@ -112,7 +113,11 @@ namespace FairyGUI
 					.OnComplete(() =>
 					{
 						tweener = null;
-						_owner.internalVisible--;
+						if (_displayLockToken != 0)
+						{
+							_owner.ReleaseDisplayLock(_displayLockToken);
+							_displayLockToken = 0;
+						}
 						_owner.InvalidateBatchingState();
 						_owner.OnGearStop.Call(this);
 					});
@@ -124,7 +129,7 @@ namespace FairyGUI
 			else
 			{
 				_owner._gearLocked = true;
-				_owner.SetSize(gv.width, gv.height, _owner.gearXY.controller == _controller);
+				_owner.SetSize(gv.width, gv.height, _owner.CheckGearController(1, _controller));
 				_owner.SetScale(gv.scaleX, gv.scaleY);
 				_owner._gearLocked = false;
 			}
@@ -132,9 +137,6 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
-				return;
-
 			GearSizeValue gv;
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
 				_storage[_controller.selectedPageId] = new GearSizeValue(_owner.width, _owner.height, _owner.scaleX, _owner.scaleY);

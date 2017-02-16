@@ -166,7 +166,8 @@ namespace FairyGUI
 		float _rotationX;
 		float _rotationY;
 		bool _visible;
-		int _internalVisible;
+		bool _internalVisible;
+		bool _handlingController;
 		bool _touchable;
 		bool _grayed;
 		bool _draggable;
@@ -199,7 +200,7 @@ namespace FairyGUI
 			_touchable = true;
 			_scaleX = 1;
 			_scaleY = 1;
-			_internalVisible = 1;
+			_internalVisible = true;
 			id = "_n" + _gInstanceCounter++;
 			name = string.Empty;
 
@@ -786,29 +787,11 @@ namespace FairyGUI
 			}
 		}
 
-		internal int internalVisible
-		{
-			get { return _internalVisible; }
-			set
-			{
-				if (value < 0)
-					value = 0;
-				bool oldValue = _internalVisible > 0;
-				bool newValue = value > 0;
-				_internalVisible = value;
-				if (oldValue != newValue)
-				{
-					if (parent != null)
-						parent.ChildStateChanged(this);
-				}
-			}
-		}
-
 		internal bool finalVisible
 		{
 			get
 			{
-				return _visible && _internalVisible > 0 && (group == null || group.finalVisible);
+				return _visible && _internalVisible && (group == null || group.finalVisible);
 			}
 		}
 
@@ -1056,14 +1039,61 @@ namespace FairyGUI
 
 		protected void UpdateGear(int index)
 		{
-			if (_gears[index] != null)
-				_gears[index].UpdateState();
+			if (underConstruct || _gearLocked)
+				return;
+
+			GearBase gear = _gears[index];
+			if (gear != null && gear.controller != null)
+				gear.UpdateState();
+		}
+
+		internal bool CheckGearController(int index, Controller c)
+		{
+			return _gears[index] != null && _gears[index].controller == c;
 		}
 
 		internal void UpdateGearFromRelations(int index, float dx, float dy)
 		{
 			if (_gears[index] != null)
 				_gears[index].UpdateFromRelations(dx, dy);
+		}
+
+		internal uint AddDisplayLock()
+		{
+			GearDisplay gearDisplay = (GearDisplay)_gears[0];
+			if (gearDisplay != null && gearDisplay.controller != null)
+			{
+				uint ret = gearDisplay.AddLock();
+				CheckGearDisplay();
+
+				return ret;
+			}
+			else
+				return 0;
+		}
+
+		internal void ReleaseDisplayLock(uint token)
+		{
+			GearDisplay gearDisplay = (GearDisplay)_gears[0];
+			if (gearDisplay != null && gearDisplay.controller != null)
+			{
+				gearDisplay.ReleaseLock(token);
+				CheckGearDisplay();
+			}
+		}
+
+		void CheckGearDisplay()
+		{
+			if (_handlingController)
+				return;
+
+			bool connected = _gears[0] == null || ((GearDisplay)_gears[0]).connected;
+			if (connected != _internalVisible)
+			{
+				_internalVisible = connected;
+				if (parent != null)
+					parent.ChildStateChanged(this);
+			}
 		}
 
 		/// <summary>
@@ -1079,12 +1109,16 @@ namespace FairyGUI
 
 		virtual public void HandleControllerChanged(Controller c)
 		{
+			_handlingController = true;
 			for (int i = 0; i < 8; i++)
 			{
 				GearBase gear = _gears[i];
 				if (gear != null && gear.controller == c)
 					gear.Apply();
 			}
+			_handlingController = false;
+
+			CheckGearDisplay();
 		}
 
 		/// <summary>

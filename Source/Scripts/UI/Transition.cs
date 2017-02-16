@@ -167,7 +167,6 @@ namespace FairyGUI
 			{
 				_onComplete = onComplete;
 
-				_owner.internalVisible++;
 				if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0)
 				{
 					int cnt = _items.Count;
@@ -175,7 +174,7 @@ namespace FairyGUI
 					{
 						TransitionItem item = _items[i];
 						if (item.target != null && item.target != _owner)
-							item.target.internalVisible++;
+							item.displayLockToken = item.target.AddDisplayLock();
 					}
 				}
 			}
@@ -205,8 +204,6 @@ namespace FairyGUI
 				_totalTimes = 0;
 				PlayCompleteCallback func = _onComplete;
 				_onComplete = null;
-
-				_owner.internalVisible--;
 
 				int cnt = _items.Count;
 				if (_reversed)
@@ -238,8 +235,11 @@ namespace FairyGUI
 
 		void StopItem(TransitionItem item, bool setToComplete)
 		{
-			if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0 && item.target != _owner)
-				item.target.internalVisible--;
+			if (item.displayLockToken != 0)
+			{
+				item.target.ReleaseDisplayLock(item.displayLockToken);
+				item.displayLockToken = 0;
+			}
 
 			if (item.type == TransitionActionType.ColorFilter && item.filterCreated)
 				item.target.filter = null;
@@ -801,7 +801,6 @@ namespace FairyGUI
 					else
 					{
 						_playing = false;
-						_owner.internalVisible--;
 
 						int cnt = _items.Count;
 						for (int i = 0; i < cnt; i++)
@@ -809,8 +808,11 @@ namespace FairyGUI
 							TransitionItem item = _items[i];
 							if (item.target != null)
 							{
-								if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0 && item.target != _owner)
-									item.target.internalVisible--;
+								if (item.displayLockToken != 0)
+								{
+									item.target.ReleaseDisplayLock(item.displayLockToken);
+									item.displayLockToken = 0;
+								}
 
 								if (item.filterCreated)
 								{
@@ -1193,6 +1195,7 @@ namespace FairyGUI
 		public bool completed;
 		public GObject target;
 		public bool filterCreated;
+		public uint displayLockToken;
 
 		public TransitionItem()
 		{

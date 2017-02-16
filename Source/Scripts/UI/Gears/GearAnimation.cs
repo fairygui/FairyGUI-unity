@@ -68,9 +68,6 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
-				return;
-
 			IAnimationGear mc = (IAnimationGear)_owner;
 			GearAnimationValue gv;
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))

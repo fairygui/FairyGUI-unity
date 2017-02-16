@@ -104,7 +104,8 @@ namespace FairyGUI
 
 				if (((IColorGear)_owner).color != gv.color)
 				{
-					_owner.internalVisible++;
+					if (_owner.CheckGearController(0, _controller))
+						_displayLockToken = _owner.AddDisplayLock();
 					_tweenTarget = gv;
 
 					tweener = DOTween.To(() => ((IColorGear)_owner).color, v =>
@@ -122,7 +123,11 @@ namespace FairyGUI
 					.OnComplete(() =>
 					{
 						tweener = null;
-						_owner.internalVisible--;
+						if (_displayLockToken != 0)
+						{
+							_owner.ReleaseDisplayLock(_displayLockToken);
+							_displayLockToken = 0;
+						}
 						_owner.InvalidateBatchingState();
 						_owner.OnGearStop.Call(this);
 					});
@@ -143,9 +148,6 @@ namespace FairyGUI
 
 		override public void UpdateState()
 		{
-			if (_controller == null || _owner._gearLocked || _owner.underConstruct)
-				return;
-
 			GearColorValue gv;
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
 				_storage[_controller.selectedPageId] = gv = new GearColorValue();
