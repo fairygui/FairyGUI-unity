@@ -1404,7 +1404,7 @@ namespace FairyGUI
 
 				this.layer = layerValue;
 			}
-			else if (!_disposed && this.gameObject != null)
+			else if (!_disposed && this.gameObject != null && !StageEngine.beingQuit)
 			{
 				if (Application.isPlaying)
 				{

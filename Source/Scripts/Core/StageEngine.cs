@@ -11,6 +11,8 @@ namespace FairyGUI
 		public int ObjectsOnStage;
 		public int GraphicsOnStage;
 
+		public static bool beingQuit;
+
 		void LateUpdate()
 		{
 			Stage.inst.InternalUpdate();
@@ -35,6 +37,8 @@ namespace FairyGUI
 
 		void OnApplicationQuit()
 		{
+			beingQuit = true;
+
 			if (Application.isEditor)
 				UIPackage.RemoveAllPackages(true);
 		}
