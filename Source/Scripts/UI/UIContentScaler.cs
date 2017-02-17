@@ -170,6 +170,9 @@ namespace FairyGUI
 			else
 				scaleFactor = constantScaleFactor;
 
+			if (scaleFactor > 10)
+				scaleFactor = 10;
+
 			StageCamera.screenSizeVer++;
 		}
 	}
