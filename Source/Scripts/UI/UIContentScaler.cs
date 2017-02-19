@@ -53,7 +53,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public int fallbackScreenDPI  = 96;
+		public int fallbackScreenDPI = 96;
 
 		/// <summary>
 		/// 
@@ -64,6 +64,11 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		public float constantScaleFactor = 1;
+
+		/// <summary>
+		/// 当false时，计算比例时会考虑designResolutionX/Y的设置是针对横屏还是竖屏。否则不考虑。
+		/// </summary>
+		public bool ignoreOrientation = false;
 
 		[System.NonSerialized]
 		public static float scaleFactor = 1;
@@ -139,7 +144,7 @@ namespace FairyGUI
 
 				int dx = designResolutionX;
 				int dy = designResolutionY;
-				if (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy)
+				if (!ignoreOrientation && (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy))
 				{
 					//scale should not change when orientation change
 					int tmp = dx;
