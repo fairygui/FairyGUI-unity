@@ -63,7 +63,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public int constantScaleFactor = 1;
+		public float constantScaleFactor = 1;
 
 		[System.NonSerialized]
 		public static float scaleFactor = 1;
