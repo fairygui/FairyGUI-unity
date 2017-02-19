@@ -17,6 +17,7 @@ namespace FairyGUIEditor
 		SerializedProperty fallbackScreenDPI;
 		SerializedProperty defaultSpriteDPI;
 		SerializedProperty constantScaleFactor;
+		SerializedProperty ignoreOrientation;
 
 #if UNITY_5
 		string[] propertyToExclude;
@@ -31,10 +32,11 @@ namespace FairyGUIEditor
 			fallbackScreenDPI = serializedObject.FindProperty("fallbackScreenDPI");
 			defaultSpriteDPI = serializedObject.FindProperty("defaultSpriteDPI");
 			constantScaleFactor = serializedObject.FindProperty("constantScaleFactor");
+			ignoreOrientation = serializedObject.FindProperty("ignoreOrientation");
 
 #if UNITY_5
 			propertyToExclude = new string[] { "m_Script", "scaleMode", "screenMatchMode", "designResolutionX", "designResolutionY",
-					"fallbackScreenDPI", "defaultSpriteDPI", "constantScaleFactor"};
+					"fallbackScreenDPI", "defaultSpriteDPI", "constantScaleFactor", "ignoreOrientation"};
 #endif
 		}
 
@@ -51,6 +53,7 @@ namespace FairyGUIEditor
 				EditorGUILayout.PropertyField(designResolutionX);
 				EditorGUILayout.PropertyField(designResolutionY);
 				EditorGUILayout.PropertyField(screenMatchMode);
+				EditorGUILayout.PropertyField(ignoreOrientation);
 			}
 			else if ((UIContentScaler.ScaleMode)scaleMode.enumValueIndex == UIContentScaler.ScaleMode.ConstantPhysicalSize)
 			{
