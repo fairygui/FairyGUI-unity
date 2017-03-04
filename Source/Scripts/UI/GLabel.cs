@@ -112,6 +112,34 @@ namespace FairyGUI
 			}
 		}
 
+		public int titleFontSize
+		{
+			get
+			{
+				if (_titleObject is GTextField)
+					return ((GTextField)_titleObject).textFormat.size;
+				else if (_titleObject is GLabel)
+					return ((GLabel)_titleObject).titleFontSize;
+				else if (_titleObject is GButton)
+					return ((GButton)_titleObject).titleFontSize;
+				else
+					return 0;
+			}
+			set
+			{
+				if (_titleObject is GTextField)
+				{
+					TextFormat tf = ((GTextField)_titleObject).textFormat;
+					tf.size = value;
+					((GTextField)_titleObject).textFormat = tf;
+				}
+				else if (_titleObject is GLabel)
+					((GLabel)_titleObject).titleFontSize = value;
+				else if (_titleObject is GButton)
+					((GButton)_titleObject).titleFontSize = value;
+			}
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -151,6 +179,9 @@ namespace FairyGUI
 			str = xml.GetAttribute("titleColor");
 			if (str != null)
 				this.titleColor = ToolSet.ConvertFromHtmlColor(str);
+			str = xml.GetAttribute("titleFontSize");
+			if (str != null)
+				this.titleFontSize = int.Parse(str);
 
 			if (_titleObject is GTextInput)
 			{
