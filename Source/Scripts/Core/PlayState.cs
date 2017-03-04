@@ -34,6 +34,7 @@ namespace FairyGUI
 
 		public PlayState()
 		{
+			_lastTime = Time.time;
 		}
 
 		/// <summary>
@@ -49,9 +50,14 @@ namespace FairyGUI
 			_lastUpdateFrameId = UpdateContext.frameId;
 			float time = Time.time;
 			float elapsed = time - _lastTime;
-			if (ignoreTimeScale && Time.timeScale != 0)
-				elapsed /= Time.timeScale;
 			_lastTime = time;
+			if (ignoreTimeScale)
+			{
+				if(Time.timeScale != 0)
+					elapsed /= Time.timeScale;
+				else
+					elapsed = 0;
+			}
 
 			reachEnding = false;
 			_curFrameDelay += elapsed;
