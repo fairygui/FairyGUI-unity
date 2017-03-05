@@ -28,13 +28,11 @@ namespace FairyGUI
 		public bool ignoreTimeScale;
 
 		int _curFrame; //当前帧
-		float _lastTime;
 		float _curFrameDelay; //当前帧延迟
-		uint _lastUpdateFrameId;
+		int _lastUpdateFrameId;
 
 		public PlayState()
 		{
-			_lastTime = Time.time;
 		}
 
 		/// <summary>
@@ -44,20 +42,17 @@ namespace FairyGUI
 		/// <param name="context"></param>
 		public void Update(MovieClip mc, UpdateContext context)
 		{
-			if (_lastUpdateFrameId == UpdateContext.frameId) //PlayState may be shared, only update once per frame
-				return;
-
-			_lastUpdateFrameId = UpdateContext.frameId;
-			float time = Time.time;
-			float elapsed = time - _lastTime;
-			_lastTime = time;
-			if (ignoreTimeScale)
-			{
-				if(Time.timeScale != 0)
-					elapsed /= Time.timeScale;
-				else
-					elapsed = 0;
-			}
+			float elapsed;
+			int frameId = Time.frameCount;
+			if (frameId - _lastUpdateFrameId != 1) 
+				//1、如果>1，表示不是连续帧了，说明刚启动（或者停止过），这里不能用流逝的时间了，不然会跳过很多帧
+				//2、如果==0，表示在本帧已经处理过了，这通常是因为一个PlayState用于多个MovieClip共享，目的是多个MovieClip同步播放
+				elapsed = 0;
+			else if (ignoreTimeScale)
+				elapsed = Time.unscaledDeltaTime;
+			else
+				elapsed = Time.deltaTime;
+			_lastUpdateFrameId = frameId;
 
 			reachEnding = false;
 			_curFrameDelay += elapsed;
