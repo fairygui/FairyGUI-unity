@@ -1015,6 +1015,30 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 获取当前点击哪个item
+		/// </summary>
+		public GObject touchItem
+		{
+			get
+			{
+				//find out which item is under finger
+				//逐层往上知道查到点击了那个item
+				GObject obj = GRoot.inst.touchTarget;
+				GObject p = obj.parent;
+				while (p != null)
+				{
+					if (p == this)
+						return obj;
+
+					obj = p;
+					p = p.parent;
+				}
+
+				return null;
+			}
+		}
+
+		/// <summary>
 		/// Get first child in view.
 		/// </summary>
 		/// <returns></returns>
