@@ -106,7 +106,10 @@ namespace FairyGUI
 
 		public void InvalidateBatchingState(bool childChanged)
 		{
-			rootContainer.InvalidateBatchingState(childChanged);
+			if (childChanged)
+				container.InvalidateBatchingState(childChanged);
+			else
+				rootContainer.InvalidateBatchingState();
 		}
 
 		/// <summary>

@@ -203,7 +203,7 @@ namespace FairyGUI
 			if (_aniObject != null)
 				_aniObject.frame = Mathf.RoundToInt(percent * 100);
 
-			this.InvalidateBatchingState();
+			InvalidateBatchingState(true);
 		}
 
 		override public void ConstructFromXML(XML cxml)

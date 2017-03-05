@@ -425,9 +425,9 @@ namespace FairyGUI
 			set
 			{
 				Vector3 v = cachedTransform.localScale;
-				v.x = value;
-				v.z = value;
+				v.x = v.z = ValidateScale(value);
 				cachedTransform.localScale = v;
+				_outlineChanged = true;
 				ApplyPivot();
 			}
 		}
@@ -441,8 +441,9 @@ namespace FairyGUI
 			set
 			{
 				Vector3 v = cachedTransform.localScale;
-				v.y = value;
+				v.y = ValidateScale(value);
 				cachedTransform.localScale = v;
+				_outlineChanged = true;
 				ApplyPivot();
 			}
 		}
@@ -455,11 +456,28 @@ namespace FairyGUI
 		public void SetScale(float xv, float yv)
 		{
 			Vector3 v = cachedTransform.localScale;
-			v.x = xv;
-			v.y = yv;
-			v.z = xv;
+			v.x = v.z = ValidateScale(xv);
+			v.y = ValidateScale(yv);
 			cachedTransform.localScale = v;
+			_outlineChanged = true;
 			ApplyPivot();
+		}
+
+		/// <summary>
+		/// 在scale过小情况（极端情况=0），当使用Transform的坐标变换时，变换到世界，再从世界变换到本地，会由于精度问题造成结果错误。
+		/// 这种错误会导致Batching错误，因为Batching会使用缓存的outline。
+		/// 这里限制一下scale的最小值作为当前解决方案。
+		/// 这个方案并不完美，因为限制了本地scale值并不能保证对世界scale不会过小。
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		private float ValidateScale(float value)
+		{
+			if (value >= 0 && value < 0.001f)
+				value = 0.001f;
+			else if (value < 0 && value > -0.001f)
+				value = -0.001f;
+			return value;
 		}
 
 		/// <summary>
@@ -487,6 +505,7 @@ namespace FairyGUI
 			set
 			{
 				_rotation.z = -value;
+				_outlineChanged = true;
 				if (_perspective)
 					UpdateTransformMatrix();
 				else
@@ -509,6 +528,7 @@ namespace FairyGUI
 			set
 			{
 				_rotation.x = value;
+				_outlineChanged = true;
 				if (_perspective)
 					UpdateTransformMatrix();
 				else
@@ -531,6 +551,7 @@ namespace FairyGUI
 			set
 			{
 				_rotation.y = value;
+				_outlineChanged = true;
 				if (_perspective)
 					UpdateTransformMatrix();
 				else
@@ -550,6 +571,7 @@ namespace FairyGUI
 			set
 			{
 				_skew = value;
+				_outlineChanged = true;
 				UpdateTransformMatrix();
 			}
 		}

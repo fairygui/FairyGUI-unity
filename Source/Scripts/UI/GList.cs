@@ -2259,7 +2259,7 @@ namespace FairyGUI
 			HandleAlign(cw, ch);
 			SetBounds(0, 0, cw, ch);
 
-			this.InvalidateBatchingState();
+			InvalidateBatchingState(true);
 		}
 
 		override public void Setup_BeforeAdd(XML xml)

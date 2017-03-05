@@ -772,7 +772,7 @@ namespace FairyGUI
 
 			if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size
 				|| item.type == TransitionActionType.Scale)
-				_owner.InvalidateBatchingState();
+				_owner.InvalidateBatchingState(true);
 
 			CheckAllComplete();
 		}
@@ -862,7 +862,7 @@ namespace FairyGUI
 						item.target.SetXY(value.f1, value.f2);
 					}
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Size:
@@ -872,13 +872,13 @@ namespace FairyGUI
 						value.f2 = item.target.height;
 					item.target.SetSize(value.f1, value.f2);
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Pivot:
 					item.target.SetPivot(value.f1, value.f2);
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Alpha:
@@ -888,19 +888,19 @@ namespace FairyGUI
 				case TransitionActionType.Rotation:
 					item.target.rotation = value.f1;
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Scale:
 					item.target.SetScale(value.f1, value.f2);
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Skew:
 					item.target.skew = new Vector2(value.f1, value.f2);
 					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState();
+						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Color:
