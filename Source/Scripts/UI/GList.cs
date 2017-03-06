@@ -1593,6 +1593,7 @@ namespace FairyGUI
 						url = itemProvider(curIndex % _numItems);
 						if (url == null)
 							url = defaultItem;
+						url = UIPackage.NormalizeURL(url);
 					}
 
 					if (ii.obj != null && ii.obj.resourceURL != url)
@@ -1749,6 +1750,7 @@ namespace FairyGUI
 						url = itemProvider(curIndex % _numItems);
 						if (url == null)
 							url = defaultItem;
+						url = UIPackage.NormalizeURL(url);
 					}
 
 					if (ii.obj != null && ii.obj.resourceURL != url)
@@ -1884,6 +1886,7 @@ namespace FairyGUI
 			int startIndex = page * pageSize;
 			int lastIndex = startIndex + pageSize * 2; //测试两页
 			bool needRender;
+			string url = defaultItem;
 
 			itemInfoVer++;
 
@@ -1949,7 +1952,15 @@ namespace FairyGUI
 
 					if (ii.obj == null)
 					{
-						ii.obj = _pool.GetObject(defaultItem);
+						if (itemProvider != null)
+						{
+							url = itemProvider(i % _numItems);
+							if (url == null)
+								url = defaultItem;
+							url = UIPackage.NormalizeURL(url);
+						}
+
+						ii.obj = _pool.GetObject(url);
 						this.AddChildAt(ii.obj, insertIndex);
 					}
 					else

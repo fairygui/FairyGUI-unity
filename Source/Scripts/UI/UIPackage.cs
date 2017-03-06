@@ -446,6 +446,9 @@ namespace FairyGUI
 
 		public static PackageItem GetItemByURL(string url)
 		{
+			if (url == null)
+				return null;
+
 			int pos1 = url.IndexOf("//");
 			if (pos1 == -1)
 				return null;
@@ -476,6 +479,32 @@ namespace FairyGUI
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// 将'ui://包名/组件名'转换为以内部id表达的url格式。如果传入的url本身就是内部id格式，则直接返回。
+		/// 同时这个方法还带格式检测，如果传入不正确的url，会返回null。
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		public static string NormalizeURL(string url)
+		{
+			if (url == null)
+				return null;
+
+			int pos1 = url.IndexOf("//");
+			if (pos1 == -1)
+				return null;
+
+			int pos2 = url.IndexOf('/', pos1 + 2);
+			if (pos2 == -1)
+				return url;
+			else
+			{
+				string pkgName = url.Substring(pos1 + 2, pos2 - pos1 - 2);
+				string srcName = url.Substring(pos2 + 1);
+				return GetItemURL(pkgName, srcName);
+			}
 		}
 
 		/// <summary>

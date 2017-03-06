@@ -62,17 +62,12 @@ namespace FairyGUI
 		/// <returns></returns>
 		public GObject GetObject(string url)
 		{
-			Queue<GObject> arr;
-			if (!_pool.TryGetValue(url, out arr))
-			{
-				arr = new Queue<GObject>();
-				_pool.Add(url, arr);
-			}
+			url = UIPackage.NormalizeURL(url);
 
-			if (arr.Count > 0)
-			{
+			Queue<GObject> arr;
+			if (_pool.TryGetValue(url, out arr)
+				&& arr.Count>0)
 				return arr.Dequeue();
-			}
 
 			GObject obj = UIPackage.CreateObjectFromURL(url);
 			if (obj != null)
