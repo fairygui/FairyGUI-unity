@@ -10,8 +10,6 @@ namespace FairyGUI
 	/// </summary>
 	public sealed class LuaUIHelper
 	{
-		static Dictionary<string, LuaFunction> packageItemExtensions = new Dictionary<string, LuaFunction>();
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -19,17 +17,22 @@ namespace FairyGUI
 		/// <param name="luaClass"></param>
 		public static void SetExtension(string url, System.Type baseType, LuaFunction extendFunction)
 		{
-			UIObjectFactory.SetPackageItemExtension(url, baseType);
-			packageItemExtensions[url] = extendFunction;
+			UIObjectFactory.SetPackageItemExtension(url, () => {
+				GComponent gcom = (GComponent)Activator.CreateInstance(baseType);
+				gcom.data = extendFunction;
+				return gcom;
+			});
 		}
 
 		[NoToLuaAttribute]
 		public static LuaTable ConnectLua(GComponent gcom)
 		{
 			LuaTable _peerTable = null;
-			LuaFunction extendFunction;
-			if (LuaUIHelper.packageItemExtensions.TryGetValue(gcom.resourceURL, out extendFunction))
+			LuaFunction extendFunction = gcom.data as LuaFunction;
+			if (extendFunction!=null)
 			{
+				gcom.data = null;
+
 				extendFunction.BeginPCall();
 				extendFunction.Push(gcom);
 				extendFunction.PCall();
