@@ -434,7 +434,6 @@ namespace FairyGUI
 			{
 				_downEffect = str == "dark" ? 1 : (str == "scale" ? 2 : 0);
 				_downEffectValue = xml.GetAttributeFloat("downEffectValue");
-				//不能只依赖Setup_AfterAdd的设置，因为顶层对象不会调用Setup_AfterAdd
 				if (_downEffect == 2)
 					this.SetPivot(0.5f, 0.5f);
 			}
@@ -461,10 +460,6 @@ namespace FairyGUI
 		override public void Setup_AfterAdd(XML cxml)
 		{
 			base.Setup_AfterAdd(cxml);
-
-			//因为Setup_BeforeAdd里会置轴心为0，所以这里要补一下
-			if (_downEffect == 2)
-				this.SetPivot(0.5f, 0.5f);
 
 			XML xml = cxml.GetNode("Button");
 			if (xml == null)
