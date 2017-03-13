@@ -1599,28 +1599,7 @@ namespace FairyGUI
 
 			arr = xml.GetAttributeArray("pivot");
 			if (arr != null)
-			{
-				float f1 = float.Parse(arr[0]);
-				float f2 = float.Parse(arr[1]);
-				//处理旧版本的兼容性(旧版本发布的值是坐标值，新版本是比例，一般都小于2）
-				if (f1 > 2)
-				{
-					if (sourceWidth != 0)
-						f1 = f1 / sourceWidth;
-					else
-						f1 = 0;
-				}
-				if (f2 > 2)
-				{
-					if (sourceHeight != 0)
-						f2 = f2 / sourceHeight;
-					else
-						f2 = 0;
-				}
-				this.SetPivot(f1, f2, xml.GetAttributeBool("anchor"));
-			}
-			else
-				this.SetPivot(0, 0, false);
+				this.SetPivot(float.Parse(arr[0]), float.Parse(arr[1]), xml.GetAttributeBool("anchor"));
 
 			str = xml.GetAttribute("alpha");
 			if (str != null)
