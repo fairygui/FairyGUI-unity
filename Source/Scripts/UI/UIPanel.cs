@@ -208,7 +208,12 @@ namespace FairyGUI
 			get
 			{
 				if (!_created && Application.isPlaying)
+				{
+					if (!string.IsNullOrEmpty(packagePath) && UIPackage.GetByName(packageName) == null)
+						UIPackage.AddPackage(packagePath);
+
 					CreateUI_PlayMode();
+				}
 
 				return _ui;
 			}
