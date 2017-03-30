@@ -60,6 +60,7 @@ namespace FairyGUIEditor
 			{
 				_loaded = false;
 				LoadPackages();
+				Debug.Log("FairyGUI - Refresh Packages And Panels complete.");
 			}
 			else
 				EditorUtility.DisplayDialog("FairyGUI", "Cannot run in play mode.", "OK");
