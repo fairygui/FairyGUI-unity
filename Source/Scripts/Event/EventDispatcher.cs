@@ -281,30 +281,33 @@ namespace FairyGUI
 				}
 			}
 
-			for (int i = 0; i < length; ++i)
+			if (!context._stopsPropagation)
 			{
-				bubbleChain[i].CallInternal(context);
-				if (context._stopsPropagation)
-					break;
-
-				if (context._touchEndCapture)
-				{
-					context._touchEndCapture = false;
-					if (strType == "onTouchBegin")
-						Stage.inst.AddTouchEndMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
-				}
-			}
-
-			if (addChain != null)
-			{
-				length = addChain.Count;
 				for (int i = 0; i < length; ++i)
 				{
-					EventBridge bridge = addChain[i];
-					if (bubbleChain.IndexOf(bridge) == -1)
+					bubbleChain[i].CallInternal(context);
+					if (context._stopsPropagation)
+						break;
+
+					if (context._touchEndCapture)
 					{
-						bridge.CallCaptureInternal(context);
-						bridge.CallInternal(context);
+						context._touchEndCapture = false;
+						if (strType == "onTouchBegin")
+							Stage.inst.AddTouchEndMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
+					}
+				}
+
+				if (addChain != null)
+				{
+					length = addChain.Count;
+					for (int i = 0; i < length; ++i)
+					{
+						EventBridge bridge = addChain[i];
+						if (bubbleChain.IndexOf(bridge) == -1)
+						{
+							bridge.CallCaptureInternal(context);
+							bridge.CallInternal(context);
+						}
 					}
 				}
 			}
