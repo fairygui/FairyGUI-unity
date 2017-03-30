@@ -1384,7 +1384,7 @@ namespace FairyGUI
 			if (numChildren > 0 && !forceUpdate)
 			{
 				float pos2 = this.GetChildAt(0).y;
-				if (pos2 > pos)
+				if (pos2 + (_lineGap > 0 ? 0 : -_lineGap) > pos)
 				{
 					for (int i = _firstIndex - _curLineItemCount; i >= 0; i -= _curLineItemCount)
 					{
@@ -1401,15 +1401,16 @@ namespace FairyGUI
 				}
 				else
 				{
+					float testGap = _lineGap > 0 ? _lineGap : 0;
 					for (int i = _firstIndex; i < _realNumItems; i += _curLineItemCount)
 					{
-						float pos3 = pos2 + _virtualItems[i].size.y + _lineGap;
-						if (pos3 > pos)
+						float pos3 = pos2 + _virtualItems[i].size.y;
+						if (pos3 + testGap > pos)
 						{
 							pos = pos2;
 							return i;
 						}
-						pos2 = pos3;
+						pos2 = pos3 + _lineGap;
 					}
 
 					pos = pos2;
@@ -1419,15 +1420,16 @@ namespace FairyGUI
 			else
 			{
 				float pos2 = 0;
+				float testGap = _lineGap > 0 ? _lineGap : 0;
 				for (int i = 0; i < _realNumItems; i += _curLineItemCount)
 				{
-					float pos3 = pos2 + _virtualItems[i].size.y + _lineGap;
-					if (pos3 > pos)
+					float pos3 = pos2 + _virtualItems[i].size.y;
+					if (pos3 + testGap > pos)
 					{
 						pos = pos2;
 						return i;
 					}
-					pos2 = pos3;
+					pos2 = pos3 + _lineGap;
 				}
 
 				pos = pos2;
@@ -1446,7 +1448,7 @@ namespace FairyGUI
 			if (numChildren > 0 && !forceUpdate)
 			{
 				float pos2 = this.GetChildAt(0).x;
-				if (pos2 > pos)
+				if (pos2 + (_columnGap > 0 ? 0 : -_columnGap) > pos)
 				{
 					for (int i = _firstIndex - _curLineItemCount; i >= 0; i -= _curLineItemCount)
 					{
@@ -1463,15 +1465,16 @@ namespace FairyGUI
 				}
 				else
 				{
+					float testGap = _columnGap > 0 ? _columnGap : 0;
 					for (int i = _firstIndex; i < _realNumItems; i += _curLineItemCount)
 					{
-						float pos3 = pos2 + _virtualItems[i].size.x + _columnGap;
-						if (pos3 > pos)
+						float pos3 = pos2 + _virtualItems[i].size.x;
+						if (pos3 + testGap > pos)
 						{
 							pos = pos2;
 							return i;
 						}
-						pos2 = pos3;
+						pos2 = pos3 + _columnGap;
 					}
 
 					pos = pos2;
@@ -1481,15 +1484,16 @@ namespace FairyGUI
 			else
 			{
 				float pos2 = 0;
+				float testGap = _columnGap > 0 ? _columnGap : 0;
 				for (int i = 0; i < _realNumItems; i += _curLineItemCount)
 				{
-					float pos3 = pos2 + _virtualItems[i].size.x + _columnGap;
-					if (pos3 > pos)
+					float pos3 = pos2 + _virtualItems[i].size.x;
+					if (pos3 + testGap > pos)
 					{
 						pos = pos2;
 						return i;
 					}
-					pos2 = pos3;
+					pos2 = pos3 + _columnGap;
 				}
 
 				pos = pos2;
@@ -1509,15 +1513,16 @@ namespace FairyGUI
 			int page = Mathf.FloorToInt(pos / viewWidth);
 			int startIndex = page * (_curLineItemCount * _curLineItemCount2);
 			float pos2 = page * viewWidth;
+			float testGap = _columnGap > 0 ? _columnGap : 0;
 			for (int i = 0; i < _curLineItemCount; i++)
 			{
-				float pos3 = pos2 + _virtualItems[startIndex + i].size.x + _columnGap;
-				if (pos3 > pos)
+				float pos3 = pos2 + _virtualItems[startIndex + i].size.x;
+				if (pos3 + testGap > pos)
 				{
 					pos = pos2;
 					return startIndex + i;
 				}
-				pos2 = pos3;
+				pos2 = pos3 + _columnGap;
 			}
 
 			pos = pos2;
