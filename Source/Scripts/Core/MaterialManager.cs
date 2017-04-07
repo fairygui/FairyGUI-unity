@@ -44,6 +44,9 @@ namespace FairyGUI
 		public static MaterialManager GetInstance(NTexture texture, string shaderName, string[] keywords)
 		{
 			NTexture rootTexture = texture.root;
+			if (rootTexture == null)
+				return null;
+
 			if (rootTexture.materialManagers == null)
 				rootTexture.materialManagers = new Dictionary<string, MaterialManager>();
 
