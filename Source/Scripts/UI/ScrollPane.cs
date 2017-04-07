@@ -87,6 +87,7 @@ namespace FairyGUI
 		EventCallback1 _touchEndDelegate;
 		EventCallback1 _touchMoveDelegate;
 		TimerCallback _tweenUpdateDelegate;
+		TimerCallback _showScrollBarDelegate;
 
 		GComponent _owner;
 		Container _maskContainer;
@@ -117,6 +118,7 @@ namespace FairyGUI
 			_tweenUpdateDelegate = TweenUpdate;
 			_touchEndDelegate = __touchEnd;
 			_touchMoveDelegate = __touchMove;
+			_showScrollBarDelegate = __showScrollBar;
 
 			_owner = owner;
 
@@ -1501,14 +1503,17 @@ namespace FairyGUI
 			if (val)
 			{
 				__showScrollBar(true);
-				Timers.inst.Remove(__showScrollBar);
+				Timers.inst.Remove(_showScrollBarDelegate);
 			}
 			else
-				Timers.inst.Add(0.5f, 1, __showScrollBar, val);
+				Timers.inst.Add(0.5f, 1, _showScrollBarDelegate, val);
 		}
 
 		private void __showScrollBar(object obj)
 		{
+			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
+				return;
+
 			_scrollBarVisible = (bool)obj && _viewSize.x > 0 && _viewSize.y > 0;
 			if (_vtScrollBar != null)
 				_vtScrollBar.displayObject.visible = _scrollBarVisible && !_vScrollNone;
@@ -1546,7 +1551,7 @@ namespace FairyGUI
 				}
 				else if (_yPos >= _overlapSize.y)
 				{
-					_yPos -= _contentSize.y / 2;
+					_yPos += _contentSize.y / 2 - _overlapSize.y;
 					changed = true;
 				}
 			}
