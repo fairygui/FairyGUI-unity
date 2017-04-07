@@ -1233,6 +1233,8 @@ namespace FairyGUI
 
 								v0.y = -line.y - yIndent + glyph2.vert.yMin - 1;
 								v1.y = -line.y - yIndent + glyph2.vert.yMax - 1;
+								if (v1.y - v0.y > 2)
+									v1.y = v0.y + 2;
 
 								float tmpX = charX + letterSpacing + glyph.width;
 
