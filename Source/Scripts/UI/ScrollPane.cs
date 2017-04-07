@@ -388,6 +388,14 @@ namespace FairyGUI
 		{
 			_owner.EnsureBoundsCorrect();
 
+			if (_loop == 1 && _overlapSize.x > 0)
+			{
+				if (value < 0.001f)
+					value += _contentSize.x / 2;
+				else if (value >= _overlapSize.x)
+					value -= _contentSize.x / 2;
+			}
+
 			value = Mathf.Clamp(value, 0, _overlapSize.x);
 			if (value != _xPos)
 			{
@@ -413,6 +421,14 @@ namespace FairyGUI
 		public void SetPosY(float value, bool ani)
 		{
 			_owner.EnsureBoundsCorrect();
+
+			if (_loop == 2 && _overlapSize.y > 0)
+			{
+				if (value < 0.001f)
+					value += _contentSize.y / 2;
+				else if (value >= _overlapSize.y)
+					value -= _contentSize.y / 2;
+			}
 
 			value = Mathf.Clamp(value, 0, _overlapSize.y);
 			if (value != _yPos)
@@ -1530,7 +1546,7 @@ namespace FairyGUI
 				}
 				else if (_yPos >= _overlapSize.y)
 				{
-					_yPos += _contentSize.y / 2 - _overlapSize.y;
+					_yPos -= _contentSize.y / 2;
 					changed = true;
 				}
 			}
