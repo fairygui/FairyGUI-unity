@@ -1312,6 +1312,8 @@ namespace FairyGUI
 					{
 						if (strings.TryGetValue(elementId, out value))
 							dxml.SetAttribute("title", value);
+						if (strings.TryGetValue(elementId + "-prompt", out value))
+							dxml.SetAttribute("prompt", value);
 						continue;
 					}
 
