@@ -68,11 +68,11 @@ Shader "FairyGUI/Text Brighter"
 					fixed2 flags : TEXCOORD1;
 
 					#ifdef CLIPPED
-					half2 clipPos : TEXCOORD2;
+					float2 clipPos : TEXCOORD2;
 					#endif
 
 					#ifdef SOFT_CLIPPED
-					half2 clipPos : TEXCOORD2;
+					float2 clipPos : TEXCOORD2;
 					#endif
 				};
 
@@ -84,7 +84,7 @@ Shader "FairyGUI/Text Brighter"
 
 				#ifdef SOFT_CLIPPED
 				float4 _ClipBox = float4(-2, -2, 0, 0);
-				half4 _ClipSoftness = half4(0, 0, 0, 0);
+				float4 _ClipSoftness = float4(0, 0, 0, 0);
 				#endif
 
 				v2f vert (appdata_t v)
@@ -143,7 +143,7 @@ Shader "FairyGUI/Text Brighter"
 					#endif
 
 					#ifdef SOFT_CLIPPED
-					half2 factor = half2(0,0);
+					float2 factor = float2(0,0);
 					if(i.clipPos.x<0)
 						factor.x = (1.0-abs(i.clipPos.x)) * _ClipSoftness.x;
 					else
@@ -156,7 +156,7 @@ Shader "FairyGUI/Text Brighter"
 					#endif
 
 					#ifdef CLIPPED
-					half2 factor = abs(i.clipPos);
+					float2 factor = abs(i.clipPos);
 					col.a *= step(max(factor.x, factor.y), 1);
 					#endif
 
