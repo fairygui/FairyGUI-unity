@@ -47,7 +47,7 @@ namespace FairyGUI
 			_selectedIndex = -1;
 			_items = new string[0];
 			_values = new string[0];
-			_popupDirection = "down";
+			_popupDirection = "auto";
 
 			onChanged = new EventListener(this, "onChanged");
 		}
