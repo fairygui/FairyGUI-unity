@@ -19,6 +19,7 @@ Get Started
 
 - Examples.Unity5  
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的工程(这里使用的Unity版本是5.2.1)。
+如果你使用的Unity版本>=5.4，Unity 可能报错“FairyGUI: texture 'atlas0.png' not fount in XXXX”,具体问题可查看[问答社区](http://www.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)。
 
 - Source  
 这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
@@ -36,6 +37,7 @@ Learn
 - 解压Examples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
 - 观看视频教程：[FairyGUI游戏UI开发基础](http://www.taikr.com/course/446)  
 - 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/tutorial)  
+- FAQ：[问答社区](http://www.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)  
 - 进群与小伙伴一起交流：434866637  
 
 License
