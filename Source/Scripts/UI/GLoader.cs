@@ -321,6 +321,9 @@ namespace FairyGUI
 			if (_contentItem != null)
 			{
 				_contentItem.Load();
+				if (_autoSize)
+					this.SetSize(_contentItem.width, _contentItem.height);
+
 				if (_contentItem.type == PackageItemType.Image)
 				{
 					_content.texture = _contentItem.texture;
@@ -399,9 +402,7 @@ namespace FairyGUI
 
 			if (_errorSign != null)
 			{
-				_errorSign.width = this.width;
-				_errorSign.height = this.height;
-				_errorSign.grayed = grayed;
+				_errorSign.SetSize(this.width, this.height);
 				((Container)displayObject).AddChild(_errorSign.displayObject);
 			}
 		}
@@ -472,7 +473,10 @@ namespace FairyGUI
 				}
 
 				if (_content.texture != null)
+				{
+					_content.SetScale(1, 1);
 					_content.size = new Vector2(_contentWidth, _contentHeight);
+				}
 				else
 					_content.SetScale(sx, sy);
 
