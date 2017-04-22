@@ -1458,6 +1458,8 @@ namespace FairyGUI
 			Dictionary<string, string> kv = new Dictionary<string, string>();
 			NTexture mainTexture = null;
 			AtlasSprite mainSprite = null;
+			float texScaleX = 1;
+			float texScaleY = 1;
 			bool ttf = false;
 			int size = 0;
 			int xadvance = 0;
@@ -1546,18 +1548,18 @@ namespace FairyGUI
 					{
 						if (mainSprite.rotated)
 						{
-							bg.uv[0] = new Vector2((float)(by + bg.height + mainSprite.rect.x) / mainTexture.width, 
-								1 - (float)(mainSprite.rect.yMax - bx) / mainTexture.height);
-							bg.uv[1] = new Vector2(bg.uv[0].x - (float)bg.height / mainTexture.width, bg.uv[0].y);
-							bg.uv[2] = new Vector2(bg.uv[1].x, bg.uv[0].y + (float)bg.width / mainTexture.height);
+							bg.uv[0] = new Vector2((float)(by + bg.height + mainSprite.rect.x) * texScaleX,
+								1 - (float)(mainSprite.rect.yMax - bx) * texScaleY);
+							bg.uv[1] = new Vector2(bg.uv[0].x - (float)bg.height * texScaleX, bg.uv[0].y);
+							bg.uv[2] = new Vector2(bg.uv[1].x, bg.uv[0].y + (float)bg.width * texScaleY);
 							bg.uv[3] = new Vector2(bg.uv[0].x, bg.uv[2].y);
 						}
 						else
 						{
-							bg.uv[0] = new Vector2((float)(bx + mainSprite.rect.x) / mainTexture.width, 
-								1 - (float)(by + bg.height + mainSprite.rect.y) / mainTexture.height);
-							bg.uv[1] = new Vector2(bg.uv[0].x, bg.uv[0].y + (float)bg.height / mainTexture.height);
-							bg.uv[2] = new Vector2(bg.uv[0].x + (float)bg.width / mainTexture.width, bg.uv[1].y);
+							bg.uv[0] = new Vector2((float)(bx + mainSprite.rect.x) * texScaleX,
+								1 - (float)(by + bg.height + mainSprite.rect.y) * texScaleY);
+							bg.uv[1] = new Vector2(bg.uv[0].x, bg.uv[0].y + (float)bg.height * texScaleY);
+							bg.uv[2] = new Vector2(bg.uv[0].x + (float)bg.width * texScaleX, bg.uv[1].y);
 							bg.uv[3] = new Vector2(bg.uv[2].x, bg.uv[0].y);
 						}
 					}
@@ -1593,6 +1595,8 @@ namespace FairyGUI
 						{
 							PackageItem atlasItem = _itemsById[mainSprite.atlas];
 							mainTexture = (NTexture)GetItemAsset(atlasItem);
+							texScaleX = mainTexture.root.uvRect.width / mainTexture.width;
+							texScaleY = mainTexture.root.uvRect.height / mainTexture.height;
 						}
 					}
 					if (kv.TryGetValue("size", out str))
