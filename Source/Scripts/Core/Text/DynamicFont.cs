@@ -205,10 +205,10 @@ namespace FairyGUI
 					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
 				glyph.vert.yMax = sTempChar.maxY - ri.yIndent;
 
-				glyph.uvTopLeft = sTempChar.uvTopLeft;
-				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
-				glyph.uvTopRight = sTempChar.uvTopRight;
-				glyph.uvBottomRight = sTempChar.uvBottomRight;
+				glyph.uv[0] = sTempChar.uvBottomLeft;
+				glyph.uv[1] = sTempChar.uvTopLeft;
+				glyph.uv[2] = sTempChar.uvTopRight;
+				glyph.uv[3] = sTempChar.uvBottomRight;
 
 				glyph.width = sTempChar.advance;
 				glyph.height = ri.height;

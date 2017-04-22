@@ -1121,10 +1121,10 @@ namespace FairyGUI
 						v0.y = -line.y - yIndent + glyph.vert.yMin;
 						v1.x = charX + glyph.vert.xMax;
 						v1.y = -line.y - yIndent + glyph.vert.yMax;
-						u0 = glyph.uvBottomLeft;
-						u1 = glyph.uvTopLeft;
-						u2 = glyph.uvTopRight;
-						u3 = glyph.uvBottomRight;
+						u0 = glyph.uv[0];
+						u1 = glyph.uv[1];
+						u2 = glyph.uv[2];
+						u3 = glyph.uv[3];
 						specFlag = 0;
 
 						if (_font.hasChannel)
@@ -1215,16 +1215,16 @@ namespace FairyGUI
 							if (_font.GetGlyph('_', glyph2))
 							{
 								//取中点的UV
-								if (glyph2.uvBottomLeft.x != glyph2.uvBottomRight.x)
-									u0.x = (glyph2.uvBottomLeft.x + glyph2.uvBottomRight.x) * 0.5f;
+								if (glyph2.uv[0].x != glyph2.uv[3].x)
+									u0.x = (glyph2.uv[0].x + glyph2.uv[3].x) * 0.5f;
 								else
-									u0.x = (glyph2.uvBottomLeft.x + glyph2.uvTopLeft.x) * 0.5f;
+									u0.x = (glyph2.uv[0].x + glyph2.uv[1].x) * 0.5f;
 								u0.x += specFlag;
 
-								if (glyph2.uvBottomLeft.y != glyph2.uvTopLeft.y)
-									u0.y = (glyph2.uvBottomLeft.y + glyph2.uvTopLeft.y) * 0.5f;
+								if (glyph2.uv[0].y != glyph2.uv[1].y)
+									u0.y = (glyph2.uv[0].y + glyph2.uv[1].y) * 0.5f;
 								else
-									u0.y = (glyph2.uvBottomLeft.y + glyph2.uvBottomRight.y) * 0.5f;
+									u0.y = (glyph2.uv[0].y + glyph2.uv[3].y) * 0.5f;
 
 								uvList.Add(u0);
 								uvList.Add(u0);

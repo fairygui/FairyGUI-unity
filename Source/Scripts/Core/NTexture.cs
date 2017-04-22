@@ -11,27 +11,32 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public Texture nativeTexture { get; private set; }
+		public Texture nativeTexture;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public NTexture alphaTexture { get; set; }
+		public NTexture alphaTexture;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public NTexture root { get; private set; }
+		public NTexture root;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public Rect uvRect { get; private set; }
+		public Rect uvRect;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public Dictionary<string, MaterialManager> materialManagers { get; internal set; }
+		public bool rotated;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Dictionary<string, MaterialManager> materialManagers;
 
 		/// <summary>
 		/// 
@@ -135,20 +140,30 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="root"></param>
 		/// <param name="region"></param>
-		public NTexture(NTexture root, Rect region)
+		public NTexture(NTexture root, Rect region, bool rotated)
 		{
 			this.root = root;
 			nativeTexture = root.nativeTexture;
-
+			this.rotated = rotated;
 			if (root._region != null)
 			{
 				region.x += ((Rect)root._region).x;
 				region.y += ((Rect)root._region).y;
 			}
-			_region = region;
-
 			uvRect = new Rect(region.x * root.uvRect.width / nativeTexture.width, 1 - region.yMax * root.uvRect.height / nativeTexture.height,
 				region.width * root.uvRect.width / nativeTexture.width, region.height * root.uvRect.height / nativeTexture.height);
+			if (rotated)
+			{
+				float tmp = region.width;
+				region.width = region.height;
+				region.height = tmp;
+
+				tmp = uvRect.width;
+				uvRect.width = uvRect.height;
+				uvRect.height = tmp;
+			}
+
+			_region = region;
 		}
 
 		/// <summary>

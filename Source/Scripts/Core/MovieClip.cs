@@ -17,6 +17,7 @@ namespace FairyGUI
 			public Rect rect;
 			public float addDelay;
 			public Rect uvRect;
+			public bool rotated;
 		}
 
 		/// <summary>
@@ -212,7 +213,7 @@ namespace FairyGUI
 					DrawFrame();
 				}
 			}
-			else if(_forceDraw)
+			else if (_forceDraw)
 				DrawFrame();
 
 			base.Update(context);
@@ -236,7 +237,7 @@ namespace FairyGUI
 					if (_flip != FlipType.None)
 						ToolSet.FlipRect(ref uvRect, _flip);
 
-					graphics.SetOneQuadMesh(frame.rect, uvRect, _color);
+					graphics.SetOneQuadMesh(frame.rect, uvRect, _color, null, frame.rotated);
 				}
 			}
 		}

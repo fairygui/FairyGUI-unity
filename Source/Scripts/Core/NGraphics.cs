@@ -118,7 +118,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int[] TRIANGLES_9_GRID = new int[] { 
+		public static int[] TRIANGLES_9_GRID = new int[] {
 			4,0,1,1,5,4,
 			5,1,2,2,6,5,
 			6,2,3,3,7,6,
@@ -134,14 +134,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static int[] TRIANGLES_4_GRID = new int[] { 
+		public static int[] TRIANGLES_4_GRID = new int[] {
 			4, 0, 5,
-			4, 5, 1, 
-			4, 1, 6, 
+			4, 5, 1,
+			4, 1, 6,
 			4, 6, 2,
 			4, 2, 7,
 			4, 7, 3,
-			4, 3, 8, 
+			4, 3, 8,
 			4, 8, 0
 		};
 
@@ -529,7 +529,7 @@ namespace FairyGUI
 		/// <param name="uvRect"></param>
 		/// <param name="color"></param>
 		/// <param name="allColors"></param>
-		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color, Color[] allColors = null)
+		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color, Color[] allColors = null, bool uvRotated = false)
 		{
 			//当四边形发生形变时，只用两个三角面表达会造成图形的变形较严重，这里做一个优化，自动增加更多的面
 			if (vertexMatrix != null)
@@ -578,6 +578,10 @@ namespace FairyGUI
 			}
 			else
 				FillColors(color);
+
+			if (uvRotated)
+				RotateUV(this.uv, ref uvRect);
+
 			UpdateMesh();
 		}
 
@@ -761,7 +765,7 @@ namespace FairyGUI
 						otherIndex = sRestIndices[(restIndexPos + i) % numRestIndices];
 						p = points[otherIndex];
 
-						if (ToolSet.IsPointInTriangle(ref p, ref  a, ref b, ref c))
+						if (ToolSet.IsPointInTriangle(ref p, ref a, ref b, ref c))
 						{
 							earFound = false;
 							break;
@@ -1024,6 +1028,29 @@ namespace FairyGUI
 			uv[index + 1] = new Vector2(rect.xMin, rect.yMax);
 			uv[index + 2] = new Vector2(rect.xMax, rect.yMax);
 			uv[index + 3] = new Vector2(rect.xMax, rect.yMin);
+		}
+
+		public static void RotateUV(Vector2[] uv, ref Rect baseUVRect)
+		{
+			int vertCount = uv.Length;
+			float xMin = Mathf.Min(baseUVRect.xMin, baseUVRect.xMax);
+			float yMin = baseUVRect.yMin;
+			float yMax = baseUVRect.yMax;
+			if (yMin > yMax)
+			{
+				yMin = yMax;
+				yMax = baseUVRect.yMin;
+			}
+
+			float tmp;
+			for (int i = 0; i < vertCount; i++)
+			{
+				Vector2 m = uv[i];
+				tmp = m.y;
+				m.y = yMin + m.x - xMin;
+				m.x = xMin + yMax - tmp;
+				uv[i] = m;
+			}
 		}
 	}
 

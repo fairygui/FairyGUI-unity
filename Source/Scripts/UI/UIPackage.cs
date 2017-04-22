@@ -1342,7 +1342,7 @@ namespace FairyGUI
 		{
 			PackageItem atlasItem;
 			if (_itemsById.TryGetValue(sprite.atlas, out atlasItem))
-				return new NTexture((NTexture)GetItemAsset(atlasItem), sprite.rect);
+				return new NTexture((NTexture)GetItemAsset(atlasItem), sprite.rect, sprite.rotated);
 			else
 			{
 				Debug.LogWarning("FairyGUI: " + sprite.atlas + " not found in " + this.name);
@@ -1434,6 +1434,13 @@ namespace FairyGUI
 							1 - sprite.rect.yMax * item.texture.uvRect.height / item.texture.height,
 							sprite.rect.width * item.texture.uvRect.width / item.texture.width,
 							sprite.rect.height * item.texture.uvRect.height / item.texture.height);
+						frame.rotated = sprite.rotated;
+						if (frame.rotated)
+						{
+							float tmp = frame.uvRect.width;
+							frame.uvRect.width = frame.uvRect.height;
+							frame.uvRect.height = tmp;
+						}
 					}
 				}
 				item.frames[i] = frame;
@@ -1450,7 +1457,7 @@ namespace FairyGUI
 			int cnt = arr.Length;
 			Dictionary<string, string> kv = new Dictionary<string, string>();
 			NTexture mainTexture = null;
-			Vector2 atlasOffset = new Vector2();
+			AtlasSprite mainSprite = null;
 			bool ttf = false;
 			int size = 0;
 			int xadvance = 0;
@@ -1521,19 +1528,38 @@ namespace FairyGUI
 							if (_itemsById.TryGetValue(str, out charImg))
 							{
 								GetItemAsset(charImg);
-								bg.uvRect = charImg.texture.uvRect;
-								if (mainTexture == null)
-									mainTexture = charImg.texture.root;
+								Rect uvRect = charImg.texture.uvRect;
+								bg.uv[0] = uvRect.position;
+								bg.uv[1] = new Vector2(uvRect.xMin, uvRect.yMax);
+								bg.uv[2] = new Vector2(uvRect.xMax, uvRect.yMax);
+								bg.uv[3] = new Vector2(uvRect.xMax, uvRect.yMin);
+								if (charImg.texture.rotated)
+									NGraphics.RotateUV(bg.uv, ref uvRect);
 								bg.width = charImg.texture.width;
 								bg.height = charImg.texture.height;
+								if (mainTexture == null)
+									mainTexture = charImg.texture.root;
 							}
 						}
 					}
 					else
 					{
-						Rect region = new Rect(bx + atlasOffset.x, by + atlasOffset.y, bg.width, bg.height);
-						bg.uvRect = new Rect(region.x / mainTexture.width, 1 - region.yMax / mainTexture.height,
-							region.width / mainTexture.width, region.height / mainTexture.height);
+						if (mainSprite.rotated)
+						{
+							bg.uv[0] = new Vector2((float)(by + bg.height + mainSprite.rect.x) / mainTexture.width, 
+								1 - (float)(mainSprite.rect.yMax - bx) / mainTexture.height);
+							bg.uv[1] = new Vector2(bg.uv[0].x - (float)bg.height / mainTexture.width, bg.uv[0].y);
+							bg.uv[2] = new Vector2(bg.uv[1].x, bg.uv[0].y + (float)bg.width / mainTexture.height);
+							bg.uv[3] = new Vector2(bg.uv[0].x, bg.uv[2].y);
+						}
+						else
+						{
+							bg.uv[0] = new Vector2((float)(bx + mainSprite.rect.x) / mainTexture.width, 
+								1 - (float)(by + bg.height + mainSprite.rect.y) / mainTexture.height);
+							bg.uv[1] = new Vector2(bg.uv[0].x, bg.uv[0].y + (float)bg.height / mainTexture.height);
+							bg.uv[2] = new Vector2(bg.uv[0].x + (float)bg.width / mainTexture.width, bg.uv[1].y);
+							bg.uv[3] = new Vector2(bg.uv[2].x, bg.uv[0].y);
+						}
 					}
 
 					if (ttf)
@@ -1563,11 +1589,9 @@ namespace FairyGUI
 						ttf = true;
 						canTint = true;
 
-						AtlasSprite sprite;
-						if (_sprites.TryGetValue(item.id, out sprite))
+						if (_sprites.TryGetValue(item.id, out mainSprite))
 						{
-							atlasOffset = new Vector2(sprite.rect.x, sprite.rect.y);
-							PackageItem atlasItem = _itemsById[sprite.atlas];
+							PackageItem atlasItem = _itemsById[mainSprite.atlas];
 							mainTexture = (NTexture)GetItemAsset(atlasItem);
 						}
 					}

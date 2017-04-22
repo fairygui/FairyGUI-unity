@@ -328,7 +328,7 @@ namespace FairyGUI
 					if (i == hc - 1)
 						uvTmp.xMax = Mathf.Lerp(uvRect.xMin, uvRect.xMax, tailWidth / sourceW);
 					if (j == vc - 1)
-						uvTmp.yMin = Mathf.Lerp(uvRect.yMin, uvRect.yMax, 1 -tailHeight / sourceH);
+						uvTmp.yMin = Mathf.Lerp(uvRect.yMin, uvRect.yMax, 1 - tailHeight / sourceH);
 
 					graphics.FillUV(vertIndex, uvTmp);
 					vertIndex += 4;
@@ -356,11 +356,13 @@ namespace FairyGUI
 				graphics.Fill(_fillMethod, _fillAmount, _fillOrigin, _fillClockwise, _contentRect, uvRect);
 				graphics.FillColors(_color);
 				graphics.FillTriangles();
+				if (_texture.rotated)
+					NGraphics.RotateUV(graphics.uv, ref uvRect);
 				graphics.UpdateMesh();
 			}
 			else if (_texture.width == _contentRect.width && _texture.height == _contentRect.height)
 			{
-				graphics.SetOneQuadMesh(_contentRect, uvRect, _color);
+				graphics.SetOneQuadMesh(_contentRect, uvRect, _color, null, _texture.rotated);
 			}
 			else if (_scaleByTile)
 			{
@@ -370,13 +372,15 @@ namespace FairyGUI
 				{
 					uvRect.width *= _contentRect.width / _texture.width;
 					uvRect.height *= _contentRect.height / _texture.height;
-					graphics.SetOneQuadMesh(_contentRect, uvRect, _color);
+					graphics.SetOneQuadMesh(_contentRect, uvRect, _color, null, _texture.rotated);
 				}
 				else
 				{
 					TileFill(_contentRect, uvRect, _texture.width, _texture.height, -1);
 					graphics.FillColors(_color);
 					graphics.FillTriangles();
+					if (_texture.rotated)
+						NGraphics.RotateUV(graphics.uv, ref uvRect);
 					graphics.UpdateMesh();
 				}
 			}
@@ -468,11 +472,13 @@ namespace FairyGUI
 				}
 
 				graphics.FillColors(_color);
+				if (_texture.rotated)
+					NGraphics.RotateUV(graphics.uv, ref uvRect);
 				graphics.UpdateMesh();
 			}
 			else
 			{
-				graphics.SetOneQuadMesh(_contentRect, uvRect, _color);
+				graphics.SetOneQuadMesh(_contentRect, uvRect, _color, null, _texture.rotated);
 			}
 		}
 
@@ -640,6 +646,9 @@ namespace FairyGUI
 				col.a = this.alpha;
 				colors[i] = col;
 			}
+
+			if (_texture.rotated)
+				NGraphics.RotateUV(uv, ref uvRect);
 
 			mesh.Clear();
 			mesh.vertices = verts;

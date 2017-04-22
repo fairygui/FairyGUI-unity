@@ -91,10 +91,7 @@ namespace FairyGUI
 	public class GlyphInfo
 	{
 		public Rect vert;
-		public Vector2 uvBottomLeft;
-		public Vector2 uvBottomRight;
-		public Vector2 uvTopLeft;
-		public Vector2 uvTopRight;
+		public Vector2[] uv = new Vector2[4];
 		public float width;
 		public float height;
 		public int channel;

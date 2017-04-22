@@ -19,7 +19,7 @@ namespace FairyGUI
 			public int height;
 			public int advance;
 			public int lineHeight;
-			public Rect uvRect;
+			public Vector2[] uv = new Vector2[4];
 			public int channel;//0-n/a, 1-r,2-g,3-b,4-alpha
 		}
 
@@ -84,6 +84,7 @@ namespace FairyGUI
 			}
 		}
 
+		private static Vector2[] ZERO_UV = new Vector2[] { Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero };
 		override public bool GetGlyph(char ch, GlyphInfo glyph)
 		{
 			BMGlyph bg;
@@ -95,10 +96,7 @@ namespace FairyGUI
 				glyph.vert.xMax = 0;
 				glyph.vert.yMin = 0;
 				glyph.vert.yMax = 0;
-				glyph.uvTopLeft = Vector2.zero;
-				glyph.uvBottomLeft = Vector2.zero;
-				glyph.uvTopRight = Vector2.zero;
-				glyph.uvBottomRight = Vector2.zero;
+				glyph.uv = ZERO_UV;
 				glyph.channel = 0;
 				return true;
 			}
@@ -110,10 +108,7 @@ namespace FairyGUI
 				glyph.vert.xMax = (bg.offsetX + bg.width) * scale;
 				glyph.vert.yMin = (-bg.height - bg.offsetY) * scale;
 				glyph.vert.yMax = -bg.offsetY * scale;
-				glyph.uvBottomLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMin);
-				glyph.uvTopLeft = new Vector2(bg.uvRect.xMin, bg.uvRect.yMax);
-				glyph.uvTopRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMax);
-				glyph.uvBottomRight = new Vector2(bg.uvRect.xMax, bg.uvRect.yMin);
+				glyph.uv = bg.uv;
 				glyph.channel = bg.channel;
 				return true;
 			}
