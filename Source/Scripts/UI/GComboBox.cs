@@ -261,6 +261,8 @@ namespace FairyGUI
 		{
 			if (this.grayed && _buttonController != null && _buttonController.HasPage(GButton.DISABLED))
 				SetState(GButton.DISABLED);
+			else if (dropdown != null && dropdown.parent != null)
+				SetState(GButton.DOWN);
 			else
 				SetState(_over ? GButton.OVER : GButton.UP);
 		}
