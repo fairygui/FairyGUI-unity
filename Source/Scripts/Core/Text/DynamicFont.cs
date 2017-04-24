@@ -224,17 +224,17 @@ namespace FairyGUI
 
 				if (!sTempChar.flipped)
 				{
-					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
-					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uv[0] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uv[1] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uv[2] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uv[3] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
 				}
 				else
 				{
-					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
-					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uv[0] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uv[1] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uv[2] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uv[3] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
 				}
 
 				glyph.width = Mathf.CeilToInt(sTempChar.width);
