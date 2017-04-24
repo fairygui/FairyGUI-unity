@@ -304,9 +304,9 @@ namespace FairyGUI
 			if (autoResizeItem)
 			{
 				if (_layout == ListLayoutType.SingleColumn)
-					child.SetSize(this.viewWidth, child.height);
+					child.SetSize(this.viewWidth, child.height, true);
 				else if (_layout == ListLayoutType.SingleRow)
-					child.SetSize(child.width, this.viewHeight);
+					child.SetSize(child.width, this.viewHeight, true);
 			}
 
 			base.AddChildAt(child, index);
@@ -919,7 +919,7 @@ namespace FairyGUI
 				for (int i = 0; i < cnt; i++)
 				{
 					GObject child = GetChildAt(i);
-					child.SetSize(cw, child.height);
+					child.SetSize(cw, child.height, true);
 				}
 			}
 			else if (_layout == ListLayoutType.SingleRow)
@@ -929,7 +929,7 @@ namespace FairyGUI
 				for (int i = 0; i < cnt; i++)
 				{
 					GObject child = GetChildAt(i);
-					child.SetSize(child.width, ch);
+					child.SetSize(child.width, ch, true);
 				}
 			}
 		}
