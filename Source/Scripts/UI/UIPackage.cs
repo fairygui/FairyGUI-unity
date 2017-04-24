@@ -221,6 +221,12 @@ namespace FairyGUI
 			return AddPackage(descFilePath, (string name, string extension, System.Type type) => { return Resources.Load(name, type); });
 		}
 
+		/// <summary>
+		/// 使用自定义的加载方式载入一个包。
+		/// </summary>
+		/// <param name="assetPath">包资源路径。</param>
+		/// <param name="loadFunc">载入函数</param>
+		/// <returns></returns>
 		public static UIPackage AddPackage(string assetPath, UIPackage.LoadResource loadFunc)
 		{
 			if (_packageInstById.ContainsKey(assetPath))
@@ -245,6 +251,27 @@ namespace FairyGUI
 			_packageInstById[assetPath] = pkg;
 			_packageList.Add(pkg);
 			pkg.assetPath = assetPath;
+
+			return pkg;
+		}
+
+		/// <summary>
+		/// 使用自定义的加载方式载入一个包。
+		/// </summary>
+		/// <param name="descData">描述文件数据。</param>
+		/// <param name="assetNamePrefix">资源文件名前缀。如果包含，则载入资源时名称将传入assetNamePrefix@resFileName这样格式。可以为空。</param>
+		/// <param name="loadFunc">载入函数</param>
+		/// <returns></returns>
+		public static UIPackage AddPackage(string descData, string assetNamePrefix, UIPackage.LoadResource loadFunc)
+		{
+			UIPackage pkg = new UIPackage();
+			pkg._loadFunc = loadFunc;
+			pkg.Create(descData, null, assetNamePrefix);
+			if (_packageInstById.ContainsKey(pkg.id))
+				Debug.LogWarning("FairyGUI: Package id conflicts, '" + pkg.name + "' and '" + _packageInstById[pkg.id].name + "'");
+			_packageInstById[pkg.id] = pkg;
+			_packageInstByName[pkg.name] = pkg;
+			_packageList.Add(pkg);
 
 			return pkg;
 		}
@@ -561,7 +588,7 @@ namespace FairyGUI
 				return null;
 		}
 
-		void Create(string desc, AssetBundle res, string mainAssetName)
+		void Create(string desc, AssetBundle res, string assetNamePrefix)
 		{
 			_descPack = new Dictionary<string, string>();
 			_resBundle = res;
@@ -571,19 +598,11 @@ namespace FairyGUI
 
 			DecodeDesc(desc);
 
-			if (res != null)
-			{
-				if (mainAssetName != null && mainAssetName.Length > 0)
-					_assetNamePrefix = mainAssetName + "@";
-				else
-					_assetNamePrefix = "";
-				_fromBundle = true;
-			}
+			if (!string.IsNullOrEmpty(assetNamePrefix))
+				_assetNamePrefix = assetNamePrefix + "@";
 			else
-			{
-				_assetNamePrefix = mainAssetName + "@";
-				_fromBundle = false;
-			}
+				_assetNamePrefix = string.Empty;
+			_fromBundle = res != null;
 
 			LoadPackage();
 		}
