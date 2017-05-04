@@ -5,7 +5,7 @@ chmf5.xml|356|<component size="90,100" extention="Button">
     <text id="n4" name="n4" xy="4,-2" size="90,27" fontSize="22" color="#ffffff" autoSize="none" strokeColor="#000000" text="Drag Me"/>
   </displayList>
   <Button/>
-</component>chmf8.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+</component>chmf8.xml|316|<movieclip interval="83" frameCount="8">
   <frames>
     <frame rect="9,0,74,65"/>
     <frame rect="7,5,74,64"/>
@@ -16,13 +16,13 @@ chmf5.xml|356|<component size="90,100" extention="Button">
     <frame rect="6,6,74,68"/>
     <frame rect="0,2,81,65"/>
   </frames>
-</movieclip>package.xml|416|<packageDescription id="jqu05wyc" name="Particles">
+</movieclip>package.xml|507|<packageDescription id="jqu05wyc" name="Particles" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <image id="chmf1" name="change" path="/" size="282,500"/>
+    <movieclip id="chmf8" name="pet" path="/" size="84,74"/>
+    <component id="chmf5" name="CoolComponent" path="/" size="90,100" exported="true"/>
+    <component id="x7kw0" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="512,512" file="atlas0.png"/>
-    <component id="chmf5" name="CoolComponent" exported="true" size="90,100"/>
-    <component id="x7kw0" name="Main" exported="true" size="1136,640"/>
-    <image id="chmf1" name="change" size="282,500"/>
-    <movieclip id="chmf8" name="pet" size="84,74"/>
   </resources>
 </packageDescription>x7kw0.xml|308|<component size="1136,640">
   <displayList>

@@ -15,13 +15,13 @@ c5s80.xml|570|<component size="1136,640">
     <image id="n0" name="n0" src="c5s81" xy="0,0" pivot="0.5,0.5" size="363,505"/>
   </displayList>
   <Button/>
-</component>package.xml|459|<packageDescription id="f3xz8s8w" name="TurnCard">
+</component>package.xml|559|<packageDescription id="f3xz8s8w" name="TurnCard" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="c5s83" name="CardComponent" path="/" size="363,505"/>
+    <image id="c5s81" name="card_back" path="/" size="362,505"/>
+    <image id="c5s82" name="card_k" path="/" size="363,505"/>
+    <image id="c5s84" name="card_a" path="/" size="363,505"/>
+    <component id="c5s80" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
-    <component id="c5s80" name="Main" exported="true" size="1136,640"/>
-    <component id="c5s83" name="CardComponent" size="363,505"/>
-    <image id="c5s81" name="card_back" size="362,505"/>
-    <image id="c5s82" name="card_k" size="363,505"/>
-    <image id="c5s84" name="card_a" size="363,505"/>
   </resources>
 </packageDescription>

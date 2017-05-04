@@ -16,15 +16,15 @@
     <loader id="n0" name="icon" xy="0,41" size="248,378"/>
   </displayList>
   <Button mode="Radio"/>
-</component>package.xml|616|<packageDescription id="i1i2ucwo" name="Curve">
+</component>package.xml|735|<packageDescription id="i1i2ucwo" name="Curve" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
-    <atlas id="atlas0" size="256,2048" file="atlas0.png"/>
-    <component id="113wo0" name="Main" exported="true" size="1320,500"/>
-    <component id="113wo2" name="item" size="248,460"/>
-    <image id="113wo3" name="n1" size="248,378" exported="true"/>
-    <image id="113wo4" name="n2" size="248,378" exported="true"/>
-    <image id="113wo5" name="n3" size="248,378" exported="true"/>
-    <image id="113wo6" name="n4" size="248,378" exported="true"/>
-    <image id="113wo7" name="n5" size="248,378" exported="true"/>
+    <component id="113wo2" name="item" path="/" size="248,460"/>
+    <component id="113wo0" name="Main" path="/" size="1320,500" exported="true"/>
+    <image id="113wo3" name="n1" path="/" size="248,378" exported="true"/>
+    <image id="113wo4" name="n2" path="/" size="248,378" exported="true"/>
+    <image id="113wo5" name="n3" path="/" size="248,378" exported="true"/>
+    <image id="113wo6" name="n4" path="/" size="248,378" exported="true"/>
+    <image id="113wo7" name="n5" path="/" size="248,378" exported="true"/>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
   </resources>
 </packageDescription>

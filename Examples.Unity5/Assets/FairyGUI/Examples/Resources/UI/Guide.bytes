@@ -1,13 +1,13 @@
-package.xml|586|<packageDescription id="q3l7vvj0" name="Guide">
+package.xml|704|<packageDescription id="q3l7vvj0" name="Guide" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="rpol1" name="BagButton" path="/" size="90,100"/>
+    <component id="rpol5" name="Button1" path="/" size="100,36"/>
+    <image id="rpol2" name="btnimage" path="/" size="86,99"/>
+    <movieclip id="rpol3" name="quan" path="/" size="120,119"/>
+    <movieclip id="xcfj6" name="rswcfhd" path="/" size="79,49"/>
+    <component id="rpol0" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="rpol4" name="GuideLayer" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="512,512" file="atlas0.png"/>
-    <component id="rpol0" name="Main" exported="true" size="1136,640"/>
-    <component id="rpol1" name="BagButton" size="90,100"/>
-    <component id="rpol4" name="GuideLayer" exported="true" size="1136,640"/>
-    <component id="rpol5" name="Button1" size="100,36"/>
-    <image id="rpol2" name="btnimage" size="86,99"/>
-    <movieclip id="rpol3" name="quan" size="120,119"/>
-    <movieclip id="xcfj6" name="rswcfhd" size="79,49"/>
   </resources>
 </packageDescription>rpol0.xml|494|<component size="1136,640">
   <displayList>
@@ -29,7 +29,7 @@ package.xml|586|<packageDescription id="q3l7vvj0" name="Guide">
     <movieclip id="n2" name="n2" src="rpol3" xy="-13,-6"/>
   </displayList>
   <Button/>
-</component>rpol3.xml|476|<movieclip pivot="60,60" interval="166" frameCount="12">
+</component>rpol3.xml|462|<movieclip interval="166" frameCount="12">
   <frames>
     <frame rect="17,18,86,85"/>
     <frame rect="18,18,84,84"/>
@@ -88,7 +88,7 @@ package.xml|586|<packageDescription id="q3l7vvj0" name="Guide">
     </text>
   </displayList>
   <Button/>
-</component>xcfj6.xml|481|<movieclip pivot="40,23" interval="41" frameCount="13">
+</component>xcfj6.xml|467|<movieclip interval="41" frameCount="13">
   <frames>
     <frame rect="0,0,75,49"/>
     <frame rect="0,0,75,49"/>

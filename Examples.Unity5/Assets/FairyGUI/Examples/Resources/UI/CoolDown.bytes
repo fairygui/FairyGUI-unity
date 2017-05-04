@@ -38,28 +38,28 @@ char id=54 img=p3ya12 xoffset=0 yoffset=0 xadvance=35
 char id=55 img=p3ya13 xoffset=0 yoffset=0 xadvance=35
 char id=56 img=p3ya14 xoffset=0 yoffset=0 xadvance=35
 char id=57 img=p3ya15 xoffset=0 yoffset=0 xadvance=35
-package.xml|1267|<packageDescription id="y768eypf" name="Cooldown">
+package.xml|1642|<packageDescription id="y768eypf" name="Cooldown" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="ltiql" name="Button1" path="/" size="60,60"/>
+    <component id="p3yap" name="Button2" path="/" size="100,100"/>
+    <image id="ltiqo" name="14" path="/images/" size="40,40" scale="9grid" scale9grid="10,10,20,20"/>
+    <image id="p3ya10" name="4(4)_png" path="/images/" size="41,45"/>
+    <image id="p3ya11" name="5(4)_png" path="/images/" size="41,45"/>
+    <image id="p3ya12" name="6(4)_png" path="/images/" size="41,45"/>
+    <image id="p3ya13" name="7(4)_png" path="/images/" size="41,45"/>
+    <image id="p3ya14" name="8(4)_png" path="/images/" size="41,45"/>
+    <image id="p3ya15" name="9(4)_png" path="/images/" size="41,45"/>
+    <image id="p3yaq" name="11" path="/images/" size="127,127"/>
+    <image id="p3yar" name="13" path="/images/" size="127,127"/>
+    <image id="p3yau" name="12" path="/images/" size="82,82"/>
+    <image id="p3yaw" name="0(4)_png" path="/images/" size="41,45"/>
+    <image id="p3yax" name="1(4)_png" path="/images/" size="41,45"/>
+    <image id="p3yay" name="2(4)_png" path="/images/" size="41,45"/>
+    <image id="p3yaz" name="3(4)_png" path="/images/" size="41,45"/>
+    <image id="uo8117" name="mask0" path="/images/" size="48,48"/>
+    <image id="uo8118" name="mask1" path="/images/" size="80,80"/>
+    <component id="fvaib" name="Main" path="/" size="1136,640" exported="true"/>
+    <font id="p3yav" name="cdtime" path="/" size="0,0" exported="true" file="p3yav.fnt"/>
     <atlas id="atlas0" size="512,256" file="atlas0.png"/>
-    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
-    <component id="ltiql" name="Button1" size="60,60"/>
-    <component id="p3yap" name="Button2" size="100,100"/>
-    <font id="p3yav" name="cdtime" exported="true"/>
-    <image id="ltiqo" name="14" size="40,40" scale="9grid" scale9grid="10,10,20,20"/>
-    <image id="p3ya10" name="4(4).png" size="41,45"/>
-    <image id="p3ya11" name="5(4).png" size="41,45"/>
-    <image id="p3ya12" name="6(4).png" size="41,45"/>
-    <image id="p3ya13" name="7(4).png" size="41,45"/>
-    <image id="p3ya14" name="8(4).png" size="41,45"/>
-    <image id="p3ya15" name="9(4).png" size="41,45"/>
-    <image id="p3yaq" name="11" size="127,127"/>
-    <image id="p3yar" name="13" size="127,127"/>
-    <image id="p3yau" name="12" size="82,82"/>
-    <image id="p3yaw" name="0(4).png" size="41,45"/>
-    <image id="p3yax" name="1(4).png" size="41,45"/>
-    <image id="p3yay" name="2(4).png" size="41,45"/>
-    <image id="p3yaz" name="3(4).png" size="41,45"/>
-    <image id="uo8117" name="mask0" size="48,48"/>
-    <image id="uo8118" name="mask1" size="80,80"/>
   </resources>
 </packageDescription>

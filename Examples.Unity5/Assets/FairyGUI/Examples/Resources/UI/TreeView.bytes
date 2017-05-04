@@ -29,7 +29,7 @@ mlvd1.xml|433|<component size="38,31" extention="Button">
     </component>
   </displayList>
   <Button mode="Radio"/>
-</component>mlvdc.xml|399|<movieclip pivot="38,29" interval="41" frameCount="10">
+</component>mlvdc.xml|385|<movieclip interval="41" frameCount="10">
   <frames>
     <frame rect="11,15,54,47"/>
     <frame rect="9,12,57,51"/>
@@ -42,18 +42,18 @@ mlvd1.xml|433|<component size="38,31" extention="Button">
     <frame rect="10,13,56,50"/>
     <frame rect="10,14,56,49"/>
   </frames>
-</movieclip>package.xml|787|<packageDescription id="2mabf2jp" name="TreeView">
+</movieclip>package.xml|977|<packageDescription id="2mabf2jp" name="TreeView" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="mlvd1" name="TreeExpandButton" path="/" size="38,31" exported="true"/>
+    <component id="mlvd4" name="TreeItem" path="/" size="240,48" exported="true"/>
+    <component id="pclm0" name="Main" path="/" size="1136,640" exported="true"/>
+    <image id="mlvd2" name="i3.png" path="/Images/" size="22,28" exported="true"/>
+    <image id="mlvd3" name="i4.png" path="/Images/" size="31,23" exported="true"/>
+    <image id="mlvd7" name="folder_closed" path="/Icons/" size="42,33" exported="true"/>
+    <image id="mlvd8" name="folder_opened" path="/Icons/" size="47,33" exported="true"/>
+    <image id="mlvd9" name="file" path="/Icons/" size="36,46" exported="true"/>
+    <movieclip id="mlvdc" name="heart" path="/Icons/" size="75,66" exported="true"/>
     <atlas id="atlas0" size="256,256" file="atlas0.png"/>
-    <component id="mlvd1" name="TreeExpandButton" exported="true" size="38,31"/>
-    <component id="mlvd4" name="TreeItem" exported="true" size="240,48"/>
-    <component id="pclm0" name="Main" exported="true" size="1136,640"/>
-    <image id="mlvd2" name="i3.png" size="22,28" exported="true"/>
-    <image id="mlvd3" name="i4.png" size="31,23" exported="true"/>
-    <image id="mlvd7" name="folder_closed" size="42,33" exported="true"/>
-    <image id="mlvd8" name="folder_opened" size="47,33" exported="true"/>
-    <image id="mlvd9" name="file" size="36,46" exported="true"/>
-    <movieclip id="mlvdc" name="heart" size="75,66"/>
   </resources>
 </packageDescription>pclm0.xml|336|<component size="1136,640">
   <displayList>

@@ -38,17 +38,17 @@ d7yq0.xml|615|<component size="1136,640" opaque="false">
   <displayList>
     <image id="n22" name="n22" src="zis77" xy="0,0"/>
   </displayList>
-</component>package.xml|662|<packageDescription id="ezq9a8mh" name="HitTest">
+</component>package.xml|798|<packageDescription id="ezq9a8mh" name="HitTest" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="g40je" name="button1" path="/" size="121,169"/>
+    <component id="g40jf" name="button2" path="/" size="131,168"/>
+    <component id="g40jg" name="button3" path="/" size="190,144"/>
+    <component id="g40jh" name="component1" path="/" size="282,500"/>
+    <image id="g40j8" name="2" path="/" size="190,144"/>
+    <image id="g40j9" name="1" path="/" size="131,168"/>
+    <image id="g40ja" name="0" path="/" size="121,169"/>
+    <image id="zis77" name="change" path="/" size="282,500"/>
+    <component id="d7yq0" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="512,512" file="atlas0.png"/>
-    <component id="d7yq0" name="Main" exported="true" size="1136,640"/>
-    <component id="g40je" name="button1" size="121,169"/>
-    <component id="g40jf" name="button2" size="131,168"/>
-    <component id="g40jg" name="button3" size="190,144"/>
-    <component id="g40jh" name="component1" size="282,500"/>
-    <image id="g40j8" name="2" size="190,144"/>
-    <image id="g40j9" name="1" size="131,168"/>
-    <image id="g40ja" name="0" size="121,169"/>
-    <image id="zis77" name="change" size="282,500"/>
   </resources>
 </packageDescription>

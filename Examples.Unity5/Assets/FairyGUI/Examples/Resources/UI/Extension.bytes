@@ -32,19 +32,19 @@ eeyy0.xml|434|<component size="1136,640">
     <item time="0" type="Visible" value="true"/>
     <item time="0" type="XY" tween="true" startValue="391,-" endValue="0,0" duration="9"/>
   </transition>
-</component>package.xml|869|<packageDescription id="jou4kj6p" name="Extension">
+</component>package.xml|1086|<packageDescription id="jou4kj6p" name="Extension" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="gsia7" name="mailItem" path="/" size="380,125"/>
+    <image id="gsia1" name="1" path="/images/" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="gsia2" name="3" path="/images/" size="261,63" scale="9grid" scale9grid="110,16,33,32"/>
+    <image id="gsia3" name="4" path="/images/" size="133,34"/>
+    <image id="gsia8" name="2" path="/images/" size="78,141" scale="9grid" scale9grid="25,26,26,90"/>
+    <image id="gsia9" name="0" path="/images/" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="gsiac" name="7" path="/images/" size="71,71"/>
+    <image id="gsiad" name="9" path="/images/" size="55,59"/>
+    <image id="gsiae" name="6" path="/images/" size="55,47"/>
+    <image id="gsiaf" name="8" path="/images/" size="143,120"/>
+    <component id="eeyy0" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="512,256" file="atlas0.png"/>
-    <component id="eeyy0" name="Main" exported="true" size="1136,640"/>
-    <component id="gsia7" name="mailItem" size="380,125"/>
-    <image id="gsia1" name="1" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
-    <image id="gsia2" name="3" size="261,63" scale="9grid" scale9grid="110,16,33,32"/>
-    <image id="gsia3" name="4" size="133,34"/>
-    <image id="gsia8" name="2" size="78,141" scale="9grid" scale9grid="25,26,26,90"/>
-    <image id="gsia9" name="0" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
-    <image id="gsiac" name="7" size="71,71"/>
-    <image id="gsiad" name="9" size="55,59"/>
-    <image id="gsiae" name="6" size="55,47"/>
-    <image id="gsiaf" name="8" size="143,120"/>
   </resources>
 </packageDescription>

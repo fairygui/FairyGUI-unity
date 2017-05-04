@@ -12,18 +12,18 @@ iitt1.xml|784|<component size="1136,640">
     <text id="n8" name="n8" xy="642,113" size="89,28" fontSize="24" color="#ffffff" strokeColor="#000000" text="Degree:"/>
     <text id="n9" name="n9" xy="732,113" size="302,28" fontSize="24" color="#ffffff" autoSize="height" strokeColor="#000000" text=""/>
   </displayList>
-</component>package.xml|385|<packageDescription id="rbw1tvvv" name="Joystick">
+</component>package.xml|490|<packageDescription id="rbw1tvvv" name="Joystick" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="q9do18" name="circle" path="/" size="212,212"/>
+    <image id="q9do19" name="1" path="/images/" size="178,160"/>
+    <image id="q9do1a" name="0" path="/images/" size="76,77"/>
+    <component id="iitt1" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="256,256" file="atlas0.png"/>
-    <component id="iitt1" name="Main" exported="true" size="1136,640"/>
-    <component id="q9do18" name="circle" size="212,212"/>
-    <image id="q9do19" name="1" size="178,160"/>
-    <image id="q9do1a" name="0" size="76,77"/>
   </resources>
-</packageDescription>q9do18.xml|352|<component size="212,212" scroll="both" extention="Button">
+</packageDescription>q9do18.xml|354|<component size="212,212" scroll="both" extention="Button">
   <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
   <displayList>
-    <image id="n1" name="thumb" src="q9do19" xy="17,26" pivot="89,80">
+    <image id="n1" name="thumb" src="q9do19" xy="17,26" pivot="0.5,0.5">
       <gearDisplay controller="button" pages="1,3"/>
     </image>
   </displayList>

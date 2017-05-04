@@ -1,17 +1,17 @@
-package.xml|849|<packageDescription id="9fb2r88o" name="Filter">
+package.xml|1003|<packageDescription id="9fb2r88o" name="Filter" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="srct2" name="Slider2" path="/" size="361,23"/>
+    <component id="srct5" name="Slider2_grip" path="/" size="56,57"/>
+    <component id="srctl" name="Button5" path="/" size="180,70"/>
+    <image id="srct3" name="background" path="/" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="srct4" name="full bar" path="/" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
+    <image id="srct6" name="back btn" path="/" size="56,57"/>
+    <image id="srctm" name="VIP_png" path="/" size="181,70"/>
+    <image id="srctn" name="k18" path="/" size="110,27"/>
+    <image id="v5sa1" name="pic" path="/" size="179,386"/>
+    <movieclip id="srctk" name="pet" path="/" size="84,74"/>
+    <component id="v5sa0" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="512,512" file="atlas0.png"/>
-    <component id="srct2" name="Slider2" size="361,23"/>
-    <component id="srct5" name="Slider2_grip" size="56,57"/>
-    <component id="srctl" name="Button5" size="180,70"/>
-    <component id="v5sa0" name="Main" exported="true" size="1136,640"/>
-    <image id="srct3" name="background" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
-    <image id="srct4" name="full bar" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
-    <image id="srct6" name="back btn" size="56,57"/>
-    <image id="srctm" name="VIP.png" size="181,70"/>
-    <image id="srctn" name="k18" size="110,27"/>
-    <image id="v5sa1" name="pic" size="179,386"/>
-    <movieclip id="srctk" name="pet" size="84,74"/>
   </resources>
 </packageDescription>srct2.xml|443|<component size="361,23" extention="Slider">
   <displayList>
@@ -30,7 +30,7 @@ package.xml|849|<packageDescription id="9fb2r88o" name="Filter">
   <displayList>
     <image id="n1" src="srct6" name="n1" xy="0,0"/>
   </displayList>
-</component>srctk.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+</component>srctk.xml|316|<movieclip interval="83" frameCount="8">
   <frames>
     <frame rect="9,0,74,65"/>
     <frame rect="7,5,74,64"/>

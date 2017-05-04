@@ -16,19 +16,19 @@ fuxf6.xml|57|<component size="1136,640">
     <image id="n3" name="bar" src="gjh34" xy="11,5"/>
   </displayList>
   <ProgressBar/>
-</component>package.xml|667|<packageDescription id="g6qoonuh" name="HeadBar">
+</component>package.xml|826|<packageDescription id="g6qoonuh" name="HeadBar" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="gjh32" name="bloodbar" path="/" size="145,20"/>
+    <image id="gjh33" name="0" path="/" size="145,20"/>
+    <image id="gjh34" name="1" path="/" size="122,9" scale="9grid" scale9grid="7,2,108,3"/>
+    <component id="fuxf6" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="gjh30" name="HeadBar" path="/" size="145,106" exported="true"/>
+    <image id="gjh35" name="task" path="/" size="47,44" exported="true"/>
+    <movieclip id="rfrh7" name="fighting" path="/" size="73,70" exported="true"/>
+    <movieclip id="rfrh8" name="cool" path="/" size="24,24" exported="true"/>
     <atlas id="atlas0" size="256,256" file="atlas0.png"/>
-    <component id="fuxf6" name="Main" exported="true" size="1136,640"/>
-    <component id="gjh30" name="HeadBar" exported="true" size="145,106"/>
-    <component id="gjh32" name="bloodbar" size="145,20"/>
-    <image id="gjh33" name="0" size="145,20"/>
-    <image id="gjh34" name="1" size="122,9" scale="9grid" scale9grid="7,2,108,3"/>
-    <image id="gjh35" name="task" size="47,44" exported="true"/>
-    <movieclip id="rfrh7" name="fighting" size="73,70"/>
-    <movieclip id="rfrh8" name="cool" size="24,24"/>
   </resources>
-</packageDescription>rfrh7.xml|303|<movieclip pivot="37,41" interval="125" frameCount="7">
+</packageDescription>rfrh7.xml|289|<movieclip interval="125" frameCount="7">
   <frames>
     <frame rect="0,0,73,68"/>
     <frame rect="4,2,65,67"/>
@@ -38,7 +38,7 @@ fuxf6.xml|57|<component size="1136,640">
     <frame rect="4,2,65,67"/>
     <frame rect="0,0,73,68"/>
   </frames>
-</movieclip>rfrh8.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+</movieclip>rfrh8.xml|166|<movieclip interval="41" frameCount="2">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>

@@ -91,24 +91,24 @@ iitt1.xml|200|<component size="1136,640">
     </text>
   </displayList>
   <Button/>
-</component>package.xml|1121|<packageDescription id="rbw1tc9t" name="RenderTexture">
+</component>package.xml|1383|<packageDescription id="rbw1tc9t" name="RenderTexture" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="iitt6" name="WindowFrame" path="/" size="615,387"/>
+    <component id="iitt8" name="CloseButton" path="/" size="60,74"/>
+    <component id="kotx12" name="ButtonLeft" path="/" size="60,60"/>
+    <component id="kotxz" name="ButtonRight" path="/" size="60,60"/>
+    <component id="p60317" name="Button1" path="/" size="100,36"/>
+    <image id="iitt7" name="5" path="/images/" size="615,387" scale="9grid" scale9grid="64,54,484,303"/>
+    <image id="iitt9" name="0" path="/images/" size="60,74"/>
+    <image id="iitta" name="4" path="/images/" size="61,53"/>
+    <image id="iittf" name="8" path="/images/" size="122,103" scale="9grid" scale9grid="20,22,84,61"/>
+    <image id="kotx10" name="10" path="/images/" size="36,35"/>
+    <image id="kotx11" name="9" path="/images/" size="36,35"/>
+    <image id="kotx13" name="12" path="/images/" size="36,35"/>
+    <image id="kotx14" name="11" path="/images/" size="36,35"/>
+    <image id="kotx15" name="13" path="/images/" size="484,432"/>
+    <component id="iitt1" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="iitt5" name="TestWin" path="/" size="478,544" exported="true"/>
     <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
-    <component id="iitt1" name="Main" exported="true" size="1136,640"/>
-    <component id="iitt5" name="TestWin" exported="true" size="478,544"/>
-    <component id="iitt6" name="WindowFrame" size="615,387"/>
-    <component id="iitt8" name="CloseButton" size="60,74"/>
-    <component id="kotx12" name="ButtonLeft" size="60,60"/>
-    <component id="kotxz" name="ButtonRight" size="60,60"/>
-    <component id="p60317" name="Button1" size="100,36"/>
-    <image id="iitt7" name="5" size="615,387" scale="9grid" scale9grid="64,54,484,303"/>
-    <image id="iitt9" name="0" size="60,74"/>
-    <image id="iitta" name="4" size="61,53"/>
-    <image id="iittf" name="8" size="122,103" scale="9grid" scale9grid="20,22,84,61"/>
-    <image id="kotx10" name="10" size="36,35"/>
-    <image id="kotx11" name="9" size="36,35"/>
-    <image id="kotx13" name="12" size="36,35"/>
-    <image id="kotx14" name="11" size="36,35"/>
-    <image id="kotx15" name="13" size="484,432"/>
   </resources>
 </packageDescription>

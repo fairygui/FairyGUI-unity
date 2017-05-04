@@ -47,12 +47,12 @@ fvaib.xml|770|<component size="1136,640">
     <loader id="n2" name="icon" xy="4,4" size="52,52" align="center" vAlign="middle" fill="scale"/>
   </displayList>
   <Button mode="Radio"/>
-</component>iy2u1q.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+</component>iy2u1q.xml|166|<movieclip interval="41" frameCount="2">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1r.xml|313|<movieclip pivot="0,0" interval="41" frameCount="5">
+</movieclip>iy2u1r.xml|301|<movieclip interval="41" frameCount="5">
   <frames>
     <frame rect="0,0,24,24" addDelay="1000"/>
     <frame rect="0,0,24,24" addDelay="83"/>
@@ -60,12 +60,12 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1s.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+</movieclip>iy2u1s.xml|166|<movieclip interval="41" frameCount="2">
   <frames>
     <frame rect="0,0,24,24" addDelay="125"/>
     <frame rect="0,0,24,24" addDelay="125"/>
   </frames>
-</movieclip>iy2u1t.xml|547|<movieclip pivot="0,0" interval="41" frameCount="11">
+</movieclip>iy2u1t.xml|535|<movieclip interval="41" frameCount="11">
   <frames>
     <frame rect="0,0,24,24" addDelay="41"/>
     <frame rect="0,0,24,24" addDelay="41"/>
@@ -79,7 +79,7 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24"/>
     <frame rect="0,0,24,24" addDelay="1000"/>
   </frames>
-</movieclip>iy2u1u.xml|478|<movieclip pivot="0,0" interval="41" frameCount="9">
+</movieclip>iy2u1u.xml|466|<movieclip interval="41" frameCount="9">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24"/>
@@ -91,12 +91,12 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1v.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+</movieclip>iy2u1v.xml|166|<movieclip interval="41" frameCount="2">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1w.xml|398|<movieclip pivot="0,0" interval="41" frameCount="7">
+</movieclip>iy2u1w.xml|386|<movieclip interval="41" frameCount="7">
   <frames>
     <frame rect="0,0,24,24" addDelay="500"/>
     <frame rect="0,0,24,24" addDelay="83"/>
@@ -106,18 +106,18 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1x.xml|223|<movieclip pivot="0,0" interval="41" frameCount="3">
+</movieclip>iy2u1x.xml|211|<movieclip interval="41" frameCount="3">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1y.xml|178|<movieclip pivot="0,0" interval="41" frameCount="2">
+</movieclip>iy2u1y.xml|166|<movieclip interval="41" frameCount="2">
   <frames>
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="166"/>
   </frames>
-</movieclip>iy2u1z.xml|661|<movieclip pivot="0,0" interval="41" frameCount="13">
+</movieclip>iy2u1z.xml|649|<movieclip interval="41" frameCount="13">
   <frames>
     <frame rect="0,0,24,24" addDelay="41"/>
     <frame rect="0,0,24,24" addDelay="41"/>
@@ -133,7 +133,7 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="41"/>
     <frame rect="0,0,24,24" addDelay="41"/>
   </frames>
-</movieclip>iy2u20.xml|580|<movieclip pivot="0,0" interval="41" frameCount="11">
+</movieclip>iy2u20.xml|568|<movieclip interval="41" frameCount="11">
   <frames>
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
@@ -147,14 +147,14 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="166"/>
     <frame rect="0,0,24,24" addDelay="500"/>
   </frames>
-</movieclip>iy2u21.xml|264|<movieclip pivot="0,0" interval="41" frameCount="4">
+</movieclip>iy2u21.xml|252|<movieclip interval="41" frameCount="4">
   <frames>
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
   </frames>
-</movieclip>iy2u22.xml|396|<movieclip pivot="0,0" interval="41" frameCount="7">
+</movieclip>iy2u22.xml|384|<movieclip interval="41" frameCount="7">
   <frames>
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
@@ -164,7 +164,7 @@ fvaib.xml|770|<component size="1136,640">
     <frame rect="0,0,24,24" addDelay="83"/>
     <frame rect="0,0,24,24" addDelay="83"/>
   </frames>
-</movieclip>iy2u23.xml|803|<movieclip pivot="0,0" interval="41" frameCount="16">
+</movieclip>iy2u23.xml|791|<movieclip interval="41" frameCount="16">
   <frames>
     <frame rect="0,0,24,24" addDelay="500"/>
     <frame rect="0,0,24,24" addDelay="83"/>
@@ -236,40 +236,40 @@ fvaib.xml|770|<component size="1136,640">
   </displayList>
   <Button/>
   <relation target="n9" sidePair="height-height"/>
-</component>package.xml|2231|<packageDescription id="y768eypa" name="Emoji">
+</component>package.xml|2952|<packageDescription id="y768eypa" name="Emoji" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="fymi19" name="Button2" path="/" size="84,84"/>
+    <component id="fymi1b" name="Button" path="/" size="163,69"/>
+    <component id="iy2u1n" name="faceSub" path="/" size="60,60"/>
+    <image id="fymi17" name="3" path="/images/" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="fymi18" name="9" path="/images/" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
+    <image id="fymi1a" name="8" path="/images/" size="71,71"/>
+    <image id="fymi1c" name="0" path="/images/" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="fymi1d" name="1" path="/images/" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="kfcb1g" name="4" path="/images/" size="9,206" scale="9grid" scale9grid="2,6,4,193"/>
+    <image id="kfcb1i" name="6" path="/images/" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
+    <image id="kfcb1k" name="7" path="/images/" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
+    <component id="fvaib" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="iy2u24" name="EmojiSelectUI" path="/" size="538,168" exported="true"/>
+    <component id="kfcb1e" name="ScrollBar_VT" path="/" size="2,376" exported="true"/>
+    <component id="kfcb1h" name="chatLeft" path="/" size="900,94" exported="true"/>
+    <component id="kfcb1j" name="chatRight" path="/" size="900,90" exported="true"/>
+    <image id="l7d51l" name="r1" path="/images/" size="120,120" exported="true"/>
+    <image id="l7d51m" name="r0" path="/images/" size="117,120" exported="true"/>
+    <movieclip id="iy2u1q" name="88" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1r" name="am" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1s" name="bs" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1t" name="bz" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1u" name="ch" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1v" name="cool" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1w" name="dhq" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1x" name="dn" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1y" name="fd" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u1z" name="gz" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u20" name="han" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u21" name="hx" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u22" name="hxiao" path="/emoji/" size="24,24" exported="true"/>
+    <movieclip id="iy2u23" name="hxiu" path="/emoji/" size="24,24" exported="true"/>
     <atlas id="atlas0" size="512,512" file="atlas0.png"/>
-    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
-    <component id="fymi19" name="Button2" size="84,84"/>
-    <component id="fymi1b" name="Button" size="163,69"/>
-    <component id="iy2u1n" name="faceSub" size="60,60"/>
-    <component id="iy2u24" name="EmojiSelectUI" exported="true" size="538,168"/>
-    <component id="kfcb1e" name="ScrollBar_VT" exported="true" size="2,376"/>
-    <component id="kfcb1h" name="chatLeft" exported="true" size="900,94"/>
-    <component id="kfcb1j" name="chatRight" exported="true" size="900,90"/>
-    <image id="fymi17" name="3" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
-    <image id="fymi18" name="9" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
-    <image id="fymi1a" name="8" size="71,71"/>
-    <image id="fymi1c" name="0" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="fymi1d" name="1" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="kfcb1g" name="4" size="9,206" scale="9grid" scale9grid="2,6,4,193"/>
-    <image id="kfcb1i" name="6" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
-    <image id="kfcb1k" name="7" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
-    <image id="l7d51l" name="r1" size="120,120" exported="true"/>
-    <image id="l7d51m" name="r0" size="117,120" exported="true"/>
-    <movieclip id="iy2u1q" name="88" size="24,24"/>
-    <movieclip id="iy2u1r" name="am" size="24,24"/>
-    <movieclip id="iy2u1s" name="bs" size="24,24"/>
-    <movieclip id="iy2u1t" name="bz" size="24,24"/>
-    <movieclip id="iy2u1u" name="ch" size="24,24"/>
-    <movieclip id="iy2u1v" name="cool" size="24,24"/>
-    <movieclip id="iy2u1w" name="dhq" size="24,24"/>
-    <movieclip id="iy2u1x" name="dn" size="24,24"/>
-    <movieclip id="iy2u1y" name="fd" size="24,24"/>
-    <movieclip id="iy2u1z" name="gz" size="24,24"/>
-    <movieclip id="iy2u20" name="han" size="24,24"/>
-    <movieclip id="iy2u21" name="hx" size="24,24"/>
-    <movieclip id="iy2u22" name="hxiao" size="24,24"/>
-    <movieclip id="iy2u23" name="hxiu" size="24,24"/>
   </resources>
 </packageDescription>

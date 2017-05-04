@@ -1,13 +1,13 @@
-package.xml|612|<packageDescription id="qf88jb5n" name="LoopList">
+package.xml|731|<packageDescription id="qf88jb5n" name="LoopList" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
-    <atlas id="atlas0" size="256,2048" file="atlas0.png"/>
-    <component id="rpol0" name="Main" exported="true" size="1136,640"/>
-    <component id="rpol1" name="item" size="248,460"/>
-    <image id="rpol3" name="n1" size="248,378" exported="true"/>
-    <image id="rpol4" name="n2" size="248,378" exported="true"/>
-    <image id="rpol5" name="n3" size="248,378" exported="true"/>
-    <image id="rpol6" name="n4" size="248,378" exported="true"/>
-    <image id="rpol7" name="n5" size="248,378" exported="true"/>
+    <component id="rpol1" name="item" path="/" size="248,460"/>
+    <component id="rpol0" name="Main" path="/" size="1136,640" exported="true"/>
+    <image id="rpol3" name="n1" path="/" size="248,378" exported="true"/>
+    <image id="rpol4" name="n2" path="/" size="248,378" exported="true"/>
+    <image id="rpol5" name="n3" path="/" size="248,378" exported="true"/>
+    <image id="rpol6" name="n4" path="/" size="248,378" exported="true"/>
+    <image id="rpol7" name="n5" path="/" size="248,378" exported="true"/>
+    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
   </resources>
 </packageDescription>rpol0.xml|879|<component size="1136,640">
   <displayList>

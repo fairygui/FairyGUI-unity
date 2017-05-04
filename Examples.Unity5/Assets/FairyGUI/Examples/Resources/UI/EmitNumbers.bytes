@@ -26,34 +26,34 @@ char id=57 img=muljm xoffset=0 yoffset=0 xadvance=24
 char id=45 img=muljn xoffset=0 yoffset=0 xadvance=24
 muljp.xml|57|<component size="1136,640">
   <displayList/>
-</component>package.xml|1584|<packageDescription id="t7096b8q" name="EmitNumbers">
+</component>package.xml|1929|<packageDescription id="t7096b8q" name="EmitNumbers" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <image id="mulj1" name="0(2)5_png" path="/" size="30,35"/>
+    <image id="mulj2" name="1(2)5_png" path="/" size="30,35"/>
+    <image id="mulj3" name="2(2)5_png" path="/" size="30,35"/>
+    <image id="mulj4" name="3(2)5_png" path="/" size="30,35"/>
+    <image id="mulj5" name="4(2)5_png" path="/" size="30,35"/>
+    <image id="mulj6" name="5(2)5_png" path="/" size="30,35"/>
+    <image id="mulj7" name="6(2)5_png" path="/" size="30,35"/>
+    <image id="mulj8" name="7(2)5_png" path="/" size="30,35"/>
+    <image id="mulj9" name="8(2)5_png" path="/" size="30,35"/>
+    <image id="mulja" name="9(2)5_png" path="/" size="30,35"/>
+    <image id="muljb" name="m2_png" path="/" size="30,35"/>
+    <image id="muljd" name="0(4)_png" path="/" size="30,35"/>
+    <image id="mulje" name="1(4)_png" path="/" size="30,35"/>
+    <image id="muljf" name="2(4)_png" path="/" size="30,35"/>
+    <image id="muljg" name="3(4)_png" path="/" size="30,35"/>
+    <image id="muljh" name="4(4)_png" path="/" size="30,35"/>
+    <image id="mulji" name="5(4)_png" path="/" size="30,35"/>
+    <image id="muljj" name="6(4)_png" path="/" size="30,35"/>
+    <image id="muljk" name="7(4)_png" path="/" size="30,35"/>
+    <image id="muljl" name="8(4)_png" path="/" size="30,35"/>
+    <image id="muljm" name="9(4)_png" path="/" size="30,35"/>
+    <image id="muljn" name="m1_png" path="/" size="30,35"/>
+    <component id="muljp" name="Main" path="/" size="1136,640" exported="true"/>
+    <font id="mulj0" name="number1" path="/" size="0,0" exported="true" file="mulj0.fnt"/>
+    <font id="muljc" name="number2" path="/" size="0,0" exported="true" file="muljc.fnt"/>
+    <image id="muljo" name="critical" path="/" size="148,83" exported="true"/>
     <atlas id="atlas0" size="256,256" file="atlas0.png"/>
-    <component id="muljp" name="Main" exported="true" size="1136,640"/>
-    <font id="mulj0" name="number1" exported="true"/>
-    <font id="muljc" name="number2" exported="true"/>
-    <image id="mulj1" name="0(2)5.png" size="30,35"/>
-    <image id="mulj2" name="1(2)5.png" size="30,35"/>
-    <image id="mulj3" name="2(2)5.png" size="30,35"/>
-    <image id="mulj4" name="3(2)5.png" size="30,35"/>
-    <image id="mulj5" name="4(2)5.png" size="30,35"/>
-    <image id="mulj6" name="5(2)5.png" size="30,35"/>
-    <image id="mulj7" name="6(2)5.png" size="30,35"/>
-    <image id="mulj8" name="7(2)5.png" size="30,35"/>
-    <image id="mulj9" name="8(2)5.png" size="30,35"/>
-    <image id="mulja" name="9(2)5.png" size="30,35"/>
-    <image id="muljb" name="m2.png" size="30,35"/>
-    <image id="muljd" name="0(4).png" size="30,35"/>
-    <image id="mulje" name="1(4).png" size="30,35"/>
-    <image id="muljf" name="2(4).png" size="30,35"/>
-    <image id="muljg" name="3(4).png" size="30,35"/>
-    <image id="muljh" name="4(4).png" size="30,35"/>
-    <image id="mulji" name="5(4).png" size="30,35"/>
-    <image id="muljj" name="6(4).png" size="30,35"/>
-    <image id="muljk" name="7(4).png" size="30,35"/>
-    <image id="muljl" name="8(4).png" size="30,35"/>
-    <image id="muljm" name="9(4).png" size="30,35"/>
-    <image id="muljn" name="m1.png" size="30,35"/>
-    <image id="muljo" name="critical" size="148,83" exported="true"/>
   </resources>
 </packageDescription>

@@ -53,7 +53,7 @@ gkq00.xml|1647|<component size="1136,640">
     <graph id="n1" name="n1" xy="0,200" size="1136,154" type="rect" lineSize="0" fillColor="#681c0000">
       <relation target="" sidePair="width-width,height-height"/>
     </graph>
-    <image id="n3" name="n3" src="gkq08" xy="389,88" pivot="179,0" size="358,367">
+    <image id="n3" name="n3" src="gkq08" xy="389,88" pivot="0.5,0" size="358,367">
       <relation target="" sidePair="center-center"/>
     </image>
   </displayList>
@@ -105,7 +105,7 @@ gkq00.xml|1647|<component size="1136,640">
     </text>
   </displayList>
   <Button/>
-</component>nra412.xml|512|<movieclip pivot="242,83" interval="41" frameCount="10">
+</component>nra412.xml|497|<movieclip interval="41" frameCount="10">
   <frames>
     <frame rect="124,19,222,113"/>
     <frame rect="107,9,255,130"/>
@@ -176,60 +176,60 @@ char id=51 img=nra4y xoffset=0 yoffset=0 xadvance=25
 char id=50 img=nra4z xoffset=0 yoffset=0 xadvance=25
 char id=49 img=nra410 xoffset=-2 yoffset=0 xadvance=20
 char id=48 img=nra411 xoffset=0 yoffset=0 xadvance=25
-package.xml|2981|<packageDescription id="zgmoraj4" name="Transition">
+package.xml|3823|<packageDescription id="zgmoraj4" name="Transition" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
-    <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
-    <component id="gkq00" name="BOSS" exported="true" size="1136,640"/>
-    <component id="gkq04" name="BOSS_SKILL" exported="true" size="1136,640"/>
-    <component id="gkq07" name="TRAP" exported="true" size="1136,640"/>
-    <component id="gkq0a" name="Main" exported="true" size="1136,640"/>
-    <component id="gkq0b" name="Button1" size="100,36"/>
-    <component id="nra413" name="GoodHit" exported="true" size="250,205"/>
-    <component id="nra4c" name="PowerUp" exported="true" size="500,120"/>
-    <font id="fou916" name="number3" exported="true"/>
-    <font id="nra4f" name="number1" exported="true"/>
-    <font id="nra4q" name="number2" exported="true"/>
-    <image id="fou917" name="h0" size="50,50"/>
-    <image id="fou918" name="h1" size="50,50"/>
-    <image id="fou919" name="h2" size="50,50"/>
-    <image id="fou91a" name="h3" size="50,50"/>
-    <image id="fou91b" name="h4" size="50,50"/>
-    <image id="fou91c" name="h5" size="50,50"/>
-    <image id="fou91d" name="h6" size="50,50"/>
-    <image id="fou91e" name="h7" size="50,50"/>
-    <image id="fou91f" name="h8" size="50,50"/>
-    <image id="fou91g" name="h9" size="50,50"/>
-    <image id="gkq01" name="2" size="270,231"/>
-    <image id="gkq02" name="3" size="396,119"/>
-    <image id="gkq05" name="0" size="1024,56"/>
-    <image id="gkq06" name="1" size="722,66"/>
-    <image id="gkq08" name="4" size="358,367"/>
-    <image id="nra410" name="0009_1" size="28,36"/>
-    <image id="nra411" name="0010_0" size="28,36"/>
-    <image id="nra414" name="blood" size="227,163"/>
-    <image id="nra415" name="bangjile" size="242,123"/>
-    <image id="nra4d" name="red" size="462,72"/>
-    <image id="nra4e" name="power" size="163,61"/>
-    <image id="nra4g" name="0000_9.png" size="36,46"/>
-    <image id="nra4h" name="0001_8.png" size="36,46"/>
-    <image id="nra4i" name="0002_7.png" size="36,46"/>
-    <image id="nra4j" name="0003_6.png" size="36,46"/>
-    <image id="nra4k" name="0004_5.png" size="36,46"/>
-    <image id="nra4l" name="0005_4.png" size="36,46"/>
-    <image id="nra4m" name="0006_3.png" size="36,46"/>
-    <image id="nra4n" name="0007_2.png" size="36,46"/>
-    <image id="nra4o" name="0008_1.png" size="36,46"/>
-    <image id="nra4p" name="0009_0-.png" size="36,46"/>
-    <image id="nra4r" name="0000_+" size="28,36"/>
-    <image id="nra4s" name="0001_9" size="28,36"/>
-    <image id="nra4t" name="0002_8" size="28,36"/>
-    <image id="nra4u" name="0003_7" size="28,36"/>
-    <image id="nra4v" name="0004_6" size="28,36"/>
-    <image id="nra4w" name="0005_5" size="28,36"/>
-    <image id="nra4x" name="0006_4" size="28,36"/>
-    <image id="nra4y" name="0007_3" size="28,36"/>
-    <image id="nra4z" name="0008_2" size="28,36"/>
-    <movieclip id="nra412" name="U1UIT17" size="398,146"/>
-    <sound id="gkq03" name="BUZZ4" file="gkq03.wav"/>
+    <component id="gkq0b" name="Button1" path="/" size="100,36"/>
+    <image id="fou917" name="h0" path="/" size="50,50"/>
+    <image id="fou918" name="h1" path="/" size="50,50"/>
+    <image id="fou919" name="h2" path="/" size="50,50"/>
+    <image id="fou91a" name="h3" path="/" size="50,50"/>
+    <image id="fou91b" name="h4" path="/" size="50,50"/>
+    <image id="fou91c" name="h5" path="/" size="50,50"/>
+    <image id="fou91d" name="h6" path="/" size="50,50"/>
+    <image id="fou91e" name="h7" path="/" size="50,50"/>
+    <image id="fou91f" name="h8" path="/" size="50,50"/>
+    <image id="fou91g" name="h9" path="/" size="50,50"/>
+    <image id="gkq01" name="2" path="/images/" size="270,231"/>
+    <image id="gkq02" name="3" path="/images/" size="396,119"/>
+    <image id="gkq05" name="0" path="/images/" size="1024,56"/>
+    <image id="gkq06" name="1" path="/images/" size="722,66"/>
+    <image id="gkq08" name="4" path="/images/" size="358,367"/>
+    <image id="nra410" name="0009_1" path="/images/" size="28,36"/>
+    <image id="nra411" name="0010_0" path="/images/" size="28,36"/>
+    <image id="nra414" name="blood" path="/images/" size="227,163"/>
+    <image id="nra415" name="bangjile" path="/images/" size="242,123"/>
+    <image id="nra4d" name="red" path="/images/" size="462,72"/>
+    <image id="nra4e" name="power" path="/images/" size="163,61"/>
+    <image id="nra4g" name="0000_9_png" path="/images/" size="36,46"/>
+    <image id="nra4h" name="0001_8_png" path="/images/" size="36,46"/>
+    <image id="nra4i" name="0002_7_png" path="/images/" size="36,46"/>
+    <image id="nra4j" name="0003_6_png" path="/images/" size="36,46"/>
+    <image id="nra4k" name="0004_5_png" path="/images/" size="36,46"/>
+    <image id="nra4l" name="0005_4_png" path="/images/" size="36,46"/>
+    <image id="nra4m" name="0006_3_png" path="/images/" size="36,46"/>
+    <image id="nra4n" name="0007_2_png" path="/images/" size="36,46"/>
+    <image id="nra4o" name="0008_1_png" path="/images/" size="36,46"/>
+    <image id="nra4p" name="0009_0-_png" path="/images/" size="36,46"/>
+    <image id="nra4r" name="0000_+" path="/images/" size="28,36"/>
+    <image id="nra4s" name="0001_9" path="/images/" size="28,36"/>
+    <image id="nra4t" name="0002_8" path="/images/" size="28,36"/>
+    <image id="nra4u" name="0003_7" path="/images/" size="28,36"/>
+    <image id="nra4v" name="0004_6" path="/images/" size="28,36"/>
+    <image id="nra4w" name="0005_5" path="/images/" size="28,36"/>
+    <image id="nra4x" name="0006_4" path="/images/" size="28,36"/>
+    <image id="nra4y" name="0007_3" path="/images/" size="28,36"/>
+    <image id="nra4z" name="0008_2" path="/images/" size="28,36"/>
+    <movieclip id="nra412" name="U1UIT17" path="/images/" size="398,146"/>
+    <sound id="gkq03" name="BUZZ4" path="/images/" size="0,0" file="gkq03.wav"/>
+    <component id="gkq00" name="BOSS" path="/" size="1136,640" exported="true"/>
+    <component id="gkq04" name="BOSS_SKILL" path="/" size="1136,640" exported="true"/>
+    <component id="gkq07" name="TRAP" path="/" size="1136,640" exported="true"/>
+    <component id="gkq0a" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="nra413" name="GoodHit" path="/" size="250,205" exported="true"/>
+    <component id="nra4c" name="PowerUp" path="/" size="500,120" exported="true"/>
+    <font id="fou916" name="number3" path="/" size="0,0" exported="true" file="fou916.fnt"/>
+    <font id="nra4f" name="number1" path="/" size="0,0" exported="true" file="nra4f.fnt"/>
+    <font id="nra4q" name="number2" path="/" size="0,0" exported="true" file="nra4q.fnt"/>
+    <atlas id="atlas0" size="2048,512" file="atlas0.png"/>
   </resources>
 </packageDescription>

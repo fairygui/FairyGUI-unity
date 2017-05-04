@@ -88,24 +88,24 @@ dwwc3.xml|693|<component size="615,387" extention="Label">
       <gearXY controller="page" pages="0,1,2" values="265,399|312,399|359,399" default="305,501"/>
     </graph>
   </displayList>
-</component>package.xml|1096|<packageDescription id="rbw1tv9t" name="Bag">
+</component>package.xml|1349|<packageDescription id="rbw1tv9t" name="Bag" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="dwwc3" name="WindowFrame" path="/" size="615,387"/>
+    <component id="dwwc4" name="CloseButton" path="/" size="60,74"/>
+    <component id="jlmg7" name="BagGridSub" path="/" size="100,100"/>
+    <component id="thi7c" name="BagButton" path="/" size="90,100"/>
+    <image id="dwwc2" name="5" path="/images/" size="615,387" scale="9grid" scale9grid="88,78,441,243"/>
+    <image id="dwwc5" name="0" path="/images/" size="60,74"/>
+    <image id="dwwc6" name="4" path="/images/" size="61,53"/>
+    <image id="jlmg8" name="1" path="/images/" size="90,91"/>
+    <image id="jlmg9" name="3" path="/images/" size="100,100"/>
+    <image id="thi7d" name="btnimage" path="/images/" size="86,99"/>
+    <image id="thi7g" name="7" path="/images/" size="332,2" scale="9grid" scale9grid="83,1,166,2"/>
+    <image id="thi7h" name="8" path="/images/" size="122,103" scale="9grid" scale9grid="31,26,62,52"/>
+    <movieclip id="thi7j" name="quan" path="/images/" size="120,119"/>
+    <component id="fvaib" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="kcy10" name="BagWin" path="/" size="640,582" exported="true"/>
     <atlas id="atlas0" size="1024,512" file="atlas0.png"/>
-    <component id="dwwc3" name="WindowFrame" size="615,387"/>
-    <component id="dwwc4" name="CloseButton" size="60,74"/>
-    <component id="fvaib" name="Main" exported="true" size="1136,640"/>
-    <component id="jlmg7" name="BagGridSub" size="100,100"/>
-    <component id="kcy10" name="BagWin" exported="true" size="640,582"/>
-    <component id="thi7c" name="BagButton" size="90,100"/>
-    <image id="dwwc2" name="5" size="615,387" scale="9grid" scale9grid="88,78,441,243"/>
-    <image id="dwwc5" name="0" size="60,74"/>
-    <image id="dwwc6" name="4" size="61,53"/>
-    <image id="jlmg8" name="1" size="90,91"/>
-    <image id="jlmg9" name="3" size="100,100"/>
-    <image id="thi7d" name="btnimage" size="86,99"/>
-    <image id="thi7g" name="7" size="332,2" scale="9grid" scale9grid="83,1,166,2"/>
-    <image id="thi7h" name="8" size="122,103" scale="9grid" scale9grid="31,26,62,52"/>
-    <movieclip id="thi7j" name="quan" size="120,119"/>
   </resources>
 </packageDescription>thi7c.xml|412|<component size="90,100" extention="Button">
   <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>

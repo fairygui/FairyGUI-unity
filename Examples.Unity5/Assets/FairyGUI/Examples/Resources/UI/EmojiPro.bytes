@@ -57,58 +57,58 @@ g25y13.xml|882|<component size="1136,640">
   </displayList>
   <Button/>
   <relation target="n9" sidePair="height-height"/>
-</component>package.xml|3606|<packageDescription id="evxk1eek" name="EmojiPro">
+</component>package.xml|4395|<packageDescription id="evxk1eek" name="EmojiPro" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="g25y16" name="Button" path="/" size="163,69"/>
+    <image id="g25y14" name="3" path="/images/" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="g25y15" name="9" path="/images/" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
+    <image id="g25y17" name="0" path="/images/" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="g25y18" name="1" path="/images/" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="g25y1d" name="6" path="/images/" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
+    <image id="g25y1f" name="7" path="/images/" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
+    <component id="g25y13" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="g25y1b" name="chatLeft" path="/" size="900,94" exported="true"/>
+    <component id="g25y1e" name="chatRight" path="/" size="900,90" exported="true"/>
+    <image id="g25y1" name="1f626" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25y10" name="1f629" path="/emoji/" size="62,61" exported="true"/>
+    <image id="g25y11" name="1f628" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y12" name="1f627" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25y1h" name="r0" path="/images/" size="117,120" exported="true"/>
+    <image id="g25y1i" name="r1" path="/images/" size="120,120" exported="true"/>
+    <image id="g25y2" name="1f625" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y3" name="1f624" path="/emoji/" size="62,61" exported="true"/>
+    <image id="g25y4" name="1f623" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y5" name="1f622" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y6" name="1f621" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y7" name="1f620" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25y8" name="1f619" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25y9" name="1f618" path="/emoji/" size="63,60" exported="true"/>
+    <image id="g25ya" name="1f617" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25yb" name="1f616" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yc" name="1f615" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25yd" name="1f614" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25ye" name="1f613" path="/emoji/" size="62,63" exported="true"/>
+    <image id="g25yf" name="1f612" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yg" name="1f611" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25yh" name="1f610" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yi" name="1f609" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yj" name="1f608" path="/emoji/" size="64,63" exported="true"/>
+    <image id="g25yk" name="1f607" path="/emoji/" size="62,64" exported="true"/>
+    <image id="g25yl" name="1f606" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25ym" name="1f605" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yn" name="1f604" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yo" name="1f603" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yp" name="1f602" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yq" name="1f601" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yr" name="1f600" path="/emoji/" size="60,58" exported="true"/>
+    <image id="g25ys" name="1f637" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yt" name="1f636" path="/emoji/" size="62,61" exported="true"/>
+    <image id="g25yu" name="1f635" path="/emoji/" size="62,61" exported="true"/>
+    <image id="g25yv" name="1f634" path="/emoji/" size="60,59" exported="true"/>
+    <image id="g25yw" name="1f633" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yx" name="1f632" path="/emoji/" size="62,60" exported="true"/>
+    <image id="g25yy" name="1f631" path="/emoji/" size="58,60" exported="true"/>
+    <image id="g25yz" name="1f630" path="/emoji/" size="62,60" exported="true"/>
     <atlas id="atlas0" size="1024,512" file="atlas0.png"/>
-    <component id="g25y13" name="Main" exported="true" size="1136,640"/>
-    <component id="g25y16" name="Button" size="163,69"/>
-    <component id="g25y1b" name="chatLeft" exported="true" size="900,94"/>
-    <component id="g25y1e" name="chatRight" exported="true" size="900,90"/>
-    <image id="g25y1" name="1f626" size="60,58" exported="true"/>
-    <image id="g25y10" name="1f629" size="62,61" exported="true"/>
-    <image id="g25y11" name="1f628" size="62,60" exported="true"/>
-    <image id="g25y12" name="1f627" size="60,58" exported="true"/>
-    <image id="g25y14" name="3" size="50,62" scale="9grid" scale9grid="10,15,28,32"/>
-    <image id="g25y15" name="9" size="48,40" scale="9grid" scale9grid="12,10,24,20"/>
-    <image id="g25y17" name="0" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="g25y18" name="1" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="g25y1d" name="6" size="377,48" scale="9grid" scale9grid="27,21,334,18"/>
-    <image id="g25y1f" name="7" size="277,79" scale="9grid" scale9grid="19,23,229,37"/>
-    <image id="g25y1h" name="r0" size="117,120" exported="true"/>
-    <image id="g25y1i" name="r1" size="120,120" exported="true"/>
-    <image id="g25y2" name="1f625" size="62,60" exported="true"/>
-    <image id="g25y3" name="1f624" size="62,61" exported="true"/>
-    <image id="g25y4" name="1f623" size="62,60" exported="true"/>
-    <image id="g25y5" name="1f622" size="62,60" exported="true"/>
-    <image id="g25y6" name="1f621" size="62,60" exported="true"/>
-    <image id="g25y7" name="1f620" size="62,60" exported="true"/>
-    <image id="g25y8" name="1f619" size="60,58" exported="true"/>
-    <image id="g25y9" name="1f618" size="63,60" exported="true"/>
-    <image id="g25ya" name="1f617" size="60,58" exported="true"/>
-    <image id="g25yb" name="1f616" size="62,60" exported="true"/>
-    <image id="g25yc" name="1f615" size="60,58" exported="true"/>
-    <image id="g25yd" name="1f614" size="62,60" exported="true"/>
-    <image id="g25ye" name="1f613" size="62,63" exported="true"/>
-    <image id="g25yf" name="1f612" size="62,60" exported="true"/>
-    <image id="g25yg" name="1f611" size="60,58" exported="true"/>
-    <image id="g25yh" name="1f610" size="62,60" exported="true"/>
-    <image id="g25yi" name="1f609" size="62,60" exported="true"/>
-    <image id="g25yj" name="1f608" size="64,63" exported="true"/>
-    <image id="g25yk" name="1f607" size="62,64" exported="true"/>
-    <image id="g25yl" name="1f606" size="62,60" exported="true"/>
-    <image id="g25ym" name="1f605" size="62,60" exported="true"/>
-    <image id="g25yn" name="1f604" size="62,60" exported="true"/>
-    <image id="g25yo" name="1f603" size="62,60" exported="true"/>
-    <image id="g25yp" name="1f602" size="62,60" exported="true"/>
-    <image id="g25yq" name="1f601" size="62,60" exported="true"/>
-    <image id="g25yr" name="1f600" size="60,58" exported="true"/>
-    <image id="g25ys" name="1f637" size="62,60" exported="true"/>
-    <image id="g25yt" name="1f636" size="62,61" exported="true"/>
-    <image id="g25yu" name="1f635" size="62,61" exported="true"/>
-    <image id="g25yv" name="1f634" size="60,59" exported="true"/>
-    <image id="g25yw" name="1f633" size="62,60" exported="true"/>
-    <image id="g25yx" name="1f632" size="62,60" exported="true"/>
-    <image id="g25yy" name="1f631" size="58,60" exported="true"/>
-    <image id="g25yz" name="1f630" size="62,60" exported="true"/>
   </resources>
 </packageDescription>

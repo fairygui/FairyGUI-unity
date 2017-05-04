@@ -20,17 +20,17 @@ c5529.xml|239|<component size="350,191">
     <text id="n5" name="n5" xy="518,32" size="557,111" fontSize="24" color="#ffffff" autoSize="none" strokeColor="#000000" text="* Drag vertically to scroll the whole list.&#xA;* Drag horizontally to scroll single item.&#xA;* Hold and drag one item to the green box."/>
     <text id="n6" name="txt" xy="705,411" size="252,28" fontSize="24" color="#ffffff" autoSize="height" strokeColor="#000000" text=""/>
   </displayList>
-</component>package.xml|614|<packageDescription id="8rugjhhl" name="ScrollPane">
+</component>package.xml|731|<packageDescription id="8rugjhhl" name="ScrollPane" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="c5529" name="Box" path="/" size="350,191"/>
+    <component id="qujq2" name="item" path="/" size="720,88"/>
+    <component id="qujq5" name="Button1" path="/" size="140,85"/>
+    <component id="qujq7" name="Button2" path="/" size="140,86"/>
+    <image id="dliz8" name="logo" path="/" size="86,86"/>
+    <image id="qujq4" name="Seperator1" path="/" size="39,2"/>
+    <component id="n38w0" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="128,128" file="atlas0.png"/>
-    <atlas id="atlas1" size="64,32" file="atlas1.png"/>
-    <component id="c5529" name="Box" size="350,191"/>
-    <component id="n38w0" name="Main" exported="true" size="1136,640"/>
-    <component id="qujq2" name="item" size="720,88"/>
-    <component id="qujq5" name="Button1" size="140,85"/>
-    <component id="qujq7" name="Button2" size="140,86"/>
-    <image id="dliz8" name="logo" size="86,86"/>
-    <image id="qujq4" name="Seperator1" size="39,2"/>
+    <atlas id="atlas1" size="64,2" file="atlas1.png"/>
   </resources>
 </packageDescription>qujq2.xml|1292|<component size="720,88" overflow="scroll" scroll="horizontal" scrollBarFlags="648" scrollBar="hidden" extention="Button">
   <displayList>

@@ -182,10 +182,10 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
   <displayList>
     <graph id="n0" name="n0" xy="15,14" size="150,150" type="rect"/>
   </displayList>
-</component>gojg7s.xml|436|<component size="100,100" extention="Button">
+</component>gojg7s.xml|438|<component size="100,100" extention="Button">
   <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
   <displayList>
-    <image id="n1" name="n1" src="gojg7t" xy="1,1" pivot="49,49">
+    <image id="n1" name="n1" src="gojg7t" xy="1,1" pivot="0.5,0.5">
       <gearLook controller="button" pages="0,1,2,3" values="-|1,180,0|-|1,180,0" default="1,0,0" tween="true" ease="Sine.Out"/>
     </image>
   </displayList>
@@ -476,7 +476,7 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
     </image>
   </displayList>
   <Button mode="Radio"/>
-</component>l6f473.xml|934|<component size="400,400">
+</component>l6f473.xml|928|<component size="400,400">
   <displayList>
     <component id="n0" name="frame" src="rt103l" xy="0,0" size="400,400">
       <relation target="" sidePair="width-width,height-height"/>
@@ -493,7 +493,7 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
         <item title="Item 7"/>
       </ComboBox>
     </component>
-    <component id="n5" name="n5" src="rpmb13" xy="108,320" pivot="90,35,0.5,0.5">
+    <component id="n5" name="n5" src="rpmb13" xy="108,320" pivot="0.5,0.5">
       <Button icon="ui://9leh0eyfrpmbu"/>
     </component>
     <list id="n6" name="n6" xy="39,98" size="335,215" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60"/>
@@ -566,228 +566,229 @@ dyz47i.xml|1109|<component size="180,70" extention="Button">
     <text id="n27" name="n27" xy="972,61" size="148,26" fontSize="22" ubb="true" strokeColor="#000000" text="[color=#3399FF,#3399FF,#FFFFFF,#FFFFFF]Gradient Text[/color]"/>
     <text id="n28" name="n28" xy="475,92" size="181,26" fontSize="22" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" shadowColor="#000000" shadowOffset="3,3" text="Text with shadow"/>
   </displayList>
-</component>package.xml|14244|<packageDescription id="9leh0eyf" name="Basics">
+</component>package.xml|18060|<packageDescription id="9leh0eyf" name="Basics" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="a7vt7n" name="GridItem" path="/components/" size="505,35"/>
+    <component id="atih7o" name="GridItem2" path="/components/" size="505,50"/>
+    <component id="dyz47i" name="Button52" path="/components/" size="180,70"/>
+    <component id="es412z" name="Component1" path="/components/" size="224,310"/>
+    <component id="eut94u" name="Slider1" path="/components/" size="480,45"/>
+    <component id="eut94x" name="Button13" path="/components/" size="50,50"/>
+    <component id="f2ax74" name="Component4" path="/components/" size="640,890"/>
+    <component id="fjqr7j" name="Component11" path="/components/" size="90,23"/>
+    <component id="fou97r" name="Component13" path="/components/" size="400,400"/>
+    <component id="gojg7s" name="Button16" path="/components/" size="100,100"/>
+    <component id="gx2b79" name="BagGridSub2" path="/components/" size="100,100"/>
+    <component id="gxip82" name="Component14" path="/components/" size="282,500"/>
+    <component id="hixt1j" name="Button10" path="/components/" size="163,69"/>
+    <component id="i3s65k" name="ScrollUpButton" path="/scrollbars/" size="17,20"/>
+    <component id="i3s65o" name="ScrollDownButton" path="/scrollbars/" size="17,20"/>
+    <component id="i3s65s" name="GripButton_HZ" path="/scrollbars/" size="20,17"/>
+    <component id="i3s65x" name="GripButton_VT" path="/scrollbars/" size="17,20"/>
+    <component id="iehu7x" name="Button82" path="/components/" size="52,49"/>
+    <component id="kpev60" name="BagGridSub" path="/components/" size="100,100"/>
+    <component id="l6f46z" name="PopupMenuItem" path="/popupmenu/" size="80,22"/>
+    <component id="niii7b" name="CloseButton" path="/components/" size="40,43"/>
+    <component id="niii7d" name="WindowFrameB" path="/components/" size="388,272"/>
+    <component id="poiq7e" name="Button1" path="/components/" size="100,36"/>
+    <component id="qa477h" name="Component6" path="/components/" size="250,250"/>
+    <component id="rpmb10" name="Button2" path="/components/" size="85,40"/>
+    <component id="rpmb11" name="Button3" path="/components/" size="85,40"/>
+    <component id="rpmb12" name="Button4" path="/components/" size="131,45"/>
+    <component id="rpmb13" name="Button5" path="/components/" size="180,70"/>
+    <component id="rpmb14" name="Button6" path="/components/" size="66,44"/>
+    <component id="rpmb15" name="Button7" path="/components/" size="69,62"/>
+    <component id="rpmb16" name="Button8" path="/components/" size="52,49"/>
+    <component id="rpmb17" name="Button9" path="/components/" size="159,52"/>
+    <component id="rpmb18" name="Checkbox" path="/components/" size="20,19"/>
+    <component id="rpmb19" name="OnOffButton" path="/components/" size="100,40"/>
+    <component id="rpmb1a" name="RadioButton" path="/components/" size="29,19"/>
+    <component id="rpmbz" name="Button" path="/components/" size="85,25"/>
+    <component id="rt103l" name="WindowFrame" path="/components/" size="157,202"/>
+    <component id="rt103n" name="WindowCloseButton" path="/components/" size="19,19"/>
+    <component id="rt103r" name="Component3" path="/components/" size="348,62"/>
+    <component id="rt103t" name="ComboBox" path="/components/" size="100,20"/>
+    <component id="rt103y" name="ComboBoxPopup" path="/components/" size="158,58"/>
+    <component id="rt1040" name="ComboBoxItem" path="/components/" size="100,19"/>
+    <component id="smv731" name="Component7" path="/components/" size="225,310"/>
+    <component id="smv73f" name="Component2" path="/components/" size="341,151"/>
+    <component id="smv73g" name="Component8" path="/components/" size="225,343"/>
+    <component id="smv73h" name="Component9" path="/components/" size="341,151"/>
+    <component id="smv73i" name="Component10" path="/components/" size="425,120"/>
+    <component id="srct86" name="Slider2_grip" path="/components/" size="56,57"/>
+    <component id="srct87" name="Slider2" path="/components/" size="361,23"/>
+    <component id="suiz4i" name="Slider_HZ" path="/components/" size="112,23"/>
+    <component id="suiz4l" name="SliderArrow_HZ" path="/components/" size="10,19"/>
+    <component id="suiz4o" name="Slider_VT" path="/components/" size="23,112"/>
+    <component id="suiz4r" name="SliderArrow_VT" path="/components/" size="19,10"/>
+    <component id="t24n7g" name="Component5" path="/components/" size="250,250"/>
+    <component id="t9fj50" name="ProgressBar" path="/components/" size="145,12"/>
+    <component id="t9fj53" name="ProgressBar6" path="/components/" size="105,21"/>
+    <component id="t9fj57" name="ProgressBar3" path="/components/" size="277,32"/>
+    <component id="t9fj59" name="ProgressBar1" path="/components/" size="227,30"/>
+    <component id="t9fj5b" name="ProgressBar5" path="/components/" size="577,53"/>
+    <component id="t9fj5g" name="ProgressBar4" path="/components/" size="277,32"/>
+    <component id="t9fj5h" name="ProgressBar2" path="/components/" size="227,30"/>
+    <component id="zd9g41" name="Dropdown" path="/components/" size="132,40"/>
+    <component id="zd9g42" name="Button15" path="/components/" size="132,40"/>
+    <component id="zd9g47" name="Dropdown2" path="/components/" size="100,100"/>
+    <component id="zd9g49" name="Button14" path="/components/" size="102,40"/>
+    <image id="a7vt7m" name="grid_header_png" path="/images/" size="200,20" scale="9grid" scale9grid="50,5,100,10"/>
+    <image id="duef6n" name="h0" path="/images/" size="50,50"/>
+    <image id="duef6o" name="h1" path="/images/" size="50,50"/>
+    <image id="duef6p" name="h2" path="/images/" size="50,50"/>
+    <image id="duef6q" name="h3" path="/images/" size="50,50"/>
+    <image id="duef6r" name="h4" path="/images/" size="50,50"/>
+    <image id="duef6s" name="h5" path="/images/" size="50,50"/>
+    <image id="duef6t" name="h6" path="/images/" size="50,50"/>
+    <image id="duef6u" name="h7" path="/images/" size="50,50"/>
+    <image id="duef6v" name="h8" path="/images/" size="50,50"/>
+    <image id="duef6w" name="h9" path="/images/" size="50,50"/>
+    <image id="es4130" name="change" path="/images/" size="282,500" scale="tile"/>
+    <image id="eut94v" name="k33" path="/images/" size="480,26"/>
+    <image id="eut94w" name="k34" path="/images/" size="420,15" scale="9grid" scale9grid="41,4,342,5"/>
+    <image id="eut94y" name="b3" path="/images/" size="25,22"/>
+    <image id="eut94z" name="b2" path="/images/" size="25,22"/>
+    <image id="fjqr7k" name="start" path="/images/" size="90,23" scale="tile"/>
+    <image id="gojg7t" name="22" path="/images/" size="97,97"/>
+    <image id="gzpr80" name="Shape 1 copy 4" path="/images/" size="99,99"/>
+    <image id="h5p722" name="i256" path="/images/" size="90,90"/>
+    <image id="hixt1k" name="b4" path="/images/" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="hixt1l" name="b5" path="/images/" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="i3s65j" name="s10.png" path="/images/" size="17,20"/>
+    <image id="i3s65l" name="s6.png" path="/images/" size="11,7"/>
+    <image id="i3s65m" name="s4.png" path="/images/" size="11,7"/>
+    <image id="i3s65n" name="s5.png" path="/images/" size="11,7"/>
+    <image id="i3s65p" name="s9.png" path="/images/" size="11,7"/>
+    <image id="i3s65q" name="s7.png" path="/images/" size="11,7"/>
+    <image id="i3s65r" name="s8.png" path="/images/" size="11,7"/>
+    <image id="i3s65t" name="s1.png" path="/images/" size="9,20"/>
+    <image id="i3s65u" name="s2.png" path="/images/" size="9,20"/>
+    <image id="i3s65v" name="s3.png" path="/images/" size="9,20"/>
+    <image id="iehu7y" name="k36" path="/images/" size="49,49"/>
+    <image id="iehu7z" name="k35" path="/images/" size="55,46"/>
+    <image id="jb800" name="BMFontTest_atlas" path="/font/" size="256,256"/>
+    <image id="kpev61" name="k0" path="/images/" size="90,91"/>
+    <image id="kpev62" name="k2" path="/images/" size="100,100"/>
+    <image id="kpev63" name="k1" path="/images/" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="l6f46y" name="p16_png" path="/images/" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
+    <image id="l6f470" name="a8_png" path="/images/" size="88,20" scale="9grid" scale9grid="8,5,70,10"/>
+    <image id="l6f471" name="VtSeperator" path="/images/" size="2,22"/>
+    <image id="l6f472" name="a18_png" path="/images/" size="12,9"/>
+    <image id="niii7c" name="close_png" path="/images/" size="40,43"/>
+    <image id="nz0z20" name="long_dead2_png" path="/images/" size="32,32" scale="tile"/>
+    <image id="rpmb1" name="VIP_png" path="/images/" size="181,70"/>
+    <image id="rpmb2" name="a1_png" path="/images/" size="13,13"/>
+    <image id="rpmb3" name="a2_png" path="/images/" size="13,13"/>
+    <image id="rpmb4" name="a3_png" path="/images/" size="13,13"/>
+    <image id="rpmb5" name="a4_png" path="/images/" size="13,13"/>
+    <image id="rpmb6" name="angry_smile_png" path="/images/" size="32,32"/>
+    <image id="rpmb7" name="b1.png" path="/images/" size="13,13"/>
+    <image id="rpmb8" name="b12_png" path="/images/" size="100,40"/>
+    <image id="rpmb9" name="b13_png" path="/images/" size="100,40"/>
+    <image id="rpmba" name="b2.png" path="/images/" size="13,13"/>
+    <image id="rpmbb" name="b3.png" path="/images/" size="13,13"/>
+    <image id="rpmbc" name="b4.png" path="/images/" size="13,13"/>
+    <image id="rpmbd" name="b5_png" path="/images/" size="85,25" scale="9grid" scale9grid="12,7,61,14"/>
+    <image id="rpmbe" name="b6_png" path="/images/" size="85,25" scale="9grid" scale9grid="9,5,66,16"/>
+    <image id="rpmbf" name="b7_png" path="/images/" size="85,25" scale="9grid" scale9grid="8,7,66,14"/>
+    <image id="rpmbg" name="long_dead_png" path="/images/" size="32,32"/>
+    <image id="rpmbh" name="plus_smile_png" path="/images/" size="32,32"/>
+    <image id="rpmbi" name="b1" path="/images/" size="70,52"/>
+    <image id="rpmbj" name="k3" path="/images/" size="62,34" scale="9grid" scale9grid="16,9,32,6"/>
+    <image id="rpmbk" name="k4" path="/images/" size="66,44"/>
+    <image id="rpmbl" name="k5" path="/images/" size="66,44"/>
+    <image id="rpmbm" name="k6" path="/images/" size="62,41" scale="9grid" scale9grid="16,11,32,7"/>
+    <image id="rpmbn" name="k8" path="/images/" size="69,62"/>
+    <image id="rpmbo" name="k9" path="/images/" size="69,62"/>
+    <image id="rpmbp" name="k10" path="/images/" size="55,46"/>
+    <image id="rpmbq" name="k11" path="/images/" size="49,49"/>
+    <image id="rpmbr" name="k12" path="/images/" size="159,52" scale="9grid" scale9grid="40,19,80,18"/>
+    <image id="rpmbs" name="k14" path="/images/" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbt" name="k13" path="/images/" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbu" name="k18" path="/images/" size="110,27"/>
+    <image id="rpmbv" name="k20" path="/images/" size="131,45"/>
+    <image id="rpmbw" name="k25" path="/images/" size="36,24"/>
+    <image id="rpmbx" name="k26" path="/images/" size="37,24"/>
+    <image id="rt103m" name="6_png" path="/images/" size="157,202" scale="9grid" scale9grid="40,40,80,142"/>
+    <image id="rt103o" name="10_png" path="/images/" size="19,19"/>
+    <image id="rt103p" name="9_png" path="/images/" size="19,19"/>
+    <image id="rt103q" name="8_png" path="/images/" size="19,19"/>
+    <image id="rt103u" name="c1_png" path="/images/" size="93,21" scale="9grid" scale9grid="7,5,73,10"/>
+    <image id="rt103v" name="c3_png" path="/images/" size="93,21" scale="9grid" scale9grid="11,5,71,10"/>
+    <image id="rt103w" name="c2_png" path="/images/" size="93,21" scale="9grid" scale9grid="8,5,73,10"/>
+    <image id="rt103x" name="b7(2)_png" path="/images/" size="15,16"/>
+    <image id="rt103z" name="p1_png" path="/images/" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
+    <image id="sner1h" name="pic" path="/images/" size="179,386"/>
+    <image id="srct83" name="back btn" path="/images/" size="56,57"/>
+    <image id="srct84" name="full bar" path="/images/" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
+    <image id="srct85" name="background" path="/images/" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="suiz4j" name="p10_png" path="/images/" size="112,23"/>
+    <image id="suiz4k" name="p11_png" path="/images/" size="62,3"/>
+    <image id="suiz4m" name="p14_png" path="/images/" size="10,19"/>
+    <image id="suiz4n" name="p15_png" path="/images/" size="10,19"/>
+    <image id="suiz4p" name="p13_png" path="/images/" size="23,112"/>
+    <image id="suiz4q" name="p12_png" path="/images/" size="3,62"/>
+    <image id="suiz4s" name="p8_png" path="/images/" size="19,10"/>
+    <image id="suiz4t" name="p9_png" path="/images/" size="19,10"/>
+    <image id="t9fj51" name="p2_png" path="/images/" size="145,12" scale="9grid" scale9grid="10,4,121,4"/>
+    <image id="t9fj52" name="p3_png" path="/images/" size="53,6"/>
+    <image id="t9fj54" name="k17" path="/images/" size="105,21" scale="9grid" scale9grid="27,9,54,2"/>
+    <image id="t9fj55" name="k16" path="/images/" size="32,11" scale="9grid" scale9grid="8,5,16,2"/>
+    <image id="t9fj56" name="k7" path="/images/" size="89,26"/>
+    <image id="t9fj58" name="caiji" path="/images/" size="277,32"/>
+    <image id="t9fj5a" name="caiji2" path="/images/" size="227,30"/>
+    <image id="t9fj5c" name="loading.png" path="/images/" size="4,16"/>
+    <image id="t9fj5d" name="huawen1_png" path="/images/" size="85,59"/>
+    <image id="t9fj5e" name="huawen2_png" path="/images/" size="88,59"/>
+    <image id="zd9g43" name="k30" path="/images/" size="132,40" scale="9grid" scale9grid="33,10,57,20"/>
+    <image id="zd9g44" name="k28" path="/images/" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g45" name="k31" path="/images/" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g46" name="k29" path="/images/" size="132,40" scale="9grid" scale9grid="33,10,53,20"/>
+    <image id="zd9g48" name="k32" path="/images/" size="104,42" scale="9grid" scale9grid="26,11,52,22"/>
+    <image id="zd9g4a" name="k23" path="/images/" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4b" name="k21" path="/images/" size="102,40" scale="9grid" scale9grid="11,7,82,26"/>
+    <image id="zd9g4c" name="k24" path="/images/" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4d" name="k22" path="/images/" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
+    <movieclip id="hixt1v" name="nlge1k" path="/images/" size="59,59"/>
+    <movieclip id="iwqq89" name="gz" path="/images/" size="24,24"/>
+    <movieclip id="t9fj5f" name="pet" path="/images/" size="84,74"/>
+    <component id="796x7a" name="WindowB" path="/" size="400,203" exported="true"/>
+    <component id="c2z47l" name="Demo_Grid" path="/" size="1136,570" exported="true"/>
+    <component id="es412y" name="Demo_Clip&amp;Scroll" path="/" size="1136,570" exported="true"/>
+    <component id="fou97q" name="Demo_Depth" path="/" size="1136,570" exported="true"/>
+    <component id="gx2b76" name="Demo_Popup" path="/" size="1136,570" exported="true"/>
+    <component id="gx2b77" name="Demo_Window" path="/" size="640,400" exported="true"/>
+    <component id="gx2b78" name="Demo_Drag&amp;Drop" path="/" size="1136,570" exported="true"/>
+    <component id="gzpr81" name="CircleProgress" path="/" size="99,99" exported="true"/>
+    <component id="hixt1m" name="Demo_Graph" path="/" size="1136,570" exported="true"/>
+    <component id="hixt1n" name="Demo_MovieClip" path="/" size="1136,570" exported="true"/>
+    <component id="i3s65i" name="ScrollBar_HZ" path="/scrollbars/" size="200,17" exported="true"/>
+    <component id="i3s65w" name="ScrollBar_VT" path="/scrollbars/" size="17,200" exported="true"/>
+    <component id="l6f46x" name="PopupMenu" path="/popupmenu/" size="160,60" exported="true"/>
+    <component id="l6f473" name="WindowA" path="/" size="400,400" exported="true"/>
+    <component id="mulj7p" name="Component12" path="/components/" size="400,297" exported="true"/>
+    <component id="nz0z1z" name="Demo_Text" path="/" size="1136,570" exported="true"/>
+    <component id="rpmb1b" name="Demo_Button" path="/" size="1136,570" exported="true"/>
+    <component id="rpmb1c" name="Main" path="/" size="1136,640" exported="true"/>
+    <component id="rt103s" name="Demo_ComboBox" path="/" size="1136,570" exported="true"/>
+    <component id="sner1i" name="Demo_Image" path="/" size="1136,570" exported="true"/>
+    <component id="t24n7f" name="Demo_Component" path="/" size="1136,570" exported="true"/>
+    <component id="w42o3j" name="Demo_Label" path="/" size="1136,570" exported="true"/>
+    <component id="wa8u2s" name="Demo_Loader" path="/" size="1136,570" exported="true"/>
+    <component id="wa8u2v" name="Demo_Controller" path="/" size="1136,570" exported="true"/>
+    <component id="wa8u2x" name="Demo_Relation" path="/" size="1136,570" exported="true"/>
+    <component id="zd9g4e" name="Demo_Slider" path="/" size="1136,570" exported="true"/>
+    <component id="zd9g4f" name="Demo_ProgressBar" path="/" size="1136,570" exported="true"/>
+    <component id="zd9g4g" name="Demo_List" path="/" size="1136,570" exported="true"/>
+    <font id="duef6m" name="HitNumber" path="/font/" size="0,0" exported="true" file="duef6m.fnt"/>
+    <font id="wa8u2r" name="BMFontTest" path="/font/" size="0,0" exported="true" texture="jb800" file="wa8u2r.fnt"/>
+    <image id="wa8u2t" name="r3" path="/images/" size="90,90" exported="true"/>
+    <image id="wa8u2u" name="r4" path="/images/" size="89,90" exported="true"/>
+    <sound id="gojg7u" name="tabswitch" path="/sound/" size="0,0" exported="true" file="gojg7u.wav"/>
+    <sound id="o4lt7w" name="click" path="/sound/" size="0,0" exported="true" file="o4lt7w.wav"/>
     <atlas id="atlas0" size="1024,1024" file="atlas0.png"/>
     <atlas id="atlas1" size="64,64" file="atlas1.png"/>
-    <component id="796x7a" name="WindowB" exported="true" size="400,203"/>
-    <component id="a7vt7n" name="GridItem" size="505,35"/>
-    <component id="atih7o" name="GridItem2" size="505,50"/>
-    <component id="c2z47l" name="Demo_Grid" exported="true" size="1136,570"/>
-    <component id="dyz47i" name="Button52" size="180,70"/>
-    <component id="es412y" name="Demo_Clip&amp;Scroll" exported="true" size="1136,570"/>
-    <component id="es412z" name="Component1" size="224,310"/>
-    <component id="eut94u" name="Slider1" size="480,45"/>
-    <component id="eut94x" name="Button13" size="50,50"/>
-    <component id="f2ax74" name="Component4" size="640,890"/>
-    <component id="fjqr7j" name="Component11" size="90,23"/>
-    <component id="fou97q" name="Demo_Depth" exported="true" size="1136,570"/>
-    <component id="fou97r" name="Component13" size="400,400"/>
-    <component id="gojg7s" name="Button16" size="100,100"/>
-    <component id="gx2b76" name="Demo_Popup" exported="true" size="1136,570"/>
-    <component id="gx2b77" name="Demo_Window" exported="true" size="640,400"/>
-    <component id="gx2b78" name="Demo_Drag&amp;Drop" exported="true" size="1136,570"/>
-    <component id="gx2b79" name="BagGridSub2" size="100,100"/>
-    <component id="gxip82" name="Component14" size="282,500"/>
-    <component id="gzpr81" name="CircleProgress" exported="true" size="99,99"/>
-    <component id="hixt1j" name="Button10" size="163,69"/>
-    <component id="hixt1m" name="Demo_Graph" exported="true" size="1136,570"/>
-    <component id="hixt1n" name="Demo_MovieClip" exported="true" size="1136,570"/>
-    <component id="i3s65i" name="ScrollBar_HZ" exported="true" size="200,17"/>
-    <component id="i3s65k" name="ScrollUpButton" size="17,20"/>
-    <component id="i3s65o" name="ScrollDownButton" size="17,20"/>
-    <component id="i3s65s" name="GripButton_HZ" size="20,17"/>
-    <component id="i3s65w" name="ScrollBar_VT" exported="true" size="17,200"/>
-    <component id="i3s65x" name="GripButton_VT" size="17,20"/>
-    <component id="iehu7x" name="Button82" size="52,49"/>
-    <component id="kpev60" name="BagGridSub" size="100,100"/>
-    <component id="l6f46x" name="PopupMenu" exported="true" size="160,60"/>
-    <component id="l6f46z" name="PopupMenuItem" size="80,22"/>
-    <component id="l6f473" name="WindowA" exported="true" size="400,400"/>
-    <component id="mulj7p" name="Component12" exported="true" size="400,297"/>
-    <component id="niii7b" name="CloseButton" size="40,43"/>
-    <component id="niii7d" name="WindowFrameB" size="388,272"/>
-    <component id="nz0z1z" name="Demo_Text" exported="true" size="1136,570"/>
-    <component id="poiq7e" name="Button1" size="100,36"/>
-    <component id="qa477h" name="Component6" size="250,250"/>
-    <component id="rpmb10" name="Button2" size="85,40"/>
-    <component id="rpmb11" name="Button3" size="85,40"/>
-    <component id="rpmb12" name="Button4" size="131,45"/>
-    <component id="rpmb13" name="Button5" size="180,70"/>
-    <component id="rpmb14" name="Button6" size="66,44"/>
-    <component id="rpmb15" name="Button7" size="69,62"/>
-    <component id="rpmb16" name="Button8" size="52,49"/>
-    <component id="rpmb17" name="Button9" size="159,52"/>
-    <component id="rpmb18" name="Checkbox" size="20,19"/>
-    <component id="rpmb19" name="OnOffButton" size="100,40"/>
-    <component id="rpmb1a" name="RadioButton" size="29,19"/>
-    <component id="rpmb1b" name="Demo_Button" exported="true" size="1136,570"/>
-    <component id="rpmb1c" name="Main" exported="true" size="1136,640"/>
-    <component id="rpmbz" name="Button" size="85,25"/>
-    <component id="rt103l" name="WindowFrame" size="157,202"/>
-    <component id="rt103n" name="WindowCloseButton" size="19,19"/>
-    <component id="rt103r" name="Component3" size="348,62"/>
-    <component id="rt103s" name="Demo_ComboBox" exported="true" size="1136,570"/>
-    <component id="rt103t" name="ComboBox" size="100,20"/>
-    <component id="rt103y" name="ComboBoxPopup" size="158,58"/>
-    <component id="rt1040" name="ComboBoxItem" size="100,19"/>
-    <component id="smv731" name="Component7" size="225,310"/>
-    <component id="smv73f" name="Component2" size="341,151"/>
-    <component id="smv73g" name="Component8" size="225,343"/>
-    <component id="smv73h" name="Component9" size="341,151"/>
-    <component id="smv73i" name="Component10" size="425,120"/>
-    <component id="sner1i" name="Demo_Image" exported="true" size="1136,570"/>
-    <component id="srct86" name="Slider2_grip" size="56,57"/>
-    <component id="srct87" name="Slider2" size="361,23"/>
-    <component id="suiz4i" name="Slider_HZ" size="112,23"/>
-    <component id="suiz4l" name="SliderArrow_HZ" size="10,19"/>
-    <component id="suiz4o" name="Slider_VT" size="23,112"/>
-    <component id="suiz4r" name="SliderArrow_VT" size="19,10"/>
-    <component id="t24n7f" name="Demo_Component" exported="true" size="1136,570"/>
-    <component id="t24n7g" name="Component5" size="250,250"/>
-    <component id="t9fj50" name="ProgressBar" size="145,12"/>
-    <component id="t9fj53" name="ProgressBar6" size="105,21"/>
-    <component id="t9fj57" name="ProgressBar3" size="277,32"/>
-    <component id="t9fj59" name="ProgressBar1" size="227,30"/>
-    <component id="t9fj5b" name="ProgressBar5" size="577,53"/>
-    <component id="t9fj5g" name="ProgressBar4" size="277,32"/>
-    <component id="t9fj5h" name="ProgressBar2" size="227,30"/>
-    <component id="w42o3j" name="Demo_Label" exported="true" size="1136,570"/>
-    <component id="wa8u2s" name="Demo_Loader" exported="true" size="1136,570"/>
-    <component id="wa8u2v" name="Demo_Controller" exported="true" size="1136,570"/>
-    <component id="wa8u2x" name="Demo_Relation" exported="true" size="1136,570"/>
-    <component id="zd9g41" name="Dropdown" size="132,40"/>
-    <component id="zd9g42" name="Button15" size="132,40"/>
-    <component id="zd9g47" name="Dropdown2" size="100,100"/>
-    <component id="zd9g49" name="Button14" size="102,40"/>
-    <component id="zd9g4e" name="Demo_Slider" exported="true" size="1136,570"/>
-    <component id="zd9g4f" name="Demo_ProgressBar" exported="true" size="1136,570"/>
-    <component id="zd9g4g" name="Demo_List" exported="true" size="1136,570"/>
-    <font id="duef6m" name="HitNumber" exported="true"/>
-    <font id="wa8u2r" name="BMFontTest" exported="true"/>
-    <image id="a7vt7m" name="grid_header.png" size="200,20" scale="9grid" scale9grid="50,5,100,10"/>
-    <image id="duef6n" name="h0" size="50,50"/>
-    <image id="duef6o" name="h1" size="50,50"/>
-    <image id="duef6p" name="h2" size="50,50"/>
-    <image id="duef6q" name="h3" size="50,50"/>
-    <image id="duef6r" name="h4" size="50,50"/>
-    <image id="duef6s" name="h5" size="50,50"/>
-    <image id="duef6t" name="h6" size="50,50"/>
-    <image id="duef6u" name="h7" size="50,50"/>
-    <image id="duef6v" name="h8" size="50,50"/>
-    <image id="duef6w" name="h9" size="50,50"/>
-    <image id="es4130" name="change" size="282,500" scale="tile"/>
-    <image id="eut94v" name="k33" size="480,26"/>
-    <image id="eut94w" name="k34" size="420,15" scale="9grid" scale9grid="41,4,342,5"/>
-    <image id="eut94y" name="b3" size="25,22"/>
-    <image id="eut94z" name="b2" size="25,22"/>
-    <image id="fjqr7k" name="start" size="90,23" scale="tile"/>
-    <image id="gojg7t" name="22" size="97,97"/>
-    <image id="gzpr80" name="Shape 1 copy 4" size="99,99"/>
-    <image id="h5p722" name="i256" size="90,90"/>
-    <image id="hixt1k" name="b4" size="173,74" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="hixt1l" name="b5" size="163,69" scale="9grid" scale9grid="40,17,80,34"/>
-    <image id="i3s65j" name="s10.png" size="17,20"/>
-    <image id="i3s65l" name="s6.png" size="11,7"/>
-    <image id="i3s65m" name="s4.png" size="11,7"/>
-    <image id="i3s65n" name="s5.png" size="11,7"/>
-    <image id="i3s65p" name="s9.png" size="11,7"/>
-    <image id="i3s65q" name="s7.png" size="11,7"/>
-    <image id="i3s65r" name="s8.png" size="11,7"/>
-    <image id="i3s65t" name="s1.png" size="9,20"/>
-    <image id="i3s65u" name="s2.png" size="9,20"/>
-    <image id="i3s65v" name="s3.png" size="9,20"/>
-    <image id="iehu7y" name="k36" size="49,49"/>
-    <image id="iehu7z" name="k35" size="55,46"/>
-    <image id="kpev61" name="k0" size="90,91"/>
-    <image id="kpev62" name="k2" size="100,100"/>
-    <image id="kpev63" name="k1" size="108,108" scale="9grid" scale9grid="17,16,74,73"/>
-    <image id="l6f46y" name="p16.png" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
-    <image id="l6f470" name="a8.png" size="88,20" scale="9grid" scale9grid="8,5,70,10"/>
-    <image id="l6f471" name="VtSeperator" size="2,22"/>
-    <image id="l6f472" name="a18.png" size="12,9"/>
-    <image id="niii7c" name="close.png" size="40,43"/>
-    <image id="nz0z20" name="long_dead2.png" size="32,32" scale="tile"/>
-    <image id="rpmb1" name="VIP.png" size="181,70"/>
-    <image id="rpmb2" name="a1.png" size="13,13"/>
-    <image id="rpmb3" name="a2.png" size="13,13"/>
-    <image id="rpmb4" name="a3.png" size="13,13"/>
-    <image id="rpmb5" name="a4.png" size="13,13"/>
-    <image id="rpmb6" name="angry_smile.png" size="32,32"/>
-    <image id="rpmb7" name="b1.png" size="13,13"/>
-    <image id="rpmb8" name="b12.png" size="100,40"/>
-    <image id="rpmb9" name="b13.png" size="100,40"/>
-    <image id="rpmba" name="b2.png" size="13,13"/>
-    <image id="rpmbb" name="b3.png" size="13,13"/>
-    <image id="rpmbc" name="b4.png" size="13,13"/>
-    <image id="rpmbd" name="b5.png" size="85,25" scale="9grid" scale9grid="12,7,61,14"/>
-    <image id="rpmbe" name="b6.png" size="85,25" scale="9grid" scale9grid="9,5,66,16"/>
-    <image id="rpmbf" name="b7.png" size="85,25" scale="9grid" scale9grid="8,7,66,14"/>
-    <image id="rpmbg" name="long_dead.png" size="32,32"/>
-    <image id="rpmbh" name="plus_smile.png" size="32,32"/>
-    <image id="rpmbi" name="b1" size="70,52"/>
-    <image id="rpmbj" name="k3" size="62,34" scale="9grid" scale9grid="16,9,32,6"/>
-    <image id="rpmbk" name="k4" size="66,44"/>
-    <image id="rpmbl" name="k5" size="66,44"/>
-    <image id="rpmbm" name="k6" size="62,41" scale="9grid" scale9grid="16,11,32,7"/>
-    <image id="rpmbn" name="k8" size="69,62"/>
-    <image id="rpmbo" name="k9" size="69,62"/>
-    <image id="rpmbp" name="k10" size="55,46"/>
-    <image id="rpmbq" name="k11" size="49,49"/>
-    <image id="rpmbr" name="k12" size="159,52" scale="9grid" scale9grid="40,19,80,18"/>
-    <image id="rpmbs" name="k14" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
-    <image id="rpmbt" name="k13" size="159,52" scale="9grid" scale9grid="40,13,80,26"/>
-    <image id="rpmbu" name="k18" size="110,27"/>
-    <image id="rpmbv" name="k20" size="131,45"/>
-    <image id="rpmbw" name="k25" size="36,24"/>
-    <image id="rpmbx" name="k26" size="37,24"/>
-    <image id="rt103m" name="6.png" size="157,202" scale="9grid" scale9grid="40,40,80,142"/>
-    <image id="rt103o" name="10.png" size="19,19"/>
-    <image id="rt103p" name="9.png" size="19,19"/>
-    <image id="rt103q" name="8.png" size="19,19"/>
-    <image id="rt103u" name="c1.png" size="93,21" scale="9grid" scale9grid="7,5,73,10"/>
-    <image id="rt103v" name="c3.png" size="93,21" scale="9grid" scale9grid="11,5,71,10"/>
-    <image id="rt103w" name="c2.png" size="93,21" scale="9grid" scale9grid="8,5,73,10"/>
-    <image id="rt103x" name="b7(2).png" size="15,16"/>
-    <image id="rt103z" name="p1.png" size="162,63" scale="9grid" scale9grid="7,4,144,49"/>
-    <image id="sner1h" name="pic" size="179,386"/>
-    <image id="srct83" name="back btn" size="56,57"/>
-    <image id="srct84" name="full bar" size="143,21" scale="9grid" scale9grid="15,6,109,12"/>
-    <image id="srct85" name="background" size="361,23" scale="9grid" scale9grid="24,6,319,13"/>
-    <image id="suiz4j" name="p10.png" size="112,23"/>
-    <image id="suiz4k" name="p11.png" size="62,3"/>
-    <image id="suiz4m" name="p14.png" size="10,19"/>
-    <image id="suiz4n" name="p15.png" size="10,19"/>
-    <image id="suiz4p" name="p13.png" size="23,112"/>
-    <image id="suiz4q" name="p12.png" size="3,62"/>
-    <image id="suiz4s" name="p8.png" size="19,10"/>
-    <image id="suiz4t" name="p9.png" size="19,10"/>
-    <image id="t9fj51" name="p2.png" size="145,12" scale="9grid" scale9grid="10,4,121,4"/>
-    <image id="t9fj52" name="p3.png" size="53,6"/>
-    <image id="t9fj54" name="k17" size="105,21" scale="9grid" scale9grid="27,9,54,2"/>
-    <image id="t9fj55" name="k16" size="32,11" scale="9grid" scale9grid="8,5,16,2"/>
-    <image id="t9fj56" name="k7" size="89,26"/>
-    <image id="t9fj58" name="caiji" size="277,32"/>
-    <image id="t9fj5a" name="caiji2" size="227,30"/>
-    <image id="t9fj5c" name="loading.png" size="4,16"/>
-    <image id="t9fj5d" name="huawen1.png" size="85,59"/>
-    <image id="t9fj5e" name="huawen2.png" size="88,59"/>
-    <image id="wa8u2t" name="r3" size="90,90" exported="true"/>
-    <image id="wa8u2u" name="r4" size="89,90" exported="true"/>
-    <image id="zd9g43" name="k30" size="132,40" scale="9grid" scale9grid="33,10,57,20"/>
-    <image id="zd9g44" name="k28" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
-    <image id="zd9g45" name="k31" size="132,40" scale="9grid" scale9grid="33,10,55,20"/>
-    <image id="zd9g46" name="k29" size="132,40" scale="9grid" scale9grid="33,10,53,20"/>
-    <image id="zd9g48" name="k32" size="104,42" scale="9grid" scale9grid="26,11,52,22"/>
-    <image id="zd9g4a" name="k23" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
-    <image id="zd9g4b" name="k21" size="102,40" scale="9grid" scale9grid="11,7,82,26"/>
-    <image id="zd9g4c" name="k24" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
-    <image id="zd9g4d" name="k22" size="102,40" scale="9grid" scale9grid="26,10,52,20"/>
-    <movieclip id="hixt1v" name="nlge1k" size="59,59"/>
-    <movieclip id="iwqq89" name="gz" size="24,24"/>
-    <movieclip id="t9fj5f" name="pet" size="84,74"/>
-    <sound id="gojg7u" name="tabswitch" file="gojg7u.wav" exported="true"/>
-    <sound id="o4lt7w" name="click" file="o4lt7w.wav" exported="true"/>
   </resources>
 </packageDescription>poiq7e.xml|1149|<component size="100,36" extention="Button">
   <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>

@@ -1,6 +1,6 @@
-package.xml|172|<packageDescription id="lua1ugq6" name="Gesture">
+package.xml|236|<packageDescription id="lua1ugq6" name="Gesture" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
-    <component id="t5or0" name="Main" exported="true" size="1136,640"/>
+    <component id="t5or0" name="Main" path="/" size="1136,640" exported="true"/>
   </resources>
 </packageDescription>t5or0.xml|427|<component size="1136,640">
   <displayList>

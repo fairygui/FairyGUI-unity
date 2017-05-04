@@ -1,7 +1,7 @@
-p6030.xml|368|<component size="300,300">
+p6030.xml|370|<component size="300,300">
   <displayList>
     <image id="n3" name="n3" src="p6033" xy="55,56" group="n4"/>
-    <image id="n1" name="n1" src="p6032" xy="76,77" pivot="73,73" group="n4"/>
+    <image id="n1" name="n1" src="p6032" xy="76,77" pivot="0.5,0.5" group="n4"/>
     <group id="n4" name="n4" xy="55,56" size="189,188" advanced="true">
       <relation target="" sidePair="center-center,middle-middle"/>
     </group>
@@ -17,7 +17,7 @@ p6030.xml|368|<component size="300,300">
       <relation target="" sidePair="center-center,middle-middle"/>
     </group>
   </displayList>
-</component>p6036.xml|270|<movieclip pivot="24,15" interval="83" frameCount="6">
+</component>p6036.xml|256|<movieclip interval="83" frameCount="6">
   <frames>
     <frame rect="4,0,45,31"/>
     <frame rect="4,0,41,31"/>
@@ -97,22 +97,22 @@ p6030.xml|368|<component size="300,300">
       <Button title="Open Window"/>
     </component>
   </displayList>
-</component>package.xml|1077|<packageDescription id="oqv64gwp" name="ModalWaiting">
+</component>package.xml|1258|<packageDescription id="oqv64gwp" name="ModalWaiting" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
+    <component id="p6037" name="WindowFrame" path="/" size="615,387"/>
+    <component id="p6039" name="CloseButton" path="/" size="60,74"/>
+    <component id="p603d" name="Button1" path="/" size="100,36"/>
+    <image id="p6032" name="0" path="/" size="146,146"/>
+    <image id="p6033" name="1" path="/" size="189,188"/>
+    <image id="p6035" name="2" path="/" size="69,69" scale="9grid" scale9grid="18,18,36,36"/>
+    <image id="p6038" name="5" path="/" size="615,387" scale="9grid" scale9grid="64,54,484,303"/>
+    <image id="p603a" name="02" path="/" size="60,74"/>
+    <image id="p603b" name="4" path="/" size="61,53"/>
+    <movieclip id="p6036" name="qtm011" path="/" size="49,31"/>
+    <component id="p6030" name="GlobalModalWaiting" path="/" size="300,300" exported="true"/>
+    <component id="p6034" name="WindowModalWaiting" path="/" size="200,200" exported="true"/>
+    <component id="p603c" name="TestWin" path="/" size="500,500" exported="true"/>
+    <component id="p603e" name="Main" path="/" size="1136,640" exported="true"/>
     <atlas id="atlas0" size="1024,512" file="atlas0.png"/>
-    <component id="p6030" name="GlobalModalWaiting" exported="true" size="300,300"/>
-    <component id="p6034" name="WindowModalWaiting" exported="true" size="200,200"/>
-    <component id="p6037" name="WindowFrame" size="615,387"/>
-    <component id="p6039" name="CloseButton" size="60,74"/>
-    <component id="p603c" name="TestWin" exported="true" size="500,500"/>
-    <component id="p603d" name="Button1" size="100,36"/>
-    <component id="p603e" name="Main" exported="true" size="1136,640"/>
-    <image id="p6032" name="0" size="146,146"/>
-    <image id="p6033" name="1" size="189,188"/>
-    <image id="p6035" name="2" size="69,69" scale="9grid" scale9grid="18,18,36,36"/>
-    <image id="p6038" name="5" size="615,387" scale="9grid" scale9grid="64,54,484,303"/>
-    <image id="p603a" name="02" size="60,74"/>
-    <image id="p603b" name="4" size="61,53"/>
-    <movieclip id="p6036" name="qtm011" size="49,31"/>
   </resources>
 </packageDescription>

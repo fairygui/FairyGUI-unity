@@ -23,7 +23,7 @@ fou90.xml|856|<component size="1136,640">
     </loader>
   </displayList>
   <ProgressBar titleType="valueAndmax"/>
-</component>fou95.xml|330|<movieclip pivot="59,61" interval="83" frameCount="8">
+</component>fou95.xml|316|<movieclip interval="83" frameCount="8">
   <frames>
     <frame rect="9,0,74,65"/>
     <frame rect="7,5,74,64"/>
@@ -63,16 +63,16 @@ fou90.xml|856|<component size="1136,640">
     </text>
   </displayList>
   <Button/>
-</component>package.xml|645|<packageDescription id="ddm193o7" name="CutScene">
+</component>package.xml|772|<packageDescription id="ddm193o7" name="CutScene" scrollBarRes="ui://9leh0eyfi3s65w,ui://9leh0eyfi3s65i">
   <resources>
-    <atlas id="atlas0" size="256,256" file="atlas0.png"/>
-    <component id="fou90" name="CutScene" exported="true" size="1136,640"/>
-    <component id="fou91" name="ProgressBar5" size="577,53"/>
-    <component id="fou96" name="Main" exported="true" size="1136,640"/>
-    <component id="fou97" name="Button1" size="100,36"/>
-    <image id="fou92" name="loading.png" size="4,16"/>
-    <image id="fou93" name="huawen1.png" size="85,59"/>
-    <image id="fou94" name="huawen2.png" size="88,59"/>
-    <movieclip id="fou95" name="pet" size="84,74"/>
+    <component id="fou91" name="ProgressBar5" path="/" size="577,53"/>
+    <component id="fou97" name="Button1" path="/" size="100,36"/>
+    <image id="fou92" name="loading.png" path="/" size="4,16"/>
+    <image id="fou93" name="huawen1_png" path="/" size="85,59"/>
+    <image id="fou94" name="huawen2_png" path="/" size="88,59"/>
+    <movieclip id="fou95" name="pet" path="/" size="84,74"/>
+    <component id="fou90" name="CutScene" path="/" size="1136,640" exported="true"/>
+    <component id="fou96" name="Main" path="/" size="1136,640" exported="true"/>
+    <atlas id="atlas0" size="512,256" file="atlas0.png"/>
   </resources>
 </packageDescription>
