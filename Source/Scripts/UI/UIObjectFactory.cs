@@ -29,7 +29,7 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="url"></param>
-		/// <param name="method"></param>
+		/// <param name="creator"></param>
 		public static void SetPackageItemExtension(string url, GComponentCreator creator)
 		{
 			if (url == null)
@@ -62,8 +62,8 @@ namespace FairyGUI
 
 		internal static void ResolvePackageItemExtension(PackageItem pi)
 		{
-			if (!packageItemExtensions.TryGetValue("ui://" + pi.owner.id + pi.id, out pi.extensionCreator)
-				&& !packageItemExtensions.TryGetValue("ui://" + pi.owner.name + "/" + pi.name, out pi.extensionCreator))
+			if (!packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.id + pi.id, out pi.extensionCreator)
+				&& !packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.name + "/" + pi.name, out pi.extensionCreator))
 				pi.extensionCreator = null;
 		}
 

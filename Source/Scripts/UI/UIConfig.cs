@@ -354,5 +354,21 @@ namespace FairyGUI
 		{ 
 			//nothing yet
 		}
+
+		public delegate AudioClip SoundLoader(string url);
+		static readonly SoundLoader defaultSoundLoader = url => null;
+		static SoundLoader soundLoader = defaultSoundLoader;
+
+		public static void SetSoundLoader(SoundLoader loader)
+		{
+			soundLoader = loader ?? defaultSoundLoader;
+		}
+
+		internal static AudioClip LoadSound(string url)
+		{
+			if (url.StartsWith(UIPackage.URL_PREFIX))
+				return UIPackage.GetItemAssetByURL(url) as AudioClip;
+			return soundLoader(url);
+		}
 	}
 }
