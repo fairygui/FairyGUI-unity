@@ -321,8 +321,6 @@ namespace FairyGUI
 			if (_contentItem != null)
 			{
 				_contentItem.Load();
-				if (_autoSize)
-					this.SetSize(_contentItem.width, _contentItem.height);
 
 				if (_contentItem.type == PackageItemType.Image)
 				{
@@ -348,7 +346,12 @@ namespace FairyGUI
 					UpdateLayout();
 				}
 				else
+				{
+					if (_autoSize)
+						this.SetSize(_contentItem.width, _contentItem.height);
+
 					SetErrorState();
+				}
 			}
 			else
 				SetErrorState();
