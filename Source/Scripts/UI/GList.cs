@@ -71,7 +71,8 @@ namespace FairyGUI
 		public bool scrollItemToViewOnClick;
 
 		ListLayoutType _layout;
-		int _lineItemCount;
+		int _lineCount;
+		int _columnCount;
 		int _lineGap;
 		int _columnGap;
 		AlignType _align;
@@ -154,17 +155,67 @@ namespace FairyGUI
 		/// <summary>
 		/// Item count in one line.
 		/// </summary>
+		[Obsolete("GList.lineItemCount is deprecated. Use GList.lineCount or GList.columnCount instead.")]
 		public int lineItemCount
 		{
-			get { return _lineItemCount; }
+			get
+			{
+				if (_layout == ListLayoutType.FlowVertical)
+					return _lineCount;
+				else
+					return _columnCount;
+			}
 			set
 			{
-				if (_lineItemCount != value)
+				if (_layout == ListLayoutType.FlowVertical)
+					_lineCount = value;
+				else
+					_columnCount = value;
+
+				SetBoundsChangedFlag();
+				if (_virtual)
+					SetVirtualListChangedFlag(true);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int lineCount
+		{
+			get { return _lineCount; }
+			set
+			{
+				if (_lineCount != value)
 				{
-					_lineItemCount = value;
-					SetBoundsChangedFlag();
-					if (_virtual)
-						SetVirtualListChangedFlag(true);
+					_lineCount = value;
+					if (_layout == ListLayoutType.FlowVertical || _layout == ListLayoutType.Pagination)
+					{
+						SetBoundsChangedFlag();
+						if (_virtual)
+							SetVirtualListChangedFlag(true);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int columnCount
+		{
+			get { return _columnCount; }
+			set
+			{
+				if (_columnCount != value)
+				{
+					_columnCount = value;
+					if (_layout == ListLayoutType.FlowHorizontal || _layout == ListLayoutType.Pagination)
+					{
+						SetBoundsChangedFlag();
+						if (_virtual)
+							SetVirtualListChangedFlag(true);
+					}
 				}
 			}
 		}
@@ -1293,32 +1344,47 @@ namespace FairyGUI
 			{
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.SingleRow)
 					_curLineItemCount = 1;
-				else if (_lineItemCount != 0)
-					_curLineItemCount = _lineItemCount;
 				else if (_layout == ListLayoutType.FlowHorizontal)
 				{
-					_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewWidth + _columnGap) / (_itemSize.x + _columnGap));
-					if (_curLineItemCount <= 0)
-						_curLineItemCount = 1;
+					if (_columnCount > 0)
+						_curLineItemCount = _columnCount;
+					else
+					{
+						_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewWidth + _columnGap) / (_itemSize.x + _columnGap));
+						if (_curLineItemCount <= 0)
+							_curLineItemCount = 1;
+					}
 				}
 				else if (_layout == ListLayoutType.FlowVertical)
 				{
-					_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewHeight + _lineGap) / (_itemSize.y + _lineGap));
-					if (_curLineItemCount <= 0)
-						_curLineItemCount = 1;
+					if (_lineCount > 0)
+						_curLineItemCount = _lineCount;
+					else
+					{
+						_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewHeight + _lineGap) / (_itemSize.y + _lineGap));
+						if (_curLineItemCount <= 0)
+							_curLineItemCount = 1;
+					}
 				}
 				else //pagination
 				{
-					_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewWidth + _columnGap) / (_itemSize.x + _columnGap));
-					if (_curLineItemCount <= 0)
-						_curLineItemCount = 1;
-				}
+					if (_columnCount > 0)
+						_curLineItemCount = _columnCount;
+					else
+					{
+						_curLineItemCount = Mathf.FloorToInt((this.scrollPane.viewWidth + _columnGap) / (_itemSize.x + _columnGap));
+						if (_curLineItemCount <= 0)
+							_curLineItemCount = 1;
+					}
 
-				if (_layout == ListLayoutType.Pagination)
-				{
-					_curLineItemCount2 = Mathf.FloorToInt((this.scrollPane.viewHeight + _lineGap) / (_itemSize.y + _lineGap));
-					if (_curLineItemCount2 <= 0)
-						_curLineItemCount2 = 1;
+					if (_lineCount > 0)
+						_curLineItemCount2 = _lineCount;
+					else
+					{
+						_curLineItemCount2 = Mathf.FloorToInt((this.scrollPane.viewHeight + _lineGap) / (_itemSize.y + _lineGap));
+						if (_curLineItemCount2 <= 0)
+							_curLineItemCount2 = 1;
+					}
 				}
 			}
 
@@ -1921,22 +1987,10 @@ namespace FairyGUI
 			int insertIndex = 0;
 			for (int i = startIndex; i < lastIndex; i++)
 			{
-				if (i >= _realNumItems)
+				ItemInfo ii = _virtualItems[i];
+				if (ii.updateFlag != itemInfoVer)
 					continue;
 
-				int col = i % _curLineItemCount;
-				if (i - startIndex < pageSize)
-				{
-					if (col < startCol)
-						continue;
-				}
-				else
-				{
-					if (col > startCol)
-						continue;
-				}
-
-				ItemInfo ii = _virtualItems[i];
 				if (ii.obj == null)
 				{
 					//寻找看有没有可重用的
@@ -1987,10 +2041,41 @@ namespace FairyGUI
 				}
 
 				if (needRender)
+				{
 					itemRenderer(i % _numItems, ii.obj);
+					ii.size.x = Mathf.CeilToInt(ii.obj.size.x);
+					ii.size.y = Mathf.CeilToInt(ii.obj.size.y);
+				}
+			}
 
-				ii.obj.SetXY((int)(i / pageSize) * viewWidth + col * (ii.size.x + _columnGap),
-					(int)(i / _curLineItemCount) % _curLineItemCount2 * (ii.size.y + _lineGap));
+			//排列item
+			float borderX = (startIndex / pageSize) * viewWidth;
+			float xx = borderX;
+			float yy = 0;
+			float lineHeight = 0;
+			for (int i = startIndex; i < lastIndex; i++)
+			{
+				ItemInfo ii = _virtualItems[i];
+				if (ii.updateFlag == itemInfoVer)
+					ii.obj.SetXY(xx, yy);
+
+				if (ii.size.y > lineHeight)
+					lineHeight = ii.size.y;
+				if (i % _curLineItemCount == _curLineItemCount - 1)
+				{
+					xx = borderX;
+					yy += lineHeight + _lineGap;
+					lineHeight = 0;
+
+					if (i == startIndex + pageSize - 1)
+					{
+						borderX += viewWidth;
+						xx = borderX;
+						yy = 0;
+					}
+				}
+				else
+					xx += ii.size.x + _columnGap;
 			}
 
 			//释放未使用的
@@ -2193,8 +2278,8 @@ namespace FairyGUI
 					if (curX != 0)
 						curX += _columnGap;
 
-					if (_lineItemCount != 0 && j >= _lineItemCount
-						|| _lineItemCount == 0 && curX + sw > viewWidth && maxHeight != 0)
+					if (_columnCount != 0 && j >= _columnCount
+						|| _columnCount == 0 && curX + sw > viewWidth && maxHeight != 0)
 					{
 						//new line
 						curX -= _columnGap;
@@ -2230,8 +2315,8 @@ namespace FairyGUI
 					if (curY != 0)
 						curY += _lineGap;
 
-					if (_lineItemCount != 0 && j >= _lineItemCount
-						|| _lineItemCount == 0 && curY + sh > viewHeight && maxWidth != 0)
+					if (_lineCount != 0 && j >= _lineCount
+						|| _lineCount == 0 && curY + sh > viewHeight && maxWidth != 0)
 					{
 						curY -= _lineGap;
 						if (curY > maxHeight)
@@ -2254,6 +2339,7 @@ namespace FairyGUI
 			{
 				int j = 0;
 				int p = 0;
+				int k = 0;
 				float viewWidth = this.viewWidth;
 				float viewHeight = this.viewHeight;
 				for (i = 0; i < cnt; i++)
@@ -2268,8 +2354,8 @@ namespace FairyGUI
 					if (curX != 0)
 						curX += _columnGap;
 
-					if (_lineItemCount != 0 && j >= _lineItemCount
-						|| _lineItemCount == 0 && curX + sw > viewWidth && maxHeight != 0)
+					if (_columnCount != 0 && j >= _columnCount
+						|| _columnCount == 0 && curX + sw > viewWidth && maxHeight != 0)
 					{
 						//new line
 						curX -= _columnGap;
@@ -2279,11 +2365,14 @@ namespace FairyGUI
 						curY += maxHeight + _lineGap;
 						maxHeight = 0;
 						j = 0;
+						k++;
 
-						if (curY + sh > viewHeight && maxWidth != 0)//new page
+						if (_lineCount != 0 && k >= _lineCount
+							|| _lineCount == 0 && curY + sh > viewHeight && maxWidth != 0)//new page
 						{
 							p++;
 							curY = 0;
+							k = 0;
 						}
 					}
 					child.SetXY(p * viewWidth + curX, curY);
@@ -2292,7 +2381,7 @@ namespace FairyGUI
 						maxHeight = sh;
 					j++;
 				}
-				ch = curY + maxHeight;
+				ch = p > 0 ? viewHeight : curY + maxHeight;
 				cw = (p + 1) * viewWidth;
 			}
 
@@ -2385,9 +2474,17 @@ namespace FairyGUI
 
 			_lineGap = xml.GetAttributeInt("lineGap");
 			_columnGap = xml.GetAttributeInt("colGap");
-			_lineItemCount = xml.GetAttributeInt("lineItemCount");
+			int c = xml.GetAttributeInt("lineItemCount");
+			if (_layout == ListLayoutType.FlowHorizontal)
+				_columnCount = c;
+			else if (_layout == ListLayoutType.FlowVertical)
+				_lineCount = c;
+			else if (_layout == ListLayoutType.Pagination)
+			{
+				_columnCount = c;
+				_lineCount = xml.GetAttributeInt("lineItemCount2");
+			}
 			defaultItem = xml.GetAttribute("defaultItem");
-
 			autoResizeItem = xml.GetAttributeBool("autoItemSize", true);
 
 			XMLList.Enumerator et = xml.GetEnumerator("item");
