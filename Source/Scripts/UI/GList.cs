@@ -1987,6 +1987,9 @@ namespace FairyGUI
 			int insertIndex = 0;
 			for (int i = startIndex; i < lastIndex; i++)
 			{
+				if (i >= _realNumItems)
+					continue;
+
 				ItemInfo ii = _virtualItems[i];
 				if (ii.updateFlag != itemInfoVer)
 					continue;
@@ -2055,6 +2058,9 @@ namespace FairyGUI
 			float lineHeight = 0;
 			for (int i = startIndex; i < lastIndex; i++)
 			{
+				if (i >= _realNumItems)
+					continue;
+
 				ItemInfo ii = _virtualItems[i];
 				if (ii.updateFlag == itemInfoVer)
 					ii.obj.SetXY(xx, yy);
