@@ -49,8 +49,19 @@ namespace FairyGUI
 		/// </summary>
 		public EventListener onTouchMove { get; private set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onKeyboardOpened { get; private set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onKeyboardClosed { get; private set; }
+
 		DisplayObject _touchTarget;
 		DisplayObject _focused;
+		InputTextField _lastInput;
 		UpdateContext _updateContext;
 		List<DisplayObject> _rollOutChain;
 		List<DisplayObject> _rollOverChain;
@@ -138,6 +149,8 @@ namespace FairyGUI
 
 			onStageResized = new EventListener(this, "onStageResized");
 			onTouchMove = new EventListener(this, "onTouchMove");
+			onKeyboardOpened = new EventListener(this, "onKeyboardOpened");
+			onKeyboardClosed = new EventListener(this, "onKeyboardClosed");
 
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
@@ -237,7 +250,10 @@ namespace FairyGUI
 				if (_focused != null)
 				{
 					if (_focused is InputTextField)
-						((InputTextField)_focused).onFocusIn.Call();
+					{
+						_lastInput = (InputTextField)_focused;
+						_lastInput.onFocusIn.Call();
+					}
 
 					_focused.onRemovedFromStage.AddCapture(_focusRemovedDelegate);
 				}
@@ -246,23 +262,11 @@ namespace FairyGUI
 
 		void OnFocusRemoved(EventContext context)
 		{
-			if (_focused == null)
-				return;
-
 			if (context.sender == _focused)
-				this.focus = null;
-			else
 			{
-				DisplayObject currentObject = _focused.parent;
-				while (currentObject != null)
-				{
-					if (currentObject == context.sender)
-					{
-						this.focus = null;
-						break;
-					}
-					currentObject = currentObject.parent;
-				}
+				if(_focused is InputTextField)
+					_lastInput = null;
+				this.focus = null;
 			}
 		}
 
@@ -411,10 +415,14 @@ namespace FairyGUI
 		/// <param name="textPlaceholder"></param>
 		/// <param name="keyboardType"></param>
 		/// <param name="hideInput"></param>
-		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure, bool alert, string textPlaceholder, int keyboardType, bool hideInput)
+		public void OpenKeyboard(string text, bool autocorrection, bool multiline, bool secure,
+			bool alert, string textPlaceholder, int keyboardType, bool hideInput)
 		{
 			if (_keyboard != null)
+			{
 				_keyboard.Open(text, autocorrection, multiline, secure, alert, textPlaceholder, keyboardType, hideInput);
+				onKeyboardOpened.Call();
+			}
 		}
 
 		/// <summary>
@@ -423,7 +431,20 @@ namespace FairyGUI
 		public void CloseKeyboard()
 		{
 			if (_keyboard != null)
+			{
 				_keyboard.Close();
+				onKeyboardClosed.Call();
+			}
+		}
+
+		/// <summary>
+		/// 输入字符到当前光标位置
+		/// </summary>
+		/// <param name="value"></param>
+		public void InputString(string value)
+		{
+			if (_lastInput != null)
+				_lastInput.ReplaceSelection(value);
 		}
 
 		/// <summary>
@@ -685,12 +706,15 @@ namespace FairyGUI
 
 			if (_keyboard != null)
 			{
-				string s = _keyboard.GetInput();
-				if (s != null)
-					textField.ReplaceText(s);
+				if (textField.keyboardInput)
+				{
+					string s = _keyboard.GetInput();
+					if (s != null)
+						textField.ReplaceText(s);
 
-				if (_keyboard.done)
-					this.focus = null;
+					if (_keyboard.done)
+						this.focus = null;
+				}
 			}
 			else
 			{

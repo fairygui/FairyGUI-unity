@@ -116,6 +116,15 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 在移动设备上是否使用键盘输入。如果false，则文本在获得焦点后不会弹出键盘。
+		/// </summary>
+		public bool keyboardInput
+		{
+			get { return inputTextField.keyboardInput; }
+			set { inputTextField.keyboardInput = value; }
+		}
+
+		/// <summary>
 		/// <see cref="UnityEngine.TouchScreenKeyboardType"/>
 		/// </summary>
 		public int keyboardType
@@ -165,7 +174,7 @@ namespace FairyGUI
 				inputTextField.promptText = str;
 			inputTextField.displayAsPassword = xml.GetAttributeBool("password", false);
 			inputTextField.restrict = xml.GetAttribute("restrict");
-			inputTextField.maxLength = xml.GetAttributeInt("maxLength", int.MaxValue);
+			inputTextField.maxLength = xml.GetAttributeInt("maxLength", 0);
 			inputTextField.keyboardType = xml.GetAttributeInt("keyboardType");
 		}
 	}

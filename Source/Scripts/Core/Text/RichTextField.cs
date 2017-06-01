@@ -30,7 +30,6 @@ namespace FairyGUI
 		public TextField textField { get; private set; }
 
 		List<IHtmlObject> _toCollect;
-		EventCallback0 _refreshObjectsDelegate;
 
 		public RichTextField()
 		{
@@ -43,8 +42,6 @@ namespace FairyGUI
 			this.textField = new TextField();
 			textField.EnableRichSupport(this);
 			AddChild(textField);
-
-			_refreshObjectsDelegate = InternalRefreshObjects;
 		}
 
 		/// <summary>
@@ -158,6 +155,13 @@ namespace FairyGUI
 			base.OnSizeChanged(widthChanged, heightChanged);
 		}
 
+		public override void Update(UpdateContext context)
+		{
+			textField.Redraw();
+
+			base.Update(context);
+		}
+
 		internal void CleanupObjects()
 		{
 			List<HtmlElement> elements = textField.htmlElements;
@@ -183,15 +187,7 @@ namespace FairyGUI
 			}
 		}
 
-		internal void RefreshObjects()
-		{
-			if (UpdateContext.working)
-				UpdateContext.OnEnd += _refreshObjectsDelegate;
-			else
-				InternalRefreshObjects();
-		}
-
-		virtual protected void InternalRefreshObjects()
+		virtual internal void RefreshObjects()
 		{
 			List<HtmlElement> elements = textField.htmlElements;
 			int count = _toCollect != null ? _toCollect.Count : 0;
