@@ -31,18 +31,19 @@ namespace FairyGUI
 		BaseFont _font;
 		float _textWidth;
 		float _textHeight;
+		float _minHeight;
 		bool _textChanged;
 		int _yOffset;
 		string _alternativeText;
 		bool _alternatvieHtml;
 		float _fontSizeScale;
 		float _renderScale;
+		string _parsedText;
 
 		RichTextField _richTextField;
 
 		const int GUTTER_X = 2;
 		const int GUTTER_Y = 2;
-		const char E_TAG = (char)1;
 		static float[] STROKE_OFFSET = new float[]
 		{
 			 -1f, 0f, 1f, 0f,
@@ -59,16 +60,14 @@ namespace FairyGUI
 			_touchDisabled = true;
 
 			_textFormat = new TextFormat();
-			_textFormat.size = 12;
-			_textFormat.lineSpacing = 3;
 			_strokeColor = Color.black;
 			_fontSizeScale = 1;
 			_renderScale = UIContentScaler.scaleFactor;
 
-			_wordWrap = true;
+			_wordWrap = false;
 			_text = string.Empty;
 
-			_elements = new List<HtmlElement>(1);
+			_elements = new List<HtmlElement>(0);
 			_lines = new List<LineInfo>(1);
 
 			CreateGameObject("TextField");
@@ -110,8 +109,7 @@ namespace FairyGUI
 				if (_font == null || _font.name != fontName)
 				{
 					_font = FontManager.GetFont(fontName);
-					if (_font != null)
-						graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+					graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
 				}
 				if (_alternativeText != null || !string.IsNullOrEmpty(_text))
 					_textChanged = true;
@@ -180,6 +178,11 @@ namespace FairyGUI
 				_textChanged = true;
 				_html = true;
 			}
+		}
+
+		public string parsedText
+		{
+			get { return _parsedText; }
 		}
 
 		/// <summary>
@@ -365,13 +368,36 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public void Redraw()
+		public bool Redraw()
 		{
+			if (_font == null)
+			{
+				_font = FontManager.GetFont(UIConfig.defaultFont);
+				graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+				_textChanged = true;
+			}
+
+			if (_font.keepCrisp && _renderScale != UIContentScaler.scaleFactor)
+				_textChanged = true;
+
+			if (_font.mainTexture != graphics.texture)
+			{
+				if (!_textChanged)
+					RequestText();
+				graphics.texture = _font.mainTexture;
+				_requireUpdateMesh = true;
+			}
+
 			if (_textChanged)
 				BuildLines();
 
 			if (_requireUpdateMesh)
+			{
 				BuildMesh();
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -438,6 +464,8 @@ namespace FairyGUI
 		{
 			if (!_updatingSize)
 			{
+				_minHeight = _contentRect.height;
+
 				if (_wordWrap && widthChanged)
 					_textChanged = true;
 				else if (_autoSize != AutoSizeType.None)
@@ -458,26 +486,8 @@ namespace FairyGUI
 
 		public override void Update(UpdateContext context)
 		{
-			if (_font != null)
-			{
-				if (_font.keepCrisp && _renderScale != UIContentScaler.scaleFactor)
-					_textChanged = true;
-
-				if (_font.mainTexture != graphics.texture)
-				{
-					if (!_textChanged)
-						RequestText();
-					graphics.texture = _font.mainTexture;
-					_requireUpdateMesh = true;
-				}
-
-				if (_textChanged)
-					BuildLines();
-
-				if (_requireUpdateMesh)
-					BuildMesh();
-			}
-
+			if (_richTextField == null) //如果是richTextField，会在update前主动调用了Redraw
+				Redraw();
 			base.Update(context);
 		}
 
@@ -486,6 +496,27 @@ namespace FairyGUI
 		/// </summary>
 		void RequestText()
 		{
+			if (_alternativeText != null)
+			{
+				if (!_alternatvieHtml)
+				{
+					_font.SetFormat(_textFormat, _fontSizeScale);
+					_font.PrepareCharacters(_alternativeText);
+					_font.PrepareCharacters("_-*");
+					return;
+				}
+			}
+			else
+			{
+				if (!_html)
+				{
+					_font.SetFormat(_textFormat, _fontSizeScale);
+					_font.PrepareCharacters(_text);
+					_font.PrepareCharacters("_-*");
+					return;
+				}
+			}
+
 			int count = _elements.Count;
 			for (int i = 0; i < count; i++)
 			{
@@ -505,66 +536,49 @@ namespace FairyGUI
 			_requireUpdateMesh = true;
 			_renderScale = UIContentScaler.scaleFactor;
 
+			string textToBuild = null;
+
 			Cleanup();
 
-			bool html = false;
 			if (_alternativeText != null)
 			{
 				if (_alternativeText.Length > 0)
 				{
-					html = _alternatvieHtml;
 					if (_alternatvieHtml)
 						HtmlParser.inst.Parse(_alternativeText, _textFormat, _elements,
 							_richTextField != null ? _richTextField.htmlParseOptions : null);
 					else
-					{
-						HtmlElement element = HtmlElement.GetElement(HtmlElementType.Text);
-						element.text = _alternativeText;
-						element.format.CopyFrom(_textFormat);
-						_elements.Add(element);
-					}
+						textToBuild = _alternativeText;
 				}
 			}
 			else
 			{
 				if (_text.Length > 0)
 				{
-					html = _html;
 					if (_html)
 						HtmlParser.inst.Parse(_text, _textFormat, _elements,
 							_richTextField != null ? _richTextField.htmlParseOptions : null);
 					else
-					{
-						HtmlElement element = HtmlElement.GetElement(HtmlElementType.Text);
-						element.text = _text;
-						element.format.CopyFrom(_textFormat);
-						_elements.Add(element);
-					}
+						textToBuild = _text;
 				}
 			}
 
-			if (_elements.Count == 0)
+			if (_elements.Count == 0 && textToBuild == null)
 			{
 				LineInfo emptyLine = LineInfo.Borrow();
-				emptyLine.width = 0;
-				emptyLine.height = 0;
-				emptyLine.text = string.Empty;
+				emptyLine.width = emptyLine.height = 0;
+				emptyLine.charIndex = emptyLine.charCount = 0;
 				emptyLine.y = emptyLine.y2 = GUTTER_Y;
 				_lines.Add(emptyLine);
 
-				_textWidth = 0;
-				_textHeight = 0;
+				_textWidth = _textHeight = 0;
 				_fontSizeScale = 1;
+
+				_parsedText = string.Empty;
 
 				BuildLinesFinal();
 
 				return;
-			}
-
-			if (_richTextField != null && _richTextField.emojies != null)
-			{
-				html = true;
-				HandleEmojies();
 			}
 
 			int letterSpacing = _textFormat.letterSpacing;
@@ -572,10 +586,15 @@ namespace FairyGUI
 			float rectWidth = _contentRect.width - GUTTER_X * 2;
 			float lineWidth = 0, lineHeight = 0, lineTextHeight = 0;
 			float glyphWidth = 0, glyphHeight = 0;
-			int wordChars = 0;
+			short wordChars = 0;
 			float wordStart = 0;
 			bool wordPossible = false;
 			float lastLineHeight = 0;
+			short lineBegin = 0;
+			short lineChars = 0;
+			bool newLineByReturn = true;
+			bool hasEmojies = _richTextField != null && _richTextField.emojies != null;
+
 			TextFormat format = _textFormat;
 			_font.SetFormat(format, _fontSizeScale);
 			bool wrap;
@@ -591,208 +610,372 @@ namespace FairyGUI
 
 			RequestText();
 
+			int elementCount = _elements.Count;
+			int elementIndex = 0;
+			HtmlElement element = null;
+			if (elementCount > 0)
+				element = _elements[0];
+
+			StringBuilder buffer = null; //对于简单文本，节省一个StringBuilder的操作
+			if (elementCount > 0 || _richTextField != null)
+				buffer = new StringBuilder();
+
 			LineInfo line;
-			StringBuilder lineBuffer = new StringBuilder();
 
-			int count = _elements.Count;
-			for (int i = 0; i < count; i++)
+			while (true)
 			{
-				HtmlElement element = _elements[i];
-
-				if (html)
+				if (element != null)
 				{
-					//Special tag, indicates the start of an element
-					lineBuffer.Append(E_TAG);
-					lineBuffer.Append((char)(i + 33));
-				}
+					element.charIndex = buffer.Length;
 
-				if (element.type == HtmlElementType.Text)
-				{
-					format = element.format;
-					_font.SetFormat(format, _fontSizeScale);
-
-					int textLength = element.text.Length;
-					for (int offset = 0; offset < textLength; ++offset)
+					if (element.type == HtmlElementType.Text)
 					{
-						char ch = element.text[offset];
-						if (ch == E_TAG)
-							ch = '?';
+						format = element.format;
+						_font.SetFormat(format, _fontSizeScale);
+						textToBuild = element.text;
+					}
+					else
+					{
+						wordChars = 0;
+						wordPossible = false;
 
-						if (ch == '\r')
+						IHtmlObject htmlObject = null;
+						if (_richTextField != null)
 						{
-							if (offset != textLength - 1 && element.text[offset + 1] == '\n')
-								continue;
-
-							ch = '\n';
+							element.space = (int)(rectWidth - lineWidth - 4);
+							htmlObject = _richTextField.htmlPageContext.CreateObject(_richTextField, element);
+							element.htmlObject = htmlObject;
 						}
-
-						if (ch == '\n')
+						if (htmlObject != null)
 						{
-							lineBuffer.Append(ch);
-							line = LineInfo.Borrow();
-							line.width = lineWidth;
-							if (lineTextHeight == 0)
-							{
-								if (lastLineHeight == 0)
-									lastLineHeight = format.size;
-								if (lineHeight == 0)
-									lineHeight = lastLineHeight;
-								lineTextHeight = lineHeight;
-							}
-							line.height = lineHeight;
-							lastLineHeight = lineHeight;
-							line.textHeight = lineTextHeight;
-							line.text = lineBuffer.ToString();
-							line.y = line.y2 = lineY;
-							lineY += (line.height + lineSpacing);
-							if (line.width > _textWidth)
-								_textWidth = line.width;
-							_lines.Add(line);
-							lineBuffer.Length = 0;
-							lineWidth = 0;
-							lineHeight = 0;
-							lineTextHeight = 0;
-							wordChars = 0;
-							continue;
-						}
-
-						if (ch == ' ')
-						{
-							wordChars = 0;
-							wordPossible = true;
-						}
-						else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z'))
-						{
-							if (wordChars == 0)
-								wordStart = lineWidth;
-							else if (wordChars > 10)
-								wordChars = int.MinValue;
-
-							wordChars++;
+							glyphWidth = (int)htmlObject.width;
+							glyphHeight = (int)htmlObject.height;
 						}
 						else
-						{
-							wordChars = 0;
-							wordPossible = false;
-						}
+							glyphWidth = 0;
 
-						if (_font.GetGlyphSize(ch, out glyphWidth, out glyphHeight))
+						if (glyphWidth > 0)
 						{
-							if (glyphHeight > lineTextHeight)
-								lineTextHeight = glyphHeight;
+							buffer.Append(' ');
+							lineChars++;
 
-							if (glyphHeight > lineHeight)
-								lineHeight = glyphHeight;
+							glyphWidth += 2;
 
 							if (lineWidth != 0)
 								lineWidth += letterSpacing;
 							lineWidth += glyphWidth;
-						}
 
-						if (!wrap || lineWidth <= rectWidth)
-						{
-							lineBuffer.Append(ch);
-						}
-						else
-						{
-							line = LineInfo.Borrow();
-							line.height = lineHeight;
-							line.textHeight = lineTextHeight;
-							if (lineBuffer.Length == 0) //the line cannt fit even a char
+							if (wrap && lineWidth > rectWidth)
 							{
-								line.text = ch.ToString();
-								wordChars = 0;
-								wordPossible = false;
-							}
-							else if (wordChars > 0 && wordStart > 0) //if word had broken, move it to new line
-							{
-								lineBuffer.Append(ch);
-								int len = lineBuffer.Length - wordChars;
-								line.text = lineBuffer.ToString(0, len);
-								line.width = wordStart;
-								lineBuffer.Remove(0, len);
+								line = LineInfo.Borrow();
+								newLineByReturn = false;
+								if (lineChars == 1)
+								{
+									if (glyphHeight > lineHeight)
+										lineHeight = glyphHeight;
+									line.charCount = 1;
+									lineChars = 0;
+									line.width = lineWidth;
+									line.height = lineHeight;
+									lineWidth = lineHeight = 0;
+								}
+								else
+								{
+									line.charCount = (short)(lineChars - 1);
+									lineChars = 1;
+									line.width = lineWidth - (glyphWidth + letterSpacing);
+									line.height = lineHeight;
+									lineWidth = glyphWidth;
+									lineHeight = glyphHeight;
+								}
+								line.textHeight = lineTextHeight;
+								lineTextHeight = 0;
+								line.charIndex = lineBegin;
+								lineBegin += line.charCount;
+								line.y = line.y2 = lineY;
+								lineY += (line.height + lineSpacing);
+								_lines.Add(line);
 
-								lineWidth -= wordStart;
-								wordStart = 0;
+								lastLineHeight = line.height;
+								if (line.width > _textWidth)
+									_textWidth = line.width;
 							}
 							else
 							{
-								line.text = lineBuffer.ToString();
-								line.width = lineWidth - (glyphWidth + letterSpacing);
-								lineBuffer.Length = 0;
-
-								lineBuffer.Append(ch);
-								lineWidth = glyphWidth;
-								lineHeight = glyphHeight;
-								lineTextHeight = glyphHeight;
-								wordChars = 0;
-								wordPossible = false;
+								if (glyphHeight > lineHeight)
+									lineHeight = glyphHeight;
 							}
-							line.y = line.y2 = lineY;
-							lineY += (line.height + lineSpacing);
-							if (line.width > _textWidth)
-								_textWidth = line.width;
-
-							_lines.Add(line);
 						}
+
+						elementIndex++;
+						if (elementIndex >= elementCount)
+							break;
+
+						element = _elements[elementIndex];
+						continue;
 					}
 				}
-				else
-				{
-					wordChars = 0;
-					wordPossible = false;
 
-					IHtmlObject htmlObject = null;
-					if (_richTextField != null)
+				int textLength = textToBuild.Length;
+				for (int offset = 0; offset < textLength; offset++)
+				{
+					char ch = textToBuild[offset];
+					if (ch == '\r')
 					{
-						element.space = (int)(rectWidth - lineWidth - 4);
-						htmlObject = _richTextField.htmlPageContext.CreateObject(_richTextField, element);
-						element.htmlObject = htmlObject;
-					}
-					if (htmlObject != null)
-					{
-						glyphWidth = (int)htmlObject.width;
-						glyphHeight = (int)htmlObject.height;
-						if (glyphWidth == 0)
+						if (offset != textLength - 1 && textToBuild[offset + 1] == '\n')
 							continue;
 
-						glyphWidth += 2;
+						ch = '\n';
+					}
+					bool highSurrogate = char.IsHighSurrogate(ch);
+					if (hasEmojies)
+					{
+						uint emojiKey = 0;
+						Emoji emoji;
+						if (highSurrogate)
+						{
+							offset++;
+							emojiKey = ((uint)textToBuild[offset] & 0x03FF) + ((((uint)ch & 0x03FF) + 0x40) << 10);
+							ch = ' ';
+						}
+						else
+						{
+							emojiKey = ch;
+						}
+						if (_richTextField.emojies.TryGetValue(emojiKey, out emoji))
+						{
+							HtmlElement imageElement = HtmlElement.GetElement(HtmlElementType.Image);
+							imageElement.Set("src", emoji.url);
+							if (emoji.width != 0)
+								imageElement.Set("width", emoji.width);
+							if (emoji.height != 0)
+								imageElement.Set("height", emoji.height);
+							if (highSurrogate)
+								imageElement.text = textToBuild.Substring(offset - 1, 2);
+							imageElement.charIndex = buffer.Length;
+							_elements.Insert(elementIndex, imageElement);
+							elementCount++;
+							elementIndex++;
+
+							wordChars = 0;
+							wordPossible = false;
+
+							IHtmlObject htmlObject = null;
+							if (_richTextField != null)
+							{
+								imageElement.space = (int)(rectWidth - lineWidth - 4);
+								htmlObject = _richTextField.htmlPageContext.CreateObject(_richTextField, imageElement);
+								imageElement.htmlObject = htmlObject;
+							}
+							if (htmlObject != null)
+							{
+								glyphWidth = (int)htmlObject.width;
+								glyphHeight = (int)htmlObject.height;
+								if (glyphWidth == 0)
+									continue;
+							}
+							else
+								continue;
+
+							buffer.Append(' ');
+							lineChars++;
+
+							glyphWidth += 2;
+							if (lineWidth != 0)
+								lineWidth += letterSpacing;
+							lineWidth += glyphWidth;
+
+							if (wrap && lineWidth > rectWidth)
+							{
+								line = LineInfo.Borrow();
+								newLineByReturn = false;
+								if (lineChars == 1)
+								{
+									if (glyphHeight > lineHeight)
+										lineHeight = glyphHeight;
+									line.charCount = 1;
+									lineChars = 0;
+									line.width = lineWidth;
+									line.height = lineHeight;
+									lineWidth = lineHeight = 0;
+								}
+								else
+								{
+									line.charCount = (short)(lineChars - 1);
+									lineChars = 1;
+									line.width = lineWidth - (glyphWidth + letterSpacing);
+									line.height = lineHeight;
+									lineWidth = glyphWidth;
+									lineHeight = glyphHeight;
+								}
+								line.textHeight = lineTextHeight;
+								lineTextHeight = 0;
+								line.charIndex = lineBegin;
+								lineBegin += line.charCount;
+								line.y = line.y2 = lineY;
+								lineY += (line.height + lineSpacing);
+								_lines.Add(line);
+
+								lastLineHeight = line.height;
+								if (line.width > _textWidth)
+									_textWidth = line.width;
+							}
+							else
+							{
+								if (glyphHeight > lineHeight)
+									lineHeight = glyphHeight;
+							}
+							continue;
+						}
 					}
 					else
-						continue;
-
-					if (glyphHeight > lineHeight)
-						lineHeight = glyphHeight;
-
-					if (lineWidth != 0)
-						lineWidth += letterSpacing;
-					lineWidth += glyphWidth;
-
-					if (wrap && lineWidth > rectWidth && glyphWidth < rectWidth)
 					{
-						line = LineInfo.Borrow();
-						line.height = lineHeight;
-						line.textHeight = lineTextHeight;
-						int len = lineBuffer.Length;
-						line.text = lineBuffer.ToString(0, len - 2);
-						line.width = lineWidth - (glyphWidth + letterSpacing);
-						lineBuffer.Remove(0, len - 2);
-						lineWidth = glyphWidth;
-						line.y = line.y2 = lineY;
-						lineY += (line.height + lineSpacing);
-						if (line.width > _textWidth)
-							_textWidth = line.width;
+						if (highSurrogate)
+						{
+							offset++;
+							ch = ' ';
+						}
+					}
 
-						lineTextHeight = 0;
-						lineHeight = glyphHeight;
+					if (buffer != null)
+						buffer.Append(ch);
+					lineChars++;
+
+					if (ch == '\n')
+					{
 						wordChars = 0;
 						wordPossible = false;
+
+						line = LineInfo.Borrow();
+						newLineByReturn = true;
+						if (lineTextHeight == 0)
+						{
+							if (lineHeight == 0)
+							{
+								if (lastLineHeight == 0)
+									lineHeight = format.size;
+								else
+									lineHeight = lastLineHeight;
+							}
+							lineTextHeight = lineHeight;
+						}
+						line.width = lineWidth;
+						line.height = lineHeight;
+						lineWidth = lineHeight = 0;
+						line.textHeight = lineTextHeight;
+						lineTextHeight = 0;
+						line.y = line.y2 = lineY;
+						lineY += (line.height + lineSpacing);
+						line.charIndex = lineBegin;
+						line.charCount = lineChars;
+						lineBegin += line.charCount;
+						lineChars = 0;
 						_lines.Add(line);
+
+						lastLineHeight = line.height;
+						if (line.width > _textWidth)
+							_textWidth = line.width;
+						continue;
+					}
+
+					if (ch == ' ')
+					{
+						wordChars = 0;
+						wordPossible = true;
+					}
+					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '-'))
+					{
+						if (wordChars == 0)
+							wordStart = lineWidth;
+						else if (wordChars > 10)
+							wordChars = short.MinValue;
+
+						wordChars++;
+					}
+					else
+					{
+						wordChars = 0;
+						wordPossible = false;
+					}
+
+					if (_font.GetGlyphSize(ch, out glyphWidth, out glyphHeight))
+					{
+						if (glyphHeight > lineTextHeight)
+							lineTextHeight = glyphHeight;
+
+						if (glyphHeight > lineHeight)
+							lineHeight = glyphHeight;
+
+						if (lineWidth != 0)
+							lineWidth += letterSpacing;
+						lineWidth += glyphWidth;
+					}
+
+					if (wrap && lineWidth > rectWidth)
+					{
+						line = LineInfo.Borrow();
+						newLineByReturn = false;
+						if (lineChars == 1) //the line cannt fit even a char
+						{
+							line.charCount = 1;
+							lineChars = 0;
+							line.width = lineWidth;
+							line.height = lineHeight;
+							lineWidth = lineHeight = 0;
+							line.textHeight = lineTextHeight;
+							lineTextHeight = 0;
+
+							wordChars = 0;
+							wordPossible = false;
+						}
+						else if (wordChars > 0 && wordStart > 0) //if word had broken, move it to new line
+						{
+							line.charCount = (short)(lineChars - wordChars);
+							lineChars = wordChars;
+							line.width = wordStart;
+							line.height = lineHeight;
+							lineWidth -= wordStart;
+							lineHeight = glyphHeight;
+							line.textHeight = lineTextHeight;
+							lineTextHeight = glyphHeight;
+
+							wordStart = 0;
+						}
+						else
+						{
+							line.charCount = (short)(lineChars - 1);
+							lineChars = 1;
+							line.width = lineWidth - (glyphWidth + letterSpacing);
+							line.height = lineHeight;
+							lineWidth = glyphWidth;
+							lineHeight = glyphHeight;
+							line.textHeight = lineTextHeight;
+							lineTextHeight = glyphHeight;
+
+							wordChars = 0;
+							wordPossible = false;
+						}
+
+						line.charIndex = (short)lineBegin;
+						lineBegin += line.charCount;
+						line.y = line.y2 = lineY;
+						lineY += (line.height + lineSpacing);
+						_lines.Add(line);
+
+						lastLineHeight = line.height;
+						if (line.width > _textWidth)
+							_textWidth = line.width;
 					}
 				}
+
+				elementIndex++;
+				if (elementIndex >= elementCount)
+					break;
+
+				element = _elements[elementIndex];
 			}
 
-			if (lineWidth > 0 || _lines.Count == 0 || _lines[_lines.Count - 1].text.EndsWith("\n"))
+			if (lineWidth > 0 || newLineByReturn)
 			{
 				line = LineInfo.Borrow();
 				line.width = lineWidth;
@@ -802,12 +985,18 @@ namespace FairyGUI
 					lineTextHeight = lineHeight;
 				line.height = lineHeight;
 				line.textHeight = lineTextHeight;
-				line.text = lineBuffer.ToString();
+				line.charIndex = (short)lineBegin;
+				line.charCount = lineChars;
 				line.y = line.y2 = lineY;
 				if (line.width > _textWidth)
 					_textWidth = line.width;
 				_lines.Add(line);
 			}
+
+			if (buffer != null)
+				_parsedText = buffer.ToString();
+			else
+				_parsedText = textToBuild;
 
 			if (_textWidth > 0)
 				_textWidth += GUTTER_X * 2;
@@ -844,120 +1033,30 @@ namespace FairyGUI
 		bool _updatingSize; //防止重复调用BuildLines
 		void BuildLinesFinal()
 		{
-			if (!_input)
+			if (!_input && _autoSize == AutoSizeType.Both)
 			{
-				if (_autoSize == AutoSizeType.Both)
-				{
-					_updatingSize = true;
-					if (_richTextField != null)
-						_richTextField.SetSize(_textWidth, _textHeight);
-					else
-						SetSize(_textWidth, _textHeight);
-					_updatingSize = false;
-				}
-				else if (_autoSize == AutoSizeType.Height)
-				{
-					_updatingSize = true;
-					if (_richTextField != null)
-						_richTextField.height = _textHeight;
-					else
-						this.height = _textHeight;
-					_updatingSize = false;
-				}
+				_updatingSize = true;
+				if (_richTextField != null)
+					_richTextField.SetSize(_textWidth, _textHeight);
+				else
+					SetSize(_textWidth, _textHeight);
+				_updatingSize = false;
+			}
+			else if (_autoSize == AutoSizeType.Height)
+			{
+				_updatingSize = true;
+				float h = _textHeight;
+				if (_input && h < _minHeight)
+					h = _minHeight;
+				if (_richTextField != null)
+					_richTextField.height = h;
+				else
+					this.height = h;
+				_updatingSize = false;
 			}
 
 			_yOffset = 0;
 			ApplyVertAlign();
-		}
-
-		void HandleEmojies()
-		{
-			int count = _elements.Count;
-			Emoji gchar;
-			int i = 0;
-			int offset;
-			int textLength;
-			uint key;
-			int rm;
-
-			while (i < count)
-			{
-				HtmlElement element = _elements[i];
-				if (element.type == HtmlElementType.Text)
-				{
-					textLength = element.text.Length;
-					offset = 0;
-					while (offset < textLength)
-					{
-						char ch = element.text[offset];
-						if (char.IsHighSurrogate(ch) && offset < textLength - 1)
-						{
-							rm = 2;
-							key = ((uint)element.text[offset + 1] & 0x03FF) + ((((uint)ch & 0x03FF) + 0x40) << 10);
-						}
-						else
-						{
-							rm = 1;
-							key = (uint)ch;
-						}
-						if (_richTextField.emojies.TryGetValue(key, out gchar))
-						{
-							HtmlElement imageElement = HtmlElement.GetElement(HtmlElementType.Image);
-							imageElement.Set("src", gchar.url);
-							if (gchar.width != 0)
-								imageElement.Set("width", gchar.width);
-							if (gchar.height != 0)
-								imageElement.Set("height", gchar.height);
-
-							if (textLength <= 1)
-							{
-								_elements.RemoveAt(i);
-								HtmlElement.ReturnElement(element);
-								_elements.Insert(i, imageElement);
-								break;
-							}
-							else if (offset == 0)
-							{
-								element.text = element.text.Substring(rm);
-								_elements.Insert(i, imageElement);
-
-								count++;
-								textLength -= rm;
-								offset = 0;
-								i++;
-							}
-							else if (offset == textLength - rm)
-							{
-								element.text = element.text.Substring(0, offset);
-								_elements.Insert(i + 1, imageElement);
-
-								count++;
-								i++;
-								break;
-							}
-							else
-							{
-								HtmlElement element2 = HtmlElement.GetElement(HtmlElementType.Text);
-								element2.text = element.text.Substring(offset + rm);
-								element2.format.CopyFrom(element.format);
-								_elements.Insert(i + 1, element2);
-
-								element.text = element.text.Substring(0, offset);
-								_elements.Insert(i + 1, imageElement);
-
-								count += 2;
-								textLength = textLength - offset - rm;
-								offset = 0;
-								i += 2;
-								element = element2;
-							}
-						}
-						else
-							offset++;
-					}
-				}
-				i++;
-			}
 		}
 
 		static List<Vector3> sCachedVerts = new List<Vector3>();
@@ -974,8 +1073,11 @@ namespace FairyGUI
 			{
 				graphics.ClearMesh();
 
-				if (_charPositions != null && _charPositions.Count == 0)
+				if (_charPositions != null)
+				{
+					_charPositions.Clear();
 					_charPositions.Add(new CharPosition());
+				}
 
 				if (_richTextField != null)
 					_richTextField.RefreshObjects();
@@ -1019,23 +1121,27 @@ namespace FairyGUI
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
 			AlignType lineAlign;
+			int elementIndex = 0;
+			int elementCount = _elements.Count;
+			HtmlElement element = null;
+			if (elementCount > 0)
+				element = _elements[0];
+			int charIndex = 0;
+			bool skipChar = false;
 
 			int lineCount = _lines.Count;
 			for (int i = 0; i < lineCount; ++i)
 			{
 				LineInfo line = _lines[i];
-				int textLength = line.text.Length;
-				if (textLength == 0)
+				if (line.charCount == 0)
 					continue;
 
 				lineClipped = clipped && i != 0 && line.y + line.height > _contentRect.height; //超出区域，剪裁
 				lineAlign = format.align;
-				if (line.text[0] == E_TAG)
-				{
-					int elementIndex = (int)line.text[1] - 33;
-					HtmlElement element = _elements[elementIndex];
+				if (element != null && element.charIndex == line.charIndex)
 					lineAlign = element.format.align;
-				}
+				else
+					lineAlign = format.align;
 				if (lineAlign == AlignType.Center)
 					xIndent = (int)((rectWidth - line.width) / 2);
 				else if (lineAlign == AlignType.Right)
@@ -1047,13 +1153,12 @@ namespace FairyGUI
 
 				charX = GUTTER_X + xIndent;
 
-				for (int j = 0; j < textLength; j++)
+				int j = 0;
+				while (j < line.charCount)
 				{
-					char ch = line.text[j];
-					if (ch == E_TAG)
+					charIndex = line.charIndex + j;
+					if (element != null && charIndex == element.charIndex)
 					{
-						int elementIndex = (int)line.text[++j] - 33;
-						HtmlElement element = _elements[elementIndex];
 						if (element.type == HtmlElementType.Text)
 						{
 							format = element.format;
@@ -1090,9 +1195,8 @@ namespace FairyGUI
 								{
 									CharPosition cp = new CharPosition();
 									cp.lineIndex = (short)i;
-									cp.charIndex = (short)j;
-									cp.caretIndex = _charPositions.Count;
-									cp.vertCount = -1 - elementIndex; //借用
+									cp.charIndex = _charPositions.Count;
+									cp.vertCount = (short)(-1 - elementIndex); //借用
 									cp.offsetX = (int)charX;
 									_charPositions.Add(cp);
 								}
@@ -1103,11 +1207,25 @@ namespace FairyGUI
 								else
 									element.status &= 254;
 								charX += htmlObj.width + letterSpacing + 2;
+								skipChar = true;
 							}
 						}
+
+						elementIndex++;
+						if (elementIndex < elementCount)
+							element = _elements[elementIndex];
+						else
+							element = null;
 						continue;
 					}
 
+					j++;
+					if (skipChar)
+					{
+						skipChar = false;
+						continue;
+					}
+					char ch = _parsedText[charIndex];
 					if (_font.GetGlyph(ch, glyph))
 					{
 						if (lineClipped || clipped && charX != 0 && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
@@ -1256,9 +1374,8 @@ namespace FairyGUI
 						{
 							CharPosition cp = new CharPosition();
 							cp.lineIndex = (short)i;
-							cp.charIndex = (short)j;
-							cp.caretIndex = _charPositions.Count;
-							cp.vertCount = ((boldVertice ? 4 : 1) + (format.underline ? 1 : 0)) * 4;
+							cp.charIndex = _charPositions.Count;
+							cp.vertCount = (short)(((boldVertice ? 4 : 1) + (format.underline ? 1 : 0)) * 4);
 							cp.offsetX = (int)charX;
 							_charPositions.Add(cp);
 						}
@@ -1271,8 +1388,7 @@ namespace FairyGUI
 						{
 							CharPosition cp = new CharPosition();
 							cp.lineIndex = (short)i;
-							cp.charIndex = (short)j;
-							cp.caretIndex = _charPositions.Count;
+							cp.charIndex = _charPositions.Count;
 							cp.vertCount = 0;
 							cp.offsetX = (int)charX;
 							_charPositions.Add(cp);
@@ -1283,11 +1399,14 @@ namespace FairyGUI
 				}//text loop
 			}//line loop
 
+			if (element != null && element.type == HtmlElementType.LinkEnd && currentLink != null)
+				currentLink.SetArea(linkStartLine, linkStartX, lineCount - 1, charX);
+
 			if (_charPositions != null)
 			{
 				CharPosition cp = new CharPosition();
 				cp.lineIndex = (short)(lineCount - 1);
-				cp.caretIndex = _charPositions.Count;
+				cp.charIndex = _charPositions.Count;
 				cp.offsetX = (int)charX;
 				_charPositions.Add(cp);
 			}
@@ -1434,29 +1553,38 @@ namespace FairyGUI
 		public class LineInfo
 		{
 			/// <summary>
-			/// 
+			/// 行的宽度
 			/// </summary>
 			public float width;
 
 			/// <summary>
-			/// 
+			/// 行的高度
 			/// </summary>
 			public float height;
+
 			/// <summary>
-			/// 
+			/// 行内文本的高度
 			/// </summary>
 			public float textHeight;
 
 			/// <summary>
-			/// 
+			/// 行首的字符索引
 			/// </summary>
-			public string text;
+			public short charIndex;
 
 			/// <summary>
-			/// 
+			/// 行包括的字符个数
+			/// </summary>
+			public short charCount;
+
+			/// <summary>
+			/// 行的y轴位置
 			/// </summary>
 			public float y;
 
+			/// <summary>
+			/// 行的y轴位置的备份
+			/// </summary>
 			internal float y2;
 
 			static Stack<LineInfo> pool = new Stack<LineInfo>();
@@ -1473,7 +1601,6 @@ namespace FairyGUI
 					ret.width = 0;
 					ret.height = 0;
 					ret.textHeight = 0;
-					ret.text = null;
 					ret.y = 0;
 					return ret;
 				}
@@ -1510,14 +1637,14 @@ namespace FairyGUI
 		public struct CharPosition
 		{
 			/// <summary>
+			/// 字符索引
+			/// </summary>
+			public int charIndex;
+
+			/// <summary>
 			/// 字符所在的行索引
 			/// </summary>
 			public short lineIndex;
-
-			/// <summary>
-			/// 字符在所在行的索引
-			/// </summary>
-			public short charIndex;
 
 			/// <summary>
 			/// 字符的x偏移
@@ -1527,9 +1654,7 @@ namespace FairyGUI
 			/// <summary>
 			/// 字符占用的顶点数量。如果小于0，用于表示一个图片。对应的图片索引为-vertCount-1
 			/// </summary>
-			public int vertCount;
-
-			internal int caretIndex;
+			public short vertCount;
 		}
 	}
 }

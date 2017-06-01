@@ -134,18 +134,16 @@ namespace FairyGUI
 			List<TextField.CharPosition> charPositions = _textField.charPositions;
 			List<TextField.LineInfo> lines = _textField.lines;
 			int listCnt = charPositions.Count;
-			char ch;
 
 			while (_printIndex < listCnt - 1) //最后一个是占位的，无效的，所以-1
 			{
 				cp = charPositions[_printIndex++];
-				ch = lines[cp.lineIndex].text[cp.charIndex];
 				if (cp.vertCount < 0) //这是一个图片
 				{
 					_textField.richTextField.ShowHtmlObject(-cp.vertCount - 1, true);
 					return true;
 				}
-				else if (!char.IsWhiteSpace(ch))
+				else if (!char.IsWhiteSpace(_textField.parsedText[_printIndex - 1]))
 				{
 					if (cp.vertCount > 0)
 						output(cp.vertCount);

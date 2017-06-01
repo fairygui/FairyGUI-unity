@@ -29,6 +29,7 @@ namespace FairyGUI.Utils
 		public string name;
 		public string text;
 		public TextFormat format;
+		public int charIndex;
 
 		public IHtmlObject htmlObject;
 		public int status; //1 hidden 2 clipped 4 added

@@ -57,6 +57,13 @@ namespace FairyGUI
 		/// </summary>
 		public AlignType align;
 
+		public TextFormat()
+		{
+			color = Color.black;
+			size = 12;
+			lineSpacing = 3;
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>

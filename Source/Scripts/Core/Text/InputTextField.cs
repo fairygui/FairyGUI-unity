@@ -35,6 +35,11 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public bool keyboardInput { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int keyboardType { get; set; }
 
 		/// <summary>
@@ -78,7 +83,7 @@ namespace FairyGUI
 
 		bool _editing;
 		int _caretPosition;
-		TextField.CharPosition? _selectionStart;
+		int _selectionStart;
 
 		EventCallback1 _touchMoveDelegate;
 
@@ -97,8 +102,9 @@ namespace FairyGUI
 			onFocusOut = new EventListener(this, "onFocusOut");
 			onChanged = new EventListener(this, "onChanged");
 
-			maxLength = int.MaxValue;
+			maxLength = 0;
 			editable = true;
+			keyboardInput = Stage.keyboardInput;
 
 			/* 因为InputTextField定义了ClipRect，而ClipRect是四周缩进了2个像素的（GUTTER)，默认的点击测试
 			 * 是使用ClipRect的，那会造成无法点击四周的空白区域。所以这里自定义了一个HitArea
@@ -128,8 +134,6 @@ namespace FairyGUI
 			{
 				base.text = value;
 				ClearSelection();
-				if (_caretPosition > textField.text.Length)
-					_caretPosition = textField.text.Length;
 				UpdateAlternativeText();
 			}
 		}
@@ -175,18 +179,16 @@ namespace FairyGUI
 		/// </summary>
 		public int caretPosition
 		{
-			get { return _caretPosition; }
+			get
+			{
+				textField.Redraw();
+				return _caretPosition;
+			}
 			set
 			{
 				_caretPosition = value;
-				if (_caretPosition > textField.text.Length)
-					_caretPosition = textField.text.Length;
-
-				if (_editing)
-				{
-					_selectionStart = null;
-					AdjustCaret(GetCharPosition(_caretPosition));
-				}
+				_selectionStart = value;
+				textField.Redraw();
 			}
 		}
 
@@ -232,24 +234,26 @@ namespace FairyGUI
 		/// <param name="value"></param>
 		public void ReplaceSelection(string value)
 		{
-			string leftText = null;
-			string rightText = null;
-			if (_selectionStart != null)
+			if (!editable)
+				throw new Exception("InputTextField is not editable.");
+
+			if (!_editing)
+				Stage.inst.focus = this;
+
+			int t0, t1;
+			if (_selectionStart != _caretPosition)
 			{
-				TextField.CharPosition cp = (TextField.CharPosition)_selectionStart;
-				ClearSelection();
-
-				if (cp.caretIndex < _caretPosition)
+				if (_selectionStart < _caretPosition)
 				{
-					leftText = textField.text.Substring(0, cp.caretIndex);
-					rightText = textField.text.Substring(_caretPosition);
-
-					_caretPosition = cp.caretIndex;
+					t0 = _selectionStart;
+					t1 = _caretPosition;
+					_caretPosition = _selectionStart;
 				}
 				else
 				{
-					leftText = textField.text.Substring(0, _caretPosition);
-					rightText = textField.text.Substring(cp.caretIndex);
+					t0 = _caretPosition;
+					t1 = _selectionStart;
+					_selectionStart = _caretPosition;
 				}
 			}
 			else
@@ -257,25 +261,25 @@ namespace FairyGUI
 				if (string.IsNullOrEmpty(value))
 					return;
 
-				leftText = textField.text.Substring(0, _caretPosition);
-				rightText = textField.text.Substring(_caretPosition);
+				t0 = t1 = _caretPosition;
 			}
 
+			StringBuilder buffer = new StringBuilder();
+			GetPartialText(0, t0, buffer);
 			if (!string.IsNullOrEmpty(value))
 			{
 				value = ValidateInput(value);
-				if (leftText.Length + rightText.Length + value.Length > maxLength)
-					value = value.Substring(0, Math.Max(0, maxLength - leftText.Length - rightText.Length));
+				buffer.Append(value);
 
-				this.text = leftText + value + rightText;
-				_caretPosition += value.Length;
+				_caretPosition += GetTextlength(value);
 			}
-			else
-				this.text = leftText + rightText;
+			GetPartialText(t1, textField.parsedText.Length - t1, buffer);
 
-			//这里立即更新，使内含的图片等对象能够立即创建，避免延迟在Update里才创建，那样会引起闪烁
-			textField.Redraw();
+			string newText = buffer.ToString();
+			if (maxLength > 0)
+				newText = TruncateText(newText, maxLength);
 
+			this.text = newText;
 			onChanged.Call();
 		}
 
@@ -290,58 +294,62 @@ namespace FairyGUI
 
 			value = ValidateInput(value);
 
-			if (value.Length > maxLength)
-				value = value.Substring(0, maxLength);
+			if (maxLength > 0)
+				value = TruncateText(value, maxLength);
 
 			this.text = value;
-			textField.Redraw();
 			onChanged.Call();
 		}
 
-		void UpdateAlternativeText()
+		void GetPartialText(int startIndex, int count, StringBuilder buffer)
 		{
-			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
+			int elementCount = textField.htmlElements.Count;
+			int lastIndex = startIndex;
+			for (int i = 0; i < elementCount; i++)
 			{
-				textField.SetAlternativeText(_decodedPromptText, true);
+				HtmlElement element = textField.htmlElements[i];
+				if (element.htmlObject != null && element.text != null)
+				{
+					if (element.charIndex >= startIndex && element.charIndex < startIndex + count)
+					{
+						buffer.Append(textField.parsedText.Substring(lastIndex, element.charIndex - lastIndex));
+						buffer.Append(element.text);
+						lastIndex = element.charIndex + 1;
+					}
+				}
 			}
-			else
-			{
-				if (_displayAsPassword)
-					textField.SetAlternativeText(EncodePasswordText(this.text), false);
-				else
-					textField.SetAlternativeText(null, false);
-			}
+			if (lastIndex < textField.parsedText.Length)
+				buffer.Append(textField.parsedText.Substring(lastIndex, startIndex + count - lastIndex));
 		}
 
-		string EncodePasswordText(string value)
+		int GetTextlength(string value)
 		{
 			int textLen = value.Length;
-			StringBuilder tmp = new StringBuilder(textLen);
+			int ret = textLen;
 			for (int i = 0; i < textLen; i++)
-				tmp.Append("*");
-			return tmp.ToString();
-		}
-
-		void ClearSelection()
-		{
-			if (_selectionStart != null)
 			{
-				if (_selectionShape != null)
-					_selectionShape.Clear();
-				_selectionStart = null;
+				if (char.IsHighSurrogate(value[i]))
+					ret--;
 			}
+			return ret;
 		}
 
-		string GetSelection()
+		string TruncateText(string value, int length)
 		{
-			if (_selectionStart == null)
-				return string.Empty;
+			int textLen = value.Length;
+			int len = 0;
+			int i = 0;
+			while (i < textLen)
+			{
+				if (len == length)
+					return value.Substring(0, i);
 
-			TextField.CharPosition cp = (TextField.CharPosition)_selectionStart;
-			if (cp.caretIndex < _caretPosition)
-				return textField.text.Substring(cp.caretIndex, _caretPosition - cp.caretIndex);
-			else
-				return textField.text.Substring(_caretPosition, cp.caretIndex - _caretPosition);
+				if (char.IsHighSurrogate(value[i]))
+					i++;
+				i++;
+				len++;
+			}
+			return value;
 		}
 
 		string ValidateInput(string source)
@@ -382,9 +390,64 @@ namespace FairyGUI
 				return source;
 		}
 
-		void AdjustCaret(TextField.CharPosition cp)
+		void UpdateAlternativeText()
 		{
-			_caretPosition = cp.caretIndex;
+			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
+			{
+				textField.SetAlternativeText(_decodedPromptText, true);
+			}
+			else
+			{
+				if (_displayAsPassword)
+					textField.SetAlternativeText(EncodePasswordText(this.text), false);
+				else
+					textField.SetAlternativeText(null, false);
+			}
+		}
+
+		string EncodePasswordText(string value)
+		{
+			int textLen = value.Length;
+			StringBuilder tmp = new StringBuilder(textLen);
+			int i = 0;
+			while (i < textLen)
+			{
+				if (char.IsHighSurrogate(value[i]))
+					i++;
+				tmp.Append("*");
+				i++;
+			}
+			return tmp.ToString();
+		}
+
+		void ClearSelection()
+		{
+			if (_selectionStart != _caretPosition)
+			{
+				if (_selectionShape != null)
+					_selectionShape.Clear();
+				_selectionStart = _caretPosition;
+			}
+		}
+
+		string GetSelection()
+		{
+			if (_selectionStart == _caretPosition)
+				return string.Empty;
+
+			StringBuilder buffer = new StringBuilder();
+			if (_selectionStart < _caretPosition)
+				GetPartialText(_selectionStart, _caretPosition - _selectionStart, buffer);
+			else
+				GetPartialText(_caretPosition, _selectionStart - _caretPosition, buffer);
+			return buffer.ToString();
+		}
+
+		void AdjustCaret(TextField.CharPosition cp, bool moveSelectionHeader = false)
+		{
+			_caretPosition = cp.charIndex;
+			if (moveSelectionHeader)
+				_selectionStart = _caretPosition;
 
 			Vector2 pos = GetCharLocation(cp);
 			TextField.LineInfo line = textField.lines[cp.lineIndex];
@@ -421,8 +484,7 @@ namespace FairyGUI
 				_nextBlink = Time.time + 0.5f;
 				_caret.graphics.enabled = true;
 
-				if (_selectionStart != null)
-					UpdateSelection(cp);
+				UpdateSelection(cp);
 			}
 		}
 
@@ -464,14 +526,14 @@ namespace FairyGUI
 
 		void UpdateSelection(TextField.CharPosition cp)
 		{
-			TextField.CharPosition start = (TextField.CharPosition)_selectionStart;
-			if (start.caretIndex == cp.caretIndex)
+			TextField.CharPosition start = GetCharPosition(_selectionStart);
+			if (start.charIndex == cp.charIndex)
 			{
 				_selectionShape.Clear();
 				return;
 			}
 
-			if (start.caretIndex > cp.caretIndex)
+			if (start.charIndex > cp.charIndex)
 			{
 				TextField.CharPosition tmp = start;
 				start = cp;
@@ -493,15 +555,12 @@ namespace FairyGUI
 
 		TextField.CharPosition GetCharPosition(int caretIndex)
 		{
-			if (caretIndex < textField.charPositions.Count)
-				return textField.charPositions[caretIndex];
-			else
-			{
-				TextField.CharPosition cp = new TextField.CharPosition();
-				cp.caretIndex = caretIndex;
-				cp.lineIndex = (short)Math.Max(0, textField.lines.Count - 1);
-				return cp;
-			}
+			if (caretIndex < 0)
+				caretIndex = 0;
+			else if (caretIndex >= textField.charPositions.Count)
+				caretIndex = textField.charPositions.Count - 1;
+
+			return textField.charPositions[caretIndex];
 		}
 
 		/// <summary>
@@ -511,13 +570,8 @@ namespace FairyGUI
 		/// <returns></returns>
 		TextField.CharPosition GetCharPosition(Vector2 location)
 		{
-			TextField.CharPosition result = new TextField.CharPosition();
-			if (textField.charPositions.Count == 0)
-			{
-				result.lineIndex = 0;
-				result.caretIndex = 0;
-				return result;
-			}
+			if (textField.charPositions.Count <= 1)
+				return textField.charPositions[0];
 
 			location.x -= textField.x;
 			location.y -= textField.y;
@@ -535,7 +589,7 @@ namespace FairyGUI
 			if (i == len)
 				i = len - 1;
 
-			result.lineIndex = (short)i;
+			int lineIndex = i;
 
 			len = textField.charPositions.Count;
 			TextField.CharPosition v;
@@ -543,7 +597,7 @@ namespace FairyGUI
 			for (i = 0; i < len; i++)
 			{
 				v = textField.charPositions[i];
-				if (v.lineIndex == result.lineIndex)
+				if (v.lineIndex == lineIndex)
 				{
 					if (firstInLine == -1)
 						firstInLine = i;
@@ -553,20 +607,19 @@ namespace FairyGUI
 						{
 							//最后一个字符有点难点
 							if (v.offsetX - location.x < 2)
-								result.caretIndex = i;
+								return v;
 							else
-								result.caretIndex = i - 1;
+								return textField.charPositions[i - 1];
 						}
 						else
-							result.caretIndex = firstInLine;
-						return result;
+							return textField.charPositions[firstInLine];
 					}
 				}
 				else if (firstInLine != -1)
 					break;
 			}
-			result.caretIndex = i - 1;
-			return result;
+
+			return textField.charPositions[i - 1];
 		}
 
 		/// <summary>
@@ -578,7 +631,7 @@ namespace FairyGUI
 		{
 			TextField.LineInfo line = textField.lines[cp.lineIndex];
 			Vector2 pos;
-			if (line.text.Length == 0 || textField.charPositions.Count == 0)
+			if (line.charCount == 0 || textField.charPositions.Count == 0)
 			{
 				if (textField.align == AlignType.Center)
 					pos.x = (int)(_contentRect.width / 2);
@@ -587,7 +640,7 @@ namespace FairyGUI
 			}
 			else
 			{
-				TextField.CharPosition v = textField.charPositions[Math.Min(cp.caretIndex, textField.charPositions.Count - 1)];
+				TextField.CharPosition v = textField.charPositions[Math.Min(cp.charIndex, textField.charPositions.Count - 1)];
 				pos.x = v.offsetX - 1;
 			}
 			pos.x += textField.x;
@@ -595,62 +648,23 @@ namespace FairyGUI
 			return pos;
 		}
 
-		void __touchBegin(EventContext context)
+		override internal void RefreshObjects()
 		{
-			if (!_editing || textField.lines.Count == 0)
-				return;
-
-			ClearSelection();
-
-			Vector3 v = Stage.inst.touchPosition;
-			v = this.GlobalToLocal(v);
-			TextField.CharPosition cp = GetCharPosition(v);
-
-			AdjustCaret(cp);
-			_selectionStart = cp;
-
-			context.CaptureTouch();
-			Stage.inst.onTouchMove.AddCapture(_touchMoveDelegate);
-		}
-
-		void __touchMove(EventContext context)
-		{
-			if (isDisposed)
-				return;
-
-			if (_selectionStart == null)
-				return;
-
-			Vector3 v = Stage.inst.touchPosition;
-			v = this.GlobalToLocal(v);
-			if (float.IsNaN(v.x))
-				return;
-
-			TextField.CharPosition cp = GetCharPosition(v);
-			if (cp.caretIndex != _caretPosition)
-				AdjustCaret(cp);
-		}
-
-		void __touchEnd(EventContext context)
-		{
-			Stage.inst.onTouchMove.RemoveCapture(_touchMoveDelegate);
-
-			if (isDisposed)
-				return;
-
-			if (_selectionStart != null && ((TextField.CharPosition)_selectionStart).caretIndex == _caretPosition)
-				_selectionStart = null;
-		}
-
-		protected override void InternalRefreshObjects()
-		{
-			base.InternalRefreshObjects();
+			base.RefreshObjects();
 
 			if (_editing)
 			{
 				SetChildIndex(_selectionShape, this.numChildren - 1);
 				SetChildIndex(_caret, this.numChildren - 2);
 			}
+
+			int cnt = textField.charPositions.Count;
+			if (_caretPosition >= cnt)
+				_caretPosition = cnt - 1;
+			if (_selectionStart >= cnt)
+				_selectionStart = cnt - 1;
+
+			textField.SetXY(0, 0);
 
 			TextField.CharPosition cp = GetCharPosition(_caretPosition);
 			AdjustCaret(cp);
@@ -730,64 +744,104 @@ namespace FairyGUI
 			_selectionShape.home = Stage.inst.cachedTransform;
 		}
 
+		void __touchBegin(EventContext context)
+		{
+			if (!_editing || textField.charPositions.Count <= 1)
+				return;
+
+			ClearSelection();
+
+			Vector3 v = Stage.inst.touchPosition;
+			v = this.GlobalToLocal(v);
+			TextField.CharPosition cp = GetCharPosition(v);
+
+			AdjustCaret(cp, true);
+
+			context.CaptureTouch();
+			Stage.inst.onTouchMove.AddCapture(_touchMoveDelegate);
+		}
+
+		void __touchMove(EventContext context)
+		{
+			if (isDisposed)
+				return;
+
+			Vector3 v = Stage.inst.touchPosition;
+			v = this.GlobalToLocal(v);
+			if (float.IsNaN(v.x))
+				return;
+
+			TextField.CharPosition cp = GetCharPosition(v);
+			if (cp.charIndex != _caretPosition)
+				AdjustCaret(cp);
+		}
+
+		void __touchEnd(EventContext context)
+		{
+			Stage.inst.onTouchMove.RemoveCapture(_touchMoveDelegate);
+		}
+
 		void __focusIn(EventContext context)
 		{
 			if (!editable || !Application.isPlaying)
 				return;
 
-			if (Stage.keyboardInput)
-			{
-				Stage.inst.OpenKeyboard(textField.text, false, _displayAsPassword ? false : !textField.singleLine,
-					_displayAsPassword, false, null, keyboardType, hideInput);
-			}
+			_editing = true;
+
+			if (_caret == null)
+				CreateCaret();
+
+			if (!string.IsNullOrEmpty(_promptText))
+				UpdateAlternativeText();
+
+			float caretSize;
+			//如果界面缩小过，光标很容易看不见，这里放大一下
+			if (UIConfig.inputCaretSize == 1 && GRoot.contentScaleFactor < 1)
+				caretSize = (float)UIConfig.inputCaretSize / GRoot.contentScaleFactor;
 			else
+				caretSize = UIConfig.inputCaretSize;
+			_caret.SetSize(caretSize, textField.textFormat.size);
+			_caret.DrawRect(0, Color.clear, textField.textFormat.color);
+			AddChild(_caret);
+
+			_selectionShape.Clear();
+			AddChild(_selectionShape);
+
+			if (!textField.Redraw())
 			{
-				Input.imeCompositionMode = IMECompositionMode.On;
-				_editing = true;
-
-				if (_caret == null)
-					CreateCaret();
-
-				if (!string.IsNullOrEmpty(_promptText))
-					UpdateAlternativeText();
-
-				float caretSize;
-				//如果界面缩小过，光标很容易看不见，这里放大一下
-				if (UIConfig.inputCaretSize == 1 && GRoot.contentScaleFactor < 1)
-					caretSize = (float)UIConfig.inputCaretSize / GRoot.contentScaleFactor;
-				else
-					caretSize = UIConfig.inputCaretSize;
-				_caret.SetSize(caretSize, textField.textFormat.size);
-				_caret.DrawRect(0, Color.clear, textField.textFormat.color);
-				AddChild(_caret);
-
-				_selectionShape.Clear();
-				AddChild(_selectionShape);
-
-				_caretPosition = textField.text.Length;
 				TextField.CharPosition cp = GetCharPosition(_caretPosition);
 				AdjustCaret(cp);
-				_selectionStart = cp;
 			}
+
+			if (Stage.keyboardInput)
+			{
+				if (keyboardInput)
+					Stage.inst.OpenKeyboard(textField.text, false, _displayAsPassword ? false : !textField.singleLine,
+						_displayAsPassword, false, null, keyboardType, hideInput);
+			}
+			else
+				Input.imeCompositionMode = IMECompositionMode.On;
 		}
 
 		void __focusOut(EventContext contxt)
 		{
+			if (!_editing)
+				return;
+
+			_editing = false;
 			if (Stage.keyboardInput)
 			{
-				Stage.inst.CloseKeyboard();
+				if (keyboardInput)
+					Stage.inst.CloseKeyboard();
 			}
-			else if (_editing)
-			{
-				_editing = false;
-
-				if (!string.IsNullOrEmpty(_promptText))
-					UpdateAlternativeText();
-
+			else
 				Input.imeCompositionMode = IMECompositionMode.Auto;
-				_caret.RemoveFromParent();
-				_selectionShape.RemoveFromParent();
-			}
+
+			if (!string.IsNullOrEmpty(_promptText))
+				UpdateAlternativeText();
+
+			_caret.RemoveFromParent();
+			_selectionShape.RemoveFromParent();
 		}
 
 		void __keydown(EventContext context)
@@ -802,43 +856,30 @@ namespace FairyGUI
 				case KeyCode.Backspace:
 					{
 						context.PreventDefault();
-						if (_selectionStart != null)
-							ReplaceSelection(null);
-						else if (_caretPosition > 0)
-						{
-							int tmp = _caretPosition;
-							_caretPosition--;
-							ReplaceText(textField.text.Substring(0, tmp - 1) + textField.text.Substring(tmp));
-						}
-
+						if (_selectionStart == _caretPosition && _caretPosition > 0)
+							_selectionStart = _caretPosition - 1;
+						ReplaceSelection(null);
 						break;
 					}
 
 				case KeyCode.Delete:
 					{
 						context.PreventDefault();
-						if (_selectionStart != null)
-							ReplaceSelection(null);
-						else if (_caretPosition < textField.text.Length)
-							ReplaceText(textField.text.Substring(0, _caretPosition) + textField.text.Substring(_caretPosition + 1));
-
+						if (_selectionStart == _caretPosition && _caretPosition < textField.charPositions.Count - 1)
+							_selectionStart = _caretPosition + 1;
+						ReplaceSelection(null);
 						break;
 					}
 
 				case KeyCode.LeftArrow:
 					{
 						context.PreventDefault();
-						if (evt.shift)
-						{
-							if (_selectionStart == null)
-								_selectionStart = GetCharPosition(_caretPosition);
-						}
-						else
+						if (!evt.shift)
 							ClearSelection();
 						if (_caretPosition > 0)
 						{
 							TextField.CharPosition cp = GetCharPosition(_caretPosition - 1);
-							AdjustCaret(cp);
+							AdjustCaret(cp, !evt.shift);
 						}
 						break;
 					}
@@ -846,17 +887,12 @@ namespace FairyGUI
 				case KeyCode.RightArrow:
 					{
 						context.PreventDefault();
-						if (evt.shift)
-						{
-							if (_selectionStart == null)
-								_selectionStart = GetCharPosition(_caretPosition);
-						}
-						else
+						if (!evt.shift)
 							ClearSelection();
-						if (_caretPosition < textField.text.Length)
+						if (_caretPosition < textField.charPositions.Count - 1)
 						{
 							TextField.CharPosition cp = GetCharPosition(_caretPosition + 1);
-							AdjustCaret(cp);
+							AdjustCaret(cp, !evt.shift);
 						}
 						break;
 					}
@@ -864,12 +900,7 @@ namespace FairyGUI
 				case KeyCode.UpArrow:
 					{
 						context.PreventDefault();
-						if (evt.shift)
-						{
-							if (_selectionStart == null)
-								_selectionStart = GetCharPosition(_caretPosition);
-						}
-						else
+						if (!evt.shift)
 							ClearSelection();
 
 						TextField.CharPosition cp = GetCharPosition(_caretPosition);
@@ -878,30 +909,25 @@ namespace FairyGUI
 
 						TextField.LineInfo line = textField.lines[cp.lineIndex - 1];
 						cp = GetCharPosition(new Vector2(_caret.x, line.y + textField.y));
-						AdjustCaret(cp);
+						AdjustCaret(cp, !evt.shift);
 						break;
 					}
 
 				case KeyCode.DownArrow:
 					{
 						context.PreventDefault();
-						if (evt.shift)
-						{
-							if (_selectionStart == null)
-								_selectionStart = GetCharPosition(_caretPosition);
-						}
-						else
+						if (!evt.shift)
 							ClearSelection();
 
 						TextField.CharPosition cp = GetCharPosition(_caretPosition);
 						if (cp.lineIndex == textField.lines.Count - 1)
-							cp.caretIndex = textField.charPositions.Count - 1;
+							cp.charIndex = textField.charPositions.Count - 1;
 						else
 						{
 							TextField.LineInfo line = textField.lines[cp.lineIndex + 1];
 							cp = GetCharPosition(new Vector2(_caret.x, line.y + textField.y));
 						}
-						AdjustCaret(cp);
+						AdjustCaret(cp, !evt.shift);
 						break;
 					}
 
@@ -924,24 +950,26 @@ namespace FairyGUI
 				case KeyCode.Home:
 					{
 						context.PreventDefault();
-						ClearSelection();
+						if (!evt.shift)
+							ClearSelection();
 
 						TextField.CharPosition cp = GetCharPosition(_caretPosition);
 						TextField.LineInfo line = textField.lines[cp.lineIndex];
 						cp = GetCharPosition(new Vector2(int.MinValue, line.y + textField.y));
-						AdjustCaret(cp);
+						AdjustCaret(cp, !evt.shift);
 						break;
 					}
 
 				case KeyCode.End:
 					{
 						context.PreventDefault();
-						ClearSelection();
+						if (!evt.shift)
+							ClearSelection();
 
 						TextField.CharPosition cp = GetCharPosition(_caretPosition);
 						TextField.LineInfo line = textField.lines[cp.lineIndex];
 						cp = GetCharPosition(new Vector2(int.MaxValue, line.y + textField.y));
-						AdjustCaret(cp);
+						AdjustCaret(cp, !evt.shift);
 
 						break;
 					}
@@ -952,8 +980,8 @@ namespace FairyGUI
 						if (evt.ctrl)
 						{
 							context.PreventDefault();
-							_selectionStart = GetCharPosition(0);
-							AdjustCaret(GetCharPosition(textField.text.Length));
+							_selectionStart = 0;
+							AdjustCaret(GetCharPosition(int.MaxValue));
 						}
 						break;
 					}
