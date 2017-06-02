@@ -49,16 +49,6 @@ namespace FairyGUI
 		/// </summary>
 		public EventListener onTouchMove { get; private set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onKeyboardOpened { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onKeyboardClosed { get; private set; }
-
 		DisplayObject _touchTarget;
 		DisplayObject _focused;
 		InputTextField _lastInput;
@@ -149,8 +139,6 @@ namespace FairyGUI
 
 			onStageResized = new EventListener(this, "onStageResized");
 			onTouchMove = new EventListener(this, "onTouchMove");
-			onKeyboardOpened = new EventListener(this, "onKeyboardOpened");
-			onKeyboardClosed = new EventListener(this, "onKeyboardClosed");
 
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
@@ -407,6 +395,15 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public IKeyboard keyboard
+		{
+			get { return _keyboard; }
+			set { _keyboard = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="text"></param>
 		/// <param name="autocorrection"></param>
 		/// <param name="multiline"></param>
@@ -421,7 +418,6 @@ namespace FairyGUI
 			if (_keyboard != null)
 			{
 				_keyboard.Open(text, autocorrection, multiline, secure, alert, textPlaceholder, keyboardType, hideInput);
-				onKeyboardOpened.Call();
 			}
 		}
 
@@ -433,7 +429,6 @@ namespace FairyGUI
 			if (_keyboard != null)
 			{
 				_keyboard.Close();
-				onKeyboardClosed.Call();
 			}
 		}
 
@@ -710,7 +705,12 @@ namespace FairyGUI
 				{
 					string s = _keyboard.GetInput();
 					if (s != null)
-						textField.ReplaceText(s);
+					{
+						if (_keyboard.supportsCaret)
+							textField.ReplaceSelection(s);
+						else
+							textField.ReplaceText(s);
+					}
 
 					if (_keyboard.done)
 						this.focus = null;

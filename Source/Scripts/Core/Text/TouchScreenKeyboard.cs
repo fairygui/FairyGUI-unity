@@ -14,6 +14,11 @@ namespace FairyGUI
 			get { return _keyboard == null || _keyboard.done; }
 		}
 
+		public bool supportsCaret
+		{
+			get { return false; }
+		}
+
 		public string GetInput()
 		{
 			if (_keyboard != null)
