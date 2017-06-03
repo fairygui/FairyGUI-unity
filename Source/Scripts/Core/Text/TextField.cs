@@ -883,7 +883,7 @@ namespace FairyGUI
 						wordChars = 0;
 						wordPossible = true;
 					}
-					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '-'))
+					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z'))
 					{
 						if (wordChars == 0)
 							wordStart = lineWidth;
