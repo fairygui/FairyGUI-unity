@@ -351,24 +351,33 @@ namespace FairyGUI
 		}
 
 		public void ApplyModifiedProperties()
-		{ 
+		{
 			//nothing yet
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
 		public delegate AudioClip SoundLoader(string url);
-		static readonly SoundLoader defaultSoundLoader = url => null;
-		static SoundLoader soundLoader = defaultSoundLoader;
+		static SoundLoader soundLoader = null;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="loader"></param>
 		public static void SetSoundLoader(SoundLoader loader)
 		{
-			soundLoader = loader ?? defaultSoundLoader;
+			soundLoader = loader;
 		}
 
 		internal static AudioClip LoadSound(string url)
 		{
-			if (url.StartsWith(UIPackage.URL_PREFIX))
+			if (soundLoader == null || url.StartsWith(UIPackage.URL_PREFIX))
 				return UIPackage.GetItemAssetByURL(url) as AudioClip;
-			return soundLoader(url);
+			else
+				return soundLoader(url);
 		}
 	}
 }
