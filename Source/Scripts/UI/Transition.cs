@@ -941,7 +941,7 @@ namespace FairyGUI
 					break;
 
 				case TransitionActionType.Sound:
-					AudioClip sound = UIPackage.GetItemAssetByURL(value.s) as AudioClip;
+					AudioClip sound = UIConfig.LoadSound(value.s);
 					if (sound != null)
 						Stage.inst.PlayOneShotSound(sound, value.f1);
 					break;
