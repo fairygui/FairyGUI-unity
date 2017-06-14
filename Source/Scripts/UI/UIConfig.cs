@@ -32,7 +32,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Resource using in GRoot.ShowModalWait for locking the screen.
 		/// </summary>
-		public static String globalModalWaiting;
+		public static string globalModalWaiting;
 
 		/// <summary>
 		/// When a modal window is in front, the background becomes dark.
@@ -136,7 +136,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Allow softness on top or left side for scrollpane.
 		/// </summary>
-		public static bool allowSoftnessOnTopOrLeftSide = false;
+		public static bool allowSoftnessOnTopOrLeftSide = true;
 
 		/// <summary>
 		/// When click the window, brings to front automatically.
