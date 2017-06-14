@@ -2467,7 +2467,16 @@ namespace FairyGUI
 					hzScrollBarRes = arr[1];
 				}
 
-				SetupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags, vtScrollBarRes, hzScrollBarRes);
+				string headerRes = null;
+				string footerRes = null;
+				arr = xml.GetAttributeArray("ptrRes");
+				if (arr != null)
+				{
+					headerRes = arr[0];
+					footerRes = arr[1];
+				}
+
+				SetupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
 			}
 			else
 			{
