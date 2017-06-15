@@ -594,6 +594,7 @@ namespace FairyGUI
 			short lineChars = 0;
 			bool newLineByReturn = true;
 			bool hasEmojies = _richTextField != null && _richTextField.emojies != null;
+			int supSpace = 0, subSpace = 0;
 
 			TextFormat format = _textFormat;
 			_font.SetFormat(format, _fontSizeScale);
@@ -676,7 +677,7 @@ namespace FairyGUI
 									line.charCount = 1;
 									lineChars = 0;
 									line.width = lineWidth;
-									line.height = lineHeight;
+									line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 									lineWidth = lineHeight = 0;
 								}
 								else
@@ -684,7 +685,7 @@ namespace FairyGUI
 									line.charCount = (short)(lineChars - 1);
 									lineChars = 1;
 									line.width = lineWidth - (glyphWidth + letterSpacing);
-									line.height = lineHeight;
+									line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 									lineWidth = glyphWidth;
 									lineHeight = glyphHeight;
 								}
@@ -699,6 +700,9 @@ namespace FairyGUI
 								lastLineHeight = line.height;
 								if (line.width > _textWidth)
 									_textWidth = line.width;
+								if (subSpace > lineSpacing)
+									supSpace = subSpace - lineSpacing;
+								subSpace = 0;
 							}
 							else
 							{
@@ -796,7 +800,7 @@ namespace FairyGUI
 									line.charCount = 1;
 									lineChars = 0;
 									line.width = lineWidth;
-									line.height = lineHeight;
+									line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 									lineWidth = lineHeight = 0;
 								}
 								else
@@ -804,7 +808,7 @@ namespace FairyGUI
 									line.charCount = (short)(lineChars - 1);
 									lineChars = 1;
 									line.width = lineWidth - (glyphWidth + letterSpacing);
-									line.height = lineHeight;
+									line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 									lineWidth = glyphWidth;
 									lineHeight = glyphHeight;
 								}
@@ -819,6 +823,9 @@ namespace FairyGUI
 								lastLineHeight = line.height;
 								if (line.width > _textWidth)
 									_textWidth = line.width;
+								if (subSpace > lineSpacing)
+									supSpace = subSpace - lineSpacing;
+								subSpace = 0;
 							}
 							else
 							{
@@ -860,7 +867,7 @@ namespace FairyGUI
 							lineTextHeight = lineHeight;
 						}
 						line.width = lineWidth;
-						line.height = lineHeight;
+						line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 						lineWidth = lineHeight = 0;
 						line.textHeight = lineTextHeight;
 						lineTextHeight = 0;
@@ -875,6 +882,9 @@ namespace FairyGUI
 						lastLineHeight = line.height;
 						if (line.width > _textWidth)
 							_textWidth = line.width;
+						if (subSpace > lineSpacing)
+							supSpace = subSpace - lineSpacing;
+						subSpace = 0;
 						continue;
 					}
 
@@ -909,9 +919,14 @@ namespace FairyGUI
 						if (lineWidth != 0)
 							lineWidth += letterSpacing;
 						lineWidth += glyphWidth;
+
+						if (format.specialStyle == TextFormat.SpecialStyle.Subscript)
+							subSpace = (int)(glyphHeight * 0.333f);
+						else if (format.specialStyle == TextFormat.SpecialStyle.Superscript)
+							supSpace = (int)(glyphHeight * 0.333f);
 					}
 
-					if (wrap && lineWidth > rectWidth)
+					if (wrap && lineWidth > rectWidth && format.specialStyle == TextFormat.SpecialStyle.None)
 					{
 						line = LineInfo.Borrow();
 						newLineByReturn = false;
@@ -920,7 +935,7 @@ namespace FairyGUI
 							line.charCount = 1;
 							lineChars = 0;
 							line.width = lineWidth;
-							line.height = lineHeight;
+							line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 							lineWidth = lineHeight = 0;
 							line.textHeight = lineTextHeight;
 							lineTextHeight = 0;
@@ -933,7 +948,7 @@ namespace FairyGUI
 							line.charCount = (short)(lineChars - wordChars);
 							lineChars = wordChars;
 							line.width = wordStart;
-							line.height = lineHeight;
+							line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 							lineWidth -= wordStart;
 							lineHeight = glyphHeight;
 							line.textHeight = lineTextHeight;
@@ -946,7 +961,7 @@ namespace FairyGUI
 							line.charCount = (short)(lineChars - 1);
 							lineChars = 1;
 							line.width = lineWidth - (glyphWidth + letterSpacing);
-							line.height = lineHeight;
+							line.height = supSpace == 0 ? lineHeight : Mathf.Max(lineTextHeight + supSpace, lineHeight);
 							lineWidth = glyphWidth;
 							lineHeight = glyphHeight;
 							line.textHeight = lineTextHeight;
@@ -965,6 +980,9 @@ namespace FairyGUI
 						lastLineHeight = line.height;
 						if (line.width > _textWidth)
 							_textWidth = line.width;
+						if (subSpace > lineSpacing)
+							supSpace = subSpace - lineSpacing;
+						subSpace = 0;
 					}
 				}
 
@@ -983,7 +1001,7 @@ namespace FairyGUI
 					lineHeight = lastLineHeight;
 				if (lineTextHeight == 0)
 					lineTextHeight = lineHeight;
-				line.height = lineHeight;
+				line.height = Mathf.Max(lineTextHeight + supSpace + subSpace, lineHeight);
 				line.textHeight = lineTextHeight;
 				line.charIndex = (short)lineBegin;
 				line.charCount = lineChars;
@@ -991,6 +1009,10 @@ namespace FairyGUI
 				if (line.width > _textWidth)
 					_textWidth = line.width;
 				_lines.Add(line);
+			}
+			else if (subSpace > 0)
+			{
+				_lines[_lines.Count - 1].height += subSpace;
 			}
 
 			if (buffer != null)
@@ -1117,7 +1139,7 @@ namespace FairyGUI
 
 			float charX = 0;
 			float xIndent;
-			float yIndent = 0;
+			int yIndent = 0;
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
 			AlignType lineAlign;
@@ -1128,6 +1150,7 @@ namespace FairyGUI
 				element = _elements[0];
 			int charIndex = 0;
 			bool skipChar = false;
+			float lastGlyphHeight = 0;
 
 			int lineCount = _lines.Count;
 			for (int i = 0; i < lineCount; ++i)
@@ -1235,6 +1258,12 @@ namespace FairyGUI
 						}
 
 						yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
+						if (format.specialStyle == TextFormat.SpecialStyle.Subscript)
+							yIndent += (int)(glyph.height * 0.333f);
+						else if (format.specialStyle == TextFormat.SpecialStyle.Superscript)
+							yIndent -= (int)(lastGlyphHeight - glyph.height * 0.667f);
+						else
+							lastGlyphHeight = glyph.height;
 						v0.x = charX + glyph.vert.xMin;
 						v0.y = -line.y - yIndent + glyph.vert.yMin;
 						v1.x = charX + glyph.vert.xMax;
