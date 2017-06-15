@@ -237,6 +237,13 @@ namespace FairyGUI
 			if (!editable)
 				throw new Exception("InputTextField is not editable.");
 
+			if (keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
+			{
+				this.text = textField.text + value;
+				onChanged.Call();
+				return;
+			}
+
 			if (!_editing)
 				Stage.inst.focus = this;
 
@@ -751,7 +758,8 @@ namespace FairyGUI
 
 		void __touchBegin(EventContext context)
 		{
-			if (!_editing || textField.charPositions.Count <= 1)
+			if (!_editing || textField.charPositions.Count <= 1
+				|| keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
 				return;
 
 			ClearSelection();
