@@ -158,6 +158,11 @@ namespace FairyGUI
 		/// </summary>
 		public static float frameTimeForAsyncUIConstruction = 0.002f;
 
+		/// <summary>
+		/// 设定默认是否所有文本都从右向左显示（阿拉伯文字）。
+		/// </summary>
+		public static bool rightToLeftText = false;
+
 		public enum ConfigKey
 		{
 			DefaultFont,
@@ -184,6 +189,7 @@ namespace FairyGUI
 			AllowSoftnessOnTopOrLeftSide,
 			InputCaretSize,
 			InputHighlightColor,
+			RightToLeftText,
 
 			PleaseSelect = 100
 		}
@@ -331,6 +337,10 @@ namespace FairyGUI
 
 					case ConfigKey.InputHighlightColor:
 						UIConfig.inputHighlightColor = value.c;
+						break;
+
+					case ConfigKey.RightToLeftText:
+						UIConfig.rightToLeftText = value.b;
 						break;
 				}
 			}
