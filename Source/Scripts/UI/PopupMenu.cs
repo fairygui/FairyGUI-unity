@@ -153,7 +153,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public String GetItemName(int index)
+		public string GetItemName(int index)
 		{
 			GButton item = _list.GetChildAt(index).asButton;
 			return item.name;

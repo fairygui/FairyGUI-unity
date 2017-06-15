@@ -100,10 +100,18 @@ namespace FairyGUI
 				string[] pages = xml.GetAttributeArray("pages");
 				string[] values = xml.GetAttributeArray("values", '|');
 
-				if (pages != null && values != null)
+				if (pages != null)
 				{
-					for (int i = 0; i < values.Length; i++)
-						AddStatus(pages[i], values[i]);
+					int cnt1 = pages.Length;
+					int cnt2 = values != null ? values.Length : 0;
+					for (int i = 0; i < cnt1; i++)
+					{
+						if (i < cnt2)
+							str = values[i];
+						else
+							str = string.Empty;
+						AddStatus(pages[i], str);
+					}
 				}
 				str = xml.GetAttribute("default");
 				if (str != null)

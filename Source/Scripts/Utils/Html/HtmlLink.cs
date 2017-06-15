@@ -84,6 +84,12 @@ namespace FairyGUI.Utils
 				rects = new List<Rect>(2);
 			else
 				rects.Clear();
+			if (startCharX > endCharX)
+			{
+				float tmp = startCharX;
+				startCharX = endCharX;
+				endCharX = tmp;
+			}
 			_owner.textField.GetLinesShape(startLine, startCharX, endLine, endCharX, true, rects);
 			_shape.rects = rects;
 		}

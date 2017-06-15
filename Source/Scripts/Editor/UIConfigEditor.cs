@@ -125,6 +125,7 @@ namespace FairyGUIEditor
 						case UIConfig.ConfigKey.DefaultScrollTouchEffect:
 						case UIConfig.ConfigKey.RenderingTextBrighterOnDesktop:
 						case UIConfig.ConfigKey.AllowSoftnessOnTopOrLeftSide:
+						case UIConfig.ConfigKey.RightToLeftText:
 							value.b = EditorGUILayout.Toggle(value.b);
 							break;
 
@@ -264,6 +265,10 @@ namespace FairyGUIEditor
 
 				case UIConfig.ConfigKey.InputHighlightColor:
 					value.c = new Color32(255, 223, 141, 128);
+					break;
+
+				case UIConfig.ConfigKey.RightToLeftText:
+					value.b = false;
 					break;
 			}
 		}

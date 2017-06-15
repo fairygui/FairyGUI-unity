@@ -90,9 +90,29 @@ namespace FairyGUI.Utils
 						break;
 
 					case "sub":
+						{
+							if (XMLIterator.tagType == XMLTagType.Start)
+							{
+								PushTextFormat();
+								_format.size = Mathf.CeilToInt(_format.size * 0.58f);
+								_format.specialStyle = TextFormat.SpecialStyle.Subscript;
+							}
+							else
+								PopTextFormat();
+						}
 						break;
 
 					case "sup":
+						{
+							if (XMLIterator.tagType == XMLTagType.Start)
+							{
+								PushTextFormat();
+								_format.size = Mathf.CeilToInt(_format.size * 0.58f);
+								_format.specialStyle = TextFormat.SpecialStyle.Superscript;
+							}
+							else
+								PopTextFormat();
+						}
 						break;
 
 					case "font":

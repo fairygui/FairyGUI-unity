@@ -7,6 +7,13 @@ namespace FairyGUI
 	/// </summary>
 	public class TextFormat
 	{
+		public enum SpecialStyle
+		{
+			None,
+			Superscript,
+			Subscript
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -57,6 +64,11 @@ namespace FairyGUI
 		/// </summary>
 		public AlignType align;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public SpecialStyle specialStyle;
+
 		public TextFormat()
 		{
 			color = Color.black;
@@ -90,7 +102,8 @@ namespace FairyGUI
 				&& bold == aFormat.bold && underline == aFormat.underline
 				&& italic == aFormat.italic
 				&& gradientColor == aFormat.gradientColor
-				&& align == aFormat.align;
+				&& align == aFormat.align
+				&& specialStyle == aFormat.specialStyle;
 		}
 
 		/// <summary>
@@ -115,6 +128,7 @@ namespace FairyGUI
 			else
 				this.gradientColor = null;
 			this.align = source.align;
+			this.specialStyle = source.specialStyle;
 		}
 	}
 }

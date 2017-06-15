@@ -444,6 +444,8 @@ namespace FairyGUI
 
 		void __clickExpandButton(EventContext context)
 		{
+			context.StopPropagation();
+
 			GButton expandButton = (GButton)context.sender;
 			TreeNode node = (TreeNode)expandButton.parent.data;
 			if (list.scrollPane != null)

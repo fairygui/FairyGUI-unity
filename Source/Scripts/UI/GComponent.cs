@@ -921,7 +921,8 @@ namespace FairyGUI
 
 		protected void SetupScroll(Margin scrollBarMargin,
 			ScrollType scroll, ScrollBarDisplayType scrollBarDisplay, int flags,
-			String vtScrollBarRes, String hzScrollBarRes)
+			string vtScrollBarRes, string hzScrollBarRes,
+			string headerRes, string footerRes)
 		{
 			if (rootContainer == container)
 			{
@@ -929,7 +930,7 @@ namespace FairyGUI
 				rootContainer.AddChild(container);
 			}
 
-			scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes);
+			scrollPane = new ScrollPane(this, scroll, scrollBarMargin, scrollBarDisplay, flags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
 		}
 
 		protected void SetupOverflow(OverflowType overflow)
@@ -1231,6 +1232,15 @@ namespace FairyGUI
 
 			SetSize(sourceWidth, sourceHeight);
 
+			arr = xml.GetAttributeArray("restrictSize");
+			if (arr != null)
+			{
+				minWidth = int.Parse(arr[0]);
+				maxWidth = int.Parse(arr[1]);
+				minHeight = int.Parse(arr[2]);
+				maxHeight = int.Parse(arr[3]);
+			}
+
 			arr = xml.GetAttributeArray("pivot");
 			if (arr != null)
 			{
@@ -1291,7 +1301,16 @@ namespace FairyGUI
 					hzScrollBarRes = arr[1];
 				}
 
-				SetupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags, vtScrollBarRes, hzScrollBarRes);
+				string headerRes = null;
+				string footerRes = null;
+				arr = xml.GetAttributeArray("ptrRes");
+				if (arr != null)
+				{
+					headerRes = arr[0];
+					footerRes = arr[1];
+				}
+
+				SetupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
 			}
 			else
 				SetupOverflow(overflow);

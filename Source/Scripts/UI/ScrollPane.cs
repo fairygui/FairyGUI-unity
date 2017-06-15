@@ -45,6 +45,7 @@ namespace FairyGUI
 		bool _vScrollNone;
 		bool _hScrollNone;
 		bool _needRefresh;
+		int _refreshBarAxis;
 
 		bool _displayOnLeft;
 		bool _snapToItem;
@@ -76,6 +77,8 @@ namespace FairyGUI
 		bool _scrollBarVisible;
 		int _touchId;
 		internal int _loop;
+		int _headerLockedSize;
+		int _footerLockedSize;
 
 		int _tweening;
 		Vector2 _tweenStart;
@@ -94,12 +97,14 @@ namespace FairyGUI
 		Container _container;
 		GScrollBar _hzScrollBar;
 		GScrollBar _vtScrollBar;
+		GComponent _header;
+		GComponent _footer;
 
 		static int _gestureFlag;
 
 		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
 		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
-		const float PULL_RATIO = 0.3f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
 
 		public ScrollPane(GComponent owner,
 									ScrollType scrollType,
@@ -107,7 +112,9 @@ namespace FairyGUI
 									ScrollBarDisplayType scrollBarDisplay,
 									int flags,
 									string vtScrollBarRes,
-									string hzScrollBarRes)
+									string hzScrollBarRes,
+									string headerRes,
+									string footerRes)
 		{
 			onScroll = new EventListener(this, "onScroll");
 			onScrollEnd = new EventListener(this, "onScrollEnd");
@@ -216,6 +223,26 @@ namespace FairyGUI
 			else
 				_mouseWheelEnabled = false;
 
+			if (Application.isPlaying)
+			{
+				if (!string.IsNullOrEmpty(headerRes))
+				{
+					_header = (GComponent)UIPackage.CreateObjectFromURL(headerRes);
+					if (_header == null)
+						Debug.LogWarning("FairyGUI: cannot create scrollPane header from " + headerRes);
+				}
+
+				if (!string.IsNullOrEmpty(footerRes))
+				{
+					_footer = (GComponent)UIPackage.CreateObjectFromURL(footerRes);
+					if (_footer == null)
+						Debug.LogWarning("FairyGUI: cannot create scrollPane footer from " + footerRes);
+				}
+
+				if (_header != null || _footer != null)
+					_refreshBarAxis = (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical) ? 1 : 0;
+			}
+
 			if (!_maskDisabled && (_vtScrollBar != null || _hzScrollBar != null))
 			{
 				//当有滚动条对象时，为了避免滚动条变化时触发重新合批，这里给rootContainer也加上剪裁。但这可能会增加额外dc。
@@ -235,6 +262,15 @@ namespace FairyGUI
 		{
 			if (_tweening != 0)
 				Timers.inst.Remove(_tweenUpdateDelegate);
+
+			if (_hzScrollBar != null)
+				_hzScrollBar.Dispose();
+			if (_vtScrollBar != null)
+				_vtScrollBar.Dispose();
+			if (_header != null)
+				_header.Dispose();
+			if (_footer != null)
+				_footer.Dispose();
 		}
 
 		/// <summary>
@@ -243,6 +279,22 @@ namespace FairyGUI
 		public GComponent owner
 		{
 			get { return _owner; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public GComponent header
+		{
+			get { return _header; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public GComponent footer
+		{
+			get { return _footer; }
 		}
 
 		/// <summary>
@@ -279,13 +331,6 @@ namespace FairyGUI
 		{
 			get { return _softnessOnTopOrLeftSide; }
 			set { _softnessOnTopOrLeftSide = value; }
-		}
-
-		[Obsolete("ScrollPane.scrollSpeed is deprecated. Use scrollStep instead.")]
-		public float scrollSpeed
-		{
-			get { return this.scrollStep; }
-			set { this.scrollStep = value; }
 		}
 
 		/// <summary>
@@ -827,6 +872,55 @@ namespace FairyGUI
 			_isMouseMoved = false;
 		}
 
+		/// <summary>
+		/// 设置Header固定显示。如果size为0，则取消固定显示。
+		/// </summary>
+		/// <param name="size">Header显示的大小</param>
+		public void LockHeader(int size)
+		{
+			if (_headerLockedSize == size)
+				return;
+
+			_headerLockedSize = size;
+			if (!onPullDownRelease.isDispatching && _container.xy[_refreshBarAxis] >= 0)
+			{
+				_tweenStart = _container.xy;
+				_tweenChange = Vector2.zero;
+				_tweenChange[_refreshBarAxis] = _headerLockedSize - _tweenStart[_refreshBarAxis];
+				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+				_tweenTime = Vector2.zero;
+				_tweening = 2;
+				Timers.inst.AddUpdate(_tweenUpdateDelegate);
+			}
+		}
+
+		/// <summary>
+		/// 设置Footer固定显示。如果size为0，则取消固定显示。
+		/// </summary>
+		/// <param name="size"></param>
+		public void LockFooter(int size)
+		{
+			if (_footerLockedSize == size)
+				return;
+
+			_footerLockedSize = size;
+			if (!onPullUpRelease.isDispatching && _container.xy[_refreshBarAxis] <= -_overlapSize[_refreshBarAxis])
+			{
+				_tweenStart = _container.xy;
+				_tweenChange = Vector2.zero;
+				float max = _overlapSize[_refreshBarAxis];
+				if (max == 0)
+					max = Mathf.Max(_contentSize[_refreshBarAxis] + _footerLockedSize - _viewSize[_refreshBarAxis], 0);
+				else
+					max += _footerLockedSize;
+				_tweenChange[_refreshBarAxis] = -max - _tweenStart[_refreshBarAxis];
+				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+				_tweenTime = Vector2.zero;
+				_tweening = 2;
+				Timers.inst.AddUpdate(_tweenUpdateDelegate);
+			}
+		}
+
 		internal void OnOwnerSizeChanged()
 		{
 			SetSize(_owner.width, _owner.height);
@@ -1071,9 +1165,34 @@ namespace FairyGUI
 			//边界检查
 			_xPos = Mathf.Clamp(_xPos, 0, _overlapSize.x);
 			_yPos = Mathf.Clamp(_yPos, 0, _overlapSize.y);
-			_container.SetXY(Mathf.Clamp(_container.x, -_overlapSize.x, 0), Mathf.Clamp(_container.y, -_overlapSize.y, 0));
+			float max = _overlapSize[_refreshBarAxis];
+			if (max == 0)
+				max = Mathf.Max(_contentSize[_refreshBarAxis] + _footerLockedSize - _viewSize[_refreshBarAxis], 0);
+			else
+				max += _footerLockedSize;
+			if (_refreshBarAxis == 0)
+				_container.SetXY(Mathf.Clamp(_container.x, -max, _headerLockedSize), Mathf.Clamp(_container.y, -_overlapSize.y, 0));
+			else
+				_container.SetXY(Mathf.Clamp(_container.x, -_overlapSize.x, 0), Mathf.Clamp(_container.y, -max, _headerLockedSize));
+
+			if (_header != null)
+			{
+				if (_refreshBarAxis == 0)
+					_header.height = _viewSize.y;
+				else
+					_header.width = _viewSize.x;
+			}
+
+			if (_footer != null)
+			{
+				if (_refreshBarAxis == 0)
+					_footer.height = _viewSize.y;
+				else
+					_footer.width = _viewSize.x;
+			}
 
 			SyncScrollBar();
+			CheckRefreshBar();
 		}
 
 		private void PosChanged(bool ani)
@@ -1323,15 +1442,19 @@ namespace FairyGUI
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.y = 0;
+					else if (_header != null && _header.maxHeight != 0)
+						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _header.maxHeight);
 					else
-						_container.y = (int)(newPos.y * PULL_RATIO);
+						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * PULL_RATIO);
 				}
 				else if (newPos.y < -_overlapSize.y)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.y = -_overlapSize.y;
+					else if (_footer != null && _footer.maxHeight > 0)
+						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_footer.maxHeight) - _overlapSize.y;
 					else
-						_container.y = (int)((newPos.y + _overlapSize.y) * PULL_RATIO - _overlapSize.y);
+						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * PULL_RATIO) - _overlapSize.y;
 				}
 				else
 					_container.y = newPos.y;
@@ -1343,15 +1466,19 @@ namespace FairyGUI
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.x = 0;
+					else if (_header != null && _header.maxWidth != 0)
+						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _header.maxWidth);
 					else
-						_container.x = (int)(newPos.x * PULL_RATIO);
+						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * PULL_RATIO);
 				}
 				else if (newPos.x < 0 - _overlapSize.x)
 				{
 					if (!_bouncebackEffect || _inertiaDisabled)
 						_container.x = -_overlapSize.x;
+					else if (_footer != null && _footer.maxWidth > 0)
+						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_footer.maxWidth) - _overlapSize.x;
 					else
-						_container.x = (int)((newPos.x + _overlapSize.x) * PULL_RATIO - _overlapSize.x);
+						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * PULL_RATIO) - _overlapSize.x;
 				}
 				else
 					_container.x = newPos.x;
@@ -1401,6 +1528,7 @@ namespace FairyGUI
 			_isMouseMoved = true;
 
 			SyncScrollBar();
+			CheckRefreshBar();
 			onScroll.Call();
 		}
 
@@ -1426,42 +1554,88 @@ namespace FairyGUI
 			}
 
 			_isMouseMoved = false;
-
-			//更新速度
-			float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
-			if (elapsed > 1)
-				_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
-
-			//根据速度计算目标位置和需要时间
 			_tweenStart = _container.xy;
-			Vector2 endPos = UpdateTargetAndDuration(_tweenStart);
-			Vector2 oldChange = endPos - _tweenStart;
 
-			//调整目标位置
-			LoopCheckingTarget(ref endPos);
-			if (_pageMode || _snapToItem)
-				AlignPosition(ref endPos, true);
-
-			_tweenChange = endPos - _tweenStart;
-			if (_tweenChange.x == 0 && _tweenChange.y == 0)
-				return;
-
-			//如果目标位置已调整，随之调整需要时间
-			if (_pageMode || _snapToItem)
+			Vector2 endPos = _tweenStart;
+			bool flag = false;
+			if (_container.x > 0)
 			{
-				FixDuration(0, oldChange.x);
-				FixDuration(1, oldChange.y);
+				endPos.x = 0;
+				flag = true;
+			}
+			else if (_container.x < -_overlapSize.x)
+			{
+				endPos.x = -_overlapSize.x;
+				flag = true;
+			}
+			if (_container.y > 0)
+			{
+				endPos.y = 0;
+				flag = true;
+			}
+			else if (_container.y < -_overlapSize.y)
+			{
+				endPos.y = -_overlapSize.y;
+				flag = true;
+			}
+
+			if (flag)
+			{
+				_tweenChange = endPos - _tweenStart;
+				if (_tweenChange.x < -UIConfig.touchDragSensitivity || _tweenChange.y < -UIConfig.touchDragSensitivity)
+					onPullDownRelease.Call();
+				else if (_tweenChange.x > UIConfig.touchDragSensitivity || _tweenChange.y > UIConfig.touchDragSensitivity)
+					onPullUpRelease.Call();
+
+				if (_headerLockedSize > 0 && endPos[_refreshBarAxis] == 0)
+				{
+					endPos[_refreshBarAxis] = _headerLockedSize;
+					_tweenChange = endPos - _tweenStart;
+				}
+				else if (_footerLockedSize > 0 && endPos[_refreshBarAxis] == -_overlapSize[_refreshBarAxis])
+				{
+					float max = _overlapSize[_refreshBarAxis];
+					if (max == 0)
+						max = Mathf.Max(_contentSize[_refreshBarAxis] + _footerLockedSize - _viewSize[_refreshBarAxis], 0);
+					else
+						max += _footerLockedSize;
+					endPos[_refreshBarAxis] = -max;
+					_tweenChange = endPos - _tweenStart;
+				}
+
+				_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+			}
+			else
+			{
+				//更新速度
+				float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+				if (elapsed > 1)
+					_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+
+				//根据速度计算目标位置和需要时间
+				endPos = UpdateTargetAndDuration(_tweenStart);
+				Vector2 oldChange = endPos - _tweenStart;
+
+				//调整目标位置
+				LoopCheckingTarget(ref endPos);
+				if (_pageMode || _snapToItem)
+					AlignPosition(ref endPos, true);
+
+				_tweenChange = endPos - _tweenStart;
+				if (_tweenChange.x == 0 && _tweenChange.y == 0)
+					return;
+
+				//如果目标位置已调整，随之调整需要时间
+				if (_pageMode || _snapToItem)
+				{
+					FixDuration(0, oldChange.x);
+					FixDuration(1, oldChange.y);
+				}
 			}
 
 			_tweening = 2;
 			_tweenTime = Vector2.zero;
 			Timers.inst.AddUpdate(_tweenUpdateDelegate);
-
-			if (_container.x > UIConfig.touchDragSensitivity || _container.y > UIConfig.touchDragSensitivity)
-				onPullDownRelease.Call();
-			else if (_container.x < -_overlapSize.x - UIConfig.touchDragSensitivity
-				|| _container.y < -_overlapSize.y - UIConfig.touchDragSensitivity)
-				onPullUpRelease.Call();
 		}
 
 		private void __mouseWheel(EventContext context)
@@ -1703,6 +1877,7 @@ namespace FairyGUI
 		{
 			float v = _velocity[axis];
 			float duration = 0;
+
 			if (pos > 0)
 				pos = 0;
 			else if (pos < -_overlapSize[axis])
@@ -1782,6 +1957,63 @@ namespace FairyGUI
 			onScrollEnd.Call();
 		}
 
+		void CheckRefreshBar()
+		{
+			if (_header == null && _footer == null)
+				return;
+
+			float pos = _container.xy[_refreshBarAxis];
+			if (_header != null)
+			{
+				if (pos > 0)
+				{
+					if (_header.displayObject.parent == null)
+						_maskContainer.AddChildAt(_header.displayObject, 0);
+					Vector2 vec;
+
+					vec = _header.size;
+					vec[_refreshBarAxis] = pos;
+					_header.size = vec;
+				}
+				else
+				{
+					if (_header.displayObject.parent != null)
+						_maskContainer.RemoveChild(_header.displayObject);
+				}
+			}
+
+			if (_footer != null)
+			{
+				float max = _overlapSize[_refreshBarAxis];
+				if (pos < -max || max == 0 && _footerLockedSize > 0)
+				{
+					if (_footer.displayObject.parent == null)
+						_maskContainer.AddChildAt(_footer.displayObject, 0);
+
+					Vector2 vec;
+
+					vec = _footer.xy;
+					if (max > 0)
+						vec[_refreshBarAxis] = pos + _contentSize[_refreshBarAxis];
+					else
+						vec[_refreshBarAxis] = Mathf.Max(Mathf.Min(pos + _viewSize[_refreshBarAxis], _viewSize[_refreshBarAxis] - _footerLockedSize), _viewSize[_refreshBarAxis] - _contentSize[_refreshBarAxis]);
+					_footer.xy = vec;
+
+					vec = _footer.size;
+					if (max > 0)
+						vec[_refreshBarAxis] = -max - pos;
+					else
+						vec[_refreshBarAxis] = _viewSize[_refreshBarAxis] - _footer.xy[_refreshBarAxis];
+					_footer.size = vec;
+				}
+				else
+				{
+					if (_footer.displayObject.parent != null)
+						_maskContainer.RemoveChild(_footer.displayObject);
+				}
+			}
+		}
+
 		void TweenUpdate(object param)
 		{
 			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
@@ -1811,12 +2043,14 @@ namespace FairyGUI
 				LoopCheckingCurrent();
 
 				SyncScrollBar(true);
+				CheckRefreshBar();
 				onScroll.Call();
 				onScrollEnd.Call();
 			}
 			else
 			{
 				SyncScrollBar(false);
+				CheckRefreshBar();
 				onScroll.Call();
 			}
 		}
@@ -1838,35 +2072,49 @@ namespace FairyGUI
 					newValue = _tweenStart[axis] + (int)(_tweenChange[axis] * ratio);
 				}
 
+				float threshold1 = 0;
+				float threshold2 = -_overlapSize[axis];
+				if (_headerLockedSize > 0 && _refreshBarAxis == axis)
+					threshold1 = _headerLockedSize;
+				if (_footerLockedSize > 0 && _refreshBarAxis == axis)
+				{
+					float max = _overlapSize[_refreshBarAxis];
+					if (max == 0)
+						max = Mathf.Max(_contentSize[_refreshBarAxis] + _footerLockedSize - _viewSize[_refreshBarAxis], 0);
+					else
+						max += _footerLockedSize;
+					threshold2 = -max;
+				}
+
 				if (_tweening == 2 && _bouncebackEffect)
 				{
-					if (newValue > 20 && _tweenChange[axis] > 0
-						|| newValue > 0 && _tweenChange[axis] == 0)//开始回弹
+					if (newValue > 20 + threshold1 && _tweenChange[axis] > 0
+						|| newValue > threshold1 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
 						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
-						_tweenChange[axis] = -newValue;
+						_tweenChange[axis] = -newValue + threshold1;
 						_tweenStart[axis] = newValue;
 					}
-					else if (newValue < -_overlapSize[axis] - 20 && _tweenChange[axis] < 0
-						|| newValue < -_overlapSize[axis] && _tweenChange[axis] == 0)//开始回弹
+					else if (newValue < threshold2 - 20 && _tweenChange[axis] < 0
+						|| newValue < threshold2 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
 						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
-						_tweenChange[axis] = -_overlapSize[axis] - newValue;
+						_tweenChange[axis] = threshold2 - newValue;
 						_tweenStart[axis] = newValue;
 					}
 				}
 				else
 				{
-					if (newValue > 0)
+					if (newValue > threshold1)
 					{
-						newValue = 0;
+						newValue = threshold1;
 						_tweenChange[axis] = 0;
 					}
-					else if (newValue < -_overlapSize[axis])
+					else if (newValue < threshold2)
 					{
-						newValue = -_overlapSize[axis];
+						newValue = threshold2;
 						_tweenChange[axis] = 0;
 					}
 				}

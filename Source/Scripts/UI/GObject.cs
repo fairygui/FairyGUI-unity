@@ -44,6 +44,26 @@ namespace FairyGUI
 		public int initHeight { get; protected set; }
 
 		/// <summary>
+		/// 
+		/// </summary>
+		public int minWidth;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int maxWidth;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int minHeight;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int maxHeight;
+
+		/// <summary>
 		/// Relations Object.
 		/// </summary>
 		public Relations relations { get; private set; }
@@ -450,10 +470,14 @@ namespace FairyGUI
 			{
 				_rawWidth = wv;
 				_rawHeight = hv;
-				if (wv < 0)
-					wv = 0;
-				if (hv < 0)
-					hv = 0;
+				if (wv < minWidth)
+					wv = minWidth;
+				else if (maxWidth > 0 && wv > maxWidth)
+					wv = maxWidth;
+				if (hv < minHeight)
+					hv = minHeight;
+				else if (maxHeight > 0 && hv > maxHeight)
+					hv = maxHeight;
 				float oldWidth = _width;
 				float oldHeight = _height;
 				_width = wv;
@@ -1583,6 +1607,15 @@ namespace FairyGUI
 				initWidth = int.Parse(arr[0]);
 				initHeight = int.Parse(arr[1]);
 				SetSize(initWidth, initHeight, true);
+			}
+
+			arr = xml.GetAttributeArray("restrictSize");
+			if (arr != null)
+			{
+				minWidth = int.Parse(arr[0]);
+				maxWidth = int.Parse(arr[1]);
+				minHeight = int.Parse(arr[2]);
+				maxHeight = int.Parse(arr[3]);
 			}
 
 			arr = xml.GetAttributeArray("scale");

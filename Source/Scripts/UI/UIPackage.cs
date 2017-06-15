@@ -137,13 +137,13 @@ namespace FairyGUI
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName)
 		{
-			string source = null;
+			byte[] source = null;
 #if UNITY_5
 			if (mainAssetName != null)
 			{
 				TextAsset ta = desc.LoadAsset<TextAsset>(mainAssetName);
 				if (ta != null)
-					source = ta.text;
+					source = ta.bytes;
 			}
 			else
 			{
@@ -155,7 +155,7 @@ namespace FairyGUI
 						TextAsset ta = desc.LoadAsset<TextAsset>(n);
 						if (ta != null)
 						{
-							source = ta.text;
+							source = ta.bytes;
 							if (mainAssetName == null)
 								mainAssetName = Path.GetFileNameWithoutExtension(n);
 							break;
@@ -168,11 +168,11 @@ namespace FairyGUI
 			{
 				TextAsset ta = (TextAsset)desc.Load(mainAssetName, typeof(TextAsset));
 				if (ta != null)
-					source = ta.text;
+					source = ta.bytes;
 			}
 			else
 			{
-				source = ((TextAsset)desc.mainAsset).text;
+				source = ((TextAsset)desc.mainAsset).bytes;
 				mainAssetName = desc.mainAsset.name;
 			}
 #endif
@@ -180,31 +180,9 @@ namespace FairyGUI
 				throw new Exception("FairyGUI: invalid package.");
 			if (desc != res)
 				desc.Unload(true);
-			return AddPackage(source, res, mainAssetName);
-		}
 
-		/// <summary>
-		/// Add a UI package from a description text and a assetbundle.
-		/// </summary>
-		/// <param name="desc">Description text.</param>
-		/// <param name="res">A assetbundle contains resources.</param>
-		/// <returns>UIPackage</returns>
-		public static UIPackage AddPackage(string desc, AssetBundle res)
-		{
-			return AddPackage(desc, res, null);
-		}
-
-		/// <summary>
-		/// Add a UI package from a description text and a assetbundle, with a optional main asset name.
-		/// </summary>
-		/// <param name="desc">Description text.</param>
-		/// <param name="res">A assetbundle contains resources.</param>
-		/// <param name="mainAssetName">Main asset name.</param>
-		/// <returns>UIPackage</returns>
-		public static UIPackage AddPackage(string desc, AssetBundle res, string mainAssetName)
-		{
 			UIPackage pkg = new UIPackage();
-			pkg.Create(desc, res, mainAssetName);
+			pkg.Create(source, res, mainAssetName, null);
 			_packageInstById[pkg.id] = pkg;
 			_packageInstByName[pkg.name] = pkg;
 			_packageList.Add(pkg);
@@ -242,8 +220,7 @@ namespace FairyGUI
 			}
 
 			UIPackage pkg = new UIPackage();
-			pkg._loadFunc = loadFunc;
-			pkg.Create(asset.text, null, assetPath);
+			pkg.Create(asset.bytes, null, assetPath, loadFunc);
 			if (_packageInstById.ContainsKey(pkg.id))
 				Debug.LogWarning("FairyGUI: Package id conflicts, '" + pkg.name + "' and '" + _packageInstById[pkg.id].name + "'");
 			_packageInstById[pkg.id] = pkg;
@@ -262,11 +239,10 @@ namespace FairyGUI
 		/// <param name="assetNamePrefix">资源文件名前缀。如果包含，则载入资源时名称将传入assetNamePrefix@resFileName这样格式。可以为空。</param>
 		/// <param name="loadFunc">载入函数</param>
 		/// <returns></returns>
-		public static UIPackage AddPackage(string descData, string assetNamePrefix, UIPackage.LoadResource loadFunc)
+		public static UIPackage AddPackage(byte[] descData, string assetNamePrefix, LoadResource loadFunc)
 		{
 			UIPackage pkg = new UIPackage();
-			pkg._loadFunc = loadFunc;
-			pkg.Create(descData, null, assetNamePrefix);
+			pkg.Create(descData, null, assetNamePrefix, loadFunc);
 			if (_packageInstById.ContainsKey(pkg.id))
 				Debug.LogWarning("FairyGUI: Package id conflicts, '" + pkg.name + "' and '" + _packageInstById[pkg.id].name + "'");
 			_packageInstById[pkg.id] = pkg;
@@ -588,10 +564,11 @@ namespace FairyGUI
 				return null;
 		}
 
-		void Create(string desc, AssetBundle res, string assetNamePrefix)
+		void Create(byte[] desc, AssetBundle res, string assetNamePrefix, LoadResource loadFunc)
 		{
 			_descPack = new Dictionary<string, string>();
 			_resBundle = res;
+			_loadFunc = loadFunc;
 
 			if (!Application.isPlaying)
 				UIObjectFactory.Clear();
@@ -607,23 +584,40 @@ namespace FairyGUI
 			LoadPackage();
 		}
 
-		void DecodeDesc(string source)
+		void DecodeDesc(byte[] descBytes)
 		{
-			int curr = 0;
-			string fn;
-			int size;
-			while (true)
+			if (descBytes.Length < 4
+				|| descBytes[0] != 0x50 || descBytes[1] != 0x4b || descBytes[2] != 0x03 || descBytes[3] != 0x04)
 			{
-				int pos = source.IndexOf("|", curr);
-				if (pos == -1)
-					break;
-				fn = source.Substring(curr, pos - curr);
-				curr = pos + 1;
-				pos = source.IndexOf("|", curr);
-				size = int.Parse(source.Substring(curr, pos - curr));
-				curr = pos + 1;
-				_descPack[fn] = source.Substring(curr, size);
-				curr += size;
+				string source = Encoding.UTF8.GetString(descBytes);
+				int curr = 0;
+				string fn;
+				int size;
+				while (true)
+				{
+					int pos = source.IndexOf("|", curr);
+					if (pos == -1)
+						break;
+					fn = source.Substring(curr, pos - curr);
+					curr = pos + 1;
+					pos = source.IndexOf("|", curr);
+					size = int.Parse(source.Substring(curr, pos - curr));
+					curr = pos + 1;
+					_descPack[fn] = source.Substring(curr, size);
+					curr += size;
+				}
+			}
+			else
+			{
+				ZipReader zip = new ZipReader(descBytes);
+				ZipReader.ZipEntry entry = new ZipReader.ZipEntry();
+				while (zip.GetNextEntry(entry))
+				{
+					if (entry.isDirectory)
+						continue;
+
+					_descPack[entry.name] = Encoding.UTF8.GetString(zip.GetEntryData(entry));
+				}
 			}
 		}
 
@@ -1382,13 +1376,21 @@ namespace FairyGUI
 #else
 				ta = (TextAsset)_resBundle.Load(fileName, typeof(TextAsset));
 #endif
+				if (ta != null)
+					return ta.bytes;
+				else
+					return null;
 			}
 			else
-				ta = (TextAsset)_loadFunc(fileName, ext, typeof(TextAsset));
-			if (ta != null)
-				return ta.bytes;
-			else
-				return null;
+			{
+				object ret = _loadFunc(fileName, ext, typeof(TextAsset));
+				if (ret == null)
+					return null;
+				if (ret is byte[])
+					return (byte[])ret;
+				else
+					return ((TextAsset)ret).bytes;
+			}
 		}
 
 		string LoadString(string fileName)
