@@ -1150,7 +1150,6 @@ namespace FairyGUI
 			int linkStartLine = 0;
 
 			float charX = 0;
-			float realCharX = 0;
 			float xIndent;
 			int yIndent = 0;
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
@@ -1180,10 +1179,23 @@ namespace FairyGUI
 					lineAlign = format.align;
 				if (lineAlign == AlignType.Center)
 					xIndent = (int)((rectWidth - line.width) / 2);
-				else if (lineAlign == AlignType.Right)
-					xIndent = rectWidth - line.width;
 				else
-					xIndent = 0;
+				{
+					if (_rtl)
+					{
+						if (lineAlign == AlignType.Right)
+							xIndent = 0;
+						else
+							xIndent = rectWidth - line.width;
+					}
+					else
+					{
+						if (lineAlign == AlignType.Right)
+							xIndent = rectWidth - line.width;
+						else
+							xIndent = 0;
+					}
+				}
 				if (_input && xIndent < 0)
 					xIndent = 0;
 
@@ -1210,10 +1222,7 @@ namespace FairyGUI
 							{
 								element.position = Vector2.zero;
 								currentLink.SetPosition(0, 0);
-								if (_rtl)
-									linkStartX = _contentRect.width - charX;
-								else
-									linkStartX = charX;
+								linkStartX = charX;
 								linkStartLine = i;
 							}
 						}
@@ -1221,7 +1230,7 @@ namespace FairyGUI
 						{
 							if (currentLink != null)
 							{
-								currentLink.SetArea(linkStartLine, linkStartX, i, _rtl ? (_contentRect.width - charX) : charX);
+								currentLink.SetArea(linkStartLine, linkStartX, i, charX);
 								currentLink = null;
 							}
 						}
@@ -1239,13 +1248,9 @@ namespace FairyGUI
 									cp.offsetX = (int)charX;
 									_charPositions.Add(cp);
 								}
-								if (_rtl)
-									realCharX = _contentRect.width - (charX + 1 + htmlObj.width);
-								else
-									realCharX = charX + 1;
-								element.position = new Vector2(realCharX, line.y + (int)((line.height - htmlObj.height) / 2));
+								element.position = new Vector2(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
 								htmlObj.SetPosition(element.position.x, element.position.y);
-								if (lineClipped || clipped && (realCharX < GUTTER_X || realCharX + htmlObj.width > _contentRect.width - GUTTER_X))
+								if (lineClipped || clipped && (element.position.x < GUTTER_X || element.position.x + htmlObj.width > _contentRect.width - GUTTER_X))
 									element.status |= 1;
 								else
 									element.status &= 254;
@@ -1284,14 +1289,10 @@ namespace FairyGUI
 							yIndent -= (int)(lastGlyphHeight - glyph.height * 0.667f);
 						else
 							lastGlyphHeight = glyph.height;
-						if (_rtl)
-							realCharX = _contentRect.width - charX - glyph.width;
-						else
-							realCharX = charX;
 
-						v0.x = realCharX + glyph.vert.xMin;
+						v0.x = charX + glyph.vert.xMin;
 						v0.y = -line.y - yIndent + glyph.vert.yMin;
-						v1.x = realCharX + glyph.vert.xMax;
+						v1.x = charX + glyph.vert.xMax;
 						v1.y = -line.y - yIndent + glyph.vert.yMax;
 						u0 = glyph.uv[0];
 						u1 = glyph.uv[1];
@@ -1408,10 +1409,10 @@ namespace FairyGUI
 								if (v1.y - v0.y > 2)
 									v1.y = v0.y + 2;
 
-								float tmpX = realCharX + letterSpacing + glyph.width;
+								float tmpX = charX + letterSpacing + glyph.width;
 
-								vertList.Add(new Vector3(realCharX, v0.y));
-								vertList.Add(new Vector3(realCharX, v1.y));
+								vertList.Add(new Vector3(charX, v0.y));
+								vertList.Add(new Vector3(charX, v1.y));
 								vertList.Add(new Vector3(tmpX, v1.y));
 								vertList.Add(new Vector3(tmpX, v0.y));
 
