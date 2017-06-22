@@ -179,9 +179,21 @@ namespace FairyGUI
 
 		protected override DisplayObject HitTest()
 		{
-			if (_type != 3)
-				return base.HitTest();
-			else
+			if (_type == 2)
+			{
+				Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
+				if (!_contentRect.Contains(localPoint))
+					return null;
+
+				//圆形加多一个在圆内的判断
+				float xx = localPoint.x - _contentRect.width * 0.5f;
+				float yy = localPoint.y - _contentRect.height * 0.5f;
+				if (Mathf.Pow((xx / (_contentRect.width * 0.5f)), 2) + Mathf.Pow((yy / (_contentRect.height * 0.5f)), 2) < 1)
+					return this;
+				else
+					return null;
+			}
+			else if (_type == 3)
 			{
 				Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
 				if (!_contentRect.Contains(localPoint))
@@ -213,6 +225,8 @@ namespace FairyGUI
 
 				return oddNodes ? this : null;
 			}
+
+			return base.HitTest();
 		}
 	}
 }
