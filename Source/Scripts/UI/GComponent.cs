@@ -43,12 +43,12 @@ namespace FairyGUI
 		protected Margin _margin;
 		protected bool _trackBounds;
 		protected bool _boundsChanged;
+		protected ChildrenRenderOrder _childrenRenderOrder;
+		protected int _apexIndex;
 		internal Vector2 _alignOffset;
 
 		Vector2 _clipSoftness;
 		int _sortingChildCount;
-		ChildrenRenderOrder _childrenRenderOrder;
-		int _apexIndex;
 		EventCallback0 _buildDelegate;
 
 		public GComponent()
@@ -871,7 +871,7 @@ namespace FairyGUI
 				_clipSoftness = value;
 				if (scrollPane != null)
 					scrollPane.UpdateClipSoft();
-				else if (_clipSoftness.x > 0 && _clipSoftness.y > 0)
+				else if (_clipSoftness.x > 0 || _clipSoftness.y > 0)
 					rootContainer.clipSoftness = new Vector4(value.x, value.y, value.x, value.y);
 				else
 					rootContainer.clipSoftness = null;
@@ -885,6 +885,15 @@ namespace FairyGUI
 		{
 			get { return container.mask; }
 			set { container.mask = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool reversedMask
+		{
+			get { return container.reversedMask; }
+			set { container.reversedMask = value; }
 		}
 
 		/// <summary>
@@ -996,6 +1005,14 @@ namespace FairyGUI
 				cc.selectedIndex = this.grayed ? 1 : 0;
 			else
 				base.HandleGrayedChanged();
+		}
+
+		override public void HandleControllerChanged(Controller c)
+		{
+			base.HandleControllerChanged(c);
+
+			if (scrollPane != null)
+				scrollPane.HandleControllerChanged(c);
 		}
 
 		/// <summary>
@@ -1372,7 +1389,12 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("mask");
 			if (str != null)
+			{
 				this.mask = GetChildById(str).displayObject;
+
+				if (xml.GetAttributeBool("reversedMask"))
+					this.reversedMask = true;
+			}
 
 			et = xml.GetEnumerator("transition");
 			while (et.MoveNext())
@@ -1411,7 +1433,17 @@ namespace FairyGUI
 		{
 			base.Setup_AfterAdd(xml);
 
-			string[] arr = xml.GetAttributeArray("controller");
+			string str;
+			string[] arr;
+
+			if (scrollPane != null && scrollPane.pageMode)
+			{
+				str = xml.GetAttribute("pageController");
+				if (str != null)
+					scrollPane.pageController = parent.GetController(str);
+			}
+
+			arr = xml.GetAttributeArray("controller");
 			if (arr != null)
 			{
 				for (int i = 0; i < arr.Length; i += 2)

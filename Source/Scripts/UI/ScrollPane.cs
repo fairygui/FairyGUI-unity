@@ -99,6 +99,7 @@ namespace FairyGUI
 		GScrollBar _vtScrollBar;
 		GComponent _header;
 		GComponent _footer;
+		Controller _pageController;
 
 		static int _gestureFlag;
 
@@ -263,6 +264,8 @@ namespace FairyGUI
 			if (_tweening != 0)
 				Timers.inst.Remove(_tweenUpdateDelegate);
 
+			_pageController = null;
+
 			if (_hzScrollBar != null)
 				_hzScrollBar.Dispose();
 			if (_vtScrollBar != null)
@@ -356,6 +359,24 @@ namespace FairyGUI
 		{
 			get { return _snapToItem; }
 			set { _snapToItem = value; }
+		}
+
+		/// <summary>
+		/// 是否页面滚动模式。
+		/// </summary>
+		public bool pageMode
+		{
+			get { return _pageMode; }
+			set { _pageMode = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Controller pageController
+		{
+			get { return _pageController; }
+			set { _pageController = value; }
 		}
 
 		/// <summary>
@@ -506,9 +527,22 @@ namespace FairyGUI
 		/// </summary>
 		public int currentPageX
 		{
-			get { return _pageMode ? Mathf.FloorToInt(_xPos / _pageSize.x) : 0; }
+			get
+			{
+				if (!_pageMode)
+					return 0;
+
+				int page = Mathf.FloorToInt(_xPos / _pageSize.x);
+				if (_xPos - page * _pageSize.x > _pageSize.x * 0.5f)
+					page++;
+
+				return page;
+			}
 			set
 			{
+				if (!_pageMode)
+					return;
+
 				if (_overlapSize.x > 0)
 					this.SetPosX(value * _pageSize.x, false);
 			}
@@ -530,7 +564,17 @@ namespace FairyGUI
 		/// </summary>
 		public int currentPageY
 		{
-			get { return _pageMode ? Mathf.FloorToInt(_yPos / _pageSize.y) : 0; }
+			get
+			{
+				if (!_pageMode)
+					return 0;
+
+				int page = Mathf.FloorToInt(_yPos / _pageSize.y);
+				if (_yPos - page * _pageSize.y > _pageSize.y * 0.5f)
+					page++;
+
+				return page;
+			}
 			set
 			{
 				if (_overlapSize.y > 0)
@@ -927,6 +971,36 @@ namespace FairyGUI
 			PosChanged(false);
 		}
 
+		internal void HandleControllerChanged(Controller c)
+		{
+			if (_pageController == c)
+			{
+				if (_scrollType == ScrollType.Horizontal)
+					this.currentPageX = c.selectedIndex;
+				else
+					this.currentPageY = c.selectedIndex;
+			}
+		}
+
+		void UpdatePageController()
+		{
+			if (_pageController != null && !_pageController.changing)
+			{
+				int index;
+				if (_scrollType == ScrollType.Horizontal)
+					index = this.currentPageX;
+				else
+					index = this.currentPageY;
+				if (index < _pageController.pageCount)
+				{
+					Controller c = _pageController;
+					_pageController = null; //防止HandleControllerChanged的调用
+					c.selectedIndex = index;
+					_pageController = c;
+				}
+			}
+		}
+
 		internal void AdjustMaskContainer()
 		{
 			float mx, my;
@@ -1077,6 +1151,9 @@ namespace FairyGUI
 					_container.y = -_yPos;
 				}
 			}
+
+			if (_pageMode)
+				UpdatePageController();
 		}
 
 		void HandleSizeChanged()
@@ -1193,6 +1270,8 @@ namespace FairyGUI
 
 			SyncScrollBar();
 			CheckRefreshBar();
+			if (_pageMode)
+				UpdatePageController();
 		}
 
 		private void PosChanged(bool ani)
@@ -1284,6 +1363,9 @@ namespace FairyGUI
 
 				LoopCheckingCurrent();
 			}
+
+			if (_pageMode)
+				UpdatePageController();
 		}
 
 		internal void UpdateClipSoft()
@@ -1529,6 +1611,8 @@ namespace FairyGUI
 
 			SyncScrollBar();
 			CheckRefreshBar();
+			if (_pageMode)
+				UpdatePageController();
 			onScroll.Call();
 		}
 
@@ -2033,6 +2117,9 @@ namespace FairyGUI
 					_xPos = Mathf.Clamp(-nx, 0, _overlapSize.x);
 				if (_overlapSize.y > 0)
 					_yPos = Mathf.Clamp(-ny, 0, _overlapSize.y);
+
+				if (_pageMode)
+					UpdatePageController();
 			}
 
 			if (_tweenChange.x == 0 && _tweenChange.y == 0)

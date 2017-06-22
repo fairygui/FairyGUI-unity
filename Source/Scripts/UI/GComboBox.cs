@@ -32,6 +32,7 @@ namespace FairyGUI
 		protected string[] _icons;
 		protected string[] _values;
 		protected string _popupDirection;
+		protected Controller _selectionController;
 
 		bool _itemsUpdated;
 		int _selectedIndex;
@@ -221,7 +222,18 @@ namespace FairyGUI
 					if (_icons != null)
 						this.icon = null;
 				}
+
+				UpdateSelectionController();
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Controller selectionController
+		{
+			get { return _selectionController; }
+			set { _selectionController = value; }
 		}
 
 		/// <summary>
@@ -280,6 +292,26 @@ namespace FairyGUI
 				base.HandleGrayedChanged();
 		}
 
+		override public void HandleControllerChanged(Controller c)
+		{
+			base.HandleControllerChanged(c);
+
+			if (_selectionController == c)
+				this.selectedIndex = c.selectedIndex;
+		}
+
+		void UpdateSelectionController()
+		{
+			if (_selectionController != null && !_selectionController.changing
+				&& _selectedIndex < _selectionController.pageCount)
+			{
+				Controller c = _selectionController;
+				_selectionController = null;
+				c.selectedIndex = _selectedIndex;
+				_selectionController = c;
+			}
+		}
+
 		public override void Dispose()
 		{
 			if (dropdown != null)
@@ -287,6 +319,8 @@ namespace FairyGUI
 				dropdown.Dispose();
 				dropdown = null;
 			}
+			_selectionController = null;
+
 			base.Dispose();
 		}
 
@@ -385,6 +419,10 @@ namespace FairyGUI
 			str = xml.GetAttribute("icon");
 			if (str != null && str.Length > 0)
 				this.icon = str;
+
+			str = xml.GetAttribute("selectionController");
+			if (str != null)
+				_selectionController = parent.GetController(str);
 		}
 
 		public void UpdateDropdownList()

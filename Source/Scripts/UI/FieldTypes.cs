@@ -485,7 +485,7 @@ namespace FairyGUI
 
 				case "none":
 					return BlendMode.None;
-				
+
 				case "screen":
 					return BlendMode.Screen;
 
@@ -494,6 +494,24 @@ namespace FairyGUI
 
 				default:
 					return BlendMode.Normal;
+			}
+		}
+
+		public static ChildrenRenderOrder ParseChildrenRenderOrder(string value)
+		{
+			switch (value)
+			{
+				case "ascent":
+					return ChildrenRenderOrder.Ascent;
+
+				case "descent":
+					return ChildrenRenderOrder.Descent;
+
+				case "arch":
+					return ChildrenRenderOrder.Arch;
+
+				default:
+					return ChildrenRenderOrder.Ascent;
 			}
 		}
 	}

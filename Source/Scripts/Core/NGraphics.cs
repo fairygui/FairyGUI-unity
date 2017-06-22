@@ -418,7 +418,10 @@ namespace FairyGUI
 						else
 						{
 							int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
-							_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
+							if (context.clipInfo.reversedMask)
+								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.NotEqual);
+							else
+								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
 							_material.SetInt("_Stencil", refValue);
 							_material.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Keep);
 							_material.SetInt("_StencilReadMask", refValue);

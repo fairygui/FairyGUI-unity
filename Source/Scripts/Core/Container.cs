@@ -25,7 +25,6 @@ namespace FairyGUI
 		/// </summary>
 		public bool opaque;
 
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -45,6 +44,11 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		public EventCallback0 onUpdate;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool reversedMask;
 
 		List<DisplayObject> _children;
 		DisplayObject _mask;
@@ -558,8 +562,12 @@ namespace FairyGUI
 				}
 			}
 
-			if (_mask != null && _mask.InternalHitTestMask() == null)
-				return null;
+			if (_mask != null)
+			{
+				DisplayObject tmp = _mask.InternalHitTestMask();
+				if (!reversedMask && tmp == null || reversedMask && tmp != null)
+					return null;
+			}
 
 			DisplayObject target = null;
 			if (touchChildren)
@@ -693,9 +701,9 @@ namespace FairyGUI
 			}
 
 			if (_mask != null)
-				context.EnterClipping(this.id, null, null);
+				context.EnterClipping(this.id, null, null, reversedMask);
 			else if (_clipRect != null)
-				context.EnterClipping(this.id, this.TransformRect((Rect)_clipRect, null), clipSoftness);
+				context.EnterClipping(this.id, this.TransformRect((Rect)_clipRect, null), clipSoftness, false);
 
 			float savedAlpha = context.alpha;
 			context.alpha *= this.alpha;
@@ -832,7 +840,7 @@ namespace FairyGUI
 							k = m;
 					}
 
-					if((bound[0]> test._internal_bounds[0]? bound[0]: test._internal_bounds[0])
+					if ((bound[0] > test._internal_bounds[0] ? bound[0] : test._internal_bounds[0])
 						<= (bound[2] < test._internal_bounds[2] ? bound[2] : test._internal_bounds[2])
 						&& (bound[1] > test._internal_bounds[1] ? bound[1] : test._internal_bounds[1])
 						<= (bound[3] < test._internal_bounds[3] ? bound[3] : test._internal_bounds[3]))

@@ -17,6 +17,7 @@ namespace FairyGUI
 			public Vector4 softness;//left-top-right-bottom
 			public uint clipId;
 			public bool stencil;
+			public bool reversedMask;
 		}
 
 		Stack<ClipInfo> _clipStack;
@@ -101,7 +102,7 @@ namespace FairyGUI
 		/// <param name="clipId"></param>
 		/// <param name="clipRect"></param>
 		/// <param name="softness"></param>
-		public void EnterClipping(uint clipId, Rect? clipRect, Vector4? softness)
+		public void EnterClipping(uint clipId, Rect? clipRect, Vector4? softness, bool reversedMask)
 		{
 			_clipStack.Push(clipInfo);
 
@@ -113,6 +114,7 @@ namespace FairyGUI
 					stencilReferenceValue = stencilReferenceValue << 1;
 				clipInfo.clipId = clipId;
 				clipInfo.stencil = true;
+				clipInfo.reversedMask = reversedMask;
 				clipped = true;
 			}
 			else
