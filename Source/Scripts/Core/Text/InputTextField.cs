@@ -237,6 +237,13 @@ namespace FairyGUI
 			if (!editable)
 				throw new Exception("InputTextField is not editable.");
 
+			if (keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
+			{
+				this.text = textField.text + value;
+				onChanged.Call();
+				return;
+			}
+
 			if (!_editing)
 				Stage.inst.focus = this;
 
@@ -273,7 +280,7 @@ namespace FairyGUI
 
 				_caretPosition += GetTextlength(value);
 			}
-			GetPartialText(t1, textField.parsedText.Length - t1, buffer);
+			GetPartialText(t1, -1, buffer);
 
 			string newText = buffer.ToString();
 			if (maxLength > 0)
@@ -301,25 +308,32 @@ namespace FairyGUI
 			onChanged.Call();
 		}
 
-		void GetPartialText(int startIndex, int count, StringBuilder buffer)
+		void GetPartialText(int startIndex, int endIndex, StringBuilder buffer)
 		{
 			int elementCount = textField.htmlElements.Count;
 			int lastIndex = startIndex;
+			string tt;
+			if (_displayAsPassword)
+				tt = textField.text;
+			else
+				tt = textField.parsedText;
+			if (endIndex < 0)
+				endIndex = tt.Length;
 			for (int i = 0; i < elementCount; i++)
 			{
 				HtmlElement element = textField.htmlElements[i];
 				if (element.htmlObject != null && element.text != null)
 				{
-					if (element.charIndex >= startIndex && element.charIndex < startIndex + count)
+					if (element.charIndex >= startIndex && element.charIndex < endIndex)
 					{
-						buffer.Append(textField.parsedText.Substring(lastIndex, element.charIndex - lastIndex));
+						buffer.Append(tt.Substring(lastIndex, element.charIndex - lastIndex));
 						buffer.Append(element.text);
 						lastIndex = element.charIndex + 1;
 					}
 				}
 			}
-			if (lastIndex < textField.parsedText.Length)
-				buffer.Append(textField.parsedText.Substring(lastIndex, startIndex + count - lastIndex));
+			if (lastIndex < tt.Length)
+				buffer.Append(tt.Substring(lastIndex, endIndex - lastIndex));
 		}
 
 		int GetTextlength(string value)
@@ -437,13 +451,13 @@ namespace FairyGUI
 
 			StringBuilder buffer = new StringBuilder();
 			if (_selectionStart < _caretPosition)
-				GetPartialText(_selectionStart, _caretPosition - _selectionStart, buffer);
+				GetPartialText(_selectionStart, _caretPosition, buffer);
 			else
-				GetPartialText(_caretPosition, _selectionStart - _caretPosition, buffer);
+				GetPartialText(_caretPosition, _selectionStart, buffer);
 			return buffer.ToString();
 		}
 
-		void AdjustCaret(TextField.CharPosition cp, bool moveSelectionHeader = false)
+		void AdjustCaret(TextField.CharPosition cp, bool moveSelectionHeader = false, bool forceUpdate = false)
 		{
 			_caretPosition = cp.charIndex;
 			if (moveSelectionHeader)
@@ -469,7 +483,7 @@ namespace FairyGUI
 			else if (newPos.y + line.height >= _contentRect.height - GUTTER_Y)
 				newPos.y = Math.Max(GUTTER_Y, _contentRect.height - line.height - GUTTER_Y);
 
-			pos += MoveContent(newPos - pos);
+			pos += MoveContent(newPos - pos, forceUpdate);
 
 			if (_editing)
 			{
@@ -488,7 +502,7 @@ namespace FairyGUI
 			}
 		}
 
-		Vector2 MoveContent(Vector2 delta)
+		Vector2 MoveContent(Vector2 delta, bool forceUpdate)
 		{
 			float ox = textField.x;
 			float oy = textField.y;
@@ -505,7 +519,7 @@ namespace FairyGUI
 			nx = (int)nx;
 			ny = (int)ny;
 
-			if (nx != ox || ny != oy)
+			if (nx != ox || ny != oy || forceUpdate)
 			{
 				textField.SetXY(nx, ny);
 
@@ -664,10 +678,8 @@ namespace FairyGUI
 			if (_selectionStart >= cnt)
 				_selectionStart = cnt - 1;
 
-			textField.SetXY(0, 0);
-
 			TextField.CharPosition cp = GetCharPosition(_caretPosition);
-			AdjustCaret(cp);
+			AdjustCaret(cp, false, true);
 		}
 
 		protected override void OnSizeChanged(bool widthChanged, bool heightChanged)
@@ -746,7 +758,8 @@ namespace FairyGUI
 
 		void __touchBegin(EventContext context)
 		{
-			if (!_editing || textField.charPositions.Count <= 1)
+			if (!_editing || textField.charPositions.Count <= 1
+				|| keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
 				return;
 
 			ClearSelection();
