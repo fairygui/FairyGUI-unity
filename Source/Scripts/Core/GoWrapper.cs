@@ -8,6 +8,11 @@ namespace FairyGUI
 	/// </summary>
 	public class GoWrapper : DisplayObject
 	{
+		/// <summary>
+		/// 被包装对象的材质是否支持Stencil。如果支持，则会自动设置这些材质的stecnil相关参数，从而实现对包装对象的遮罩
+		/// </summary>
+		public bool supportStencil;
+
 		protected GameObject _wrapTarget;
 		protected Renderer[] _renders;
 
@@ -131,6 +136,60 @@ namespace FairyGUI
 					}
 				}
 			}
+		}
+
+		override public void Update(UpdateContext context)
+		{
+			if (supportStencil)
+			{
+				bool clearStencil = false;
+				if (context.clipped)
+				{
+					if (context.stencilReferenceValue > 0)
+					{
+						int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
+						int cnt = _renders.Length;
+						for (int i = 0; i < cnt; i++)
+						{
+							Renderer r = _renders[i];
+							if (r != null)
+							{
+								if (context.clipInfo.reversedMask)
+									r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.NotEqual);
+								else
+									r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
+								r.sharedMaterial.SetInt("_Stencil", refValue);
+								r.sharedMaterial.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Keep);
+								r.sharedMaterial.SetInt("_StencilReadMask", refValue);
+								r.sharedMaterial.SetInt("_ColorMask", 15);
+							}
+						}
+					}
+					else
+						clearStencil = true;
+				}
+				else
+					clearStencil = true;
+
+				if (clearStencil)
+				{
+					int cnt = _renders.Length;
+					for (int i = 0; i < cnt; i++)
+					{
+						Renderer r = _renders[i];
+						if (r != null)
+						{
+							r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Always);
+							r.sharedMaterial.SetInt("_Stencil", 0);
+							r.sharedMaterial.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Keep);
+							r.sharedMaterial.SetInt("_StencilReadMask", 255);
+							r.sharedMaterial.SetInt("_ColorMask", 15);
+						}
+					}
+				}
+			}
+
+			base.Update(context);
 		}
 
 		public override void Dispose()
