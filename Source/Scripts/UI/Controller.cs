@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FairyGUI.Utils;
 using System;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -79,7 +80,7 @@ namespace FairyGUI
 						_playingTransition = null;
 					}
 
-					if (_pageTransitions != null)
+					if (_pageTransitions != null && Application.isPlaying)
 					{
 						foreach (PageTransition pt in _pageTransitions)
 						{

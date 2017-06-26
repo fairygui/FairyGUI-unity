@@ -1758,7 +1758,9 @@ namespace FairyGUI
 
 		private void ShowScrollBar(bool val)
 		{
-			if (val)
+			if(!Application.isPlaying)
+				__showScrollBar(val);
+			else if (val)
 			{
 				__showScrollBar(true);
 				Timers.inst.Remove(_showScrollBarDelegate);
