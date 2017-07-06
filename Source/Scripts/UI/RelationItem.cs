@@ -447,7 +447,7 @@ namespace FairyGUI
 		void __targetXYChanged(EventContext context)
 		{
 			if (_owner.relations.handling != null
-				|| _owner.group != null && _owner.group._updating)
+				|| _owner.group != null && _owner.group._updating != 0)
 			{
 				_targetData.x = _target.x;
 				_targetData.y = _target.y;
@@ -488,7 +488,8 @@ namespace FairyGUI
 
 		void __targetSizeChanged(EventContext context)
 		{
-			if (_owner.relations.handling != null)
+			if (_owner.relations.handling != null
+				|| _owner.group != null && _owner.group._updating != 0)
 			{
 				_targetData.z = _target._rawWidth;
 				_targetData.w = _target._rawHeight;

@@ -26,22 +26,22 @@ namespace FairyGUI
 		/// <summary>
 		/// The source width of the object.
 		/// </summary>
-		public int sourceWidth { get; protected set; }
+		public int sourceWidth;
 
 		/// <summary>
 		/// The source height of the object.
 		/// </summary>
-		public int sourceHeight { get; protected set; }
+		public int sourceHeight;
 
 		/// <summary>
 		/// The initial width of the object.
 		/// </summary>
-		public int initWidth { get; protected set; }
+		public int initWidth;
 
 		/// <summary>
 		/// The initial height of the object.
 		/// </summary>
-		public int initHeight { get; protected set; }
+		public int initHeight;
 
 		/// <summary>
 		/// 
@@ -67,11 +67,6 @@ namespace FairyGUI
 		/// Relations Object.
 		/// </summary>
 		public Relations relations { get; private set; }
-
-		/// <summary>
-		/// Group belonging to.
-		/// </summary>
-		public GGroup group;
 
 		/// <summary>
 		/// Restricted range of dragging.
@@ -197,6 +192,7 @@ namespace FairyGUI
 		bool _focusable;
 		string _tooltips;
 		bool _pixelSnapping;
+		GGroup _group;
 
 		GearBase[] _gears;
 
@@ -208,6 +204,7 @@ namespace FairyGUI
 		internal float _rawWidth;
 		internal float _rawHeight;
 		internal bool _gearLocked;
+		internal float _sizePercentInGroup;
 
 		internal static uint _gInstanceCounter;
 
@@ -339,6 +336,8 @@ namespace FairyGUI
 				if (parent != null && !(parent is GList))
 				{
 					parent.SetBoundsChangedFlag();
+					if (_group != null)
+						_group.SetBoundsChangedFlag();
 					onPositionChanged.Call();
 				}
 
@@ -478,8 +477,8 @@ namespace FairyGUI
 					hv = minHeight;
 				else if (maxHeight > 0 && hv > maxHeight)
 					hv = maxHeight;
-				float oldWidth = _width;
-				float oldHeight = _height;
+				float dWidth = wv - _width;
+				float dHeight = hv - _height;
 				_width = wv;
 				_height = hv;
 
@@ -490,7 +489,7 @@ namespace FairyGUI
 					if (!_pivotAsAnchor)
 					{
 						if (!ignorePivot)
-							this.SetXY(_x - _pivotX * (_width - oldWidth), _y - _pivotY * (_height - oldHeight));
+							this.SetXY(_x - _pivotX * dWidth, _y - _pivotY * dHeight);
 						else
 							this.HandlePositionChanged();
 					}
@@ -498,12 +497,17 @@ namespace FairyGUI
 						this.HandlePositionChanged();
 				}
 
+				if (this is GGroup)
+					((GGroup)this).ResizeChildren(dWidth, dHeight);
+
 				UpdateGear(2);
 
 				if (parent != null)
 				{
-					relations.OnOwnerSizeChanged(_width - oldWidth, _height - oldHeight);
+					relations.OnOwnerSizeChanged(dWidth, dHeight);
 					parent.SetBoundsChangedFlag();
+					if (_group != null)
+						_group.SetBoundsChangedFlag(true);
 				}
 
 				onSizeChanged.Call();
@@ -1183,6 +1187,25 @@ namespace FairyGUI
 		{
 			if (parent != null)
 				parent.RemoveChild(this);
+		}
+
+		/// <summary>
+		///  Group belonging to.
+		/// </summary>
+		public GGroup group
+		{
+			get { return _group; }
+			set
+			{
+				if (_group != value)
+				{
+					if (_group != null)
+						_group.SetBoundsChangedFlag(true);
+					_group = value;
+					if (_group != null)
+						_group.SetBoundsChangedFlag(true);
+				}
+			}
 		}
 
 		/// <summary>

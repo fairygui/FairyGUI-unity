@@ -212,6 +212,8 @@ namespace FairyGUI
 
 					ChildStateChanged(child);
 					SetBoundsChangedFlag();
+					if (child.group != null)
+						child.group.SetBoundsChangedFlag(true);
 				}
 				return child;
 			}
@@ -291,6 +293,7 @@ namespace FairyGUI
 					_sortingChildCount--;
 
 				_children.RemoveAt(index);
+				child.group = null;
 				if (child.inContainer)
 				{
 					container.RemoveChild(child.displayObject);
@@ -305,7 +308,6 @@ namespace FairyGUI
 					child.Dispose();
 
 				SetBoundsChangedFlag();
-
 				return child;
 			}
 			else
@@ -1218,7 +1220,12 @@ namespace FairyGUI
 					_SetChildIndex(child, oldIndex, index);
 			}
 		}
-
+		
+		/// <summary>
+		/// 每帧调用的一个回调。如果你要override，请记住以下两点：
+		/// 1、记得调用base.onUpdate;
+		/// 2、不要在方法里进行任何会更改显示列表的操作，例如AddChild、RemoveChild、visible等。
+		/// </summary>
 		virtual protected void OnUpdate()
 		{
 			if (_boundsChanged)

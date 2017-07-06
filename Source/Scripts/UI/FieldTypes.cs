@@ -151,6 +151,13 @@ namespace FairyGUI
 		Unknown
 	}
 
+	public enum GroupLayoutType
+	{
+		None,
+		Horizontal,
+		Vertical
+	}
+
 	class FieldTypes
 	{
 		public static PackageItemType ParsePackageItemType(string value)
@@ -512,6 +519,19 @@ namespace FairyGUI
 
 				default:
 					return ChildrenRenderOrder.Ascent;
+			}
+		}
+
+		public static GroupLayoutType ParseGroupLayoutType(string value)
+		{
+			switch (value)
+			{
+				case "hz":
+					return GroupLayoutType.Horizontal;
+				case "vt":
+					return GroupLayoutType.Vertical;
+				default:
+					return GroupLayoutType.None;
 			}
 		}
 	}
