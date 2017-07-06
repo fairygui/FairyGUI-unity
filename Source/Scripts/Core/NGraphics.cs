@@ -226,14 +226,6 @@ namespace FairyGUI
 			get { return _material; }
 			set
 			{
-				if (_customMatarial && _material != null)
-				{
-					if (Application.isPlaying)
-						Material.Destroy(_material);
-					else
-						Material.DestroyImmediate(_material);
-				}
-
 				_material = value;
 				if (_material != null)
 				{

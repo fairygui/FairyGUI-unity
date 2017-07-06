@@ -15,6 +15,8 @@ namespace FairyGUI
 		float[] _matrix;
 		Matrix4x4 _shaderMatrix;
 		Vector4 _offset;
+		Material _material;
+		Material _savedMaterial;
 
 		const float LUMA_R = 0.299f;
 		const float LUMA_G = 0.587f;
@@ -41,12 +43,16 @@ namespace FairyGUI
 					_target.graphics.materialKeywords = FILTER_KEY;
 				else //否则通过绘画模式，需要建立一张RT，所以会有一定消耗
 				{
-					Material mat = new Material(ShaderConfig.GetShader(ShaderConfig.imageShader));
-					mat.hideFlags = DisplayOptions.hideFlags;
-					mat.EnableKeyword(FILTER_KEY[0]);
+					if (_material == null)
+					{
+						_material = new Material(ShaderConfig.GetShader(ShaderConfig.imageShader));
+						_material.hideFlags = DisplayOptions.hideFlags;
+						_material.EnableKeyword(FILTER_KEY[0]);
+					}
 
 					_target.EnterPaintingMode(1, null);
-					_target.paintingGraphics.material = mat; //设置后材质的所有权已转移到paintingGraphics
+					_savedMaterial = _target.paintingGraphics.material; //保存原来的材质
+					_target.paintingGraphics.material = _material; //设置后材质的所有权已转移到paintingGraphics
 				}
 			}
 		}
@@ -55,9 +61,18 @@ namespace FairyGUI
 		{
 			if ((_target is Image) || (_target is MovieClip))
 				_target.graphics.materialKeywords = null;
-			else
+			else if (!_target.isDisposed)
+			{
+				//恢复原来的材质
+				_target.paintingGraphics.material = _savedMaterial;
 				_target.LeavePaintingMode(1);
+			}
 
+			if (_material != null)
+				Material.Destroy(_material);
+
+			_savedMaterial = null;
+			_material = null;
 			_target = null;
 		}
 
@@ -67,7 +82,7 @@ namespace FairyGUI
 			if ((_target is Image) || (_target is MovieClip))
 				mat = _target.graphics.material;
 			else
-				mat = _target.paintingGraphics.material;
+				mat = _material;
 			if ((object)mat != null)
 			{
 				mat.SetMatrix("_ColorMatrix", _shaderMatrix);
