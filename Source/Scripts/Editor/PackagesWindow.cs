@@ -147,10 +147,10 @@ namespace FairyGUIEditor
 			//buttons start---
 			EditorGUILayout.BeginHorizontal();
 
-			GUILayout.Space(210);
+			GUILayout.Space(180);
 
-			if (GUILayout.Button("Cancel", GUILayout.Width(100)))
-				this.Close();
+			if (GUILayout.Button("Refresh", GUILayout.Width(100)))
+				EditorToolSet.ReloadPackages();
 
 			GUILayout.Space(20);
 			if (GUILayout.Button("OK", GUILayout.Width(100)) && selectedPackage >= 0)

@@ -56,14 +56,7 @@ namespace FairyGUIEditor
 		[MenuItem("Window/FairyGUI - Refresh Packages And Panels")]
 		static void RefreshPanels()
 		{
-			if (!Application.isPlaying)
-			{
-				_loaded = false;
-				LoadPackages();
-				Debug.Log("FairyGUI - Refresh Packages And Panels complete.");
-			}
-			else
-				EditorUtility.DisplayDialog("FairyGUI", "Cannot run in play mode.", "OK");
+			ReloadPackages();
 		}
 
 		static void EditorApplication_Update()
@@ -75,6 +68,18 @@ namespace FairyGUIEditor
 				return;
 
 			LoadPackages();
+		}
+
+		public static void ReloadPackages()
+		{
+			if (!Application.isPlaying)
+			{
+				_loaded = false;
+				LoadPackages();
+				Debug.Log("FairyGUI - Refresh Packages And Panels complete.");
+			}
+			else
+				EditorUtility.DisplayDialog("FairyGUI", "Cannot run in play mode.", "OK");
 		}
 
 		public static void LoadPackages()
