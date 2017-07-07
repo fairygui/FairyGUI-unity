@@ -593,21 +593,26 @@ namespace FairyGUI
 			if (sound != null)
 				Stage.inst.PlayOneShotSound(sound, soundVolumeScale);
 
-			if (!changeStateOnClick)
-				return;
-
 			if (_mode == ButtonMode.Check)
 			{
-				this.selected = !_selected;
-				onChanged.Call();
+				if (changeStateOnClick)
+				{
+					this.selected = !_selected;
+					onChanged.Call();
+				}
 			}
 			else if (_mode == ButtonMode.Radio)
 			{
-				if (!_selected)
+				if (changeStateOnClick && !_selected)
 				{
 					this.selected = true;
 					onChanged.Call();
 				}
+			}
+			else
+			{
+				if (_relatedController != null)
+					_relatedController.selectedPageId = pageOption.id;
 			}
 		}
 	}
