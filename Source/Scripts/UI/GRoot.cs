@@ -228,6 +228,29 @@ namespace FairyGUI
 
 			return null;
 		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		public GGraph modalLayer
+		{
+			get
+			{
+				if (_modalLayer == null)
+					CreateModalLayer();
+
+				return _modalLayer;
+			}
+		}
+
+		void CreateModalLayer()
+		{
+			_modalLayer = new GGraph();
+			_modalLayer.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
+			_modalLayer.AddRelation(this, RelationType.Size);
+			_modalLayer.name = _modalLayer.gameObjectName = "ModalLayer";
+			_modalLayer.SetHome(this);
+		}
 
 		/// <summary>
 		/// Return true if a modal window is on stage.
@@ -279,13 +302,7 @@ namespace FairyGUI
 		private void AdjustModalLayer()
 		{
 			if (_modalLayer == null)
-			{
-				_modalLayer = new GGraph();
-				_modalLayer.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
-				_modalLayer.AddRelation(this, RelationType.Size);
-				_modalLayer.gameObjectName = "ModalLayer";
-				_modalLayer.SetHome(this);
-			}
+				CreateModalLayer();
 
 			int cnt = this.numChildren;
 
