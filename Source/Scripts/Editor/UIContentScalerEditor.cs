@@ -19,7 +19,7 @@ namespace FairyGUIEditor
 		SerializedProperty constantScaleFactor;
 		SerializedProperty ignoreOrientation;
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		string[] propertyToExclude;
 #endif
 		
@@ -34,7 +34,7 @@ namespace FairyGUIEditor
 			constantScaleFactor = serializedObject.FindProperty("constantScaleFactor");
 			ignoreOrientation = serializedObject.FindProperty("ignoreOrientation");
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			propertyToExclude = new string[] { "m_Script", "scaleMode", "screenMatchMode", "designResolutionX", "designResolutionY",
 					"fallbackScreenDPI", "defaultSpriteDPI", "constantScaleFactor", "ignoreOrientation"};
 #endif
@@ -44,7 +44,7 @@ namespace FairyGUIEditor
 		{
 			serializedObject.Update();
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DrawPropertiesExcluding(serializedObject, propertyToExclude);
 #endif
 			EditorGUILayout.PropertyField(scaleMode);

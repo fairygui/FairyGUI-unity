@@ -26,7 +26,7 @@ namespace FairyGUIEditor
 		SerializedProperty hitTestMode;
 		SerializedProperty setNativeChildrenOrder;
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		string[] propertyToExclude;
 #endif
 		void OnEnable()
@@ -46,7 +46,7 @@ namespace FairyGUIEditor
 			setNativeChildrenOrder = serializedObject.FindProperty("setNativeChildrenOrder");
 
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			propertyToExclude = new string[] { "m_Script", "packageName", "componentName", "packagePath", "renderMode",
 				"renderCamera", "sortingOrder", "position", "scale", "rotation", "fairyBatching", "fitScreen","touchDisabled",
 				"hitTestMode","cachedUISize","setNativeChildrenOrder"
@@ -59,7 +59,7 @@ namespace FairyGUIEditor
 			serializedObject.Update();
 
 			FairyGUI.UIPanel panel = target as FairyGUI.UIPanel;
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DrawPropertiesExcluding(serializedObject, propertyToExclude);
 #endif
 			EditorGUILayout.BeginHorizontal();

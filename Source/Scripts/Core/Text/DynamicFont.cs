@@ -61,7 +61,7 @@ namespace FairyGUI
 			if (_font == null)
 				_font = (Font)Resources.Load("Fonts/" + name, typeof(Font));
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			//Try to use new API in Uinty5 to load
 			if (_font == null)
 			{
@@ -100,7 +100,7 @@ namespace FairyGUI
 				_font.material.mainTexture.hideFlags = DisplayOptions.hideFlags;
 			}
 
-#if (UNITY_4_7 || UNITY_5)
+#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
 			Font.textureRebuilt += textureRebuildCallback;
 #else
 			_font.textureRebuildCallback += textureRebuildCallback;
@@ -161,7 +161,7 @@ namespace FairyGUI
 					_lastFontSize = _size;
 					ri = _lastRenderInfo = GetRenderInfo(_size);
 				}
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				width = sTempChar.advance;
 #else
 				width = Mathf.CeilToInt(sTempChar.width);
@@ -198,7 +198,7 @@ namespace FairyGUI
 					_lastFontSize = _size;
 					ri = _lastRenderInfo = GetRenderInfo(_size);
 				}
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				glyph.vert.xMin = sTempChar.minX;
 				glyph.vert.yMin = sTempChar.minY - ri.yIndent;
 				glyph.vert.xMax = sTempChar.maxX;
@@ -259,7 +259,7 @@ namespace FairyGUI
 				return false;
 		}
 
-#if (UNITY_5 || UNITY_4_7)
+#if (UNITY_5 || UNITY_5_3_OR_NEWER || UNITY_4_7)
 		void textureRebuildCallback(Font targetFont)
 		{
 			if (_font != targetFont)
@@ -301,7 +301,7 @@ namespace FairyGUI
 					char ch = TEST_STRING[i];
 					if (_font.GetCharacterInfo(ch, out charInfo, size, FontStyle.Normal))
 					{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 						y0 = Mathf.Max(y0, charInfo.maxY);
 						y1 = Mathf.Min(y1, charInfo.minY);
 						glyphHeight = Math.Max(glyphHeight, charInfo.glyphHeight);

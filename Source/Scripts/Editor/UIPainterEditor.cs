@@ -20,7 +20,7 @@ namespace FairyGUIEditor
 		SerializedProperty touchDisabled;
 		SerializedProperty sortingOrder;
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		string[] propertyToExclude;
 #endif
 		void OnEnable()
@@ -32,7 +32,7 @@ namespace FairyGUIEditor
 			touchDisabled = serializedObject.FindProperty("touchDisabled");
 			sortingOrder = serializedObject.FindProperty("sortingOrder");
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			propertyToExclude = new string[] { "m_Script", "packageName", "componentName", "packagePath",
 				"renderCamera", "fairyBatching", "touchDisabled","sortingOrder" 
 			};
@@ -44,7 +44,7 @@ namespace FairyGUIEditor
 			serializedObject.Update();
 
 			UIPainter panel = target as UIPainter;
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DrawPropertiesExcluding(serializedObject, propertyToExclude);
 #endif
 			EditorGUILayout.BeginHorizontal();

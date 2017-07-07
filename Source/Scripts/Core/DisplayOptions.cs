@@ -17,7 +17,7 @@ namespace FairyGUI
 		/// </summary>
 		public static void SetEditModeHideFlags()
 		{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 	#if SHOW_HIERARCHY_EDIT_MODE
 			hideFlags = HideFlags.DontSaveInEditor;
 	#else

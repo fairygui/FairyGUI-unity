@@ -79,14 +79,21 @@ namespace FairyGUI
 		/// </summary>
 		public void SetBoundsChangedFlag(bool childSizeChanged = false)
 		{
-			if (_updating == 0 && !_boundsChanged && parent != null && !underConstruct)
+			if (_updating == 0 && parent != null && !underConstruct)
 			{
-				_boundsChanged = true;
 				if (childSizeChanged)
 					_percentReady = false;
 
-				UpdateContext.OnBegin -= _refreshDelegate;
-				UpdateContext.OnBegin += _refreshDelegate;
+				if (!_boundsChanged)
+				{
+					_boundsChanged = true;
+
+					if (_layout != GroupLayoutType.None)
+					{
+						UpdateContext.OnBegin -= _refreshDelegate;
+						UpdateContext.OnBegin += _refreshDelegate;
+					}
+				}
 			}
 		}
 

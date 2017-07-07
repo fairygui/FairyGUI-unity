@@ -346,7 +346,7 @@ namespace FairyGUI
 			if (!EMRenderSupport.packageListReady || UIPackage.GetByName(packageName) == null)
 				return;
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DisplayOptions.SetEditModeHideFlags();
 			_ui = (GComponent)UIPackage.CreateObject(packageName, componentName);
 

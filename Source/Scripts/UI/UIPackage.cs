@@ -138,7 +138,7 @@ namespace FairyGUI
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName)
 		{
 			byte[] source = null;
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			if (mainAssetName != null)
 			{
 				TextAsset ta = desc.LoadAsset<TextAsset>(mainAssetName);
@@ -1151,7 +1151,7 @@ namespace FairyGUI
 			Texture2D tex;
 			if (_resBundle != null)
 			{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				tex = _resBundle.LoadAsset<Texture2D>(filePath);
 #else
 				tex = (Texture2D)_resBundle.Load(filePath, typeof(Texture2D));
@@ -1174,7 +1174,7 @@ namespace FairyGUI
 				filePath = filePath + "!a";
 				if (_resBundle != null)
 				{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 					tex = _resBundle.LoadAsset<Texture2D>(filePath);
 #else
 					tex = (Texture2D)_resBundle.Load(filePath, typeof(Texture2D));
@@ -1196,7 +1196,7 @@ namespace FairyGUI
 			string ext = Path.GetExtension(item.file);
 			if (_resBundle != null)
 			{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				item.audioClip = _resBundle.LoadAsset<AudioClip>(fileName);
 #else
 				item.audioClip = (AudioClip)_resBundle.Load(fileName, typeof(AudioClip));
@@ -1371,7 +1371,7 @@ namespace FairyGUI
 			TextAsset ta;
 			if (_resBundle != null)
 			{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				ta = _resBundle.LoadAsset<TextAsset>(fileName);
 #else
 				ta = (TextAsset)_resBundle.Load(fileName, typeof(TextAsset));

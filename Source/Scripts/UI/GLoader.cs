@@ -444,61 +444,65 @@ namespace FairyGUI
 				if (_contentHeight == 0)
 					_contentHeight = 30;
 				this.SetSize(_contentWidth, _contentHeight);
-				_content.SetScale(1, 1);
-				if (_content.texture != null)
-					_content.SetNativeSize();
 				_updatingLayout = false;
-			}
-			else
-			{
-				float sx = 1, sy = 1;
-				if (_fill != FillType.None)
-				{
-					sx = this.width / _contentSourceWidth;
-					sy = this.height / _contentSourceHeight;
 
-					if (sx != 1 || sy != 1)
-					{
-						if (_fill == FillType.ScaleMatchHeight)
-							sx = sy;
-						else if (_fill == FillType.ScaleMatchWidth)
-							sy = sx;
-						else if (_fill == FillType.Scale)
-						{
-							if (sx > sy)
-								sx = sy;
-							else
-								sy = sx;
-						}
-						_contentWidth = Mathf.FloorToInt(_contentSourceWidth * sx);
-						_contentHeight = Mathf.FloorToInt(_contentSourceHeight * sy);
-					}
-				}
-
-				if (_content.texture != null)
+				if (_width == _contentWidth && _height == _contentHeight)
 				{
 					_content.SetScale(1, 1);
-					_content.size = new Vector2(_contentWidth, _contentHeight);
+					if (_content.texture != null)
+						_content.SetNativeSize();
+					return;
 				}
-				else
-					_content.SetScale(sx, sy);
-
-				float nx;
-				float ny;
-				if (_align == AlignType.Center)
-					nx = Mathf.FloorToInt((this.width - _contentWidth) / 2);
-				else if (_align == AlignType.Right)
-					nx = Mathf.FloorToInt(this.width - _contentWidth);
-				else
-					nx = 0;
-				if (_verticalAlign == VertAlignType.Middle)
-					ny = Mathf.FloorToInt((this.height - _contentHeight) / 2);
-				else if (_verticalAlign == VertAlignType.Bottom)
-					ny = Mathf.FloorToInt(this.height - _contentHeight);
-				else
-					ny = 0;
-				_content.SetXY(nx, ny);
+				//如果不相等，可能是由于大小限制造成的，要后续处理
 			}
+
+			float sx = 1, sy = 1;
+			if (_fill != FillType.None)
+			{
+				sx = this.width / _contentSourceWidth;
+				sy = this.height / _contentSourceHeight;
+
+				if (sx != 1 || sy != 1)
+				{
+					if (_fill == FillType.ScaleMatchHeight)
+						sx = sy;
+					else if (_fill == FillType.ScaleMatchWidth)
+						sy = sx;
+					else if (_fill == FillType.Scale)
+					{
+						if (sx > sy)
+							sx = sy;
+						else
+							sy = sx;
+					}
+					_contentWidth = Mathf.FloorToInt(_contentSourceWidth * sx);
+					_contentHeight = Mathf.FloorToInt(_contentSourceHeight * sy);
+				}
+			}
+
+			if (_content.texture != null)
+			{
+				_content.SetScale(1, 1);
+				_content.size = new Vector2(_contentWidth, _contentHeight);
+			}
+			else
+				_content.SetScale(sx, sy);
+
+			float nx;
+			float ny;
+			if (_align == AlignType.Center)
+				nx = Mathf.FloorToInt((this.width - _contentWidth) / 2);
+			else if (_align == AlignType.Right)
+				nx = Mathf.FloorToInt(this.width - _contentWidth);
+			else
+				nx = 0;
+			if (_verticalAlign == VertAlignType.Middle)
+				ny = Mathf.FloorToInt((this.height - _contentHeight) / 2);
+			else if (_verticalAlign == VertAlignType.Bottom)
+				ny = Mathf.FloorToInt(this.height - _contentHeight);
+			else
+				ny = 0;
+			_content.SetXY(nx, ny);
 		}
 
 		private void ClearContent()

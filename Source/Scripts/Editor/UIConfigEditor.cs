@@ -10,7 +10,7 @@ namespace FairyGUIEditor
 	[CustomEditor(typeof(UIConfig))]
 	public class UIConfigEditor : Editor
 	{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		string[] propertyToExclude;
 #endif
 		bool itemsFoldout;
@@ -21,7 +21,7 @@ namespace FairyGUIEditor
 
 		void OnEnable()
 		{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			propertyToExclude = new string[] { "m_Script", "Items", "PreloadPackages" };
 #endif
 			itemsFoldout = EditorPrefs.GetBool("itemsFoldOut");
@@ -33,7 +33,7 @@ namespace FairyGUIEditor
 		{
 			serializedObject.Update();
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DrawPropertiesExcluding(serializedObject, propertyToExclude);
 #endif
 

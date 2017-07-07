@@ -152,8 +152,8 @@ namespace FairyGUI.Utils
 			if ((object)t.parent == (object)t)
 				return;
 
-#if (UNITY_4_6 || UNITY_4_7 || UNITY_5)
-				t.SetParent(parent, false);
+#if (UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
+			t.SetParent(parent, false);
 #else
 			Vector3 p = t.localPosition;
 			Vector3 s = t.localScale;

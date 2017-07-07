@@ -171,8 +171,6 @@ namespace FairyGUI
 		float _x;
 		float _y;
 		float _z;
-		float _width;
-		float _height;
 		float _pivotX;
 		float _pivotY;
 		bool _pivotAsAnchor;
@@ -201,6 +199,8 @@ namespace FairyGUI
 
 		internal PackageItem packageItem;
 		internal protected bool underConstruct;
+		internal float _width;
+		internal float _height;
 		internal float _rawWidth;
 		internal float _rawHeight;
 		internal bool _gearLocked;

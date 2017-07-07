@@ -151,32 +151,6 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// Item count in one line.
-		/// </summary>
-		[Obsolete("GList.lineItemCount is deprecated. Use GList.lineCount or GList.columnCount instead.")]
-		public int lineItemCount
-		{
-			get
-			{
-				if (_layout == ListLayoutType.FlowVertical)
-					return _lineCount;
-				else
-					return _columnCount;
-			}
-			set
-			{
-				if (_layout == ListLayoutType.FlowVertical)
-					_lineCount = value;
-				else
-					_columnCount = value;
-
-				SetBoundsChangedFlag();
-				if (_virtual)
-					SetVirtualListChangedFlag(true);
-			}
-		}
-
-		/// <summary>
 		/// 
 		/// </summary>
 		public int lineCount
@@ -2275,8 +2249,6 @@ namespace FairyGUI
 			float cw, ch;
 			float maxWidth = 0;
 			float maxHeight = 0;
-			float sw;
-			float sh;
 			float viewWidth = this.viewWidth;
 			float viewHeight = this.viewHeight;
 
@@ -2288,22 +2260,16 @@ namespace FairyGUI
 					if (foldInvisibleItems && !child.visible)
 						continue;
 
-					sw = Mathf.CeilToInt(child.width);
-					sh = Mathf.CeilToInt(child.height);
-
 					if (curY != 0)
 						curY += _lineGap;
 					child.y = curY;
 					if (_autoResizeItem)
-					{
-						sw = viewWidth;
-						child.SetSize(sw, sh, true);
-					}
-					curY += sh;
-					if (sw > maxWidth)
-						maxWidth = sw;
+						child.SetSize(viewWidth, child.height, true);
+					curY += Mathf.CeilToInt(child.height);
+					if (child.width > maxWidth)
+						maxWidth = child.width;
 				}
-				cw = maxWidth;
+				cw = Mathf.CeilToInt(maxWidth);
 				ch = curY;
 			}
 			else if (_layout == ListLayoutType.SingleRow)
@@ -2314,23 +2280,17 @@ namespace FairyGUI
 					if (foldInvisibleItems && !child.visible)
 						continue;
 
-					sw = Mathf.CeilToInt(child.width);
-					sh = Mathf.CeilToInt(child.height);
-
 					if (curX != 0)
 						curX += _columnGap;
 					child.x = curX;
 					if (_autoResizeItem)
-					{
-						sh = viewHeight;
-						child.SetSize(sw, sh, true);
-					}
-					curX += sw;
-					if (sh > maxHeight)
-						maxHeight = sh;
+						child.SetSize(child.width, viewHeight, true);
+					curX += Mathf.CeilToInt(child.width);
+					if (child.height > maxHeight)
+						maxHeight = child.height;
 				}
 				cw = curX;
-				ch = maxHeight;
+				ch = Mathf.CeilToInt(maxHeight);
 			}
 			else if (_layout == ListLayoutType.FlowHorizontal)
 			{
@@ -2363,7 +2323,7 @@ namespace FairyGUI
 								if (j < i)
 								{
 									child.SetSize(child.sourceWidth + Mathf.RoundToInt(child.sourceWidth * ratio), child.height, true);
-									curX += child.width + _columnGap;
+									curX += Mathf.CeilToInt(child.width) + _columnGap;
 								}
 								else
 								{
@@ -2373,14 +2333,14 @@ namespace FairyGUI
 									maxHeight = child.height;
 							}
 							//new line
-							curY += maxHeight + _lineGap;
+							curY += Mathf.CeilToInt(maxHeight) + _lineGap;
 							maxHeight = 0;
 							j = 0;
 							lineStart = i + 1;
 							lineSize = 0;
 						}
 					}
-					ch = curY + maxHeight;
+					ch = curY + Mathf.CeilToInt(maxHeight);
 					cw = viewWidth;
 				}
 				else
@@ -2391,31 +2351,28 @@ namespace FairyGUI
 						if (foldInvisibleItems && !child.visible)
 							continue;
 
-						sw = Mathf.CeilToInt(child.width);
-						sh = Mathf.CeilToInt(child.height);
-
 						if (curX != 0)
 							curX += _columnGap;
 
 						if (_columnCount != 0 && j >= _columnCount
-							|| _columnCount == 0 && curX + sw > viewWidth && maxHeight != 0)
+							|| _columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0)
 						{
 							//new line
 							curX = 0;
-							curY += maxHeight + _lineGap;
+							curY += Mathf.CeilToInt(maxHeight) + _lineGap;
 							maxHeight = 0;
 							j = 0;
 						}
 						child.SetXY(curX, curY);
-						curX += sw;
+						curX += Mathf.CeilToInt(child.width);
 						if (curX > maxWidth)
 							maxWidth = curX;
-						if (sh > maxHeight)
-							maxHeight = sh;
+						if (child.height > maxHeight)
+							maxHeight = child.height;
 						j++;
 					}
-					ch = curY + maxHeight;
-					cw = maxWidth;
+					ch = curY + Mathf.CeilToInt(maxHeight);
+					cw = Mathf.CeilToInt(maxWidth);
 				}
 			}
 			else if (_layout == ListLayoutType.FlowVertical)
@@ -2449,7 +2406,7 @@ namespace FairyGUI
 								if (j < i)
 								{
 									child.SetSize(child.width, child.sourceHeight + Mathf.RoundToInt(child.sourceHeight * ratio), true);
-									curY += child.height + _lineGap;
+									curY += Mathf.CeilToInt(child.height) + _lineGap;
 								}
 								else
 								{
@@ -2459,14 +2416,14 @@ namespace FairyGUI
 									maxWidth = child.width;
 							}
 							//new line
-							curX += maxWidth + _columnGap;
+							curX += Mathf.CeilToInt(maxWidth) + _columnGap;
 							maxWidth = 0;
 							j = 0;
 							lineStart = i + 1;
 							lineSize = 0;
 						}
 					}
-					cw = curX + maxWidth;
+					cw = curX + Mathf.CeilToInt(maxWidth);
 					ch = viewHeight;
 				}
 				else
@@ -2477,36 +2434,36 @@ namespace FairyGUI
 						if (foldInvisibleItems && !child.visible)
 							continue;
 
-						sw = Mathf.CeilToInt(child.width);
-						sh = Mathf.CeilToInt(child.height);
-
 						if (curY != 0)
 							curY += _lineGap;
 
 						if (_lineCount != 0 && j >= _lineCount
-							|| _lineCount == 0 && curY + sh > viewHeight && maxWidth != 0)
+							|| _lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0)
 						{
 							curY = 0;
-							curX += maxWidth + _columnGap;
+							curX += Mathf.CeilToInt(maxWidth) + _columnGap;
 							maxWidth = 0;
 							j = 0;
 						}
 						child.SetXY(curX, curY);
-						curY += sh;
+						curY += child.height;
 						if (curY > maxHeight)
 							maxHeight = curY;
-						if (sw > maxWidth)
-							maxWidth = sw;
+						if (child.width > maxWidth)
+							maxWidth = child.width;
 						j++;
 					}
-					cw = curX + maxWidth;
-					ch = maxHeight;
+					cw = curX + Mathf.CeilToInt(maxWidth);
+					ch = Mathf.CeilToInt(maxHeight);
 				}
 			}
 			else //pagination
 			{
 				int page = 0;
-				int lineCount = 0;
+				int k = 0;
+				float eachHeight = 0;
+				if (_autoResizeItem && _lineCount > 0)
+					eachHeight = Mathf.Floor((viewHeight - (_lineCount - 1) * _lineGap) / _lineCount);
 
 				if (_autoResizeItem && _columnCount > 0)
 				{
@@ -2536,32 +2493,33 @@ namespace FairyGUI
 
 								if (j < i)
 								{
-									child.SetSize(child.sourceWidth + Mathf.RoundToInt(child.sourceWidth * ratio), child.height, true);
-									curX += child.width + _columnGap;
+									child.SetSize(child.sourceWidth + Mathf.RoundToInt(child.sourceWidth * ratio),
+										_lineCount > 0 ? eachHeight : child.height, true);
+									curX += Mathf.CeilToInt(child.width) + _columnGap;
 								}
 								else
 								{
-									child.SetSize(viewWidth - curX, child.height, true);
+									child.SetSize(viewWidth - curX, _lineCount > 0 ? eachHeight : child.height, true);
 								}
 								if (child.height > maxHeight)
 									maxHeight = child.height;
 							}
 							//new line
-							curY += maxHeight + _lineGap;
+							curY += Mathf.CeilToInt(maxHeight) + _lineGap;
 							maxHeight = 0;
 							j = 0;
 							lineStart = i + 1;
 							lineSize = 0;
 
-							lineCount++;
+							k++;
 
-							if (_lineCount != 0 && lineCount >= _lineCount
+							if (_lineCount != 0 && k >= _lineCount
 								|| _lineCount == 0 && curY + child.height > viewHeight)
 							{
 								//new page
 								page++;
 								curY = 0;
-								lineCount = 0;
+								k = 0;
 							}
 						}
 					}
@@ -2574,41 +2532,39 @@ namespace FairyGUI
 						if (foldInvisibleItems && !child.visible)
 							continue;
 
-						sw = Mathf.CeilToInt(child.width);
-						sh = Mathf.CeilToInt(child.height);
-
 						if (curX != 0)
 							curX += _columnGap;
 
+						if (_autoResizeItem && _lineCount > 0)
+							child.SetSize(child.width, eachHeight, true);
+
 						if (_columnCount != 0 && j >= _columnCount
-							|| _columnCount == 0 && curX + sw > viewWidth && maxHeight != 0)
+							|| _columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0)
 						{
-							//new line
-							curX -= _columnGap;
-							if (curX > maxWidth)
-								maxWidth = curX;
 							curX = 0;
 							curY += maxHeight + _lineGap;
 							maxHeight = 0;
 							j = 0;
-							lineCount++;
+							k++;
 
-							if (_lineCount != 0 && lineCount >= _lineCount
-								|| _lineCount == 0 && curY + sh > viewHeight && maxWidth != 0)//new page
+							if (_lineCount != 0 && k >= _lineCount
+								|| _lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0)//new page
 							{
 								page++;
 								curY = 0;
-								lineCount = 0;
+								k = 0;
 							}
 						}
 						child.SetXY(page * viewWidth + curX, curY);
-						curX += sw;
-						if (sh > maxHeight)
-							maxHeight = sh;
+						curX += Mathf.CeilToInt(child.width);
+						if (curX > maxWidth)
+							maxWidth = curX;
+						if (child.height > maxHeight)
+							maxHeight = child.height;
 						j++;
 					}
 				}
-				ch = page > 0 ? viewHeight : curY + maxHeight;
+				ch = page > 0 ? viewHeight : (curY + Mathf.CeilToInt(maxHeight));
 				cw = (page + 1) * viewWidth;
 			}
 
