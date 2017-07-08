@@ -54,6 +54,7 @@ namespace FairyGUI
 		Controller _buttonController;
 		int _downEffect;
 		float _downEffectValue;
+		bool _downScaled;
 
 		bool _down;
 		bool _over;
@@ -353,9 +354,21 @@ namespace FairyGUI
 			else if (_downEffect == 2)
 			{
 				if (val == DOWN || val == SELECTED_OVER || val == SELECTED_DISABLED)
-					SetScale(_downEffectValue, _downEffectValue);
+				{
+					if (!_downScaled)
+					{
+						_downScaled = true;
+						SetScale(this.scaleX * _downEffectValue, this.scaleY * _downEffectValue);
+					}
+				}
 				else
-					SetScale(1, 1);
+				{
+					if (_downScaled)
+					{
+						_downScaled = false;
+						SetScale(this.scaleX / _downEffectValue, this.scaleY / _downEffectValue);
+					}
+				}
 			}
 		}
 
