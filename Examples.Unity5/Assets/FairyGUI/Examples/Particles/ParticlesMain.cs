@@ -9,7 +9,7 @@ public class ParticlesMain : MonoBehaviour
 	{
 		UIPackage.AddPackage("UI/Particles");
 
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("Particles", "CoolComponent"), typeof(CoolComponent));
+		UIObjectFactory.SetPackageItemExtension("ui://Particles/CoolComponent", typeof(CoolComponent));
 	}
 
 	void Start()

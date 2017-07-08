@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "FairyGUI/Image"
 {
 	Properties
@@ -104,11 +106,11 @@ Shader "FairyGUI/Image"
 					o.color = v.color;
 
 					#ifdef CLIPPED
-					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
+					o.clipPos = mul(unity_ObjectToWorld, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
 					#endif
 
 					#ifdef SOFT_CLIPPED
-					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
+					o.clipPos = mul(unity_ObjectToWorld, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
 					#endif
 
 					return o;

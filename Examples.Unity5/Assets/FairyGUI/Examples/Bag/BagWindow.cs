@@ -7,7 +7,6 @@ using DG.Tweening;
 public class BagWindow : Window
 {
 	GList _list;
-	Controller _page;
 
 	public BagWindow()
 	{
@@ -19,12 +18,9 @@ public class BagWindow : Window
 		this.Center();
 		this.modal = true;
 
-		_page = this.contentPane.GetController("page");
-
 		_list = this.contentPane.GetChild("list").asList;
 		_list.onClickItem.Add(__clickItem);
 		_list.itemRenderer = RenderListItem;
-		_list.scrollPane.onScroll.Add(OnScroll);
 		_list.numItems = 45;
 	}
 
@@ -33,11 +29,6 @@ public class BagWindow : Window
 		GButton button = (GButton)obj;
 		button.icon = "i" + UnityEngine.Random.Range(0, 10);
 		button.title = "" + UnityEngine.Random.Range(0, 100);
-	}
-
-	void OnScroll()
-	{
-		_page.selectedIndex = _list.scrollPane.currentPageX;
 	}
 
 	override protected void DoShowAnimation()

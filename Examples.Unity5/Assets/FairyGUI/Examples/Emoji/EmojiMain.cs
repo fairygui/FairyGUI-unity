@@ -27,7 +27,7 @@ public class EmojiMain : MonoBehaviour
 	{
 		UIPackage.AddPackage("UI/Emoji");
 
-		UIConfig.verticalScrollBar = UIPackage.GetItemURL("Emoji", "ScrollBar_VT");
+		UIConfig.verticalScrollBar = "ui://Emoji/ScrollBar_VT";
 		UIConfig.defaultScrollBarDisplay = ScrollBarDisplayType.Auto;
 	}
 

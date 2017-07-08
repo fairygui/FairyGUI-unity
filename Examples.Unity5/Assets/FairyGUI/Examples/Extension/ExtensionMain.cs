@@ -9,7 +9,7 @@ public class ExtensionMain : MonoBehaviour
 	void Awake()
 	{
 		UIPackage.AddPackage("UI/Extension");
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("Extension", "mailItem"), typeof(MailItem));
+		UIObjectFactory.SetPackageItemExtension("ui://Extension/mailItem", typeof(MailItem));
 
 	}
 

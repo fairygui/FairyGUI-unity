@@ -13,7 +13,7 @@ public class ExtensionMain : MonoBehaviour
 		Stage.inst.onKeyDown.Add(OnKeyDown);
 
 		UIPackage.AddPackage("UI/Extension");
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("Extension", "mailItem"), typeof(MailItem));
+		UIObjectFactory.SetPackageItemExtension("ui://Extension/mailItem", typeof(MailItem));
 
 		_mainView = UIPackage.CreateObject("Extension", "Main").asCom;
 		_mainView.fairyBatching = true;

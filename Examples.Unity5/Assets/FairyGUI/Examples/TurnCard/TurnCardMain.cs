@@ -14,7 +14,7 @@ public class TurnCardMain : MonoBehaviour
 		Stage.inst.onKeyDown.Add(OnKeyDown);
 
 		UIPackage.AddPackage("UI/TurnCard");
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("TurnCard", "CardComponent"), typeof(Card));
+		UIObjectFactory.SetPackageItemExtension("ui://TurnCard/CardComponent", typeof(Card));
 	}
 
 	void Start()

@@ -13,15 +13,15 @@ public class HeadBarMain : MonoBehaviour
 		
 		Transform npc = GameObject.Find("npc1").transform;
 		UIPanel panel = npc.FindChild("HeadBar").GetComponent<UIPanel>();
-		panel.ui.GetChild("name").text = "Long [color=#FFFFFF]Long[/color][img]" + UIPackage.GetItemURL("HeadBar", "cool") + "[/img] Name";
+		panel.ui.GetChild("name").text = "Long [color=#FFFFFF]Long[/color][img]ui://HeadBar/cool[/img] Name";
 		panel.ui.GetChild("blood").asProgress.value = 75;
-		panel.ui.GetChild("sign").asLoader.url = UIPackage.GetItemURL("HeadBar", "task");
+		panel.ui.GetChild("sign").asLoader.url = "ui://HeadBar/task";
 
 		npc = GameObject.Find("npc2").transform;
 		panel = npc.FindChild("HeadBar").GetComponent<UIPanel>();
 		panel.ui.GetChild("name").text = "Man2";
 		panel.ui.GetChild("blood").asProgress.value = 25;
-		panel.ui.GetChild("sign").asLoader.url = UIPackage.GetItemURL("HeadBar", "fighting");
+		panel.ui.GetChild("sign").asLoader.url = "ui://HeadBar/fighting";
 	}
 
 	void OnKeyDown(EventContext context)

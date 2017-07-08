@@ -13,7 +13,7 @@ public class VirtualListMain : MonoBehaviour
 		Stage.inst.onKeyDown.Add(OnKeyDown);
 
 		UIPackage.AddPackage("UI/VirtualList");
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("VirtualList", "mailItem"), typeof(MailItem));
+		UIObjectFactory.SetPackageItemExtension("ui://VirtualList/mailItem", typeof(MailItem));
 
 		_mainView = UIPackage.CreateObject("VirtualList", "Main").asCom;
 		_mainView.fairyBatching = true;

@@ -20,9 +20,9 @@ public class TreeViewMain : MonoBehaviour
 	{
 		_mainView = this.GetComponent<UIPanel>().ui;
 
-		_folderURL1 = UIPackage.GetItemURL("TreeView", "folder_closed");
-		_folderURL2 = UIPackage.GetItemURL("TreeView", "folder_opened");
-		_fileURL = UIPackage.GetItemURL("TreeView", "file");
+		_folderURL1 = "ui://TreeView/folder_closed";
+		_folderURL2 = "ui://TreeView/folder_opened";
+		_fileURL = "ui://TreeView/file";
 
 		_treeView = new TreeView(_mainView.GetChild("tree").asList);
 		_treeView.onClickNode.Add(__clickNode);
@@ -56,7 +56,7 @@ public class TreeViewMain : MonoBehaviour
 		}
 
 		TreeNode anotherTopNode = new TreeNode(false);
-		anotherTopNode.data = new string[] { "I'm a top node too", UIPackage.GetItemURL("TreeView", "heart") };
+		anotherTopNode.data = new string[] { "I'm a top node too", "ui://TreeView/heart" };
 		_treeView.root.AddChild(anotherTopNode);
 	}
 

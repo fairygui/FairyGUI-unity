@@ -26,9 +26,9 @@ public class BasicsMain : MonoBehaviour
 #endif
 		UIPackage.AddPackage("UI/Basics");
 
-		UIConfig.verticalScrollBar = UIPackage.GetItemURL("Basics", "ScrollBar_VT");
-		UIConfig.horizontalScrollBar = UIPackage.GetItemURL("Basics", "ScrollBar_HZ");
-		UIConfig.popupMenu = UIPackage.GetItemURL("Basics", "PopupMenu");
+		UIConfig.verticalScrollBar = "ui://Basics/ScrollBar_VT";
+		UIConfig.horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
+		UIConfig.popupMenu = "ui://Basics/PopupMenu";
 		UIConfig.buttonSound = (AudioClip)UIPackage.GetItemAsset("Basics", "click");
 	}
 
@@ -139,7 +139,7 @@ public class BasicsMain : MonoBehaviour
 		obj.GetChild("n12").asRichTextField.onClickLink.Add((EventContext context) =>
 		{
 			GRichTextField t = context.sender as GRichTextField;
-			t.text = "[img]ui://9leh0eyft9fj5f[/img][color=#FF0000]You click the link[/color]：" + context.data;
+			t.text = "[img]ui://Basics/pet[/img][color=#FF0000]You click the link[/color]：" + context.data;
 		});
 		obj.GetChild("n25").onClick.Add(() =>
 		{

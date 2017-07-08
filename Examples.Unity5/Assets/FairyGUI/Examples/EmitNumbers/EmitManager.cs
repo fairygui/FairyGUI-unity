@@ -25,9 +25,9 @@ public class EmitManager
 
 	public EmitManager()
 	{
-		hurtFont1 = UIPackage.GetItemURL("EmitNumbers", "number1");
-		hurtFont2 = UIPackage.GetItemURL("EmitNumbers", "number2");
-		criticalSign = UIPackage.GetItemURL("EmitNumbers", "critical");
+		hurtFont1 = "ui://EmitNumbers/number1";
+		hurtFont2 = "ui://EmitNumbers/number2";
+		criticalSign = "ui://EmitNumbers/critical";
 
 		view = new GComponent();
 		GRoot.inst.AddChild(view);

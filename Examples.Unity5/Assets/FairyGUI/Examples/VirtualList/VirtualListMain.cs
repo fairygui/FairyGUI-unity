@@ -9,7 +9,7 @@ public class VirtualListMain : MonoBehaviour
 	void Awake()
 	{
 		UIPackage.AddPackage("UI/VirtualList");
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("VirtualList", "mailItem"), typeof(MailItem));
+		UIObjectFactory.SetPackageItemExtension("ui://VirtualList/mailItem", typeof(MailItem));
 	}
 
 	void Start()

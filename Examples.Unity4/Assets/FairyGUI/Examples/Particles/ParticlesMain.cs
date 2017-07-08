@@ -13,7 +13,7 @@ public class ParticlesMain : MonoBehaviour
 
 		UIPackage.AddPackage("UI/Particles");
 
-		UIObjectFactory.SetPackageItemExtension(UIPackage.GetItemURL("Particles", "CoolComponent"), typeof(CoolComponent));
+		UIObjectFactory.SetPackageItemExtension("ui://Particles/CoolComponent", typeof(CoolComponent));
 
 		_mainView = UIPackage.CreateObject("Particles", "Main").asCom;
 		_mainView.SetSize(GRoot.inst.width, GRoot.inst.height);

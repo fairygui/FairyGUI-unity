@@ -31,9 +31,9 @@ public class BasicsMain : MonoBehaviour
 		UIConfig.defaultFont = "afont";
 #endif
 
-		UIConfig.verticalScrollBar = UIPackage.GetItemURL("Basics", "ScrollBar_VT");
-		UIConfig.horizontalScrollBar = UIPackage.GetItemURL("Basics", "ScrollBar_HZ");
-		UIConfig.popupMenu = UIPackage.GetItemURL("Basics", "PopupMenu");
+		UIConfig.verticalScrollBar = "ui://Basics/ScrollBar_VT";
+		UIConfig.horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
+		UIConfig.popupMenu = "ui://Basics/PopupMenu";
 		UIConfig.buttonSound = (AudioClip)UIPackage.GetItemAsset("Basics", "click");
 
 		_mainView = UIPackage.CreateObject("Basics", "Main").asCom;
@@ -108,6 +108,10 @@ public class BasicsMain : MonoBehaviour
 			case "Depth":
 				PlayDepth();
 				break;
+
+			case "ProgressBar":
+				PlayProgressBar();
+				break;
 		}
 	}
 
@@ -138,7 +142,7 @@ public class BasicsMain : MonoBehaviour
 		obj.GetChild("n12").asRichTextField.onClickLink.Add((EventContext context) =>
 		{
 			GRichTextField t = context.sender as GRichTextField;
-			t.text = "[img]ui://9leh0eyft9fj5f[/img][color=#FF0000]You click the link[/color]：" + context.data;
+			t.text = "[img]ui://Basics/pet[/img][color=#FF0000]You click the link[/color]：" + context.data;
 		});
 		obj.GetChild("n25").onClick.Add(() =>
 		{
@@ -158,13 +162,13 @@ public class BasicsMain : MonoBehaviour
 		for (int i = 0; i < cnt; i++)
 		{
 			GButton item = list1.AddItemFromPool().asButton;
-			item.GetChild("t0").text = "" + (i+1);
+			item.GetChild("t0").text = "" + (i + 1);
 			item.GetChild("t1").text = testNames[i];
 			item.GetChild("t2").asTextField.color = testColor[UnityEngine.Random.Range(0, 4)];
 			item.GetChild("star").asProgress.value = (int)((float)UnityEngine.Random.Range(1, 4) / 3f * 100);
 		}
 
-		GList list2= obj.GetChild("list2").asList;
+		GList list2 = obj.GetChild("list2").asList;
 		list2.RemoveChildrenToPool();
 		for (int i = 0; i < cnt; i++)
 		{
@@ -328,11 +332,36 @@ public class BasicsMain : MonoBehaviour
 		Rect rect = bounds.TransformRect(new Rect(0, 0, bounds.width, bounds.height), GRoot.inst);
 
 		//---!!Because at this time the container is on the right side of the stage and beginning to move to left(transition), so we need to caculate the final position
-		rect.x -= obj.parent.x; 
+		rect.x -= obj.parent.x;
 		//----
 
 		GButton d = obj.GetChild("d").asButton;
 		d.draggable = true;
 		d.dragBounds = rect;
+	}
+
+	//------------------------------
+	private void PlayProgressBar()
+	{
+		GComponent obj = _demoObjects["ProgressBar"];
+		Timers.inst.Add(0.001f, 0, __playProgress);
+		obj.onRemovedFromStage.Add(() => { Timers.inst.Remove(__playProgress); });
+	}
+
+	void __playProgress(object param)
+	{
+		GComponent obj = _demoObjects["ProgressBar"];
+		int cnt = obj.numChildren;
+		for (int i = 0; i < cnt; i++)
+		{
+			GProgressBar child = obj.GetChildAt(i) as GProgressBar;
+			if (child != null)
+			{
+
+				child.value += 1;
+				if (child.value > child.max)
+					child.value = 0;
+			}
+		}
 	}
 }
