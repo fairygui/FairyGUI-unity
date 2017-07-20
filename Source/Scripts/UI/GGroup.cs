@@ -79,7 +79,7 @@ namespace FairyGUI
 		/// </summary>
 		public void SetBoundsChangedFlag(bool childSizeChanged = false)
 		{
-			if (_updating == 0 && parent != null && !underConstruct)
+			if (_updating == 0 && parent != null)
 			{
 				if (childSizeChanged)
 					_percentReady = false;
