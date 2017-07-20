@@ -5,13 +5,6 @@ using FairyGUI.Utils;
 
 namespace FairyGUI
 {
-	public enum ChildrenRenderOrder
-	{
-		Ascent,
-		Descent,
-		Arch,
-	}
-
 	/// <summary>
 	/// Component
 	/// </summary>
@@ -826,6 +819,8 @@ namespace FairyGUI
 				GObject child = _children[i];
 				child.HandleControllerChanged(c);
 			}
+
+			c.RunActions();
 		}
 
 		void ApplyAllControllers()

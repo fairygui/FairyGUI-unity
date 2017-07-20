@@ -158,6 +158,13 @@ namespace FairyGUI
 		Vertical
 	}
 
+	public enum ChildrenRenderOrder
+	{
+		Ascent,
+		Descent,
+		Arch,
+	}
+
 	class FieldTypes
 	{
 		public static PackageItemType ParsePackageItemType(string value)

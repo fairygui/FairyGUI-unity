@@ -32,7 +32,7 @@ namespace FairyGUI
 		int _previousIndex;
 		List<string> _pageIds;
 		List<string> _pageNames;
-		List<PageTransition> _pageTransitions;
+		List<ControllerAction> _actions;
 		Transition _playingTransition;
 
 		static uint _nextPageId;
@@ -73,27 +73,6 @@ namespace FairyGUI
 					onChanged.Call();
 
 					changing = false;
-
-					if (_playingTransition != null)
-					{
-						_playingTransition.Stop();
-						_playingTransition = null;
-					}
-
-					if (_pageTransitions != null && Application.isPlaying)
-					{
-						foreach (PageTransition pt in _pageTransitions)
-						{
-							if (pt.toIndex == _selectedIndex && (pt.fromIndex == -1 || pt.fromIndex == _previousIndex))
-							{
-								_playingTransition = parent.GetTransition(pt.transitionName);
-								break;
-							}
-						}
-
-						if (_playingTransition != null)
-							_playingTransition.Play(() => { _playingTransition = null; });
-					}
 				}
 			}
 		}
@@ -115,12 +94,6 @@ namespace FairyGUI
 				_selectedIndex = value;
 				parent.ApplyController(this);
 				changing = false;
-
-				if (_playingTransition != null)
-				{
-					_playingTransition.Stop();
-					_playingTransition = null;
-				}
 			}
 		}
 
@@ -362,6 +335,18 @@ namespace FairyGUI
 			}
 		}
 
+		public void RunActions()
+		{
+			if (_actions != null)
+			{
+				int cnt = _actions.Count;
+				for (int i = 0; i < cnt; i++)
+				{
+					_actions[i].Run(this, previousPageId, selectedPageId);
+				}
+			}
+		}
+
 		public void Setup(XML xml)
 		{
 			string[] arr;
@@ -380,28 +365,46 @@ namespace FairyGUI
 				}
 			}
 
+			XMLList.Enumerator et = xml.GetEnumerator("action");
+			while (et.MoveNext())
+			{
+				if (_actions == null)
+					_actions = new List<ControllerAction>();
+
+				XML cxml = et.Current;
+				ControllerAction action = ControllerAction.CreateAction(cxml.GetAttribute("type"));
+				action.Setup(cxml);
+				_actions.Add(action);
+			}
+
 			arr = xml.GetAttributeArray("transitions");
 			if (arr != null)
 			{
-				_pageTransitions = new List<PageTransition>();
+				if (_actions == null)
+					_actions = new List<ControllerAction>();
 
 				int cnt = arr.Length;
 				for (int i = 0; i < cnt; i++)
 				{
 					string str = arr[i];
 
-					PageTransition pt = new PageTransition();
+					PlayTransitionAction taction = new PlayTransitionAction();
 					int k = str.IndexOf("=");
-					pt.transitionName = str.Substring(k + 1);
+					taction.transitionName = str.Substring(k + 1);
 					str = str.Substring(0, k);
 					k = str.IndexOf("-");
-					pt.toIndex = int.Parse(str.Substring(k + 1));
+					int ii = int.Parse(str.Substring(k + 1));
+					if (ii < _pageIds.Count)
+						taction.toPage = new string[] { _pageIds[ii] };
 					str = str.Substring(0, k);
 					if (str == "*")
-						pt.fromIndex = -1;
-					else
-						pt.fromIndex = int.Parse(str);
-					_pageTransitions.Add(pt);
+					{
+						ii = int.Parse(str);
+						if (ii < _pageIds.Count)
+							taction.fromPage = new string[] { _pageIds[ii] };
+					}
+					taction.stopOnExit = true;
+					_actions.Add(taction);
 				}
 			}
 
@@ -410,12 +413,5 @@ namespace FairyGUI
 			else
 				_selectedIndex = -1;
 		}
-	}
-
-	class PageTransition
-	{
-		public string transitionName;
-		public int fromIndex;
-		public int toIndex;
 	}
 }

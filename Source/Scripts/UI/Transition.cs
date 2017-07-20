@@ -150,14 +150,15 @@ namespace FairyGUI
 			_Play(times, delay, onComplete, true);
 		}
 
+		public void ChangeRepeat(int value)
+		{
+			_totalTimes = value;
+		}
+
 		void _Play(int times, float delay, PlayCompleteCallback onComplete, bool reverse)
 		{
 			Stop(true, true);
 
-			if (times == 0)
-				times = 1;
-			else if (times == -1)
-				times = int.MaxValue;
 			_totalTimes = times;
 			_reversed = reverse;
 
@@ -925,7 +926,7 @@ namespace FairyGUI
 						if (value.i == 0)
 							trans.Stop(false, true);
 						else if (trans.playing)
-							trans._totalTimes = value.i == -1 ? int.MaxValue : value.i;
+							trans._totalTimes = value.i;
 						else
 						{
 							item.completed = false;
