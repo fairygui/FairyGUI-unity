@@ -456,13 +456,8 @@ namespace FairyGUI
 		{
 			_owner.EnsureBoundsCorrect();
 
-			if (_loop == 1 && _overlapSize.x > 0)
-			{
-				if (value < 0.001f)
-					value += _contentSize.x / 2;
-				else if (value >= _overlapSize.x)
-					value -= _contentSize.x / 2;
-			}
+			if (_loop == 1)
+				LoopCheckingNewPos(ref value, 0);
 
 			value = Mathf.Clamp(value, 0, _overlapSize.x);
 			if (value != _xPos)
@@ -490,13 +485,8 @@ namespace FairyGUI
 		{
 			_owner.EnsureBoundsCorrect();
 
-			if (_loop == 2 && _overlapSize.y > 0)
-			{
-				if (value < 0.001f)
-					value += _contentSize.y / 2;
-				else if (value >= _overlapSize.y)
-					value -= _contentSize.y / 2;
-			}
+			if (_loop == 2)
+				LoopCheckingNewPos(ref value, 1);
 
 			value = Mathf.Clamp(value, 0, _overlapSize.y);
 			if (value != _yPos)
@@ -836,9 +826,6 @@ namespace FairyGUI
 
 			if (_overlapSize.y > 0)
 			{
-				if (_loop != 0 && _yPos == 0)
-					ani = false;
-
 				float bottom = _yPos + _viewSize.y;
 				if (setFirst || rect.y <= _yPos || rect.height >= _viewSize.y)
 				{
@@ -859,9 +846,6 @@ namespace FairyGUI
 			}
 			if (_overlapSize.x > 0)
 			{
-				if (_loop != 0 && _xPos == 0)
-					ani = false;
-
 				float right = _xPos + _viewSize.x;
 				if (setFirst || rect.x <= _xPos || rect.width >= _viewSize.x)
 				{
@@ -1764,7 +1748,7 @@ namespace FairyGUI
 
 		private void ShowScrollBar(bool val)
 		{
-			if(!Application.isPlaying)
+			if (!Application.isPlaying)
 				__showScrollBar(val);
 			else if (val)
 			{
@@ -1787,6 +1771,11 @@ namespace FairyGUI
 				_hzScrollBar.displayObject.visible = _scrollBarVisible && !_hScrollNone;
 		}
 
+		float GetLoopPartSize(float division, int axis)
+		{
+			return (_contentSize[axis] + (axis == 0 ? ((GList)_owner).columnGap : ((GList)_owner).lineGap)) / division;
+		}
+
 		/// <summary>
 		/// 对当前的滚动位置进行循环滚动边界检查。当到达边界时，回退一半内容区域（循环滚动内容大小通常是真实内容大小的偶数倍）。
 		/// </summary>
@@ -1798,13 +1787,12 @@ namespace FairyGUI
 			{
 				if (_xPos < 0.001f)
 				{
-					_xPos += _contentSize.x / 2;
+					_xPos += GetLoopPartSize(2, 0);
 					changed = true;
-
 				}
 				else if (_xPos >= _overlapSize.x)
 				{
-					_xPos -= _contentSize.x / 2;
+					_xPos -= GetLoopPartSize(2, 0);
 					changed = true;
 				}
 			}
@@ -1812,12 +1800,12 @@ namespace FairyGUI
 			{
 				if (_yPos < 0.001f)
 				{
-					_yPos += _contentSize.y / 2;
+					_yPos += GetLoopPartSize(2, 1);
 					changed = true;
 				}
 				else if (_yPos >= _overlapSize.y)
 				{
-					_yPos += _contentSize.y / 2 - _overlapSize.y;
+					_yPos -= GetLoopPartSize(2, 1);
 					changed = true;
 				}
 			}
@@ -1845,21 +1833,62 @@ namespace FairyGUI
 		{
 			if (endPos[axis] > 0)
 			{
-				float tmp = _tweenStart[axis] - _contentSize[axis] / 2;
+				float halfSize = GetLoopPartSize(2, axis);
+				float tmp = _tweenStart[axis] - halfSize;
 				if (tmp <= 0 && tmp >= -_overlapSize[axis])
 				{
-					endPos[axis] -= _contentSize[axis] / 2;
+					endPos[axis] -= halfSize;
 					_tweenStart[axis] = tmp;
 				}
 			}
 			else if (endPos[axis] < -_overlapSize[axis])
 			{
-				float tmp = _tweenStart[axis] + _contentSize[axis] / 2;
+				float halfSize = GetLoopPartSize(2, axis);
+				float tmp = _tweenStart[axis] + halfSize;
 				if (tmp <= 0 && tmp >= -_overlapSize.x)
 				{
-					endPos[axis] += _contentSize[axis] / 2;
+					endPos[axis] += halfSize;
 					_tweenStart[axis] = tmp;
 				}
+			}
+		}
+
+		void LoopCheckingNewPos(ref float value, int axis)
+		{
+			if (_overlapSize[axis] == 0)
+				return;
+
+			float pos = axis == 0 ? _xPos : _yPos;
+			bool changed = false;
+			if (value < 0.001f)
+			{
+				value += GetLoopPartSize(2, axis);
+				if (value > pos)
+				{
+					float v = GetLoopPartSize(6, axis);
+					v = Mathf.CeilToInt((value - pos) / v) * v;
+					pos = Mathf.Clamp(pos + v, 0, _overlapSize[axis]);
+					changed = true;
+				}
+			}
+			else if (value >= _overlapSize[axis])
+			{
+				value -= GetLoopPartSize(2, axis);
+				if (value < pos)
+				{
+					float v = GetLoopPartSize(6, axis);
+					v = Mathf.CeilToInt((pos - value) / v) * v;
+					pos = Mathf.Clamp(pos - v, 0, _overlapSize[axis]);
+					changed = true;
+				}
+			}
+
+			if (changed)
+			{
+				if (axis == 0)
+					_container.x = -(int)pos;
+				else
+					_container.y = -(int)pos;
 			}
 		}
 
