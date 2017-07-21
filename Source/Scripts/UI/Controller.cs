@@ -397,7 +397,7 @@ namespace FairyGUI
 					if (ii < _pageIds.Count)
 						taction.toPage = new string[] { _pageIds[ii] };
 					str = str.Substring(0, k);
-					if (str == "*")
+					if (str != "*")
 					{
 						ii = int.Parse(str);
 						if (ii < _pageIds.Count)
