@@ -12,9 +12,9 @@ namespace FairyGUI
 		double _max;
 		double _value;
 		ProgressTitleType _titleType;
+		bool _reverse;
 
 		GTextField _titleObject;
-		GMovieClip _aniObject;
 		GObject _barObjectH;
 		GObject _barObjectV;
 		float _barMaxWidth;
@@ -25,6 +25,11 @@ namespace FairyGUI
 		Vector2 _clickPos;
 		float _clickPercent;
 		int _touchId;
+		float _barStartX;
+		float _barStartY;
+
+		public bool changeOnClick;
+		public bool canDrag;
 
 		EventCallback1 _touchMoveDelegate;
 
@@ -42,6 +47,8 @@ namespace FairyGUI
 		{
 			_value = 50;
 			_max = 100;
+			changeOnClick = true;
+			canDrag = true;
 
 			onChanged = new EventListener(this, "onChanged");
 			onGripTouchEnd = new EventListener(this, "onGripTouchEnd");
@@ -136,12 +143,28 @@ namespace FairyGUI
 				}
 			}
 
-			if (_barObjectH != null)
-				_barObjectH.width = Mathf.RoundToInt((this.width - _barMaxWidthDelta) * percent);
-			if (_barObjectV != null)
-				_barObjectV.height = Mathf.RoundToInt((this.height - _barMaxHeightDelta) * percent);
-			if (_aniObject != null)
-				_aniObject.frame = Mathf.RoundToInt(percent * 100);
+			float fullWidth = this.width - _barMaxWidthDelta;
+			float fullHeight = this.height - _barMaxHeightDelta;
+			if (!_reverse)
+			{
+				if (_barObjectH != null)
+					_barObjectH.width = fullWidth * percent;
+				if (_barObjectV != null)
+					_barObjectV.height = fullHeight * percent;
+			}
+			else
+			{
+				if (_barObjectH != null)
+				{
+					_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
+					_barObjectH.x = _barStartX + (fullWidth - _barObjectH.width);
+				}
+				if (_barObjectV != null)
+				{
+					_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
+					_barObjectV.y = _barStartY + (fullHeight - _barObjectV.height);
+				}
+			}
 
 			InvalidateBatchingState(true);
 		}
@@ -158,22 +181,24 @@ namespace FairyGUI
 				_titleType = FieldTypes.ParseProgressTitleType(str);
 			else
 				_titleType = ProgressTitleType.Percent;
+			_reverse = xml.GetAttributeBool("reverse");
 
 			_titleObject = GetChild("title") as GTextField;
 			_barObjectH = GetChild("bar");
 			_barObjectV = GetChild("bar_v");
-			_aniObject = GetChild("ani") as GMovieClip;
 			_gripObject = GetChild("grip");
 
 			if (_barObjectH != null)
 			{
 				_barMaxWidth = _barObjectH.width;
 				_barMaxWidthDelta = this.width - _barMaxWidth;
+				_barStartX = _barObjectH.x;
 			}
 			if (_barObjectV != null)
 			{
 				_barMaxHeight = _barObjectV.height;
 				_barMaxHeightDelta = this.height - _barMaxHeight;
+				_barStartY = _barObjectV.y;
 			}
 
 			if (_gripObject != null)
@@ -181,6 +206,8 @@ namespace FairyGUI
 				_gripObject.onTouchBegin.Add(__gripTouchBegin);
 				_gripObject.onTouchEnd.Add(__gripTouchEnd);
 			}
+
+			onTouchBegin.Add(__barTouchBegin);
 		}
 
 		override public void Setup_AfterAdd(XML cxml)
@@ -211,6 +238,9 @@ namespace FairyGUI
 
 		private void __gripTouchBegin(EventContext context)
 		{
+			this.canDrag = true;
+			context.StopPropagation();
+
 			InputEvent evt = context.inputEvent;
 			_touchId = evt.touchId;
 
@@ -223,6 +253,9 @@ namespace FairyGUI
 
 		private void __gripTouchMove(EventContext context)
 		{
+			if (!this.canDrag)
+				return;
+
 			InputEvent evt = context.inputEvent;
 			if (_touchId != evt.touchId)
 				return;
@@ -233,6 +266,11 @@ namespace FairyGUI
 
 			float deltaX = pt.x - _clickPos.x;
 			float deltaY = pt.y - _clickPos.y;
+			if (_reverse)
+			{
+				deltaX = -deltaX;
+				deltaY = -deltaY;
+			}
 
 			float percent;
 			if (_barObjectH != null)
@@ -264,10 +302,37 @@ namespace FairyGUI
 			if (displayObject == null || displayObject.isDisposed)
 				return;
 
-			float percent = (float)(_value / _max);
-			UpdateWidthPercent(percent);
-
 			onGripTouchEnd.Call();
+		}
+
+		private void __barTouchBegin(EventContext context)
+		{
+			if (!changeOnClick)
+				return;
+
+			InputEvent evt = context.inputEvent;
+			Vector2 pt = _gripObject.GlobalToLocal(new Vector2(evt.x, evt.y));
+			float percent = (float)(_value / _max);
+			float delta = 0;
+			if (_barObjectH != null)
+				delta = (pt.x - _gripObject.width / 2) / _barMaxWidth;
+			if (_barObjectV != null)
+				delta = (pt.y - _gripObject.height / 2) / _barMaxHeight;
+			if (_reverse)
+				percent -= delta;
+			else
+				percent += delta;
+			if (percent > 1)
+				percent = 1;
+			else if (percent < 0)
+				percent = 0;
+			double newValue = percent * _max;
+			if (newValue != _value)
+			{
+				_value = newValue;
+				onChanged.Call();
+			}
+			UpdateWidthPercent(percent);
 		}
 	}
 }

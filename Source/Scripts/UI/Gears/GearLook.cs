@@ -10,12 +10,14 @@ namespace FairyGUI
 		public float alpha;
 		public float rotation;
 		public bool grayed;
+		public bool touchable;
 
-		public GearLookValue(float alpha, float rotation, bool grayed)
+		public GearLookValue(float alpha, float rotation, bool grayed, bool touchable)
 		{
 			this.alpha = alpha;
 			this.rotation = rotation;
 			this.grayed = grayed;
+			this.touchable = touchable;
 		}
 	}
 
@@ -37,7 +39,7 @@ namespace FairyGUI
 
 		protected override void Init()
 		{
-			_default = new GearLookValue(_owner.alpha, _owner.rotation, _owner.grayed);
+			_default = new GearLookValue(_owner.alpha, _owner.rotation, _owner.grayed, _owner.touchable);
 			_storage = new Dictionary<string, GearLookValue>();
 		}
 
@@ -52,9 +54,12 @@ namespace FairyGUI
 				_default.alpha = float.Parse(arr[0]);
 				_default.rotation = float.Parse(arr[1]);
 				_default.grayed = int.Parse(arr[2]) == 1;
+				if (arr.Length > 3)
+					_default.touchable = int.Parse(arr[3]) == 1;
 			}
 			else
-				_storage[pageId] = new GearLookValue(float.Parse(arr[0]), float.Parse(arr[1]), int.Parse(arr[2]) == 1);
+				_storage[pageId] = new GearLookValue(float.Parse(arr[0]), float.Parse(arr[1]), int.Parse(arr[2]) == 1,
+					arr.Length < 4 ? _owner.touchable : (int.Parse(arr[3]) == 1));
 		}
 
 		override public void Apply()
@@ -67,6 +72,7 @@ namespace FairyGUI
 			{
 				_owner._gearLocked = true;
 				_owner.grayed = gv.grayed;
+				_owner.touchable = gv.touchable;
 				_owner._gearLocked = false;
 
 				if (tweener != null)
@@ -127,6 +133,7 @@ namespace FairyGUI
 				_owner.alpha = gv.alpha;
 				_owner.rotation = gv.rotation;
 				_owner.grayed = gv.grayed;
+				_owner.touchable = gv.touchable;
 				_owner._gearLocked = false;
 			}
 		}
@@ -135,12 +142,13 @@ namespace FairyGUI
 		{
 			GearLookValue gv;
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
-				_storage[_controller.selectedPageId] = new GearLookValue(_owner.alpha, _owner.rotation, _owner.grayed);
+				_storage[_controller.selectedPageId] = new GearLookValue(_owner.alpha, _owner.rotation, _owner.grayed, _owner.touchable);
 			else
 			{
 				gv.alpha = _owner.alpha;
 				gv.rotation = _owner.rotation;
 				gv.grayed = _owner.grayed;
+				gv.touchable = _owner.touchable;
 			}
 		}
 	}

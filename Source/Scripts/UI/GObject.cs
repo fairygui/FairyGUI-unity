@@ -670,9 +670,14 @@ namespace FairyGUI
 			}
 			set
 			{
-				_touchable = value;
-				if (displayObject != null)
-					displayObject.touchable = _touchable;
+				if (_touchable != value)
+				{
+					_touchable = value;
+					UpdateGear(3);
+
+					if (displayObject != null)
+						displayObject.touchable = _touchable;
+				}
 			}
 		}
 
