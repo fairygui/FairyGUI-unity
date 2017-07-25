@@ -102,10 +102,10 @@ public class RenderImage
 			rect = this._image.TransformRect(new Rect(0, 0, this._width, this._height), source2);
 			source2.PrintTo(mesh, rect);
 
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			mesh.uv2 = mesh.uv;
 #else
-			mesh.uv1 = mesh.uv;
+			mesh.uv2 = mesh.uv;
 #endif
 			mesh.uv = tmp;
 		}
@@ -129,7 +129,7 @@ public class RenderImage
 		MeshRenderer meshRenderer = this._background.gameObject.GetComponent<MeshRenderer>();
 		if (meshRenderer == null)
 			meshRenderer = this._background.gameObject.AddComponent<MeshRenderer>();
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 #else
 		meshRenderer.castShadows = false;

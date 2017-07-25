@@ -7,7 +7,7 @@ public class BuildAssetBundles
 	[MenuItem("Window/Build FairyGUI Example Bundles")]
 	public static void Builde()
 	{
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		for (int i = 0; i < 10; i++)
 		{
 			AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/Icons/i" + i + ".png").assetBundleName = "fairygui-examples/i" + i + ".ab";

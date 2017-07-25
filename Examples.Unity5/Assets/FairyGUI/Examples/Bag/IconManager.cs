@@ -99,7 +99,7 @@ public class IconManager : MonoBehaviour
 						item.onFail(www.error);
 					continue;
 				}
-#if UNITY_5
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				NTexture texture = new NTexture(bundle.LoadAllAssets<Texture2D>()[0]);
 #else
 				NTexture texture = new NTexture((Texture2D)bundle.mainAsset);
