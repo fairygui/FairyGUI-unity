@@ -84,7 +84,7 @@ namespace FairyGUI.Utils
 				rects = new List<Rect>(2);
 			else
 				rects.Clear();
-			if (startCharX > endCharX)
+			if (startLine == endLine && startCharX > endCharX)
 			{
 				float tmp = startCharX;
 				startCharX = endCharX;
