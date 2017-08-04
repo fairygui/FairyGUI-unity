@@ -42,6 +42,7 @@ namespace FairyGUI.Utils
 
 			_elements = elements;
 			_textFormatStackTop = 0;
+			_skipText = 0;
 			_ignoreWhiteSpace = parseOptions.ignoreWhiteSpace;
 			_format.CopyFrom(defaultFormat);
 			_format.colorChanged = false;
