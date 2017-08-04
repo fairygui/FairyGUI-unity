@@ -43,6 +43,7 @@ namespace FairyGUI
 		Vector2 _clipSoftness;
 		int _sortingChildCount;
 		EventCallback0 _buildDelegate;
+		Controller _applyingController;
 
 		public GComponent()
 		{
@@ -813,12 +814,14 @@ namespace FairyGUI
 
 		internal void ApplyController(Controller c)
 		{
+			_applyingController = c;
 			int cnt = _children.Count;
 			for (int i = 0; i < cnt; ++i)
 			{
 				GObject child = _children[i];
 				child.HandleControllerChanged(c);
 			}
+			_applyingController = null;
 
 			c.RunActions();
 		}
@@ -854,7 +857,11 @@ namespace FairyGUI
 				}
 			}
 			if (myIndex < maxIndex)
+			{
+				if (_applyingController != null)
+					_children[maxIndex].HandleControllerChanged(_applyingController);
 				this.SwapChildrenAt(myIndex, maxIndex);
+			}
 		}
 
 		/// <summary>
@@ -1215,7 +1222,7 @@ namespace FairyGUI
 					_SetChildIndex(child, oldIndex, index);
 			}
 		}
-		
+
 		/// <summary>
 		/// 每帧调用的一个回调。如果你要override，请记住以下两点：
 		/// 1、记得调用base.onUpdate;
