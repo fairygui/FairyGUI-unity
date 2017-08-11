@@ -132,7 +132,6 @@ namespace FairyGUI
 
 			TextField.CharPosition cp;
 			List<TextField.CharPosition> charPositions = _textField.charPositions;
-			List<TextField.LineInfo> lines = _textField.lines;
 			int listCnt = charPositions.Count;
 
 			while (_printIndex < listCnt - 1) //最后一个是占位的，无效的，所以-1
