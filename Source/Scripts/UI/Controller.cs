@@ -33,7 +33,6 @@ namespace FairyGUI
 		List<string> _pageIds;
 		List<string> _pageNames;
 		List<ControllerAction> _actions;
-		Transition _playingTransition;
 
 		static uint _nextPageId;
 
