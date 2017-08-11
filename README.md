@@ -2,10 +2,10 @@ FairyGUI Unity SDK
 ====
 
 A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.  
-Download the editor from here: [www.fairygui.com](http://www.fairygui.com/download)  
+Download the editor from here: [www.fairygui.com](http://www.fairygui.com/product)  
 
 FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity，Starling，Egret， LayaAir，Flash等多个主流应用和游戏平台。<br>
-下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/download)
+下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/product)
 
 与NGUI、UGUI等传统Unity UI引擎相比，FairyGUI使用一种更接近设计师的思维方式去重新定义UI的制作过程，大大减轻了程序员在制作UI需要投入的时间。<br>
 在运行效率方面，FairyGUI对DrawCall优化使用了特有的`FairyBatching`技术，相比NGUI、UGUI的传统优化技术更加高效而且容易控制，特别是对动静耦合越来越复杂的UI设计更是应付自如。<br>
@@ -19,7 +19,7 @@ Get Started
 
 - Examples.Unity5  
 如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的工程(这里使用的Unity版本是5.5.0)。
-如果你使用的Unity版本>=5.4，Unity 可能报错“FairyGUI: texture 'atlas0.png' not fount in XXXX”,具体问题可查看[问答社区](http://www.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)。
+如果你使用的Unity版本>=5.4，Unity 可能报错“FairyGUI: texture 'atlas0.png' not fount in XXXX”,具体问题可查看[问答社区](http://ask.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)。
 
 - Source  
 这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
@@ -36,11 +36,11 @@ Learn
 - 下载Examples工程，浏览一遍FairyGUI的例子。  
 - 解压Examples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
 - 观看视频教程：[FairyGUI游戏UI开发基础](http://www.taikr.com/course/446)  
-- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/tutorial)  
-- FAQ：[问答社区](http://www.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)  
-- 进群与小伙伴一起交流：434866637  
+- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/guide)  
+- FAQ：[问答社区](http://ask.fairygui.com)  
+- 进群与小伙伴一起交流：一群 434866637（已满） 二群 614444599  
 
 License
 ====
 MIT 你可以自由使用FairyGUI在你的商业和非商业项目。  
-如果觉得FairyGUI好用，请在Unity商店购买支持作者。[Unity AssetStore](http://u3d.as/kX8)
+如果觉得FairyGUI好用，请[赞助作者](http://fairygui.com/about/donate.html)
