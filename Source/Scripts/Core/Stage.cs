@@ -22,7 +22,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static bool keyboardInput { get; private set; }
+		public static bool keyboardInput { get; set; }
 
 		/// <summary>
 		/// 
