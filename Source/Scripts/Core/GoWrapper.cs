@@ -14,7 +14,15 @@ namespace FairyGUI
 		public bool supportStencil;
 
 		protected GameObject _wrapTarget;
-		protected Renderer[] _renders;
+		protected Renderer[] _renderers;
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+		protected Canvas _canvas;
+#endif
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventCallback0 onUpdate;
 
 		/// <summary>
 		/// 
@@ -52,11 +60,34 @@ namespace FairyGUI
 				if (_wrapTarget != null)
 					_wrapTarget.transform.parent = null;
 
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+				_canvas = null;
+#endif
+				_renderers = null;
 				_wrapTarget = value;
+
 				if (_wrapTarget != null)
 				{
 					ToolSet.SetParent(_wrapTarget.transform, this.cachedTransform);
-					CacheRenderers();
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+					_canvas = _wrapTarget.GetComponent<Canvas>();
+					if (_canvas != null)
+					{
+						_canvas.renderMode = RenderMode.WorldSpace;
+						_canvas.worldCamera = StageCamera.main;
+						_canvas.overrideSorting = true;
+
+						RectTransform rt = _canvas.GetComponent<RectTransform>();
+						rt.pivot = new Vector2(0, 1);
+						rt.position = new Vector3(0, 0, 0);
+						this.SetSize(rt.rect.width, rt.rect.height);
+					}
+					else
+#endif
+					{
+						CacheRenderers();
+						this.SetSize(0, 0);
+					}
 
 					Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
 					int lv = this.layer;
@@ -64,11 +95,6 @@ namespace FairyGUI
 					{
 						t.gameObject.layer = lv;
 					}
-				}
-				else
-				{
-					_renders = null;
-					_wrapTarget = null;
 				}
 			}
 		}
@@ -81,11 +107,15 @@ namespace FairyGUI
 		/// </summary>
 		public void CacheRenderers()
 		{
-			_renders = _wrapTarget.GetComponentsInChildren<Renderer>(true);
-			int cnt = _renders.Length;
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+			if (_canvas != null)
+				return;
+#endif
+			_renderers = _wrapTarget.GetComponentsInChildren<Renderer>(true);
+			int cnt = _renderers.Length;
 			for (int i = 0; i < cnt; i++)
 			{
-				Renderer r = _renders[i];
+				Renderer r = _renderers[i];
 				if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
 				{
 					//Set the object rendering in Transparent Queue as UI objects
@@ -104,12 +134,18 @@ namespace FairyGUI
 			set
 			{
 				base.renderingOrder = value;
-				if (_renders != null)
+
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+				if (_canvas != null)
+					_canvas.sortingOrder = value;
+#endif
+
+				if (_renderers != null)
 				{
-					int cnt = _renders.Length;
+					int cnt = _renderers.Length;
 					for (int i = 0; i < cnt; i++)
 					{
-						Renderer r = _renders[i];
+						Renderer r = _renderers[i];
 						if (r != null)
 							r.sortingOrder = value;
 					}
@@ -127,7 +163,7 @@ namespace FairyGUI
 			{
 				base.layer = value;
 
-				if (_renders != null)
+				if (_wrapTarget)
 				{
 					Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
 					foreach (Transform t in transforms)
@@ -148,10 +184,10 @@ namespace FairyGUI
 					if (context.stencilReferenceValue > 0)
 					{
 						int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
-						int cnt = _renders.Length;
+						int cnt = _renderers.Length;
 						for (int i = 0; i < cnt; i++)
 						{
-							Renderer r = _renders[i];
+							Renderer r = _renderers[i];
 							if (r != null)
 							{
 								if (context.clipInfo.reversedMask)
@@ -173,10 +209,10 @@ namespace FairyGUI
 
 				if (clearStencil)
 				{
-					int cnt = _renders.Length;
+					int cnt = _renderers.Length;
 					for (int i = 0; i < cnt; i++)
 					{
-						Renderer r = _renders[i];
+						Renderer r = _renderers[i];
 						if (r != null)
 						{
 							r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Always);
@@ -198,6 +234,9 @@ namespace FairyGUI
 			{
 				Object.Destroy(_wrapTarget);
 				_wrapTarget = null;
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+				_canvas = null;
+#endif
 			}
 
 			base.Dispose();
