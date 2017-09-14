@@ -188,7 +188,7 @@ namespace FairyGUI
 						for (int i = 0; i < cnt; i++)
 						{
 							Renderer r = _renderers[i];
-							if (r != null)
+							if (r != null && r.sharedMaterial != null)
 							{
 								if (context.clipInfo.reversedMask)
 									r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.NotEqual);
@@ -213,7 +213,7 @@ namespace FairyGUI
 					for (int i = 0; i < cnt; i++)
 					{
 						Renderer r = _renderers[i];
-						if (r != null)
+						if (r != null && r.sharedMaterial != null)
 						{
 							r.sharedMaterial.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Always);
 							r.sharedMaterial.SetInt("_Stencil", 0);
