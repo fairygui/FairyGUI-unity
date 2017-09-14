@@ -61,7 +61,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="designResolutionX">Design resolution of x axis.</param>
 		/// <param name="designResolutionY">Design resolution of y axis.</param>
-		/// <param name="screenMatchMode">Math mode.</param>
+		/// <param name="screenMatchMode">Match mode.</param>
 		public void SetContentScaleFactor(int designResolutionX, int designResolutionY, UIContentScaler.ScreenMatchMode screenMatchMode)
 		{
 			UIContentScaler scaler = Stage.inst.gameObject.GetComponent<UIContentScaler>();
