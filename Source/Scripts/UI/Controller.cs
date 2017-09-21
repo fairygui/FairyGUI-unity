@@ -307,7 +307,8 @@ namespace FairyGUI
 			set
 			{
 				int i = _pageIds.IndexOf(value);
-				this.selectedIndex = i;
+				if (i != -1)
+					this.selectedIndex = i;
 			}
 		}
 
