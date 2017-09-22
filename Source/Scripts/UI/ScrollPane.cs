@@ -1405,13 +1405,17 @@ namespace FairyGUI
 			{
 				KillTween();
 				Stage.inst.CancelClick(_touchId);
+
+				//立刻停止惯性滚动，可能位置不对齐，设定这个标志，使touchEnd时归位
+				_isMouseMoved = true;
 			}
+			else
+				_isMouseMoved = false;
 
 			_containerPos = _container.xy;
 			_beginTouchPos = _lastTouchPos = pt;
 			_lastTouchGlobalPos = evt.position;
 			_isHoldAreaDone = false;
-			_isMouseMoved = false;
 			_velocity = Vector2.zero;
 			_velocityScale = 1;
 			_lastMoveTime = Time.unscaledTime;
