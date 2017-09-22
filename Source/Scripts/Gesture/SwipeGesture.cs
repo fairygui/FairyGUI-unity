@@ -87,10 +87,18 @@ namespace FairyGUI
 		public void Enable(bool value)
 		{
 			if (value)
-				host.onTouchBegin.Add(__touchBegin);
+			{
+				if (host == GRoot.inst)
+					Stage.inst.onTouchBegin.Add(__touchBegin);
+				else
+					host.onTouchBegin.Add(__touchBegin);
+			}
 			else
 			{
-				host.onTouchBegin.Remove(__touchBegin);
+				if (host == GRoot.inst)
+					Stage.inst.onTouchBegin.Remove(__touchBegin);
+				else
+					host.onTouchBegin.Remove(__touchBegin);
 				Stage.inst.onTouchMove.Remove(__touchMove);
 				Stage.inst.onTouchEnd.Remove(__touchEnd);
 			}

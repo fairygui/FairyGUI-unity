@@ -41,7 +41,7 @@ namespace FairyGUI
 		/// 是否把变化量强制为整数。默认true。
 		/// </summary>
 		public bool snapping;
-		
+
 		Vector2 _startVector;
 		float _lastRotation;
 		int[] _touches;
@@ -69,11 +69,19 @@ namespace FairyGUI
 		public void Enable(bool value)
 		{
 			if (value)
-				host.onTouchBegin.Add(__touchBegin);
+			{
+				if (host == GRoot.inst)
+					Stage.inst.onTouchBegin.Add(__touchBegin);
+				else
+					host.onTouchBegin.Add(__touchBegin);
+			}
 			else
 			{
 				_started = false;
-				host.onTouchBegin.Remove(__touchBegin);
+				if (host == GRoot.inst)
+					Stage.inst.onTouchBegin.Remove(__touchBegin);
+				else
+					host.onTouchBegin.Remove(__touchBegin);
 				Stage.inst.onTouchMove.Remove(__touchMove);
 				Stage.inst.onTouchEnd.Remove(__touchEnd);
 			}
