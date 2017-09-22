@@ -45,7 +45,7 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
-			if (value == "-")
+			if (value == "-" || value.Length == 0)
 				return;
 
 			string[] arr = value.Split(',');

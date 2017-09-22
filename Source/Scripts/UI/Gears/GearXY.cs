@@ -41,7 +41,7 @@ namespace FairyGUI
 
 		override protected void AddStatus(string pageId, string value)
 		{
-			if (value == "-") //历史遗留处理
+			if (value == "-" || value.Length == 0) //历史遗留处理
 				return;
 
 			string[] arr = value.Split(',');
@@ -87,7 +87,7 @@ namespace FairyGUI
 					}, new Vector2(gv.x, gv.y), tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
-					.OnUpdate(()=>
+					.OnUpdate(() =>
 					{
 						_owner.InvalidateBatchingState();
 					})
