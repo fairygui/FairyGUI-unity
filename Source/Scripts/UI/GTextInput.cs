@@ -22,6 +22,11 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		public EventListener onChanged { get; private set; }
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onSubmit { get; private set; }
 
 		/// <summary>
 		/// 
@@ -33,23 +38,11 @@ namespace FairyGUI
 			onFocusIn = new EventListener(this, "onFocusIn");
 			onFocusOut = new EventListener(this, "onFocusOut");
 			onChanged = new EventListener(this, "onChanged");
+			onSubmit = new EventListener(this, "onSubmit");
 
 			this.focusable = true;
 			_textField.autoSize = AutoSizeType.None;
 			_textField.wordWrap = false;
-		}
-
-		public override string text
-		{
-			get
-			{
-				_text = inputTextField.text;
-				return _text;
-			}
-			set
-			{
-				base.text = value;
-			}
 		}
 
 		/// <summary>
@@ -151,9 +144,14 @@ namespace FairyGUI
 			inputTextField.ReplaceSelection(value);
 		}
 
-		override protected void UpdateTextFieldText()
+		override protected void SetTextFieldText()
 		{
 			inputTextField.text = _text;
+		}
+
+		override protected void GetTextFieldText()
+		{
+			_text = inputTextField.text;
 		}
 
 		override protected void CreateDisplayObject()

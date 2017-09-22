@@ -30,10 +30,16 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public int maxLength { get; set; }
+		public EventListener onSubmit { get; private set; }
 
 		/// <summary>
 		/// 
+		/// </summary>
+		public int maxLength { get; set; }
+
+		/// <summary>
+		/// 如果是true，则当文本获得焦点时，弹出键盘进行输入，如果是false则不会。
+		/// 默认是使用Stage.keyboardInput的值。
 		/// </summary>
 		public bool keyboardInput { get; set; }
 
@@ -75,6 +81,7 @@ namespace FairyGUI
 		/// </summary>
 		public static PasteHandler onPaste;
 
+		string _text;
 		string _restrict;
 		Regex _restrictPattern;
 		bool _displayAsPassword;
@@ -84,6 +91,8 @@ namespace FairyGUI
 		bool _editing;
 		int _caretPosition;
 		int _selectionStart;
+		int _composing;
+		char _highSurrogateChar;
 
 		EventCallback1 _touchMoveDelegate;
 
@@ -101,9 +110,12 @@ namespace FairyGUI
 			onFocusIn = new EventListener(this, "onFocusIn");
 			onFocusOut = new EventListener(this, "onFocusOut");
 			onChanged = new EventListener(this, "onChanged");
+			onSubmit = new EventListener(this, "onSubmit");
 
+			_text = string.Empty;
 			maxLength = 0;
 			editable = true;
+			_composing = 0;
 			keyboardInput = Stage.keyboardInput;
 
 			/* 因为InputTextField定义了ClipRect，而ClipRect是四周缩进了2个像素的（GUTTER)，默认的点击测试
@@ -128,13 +140,13 @@ namespace FairyGUI
 		{
 			get
 			{
-				return base.text;
+				return _text;
 			}
 			set
 			{
-				base.text = value;
+				_text = value;
 				ClearSelection();
-				UpdateAlternativeText();
+				UpdateText();
 			}
 		}
 
@@ -208,7 +220,7 @@ namespace FairyGUI
 					_decodedPromptText = UBBParser.inst.Parse(XMLUtils.EncodeString(_promptText));
 				else
 					_decodedPromptText = null;
-				UpdateAlternativeText();
+				UpdateText();
 			}
 		}
 
@@ -223,7 +235,7 @@ namespace FairyGUI
 				if (_displayAsPassword != value)
 				{
 					_displayAsPassword = value;
-					UpdateAlternativeText();
+					UpdateText();
 				}
 			}
 		}
@@ -239,7 +251,7 @@ namespace FairyGUI
 
 			if (keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
 			{
-				this.text = textField.text + value;
+				this.text = _text + value;
 				onChanged.Call();
 				return;
 			}
@@ -280,7 +292,7 @@ namespace FairyGUI
 
 				_caretPosition += GetTextlength(value);
 			}
-			GetPartialText(t1, -1, buffer);
+			GetPartialText(t1 + _composing, -1, buffer);
 
 			string newText = buffer.ToString();
 			if (maxLength > 0)
@@ -296,7 +308,7 @@ namespace FairyGUI
 		/// <param name="value"></param>
 		public void ReplaceText(string value)
 		{
-			if (value == textField.text)
+			if (value == _text)
 				return;
 
 			value = ValidateInput(value);
@@ -314,7 +326,7 @@ namespace FairyGUI
 			int lastIndex = startIndex;
 			string tt;
 			if (_displayAsPassword)
-				tt = textField.text;
+				tt = _text;
 			else
 				tt = textField.parsedText;
 			if (endIndex < 0)
@@ -404,19 +416,29 @@ namespace FairyGUI
 				return source;
 		}
 
-		void UpdateAlternativeText()
+		void UpdateText()
 		{
-			if (!_editing && this.text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
+			int composing = _composing;
+			_composing = 0;
+
+			if (!_editing && _text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
+				textField.htmlText = _decodedPromptText;
+			else if (_displayAsPassword)
+				textField.text = EncodePasswordText(_text);
+			else if (Input.compositionString.Length > 0)
 			{
-				textField.SetAlternativeText(_decodedPromptText, true);
+				StringBuilder buffer = new StringBuilder();
+				GetPartialText(0, _caretPosition, buffer);
+				buffer.Append(Input.compositionString);
+				GetPartialText(_caretPosition + composing, -1, buffer);
+
+				_composing = Input.compositionString.Length;
+
+				string newText = buffer.ToString();
+				textField.text = newText;
 			}
 			else
-			{
-				if (_displayAsPassword)
-					textField.SetAlternativeText(EncodePasswordText(this.text), false);
-				else
-					textField.SetAlternativeText(null, false);
-			}
+				textField.text = _text;
 		}
 
 		string EncodePasswordText(string value)
@@ -426,9 +448,15 @@ namespace FairyGUI
 			int i = 0;
 			while (i < textLen)
 			{
-				if (char.IsHighSurrogate(value[i]))
-					i++;
-				tmp.Append("*");
+				char c = value[i];
+				if (c == '\n')
+					tmp.Append(c);
+				else
+				{
+					if (char.IsHighSurrogate(c))
+						i++;
+					tmp.Append("*");
+				}
 				i++;
 			}
 			return tmp.ToString();
@@ -457,11 +485,22 @@ namespace FairyGUI
 			return buffer.ToString();
 		}
 
-		void AdjustCaret(TextField.CharPosition cp, bool moveSelectionHeader = false, bool forceUpdate = false)
+		void AdjustCaret(TextField.CharPosition cp, bool moveSelectionHeader = false)
 		{
 			_caretPosition = cp.charIndex;
 			if (moveSelectionHeader)
 				_selectionStart = _caretPosition;
+
+			UpdateCaret(false);
+		}
+
+		void UpdateCaret(bool forceUpdate = false)
+		{
+			TextField.CharPosition cp;
+			if (_editing)
+				cp = GetCharPosition(_caretPosition + Input.compositionString.Length);
+			else
+				cp = GetCharPosition(_caretPosition);
 
 			Vector2 pos = GetCharLocation(cp);
 			TextField.LineInfo line = textField.lines[cp.lineIndex];
@@ -540,13 +579,25 @@ namespace FairyGUI
 
 		void UpdateSelection(TextField.CharPosition cp)
 		{
-			TextField.CharPosition start = GetCharPosition(_selectionStart);
-			if (start.charIndex == cp.charIndex)
+			if (_selectionStart == _caretPosition)
 			{
 				_selectionShape.Clear();
 				return;
 			}
 
+			TextField.CharPosition start;
+			if (_editing && Input.compositionString.Length > 0)
+			{
+				if (_selectionStart < _caretPosition)
+				{
+					cp = GetCharPosition(_caretPosition);
+					start = GetCharPosition(_selectionStart);
+				}
+				else
+					start = GetCharPosition(_selectionStart + Input.compositionString.Length);
+			}
+			else
+				start = GetCharPosition(_selectionStart);
 			if (start.charIndex > cp.charIndex)
 			{
 				TextField.CharPosition tmp = start;
@@ -678,8 +729,7 @@ namespace FairyGUI
 			if (_selectionStart >= cnt)
 				_selectionStart = cnt - 1;
 
-			TextField.CharPosition cp = GetCharPosition(_caretPosition);
-			AdjustCaret(cp, false, true);
+			UpdateCaret(true);
 		}
 
 		protected override void OnSizeChanged(bool widthChanged, bool heightChanged)
@@ -805,7 +855,7 @@ namespace FairyGUI
 				CreateCaret();
 
 			if (!string.IsNullOrEmpty(_promptText))
-				UpdateAlternativeText();
+				UpdateText();
 
 			float caretSize;
 			//如果界面缩小过，光标很容易看不见，这里放大一下
@@ -829,11 +879,14 @@ namespace FairyGUI
 			if (Stage.keyboardInput)
 			{
 				if (keyboardInput)
-					Stage.inst.OpenKeyboard(textField.text, false, _displayAsPassword ? false : !textField.singleLine,
+					Stage.inst.OpenKeyboard(_text, false, _displayAsPassword ? false : !textField.singleLine,
 						_displayAsPassword, false, null, keyboardType, hideInput);
 			}
 			else
+			{
 				Input.imeCompositionMode = IMECompositionMode.On;
+				_composing = 0;
+			}
 		}
 
 		void __focusOut(EventContext contxt)
@@ -851,7 +904,7 @@ namespace FairyGUI
 				Input.imeCompositionMode = IMECompositionMode.Auto;
 
 			if (!string.IsNullOrEmpty(_promptText))
-				UpdateAlternativeText();
+				UpdateText();
 
 			_caret.RemoveFromParent();
 			_selectionShape.RemoveFromParent();
@@ -1042,16 +1095,49 @@ namespace FairyGUI
 				case KeyCode.Return:
 				case KeyCode.KeypadEnter:
 					{
-						if (!evt.ctrl && !evt.shift)
+						if (textField.singleLine)
 						{
-							context.PreventDefault();
-
-							if (!textField.singleLine)
-								ReplaceSelection("\n");
+							onSubmit.Call();
+							return;
 						}
 						break;
 					}
 			}
+
+			char c = evt.character;
+			if (c != 0)
+			{
+				if (evt.ctrl)
+					return;
+
+				if (c == '\r' || (int)c == 3)
+					c = '\n';
+
+				if (c == 127 || textField.singleLine && c == '\n')
+					return;
+
+				if (char.IsHighSurrogate(c))
+				{
+					_highSurrogateChar = c;
+					return;
+				}
+
+				if (char.IsLowSurrogate(c))
+					ReplaceSelection(char.ConvertFromUtf32(((int)c & 0x03FF) + ((((int)_highSurrogateChar & 0x03FF) + 0x40) << 10)));
+				else
+					ReplaceSelection(c.ToString());
+			}
+			else
+			{
+				if (Input.compositionString.Length > 0)
+					UpdateText();
+			}
+		}
+
+		public void CheckComposition()
+		{
+			if (_composing != 0 && Input.compositionString.Length == 0)
+				UpdateText();
 		}
 	}
 }

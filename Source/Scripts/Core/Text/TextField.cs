@@ -35,8 +35,6 @@ namespace FairyGUI
 		float _minHeight;
 		bool _textChanged;
 		int _yOffset;
-		string _alternativeText;
-		bool _alternatvieHtml;
 		float _fontSizeScale;
 		float _renderScale;
 		string _parsedText;
@@ -113,7 +111,7 @@ namespace FairyGUI
 					_font = FontManager.GetFont(fontName);
 					graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
 				}
-				if (_alternativeText != null || !string.IsNullOrEmpty(_text))
+				if (!string.IsNullOrEmpty(_text))
 					_textChanged = true;
 			}
 		}
@@ -129,7 +127,7 @@ namespace FairyGUI
 				if (_textFormat.align != value)
 				{
 					_textFormat.align = value;
-					if (_alternativeText != null || !string.IsNullOrEmpty(_text))
+					if (!string.IsNullOrEmpty(_text))
 						_textChanged = true;
 				}
 			}
@@ -365,21 +363,6 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="html"></param>
-		public void SetAlternativeText(string value, bool html)
-		{
-			if (_alternativeText != value || _alternatvieHtml != html)
-			{
-				_alternativeText = value;
-				_alternatvieHtml = html;
-				_textChanged = true;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public bool Redraw()
 		{
 			if (_font == null)
@@ -508,36 +491,24 @@ namespace FairyGUI
 		/// </summary>
 		void RequestText()
 		{
-			if (_alternativeText != null)
+			if (!_html)
 			{
-				if (!_alternatvieHtml)
-				{
-					_font.SetFormat(_textFormat, _fontSizeScale);
-					_font.PrepareCharacters(_alternativeText);
-					_font.PrepareCharacters("_-*");
-					return;
-				}
+				_font.SetFormat(_textFormat, _fontSizeScale);
+				_font.PrepareCharacters(_text);
+				_font.PrepareCharacters("_-*");
 			}
 			else
 			{
-				if (!_html)
+				int count = _elements.Count;
+				for (int i = 0; i < count; i++)
 				{
-					_font.SetFormat(_textFormat, _fontSizeScale);
-					_font.PrepareCharacters(_text);
-					_font.PrepareCharacters("_-*");
-					return;
-				}
-			}
-
-			int count = _elements.Count;
-			for (int i = 0; i < count; i++)
-			{
-				HtmlElement element = _elements[i];
-				if (element.type == HtmlElementType.Text)
-				{
-					_font.SetFormat(element.format, _fontSizeScale);
-					_font.PrepareCharacters(element.text);
-					_font.PrepareCharacters("_-*");
+					HtmlElement element = _elements[i];
+					if (element.type == HtmlElementType.Text)
+					{
+						_font.SetFormat(element.format, _fontSizeScale);
+						_font.PrepareCharacters(element.text);
+						_font.PrepareCharacters("_-*");
+					}
 				}
 			}
 		}
@@ -552,27 +523,13 @@ namespace FairyGUI
 
 			Cleanup();
 
-			if (_alternativeText != null)
+			if (_text.Length > 0)
 			{
-				if (_alternativeText.Length > 0)
-				{
-					if (_alternatvieHtml)
-						HtmlParser.inst.Parse(_alternativeText, _textFormat, _elements,
-							_richTextField != null ? _richTextField.htmlParseOptions : null);
-					else
-						textToBuild = _alternativeText;
-				}
-			}
-			else
-			{
-				if (_text.Length > 0)
-				{
-					if (_html)
-						HtmlParser.inst.Parse(_text, _textFormat, _elements,
-							_richTextField != null ? _richTextField.htmlParseOptions : null);
-					else
-						textToBuild = _text;
-				}
+				if (_html)
+					HtmlParser.inst.Parse(_text, _textFormat, _elements,
+						_richTextField != null ? _richTextField.htmlParseOptions : null);
+				else
+					textToBuild = _text;
 			}
 
 			if (_elements.Count == 0 && textToBuild == null)
@@ -851,6 +808,14 @@ namespace FairyGUI
 					{
 						if (highSurrogate)
 						{
+							//这里需要跳过字符，如果不更新parsedText会出问题
+							if (buffer == null)
+							{
+								buffer = new StringBuilder();
+								if (offset != 0)
+									buffer.Append(textToBuild.Substring(0, offset));
+							}
+
 							offset++;
 							ch = ' ';
 						}

@@ -17,16 +17,6 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static bool touchScreen { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public static bool keyboardInput { get; set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public int stageHeight { get; private set; }
 
 		/// <summary>
@@ -63,16 +53,14 @@ namespace FairyGUI
 		bool _customInput;
 		Vector2 _customInputPos;
 		bool _customInputButtonDown;
-
 		EventCallback1 _focusRemovedDelegate;
-
 		AudioSource _audio;
-
-#pragma warning disable 0649
-		IKeyboard _keyboard;
-#pragma warning restore 0649
-
 		List<NTexture> _toCollectTextures = new List<NTexture>();
+
+		static bool _touchScreen;
+#pragma warning disable 0649
+		static IKeyboard _keyboard;
+#pragma warning restore 0649
 
 		static Stage _inst;
 		/// <summary>
@@ -106,6 +94,54 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 如果是true，表示触摸输入，将使用Input.GetTouch接口读取触摸屏输入。
+		/// 如果是false，表示使用鼠标输入，将使用Input.GetMouseButtonXXX接口读取鼠标输入。
+		/// 一般来说，不需要设置，底层会自动根据系统环境设置正确的值。
+		/// </summary>
+		public static bool touchScreen
+		{
+			get { return _touchScreen; }
+			set
+			{
+				_touchScreen = value;
+				if (_touchScreen)
+				{
+#if !(UNITY_WEBPLAYER || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR)
+					_keyboard = new FairyGUI.TouchScreenKeyboard();
+					keyboardInput = true;
+#endif
+				}
+				else
+				{
+					_keyboard = null;
+					keyboardInput = false;
+					Stage.inst.ResetInputState();
+				}
+			}
+		}
+
+		/// <summary>
+		/// 如果是true，表示使用屏幕上弹出的键盘输入文字。常见于移动设备。
+		/// 如果是false，表示是接受按键消息输入文字。常见于PC。
+		/// 一般来说，不需要设置，底层会自动根据系统环境设置正确的值。
+		/// </summary>
+		public static bool keyboardInput
+		{
+			get; set;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public static bool isTouchOnUI
+		{
+			get
+			{
+				return _inst != null && _inst.touchTarget != null;
+			}
+		}
+
+		/// <summary>
 		/// 
 		/// </summary>
 		public Stage()
@@ -119,6 +155,10 @@ namespace FairyGUI
 			stageHeight = Screen.height;
 			_frameGotHitTarget = -1;
 
+			_touches = new TouchInfo[5];
+			for (int i = 0; i < _touches.Length; i++)
+				_touches[i] = new TouchInfo();
+
 			if (Application.platform == RuntimePlatform.WindowsPlayer
 				|| Application.platform == RuntimePlatform.WindowsEditor
 				|| Application.platform == RuntimePlatform.OSXPlayer
@@ -126,13 +166,6 @@ namespace FairyGUI
 				touchScreen = false;
 			else
 				touchScreen = Input.touchSupported && SystemInfo.deviceType != DeviceType.Desktop;
-
-			_touches = new TouchInfo[5];
-			for (int i = 0; i < _touches.Length; i++)
-				_touches[i] = new TouchInfo();
-
-			if (!touchScreen)
-				_touches[0].touchId = 0;
 
 			_rollOutChain = new List<DisplayObject>();
 			_rollOverChain = new List<DisplayObject>();
@@ -154,14 +187,6 @@ namespace FairyGUI
 			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
 
 			EnableSound();
-
-			if (touchScreen)
-			{
-#if !(UNITY_WEBPLAYER || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR)
-				_keyboard = new FairyGUI.TouchScreenKeyboard();
-				keyboardInput = true;
-#endif
-			}
 
 			Timers.inst.Add(5, 0, RunTextureCollector);
 
@@ -192,17 +217,6 @@ namespace FairyGUI
 					return null;
 				else
 					return _touchTarget;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public static bool isTouchOnUI
-		{
-			get
-			{
-				return _inst != null && _inst.touchTarget != null;
 			}
 		}
 
@@ -252,7 +266,7 @@ namespace FairyGUI
 		{
 			if (context.sender == _focused)
 			{
-				if(_focused is InputTextField)
+				if (_focused is InputTextField)
 					_lastInput = null;
 				this.focus = null;
 			}
@@ -606,11 +620,12 @@ namespace FairyGUI
 
 		internal void HandleGUIEvents(Event evt)
 		{
-			if (evt.rawType == EventType.KeyDown && evt.keyCode != KeyCode.None)
+			if (evt.rawType == EventType.KeyDown)
 			{
 				TouchInfo touch = _touches[0];
 				touch.keyCode = evt.keyCode;
 				touch.modifiers = evt.modifiers;
+				touch.character = evt.character;
 				InputEvent.shiftDown = (evt.modifiers & EventModifiers.Shift) != 0;
 
 				touch.UpdateEvent();
@@ -699,9 +714,9 @@ namespace FairyGUI
 			if (!textField.editable)
 				return;
 
-			if (_keyboard != null)
+			if (keyboardInput)
 			{
-				if (textField.keyboardInput)
+				if (textField.keyboardInput && _keyboard != null)
 				{
 					string s = _keyboard.GetInput();
 					if (s != null)
@@ -717,20 +732,7 @@ namespace FairyGUI
 				}
 			}
 			else
-			{
-				if (!string.IsNullOrEmpty(Input.inputString))
-				{
-					StringBuilder sb = new StringBuilder();
-					int len = Input.inputString.Length;
-					for (int i = 0; i < len; ++i)
-					{
-						char ch = Input.inputString[i];
-						if (ch >= ' ') sb.Append(ch.ToString());
-					}
-					if (sb.Length > 0)
-						textField.ReplaceSelection(sb.ToString());
-				}
-			}
+				textField.CheckComposition();
 		}
 
 		void HandleCustomInput()
@@ -862,7 +864,8 @@ namespace FairyGUI
 					touch.UpdateEvent();
 					onTouchMove.Call(touch.evt);
 
-					//no rollover/rollout on mobile
+					if (touch.lastRollOver != touch.target)
+						HandleRollOver(touch);
 				}
 
 				if (uTouch.phase == TouchPhase.Began)
@@ -894,6 +897,9 @@ namespace FairyGUI
 							touch.UpdateEvent();
 							clickTarget.onClick.BubbleCall(touch.evt);
 						}
+
+						touch.target = null;
+						HandleRollOver(touch);
 					}
 
 					touch.Reset();
@@ -1114,6 +1120,7 @@ namespace FairyGUI
 		public int touchId;
 		public int clickCount;
 		public KeyCode keyCode;
+		public char character;
 		public EventModifiers modifiers;
 		public int mouseWheelDelta;
 		public int button;
@@ -1148,6 +1155,7 @@ namespace FairyGUI
 			clickCount = 0;
 			button = 0;
 			keyCode = KeyCode.None;
+			character = '\0';
 			modifiers = 0;
 			mouseWheelDelta = 0;
 			lastClickTime = 0;
@@ -1166,6 +1174,7 @@ namespace FairyGUI
 			evt.y = this.y;
 			evt.clickCount = this.clickCount;
 			evt.keyCode = this.keyCode;
+			evt.character = this.character;
 			evt.modifiers = this.modifiers;
 			evt.mouseWheelDelta = this.mouseWheelDelta;
 			evt.button = this.button;

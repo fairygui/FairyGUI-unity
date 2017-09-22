@@ -44,6 +44,7 @@ namespace FairyGUI
 		{
 			get
 			{
+				GetTextFieldText();
 				return _text;
 			}
 			set
@@ -51,18 +52,22 @@ namespace FairyGUI
 				if (value == null)
 					value = string.Empty;
 				_text = value;
-				UpdateTextFieldText();
+				SetTextFieldText();
 				UpdateSize();
 				UpdateGear(6);
 			}
 		}
 
-		virtual protected void UpdateTextFieldText()
+		virtual protected void SetTextFieldText()
 		{
 			if (_ubbEnabled)
 				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
 			else
 				_textField.text = _text;
+		}
+
+		virtual protected void GetTextFieldText()
+		{
 		}
 
 		/// <summary>

@@ -28,12 +28,17 @@ namespace FairyGUI
 			_textField = richTextField.textField;
 		}
 
-		override protected void UpdateTextFieldText()
+		override protected void SetTextFieldText()
 		{
 			if (_ubbEnabled)
-				_textField.htmlText = UBBParser.inst.Parse(_text);
+				richTextField.htmlText = UBBParser.inst.Parse(_text);
 			else
-				_textField.htmlText = _text;
+				richTextField.htmlText = _text;
+		}
+
+		override protected void GetTextFieldText()
+		{
+			_text = richTextField.text;
 		}
 
 		/// <summary>
