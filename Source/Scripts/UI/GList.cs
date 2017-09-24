@@ -453,9 +453,14 @@ namespace FairyGUI
 
 			set
 			{
-				ClearSelection();
-				if (value >= 0 && value < _numItems)
+				if (value >= 0 && value < this.numItems)
+				{
+					if (selectionMode != ListSelectionMode.Single)
+						ClearSelection();
 					AddSelection(value, false);
+				}
+				else
+					ClearSelection();
 			}
 		}
 
@@ -950,7 +955,7 @@ namespace FairyGUI
 						{
 							int min = Math.Min(_lastSelectedIndex, index);
 							int max = Math.Max(_lastSelectedIndex, index);
-							max = Math.Min(max, _numItems - 1);
+							max = Math.Min(max, this.numItems - 1);
 							if (_virtual)
 							{
 								for (int i = min; i <= max; i++)
