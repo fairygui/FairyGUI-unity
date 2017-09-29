@@ -68,6 +68,12 @@ namespace FairyGUI
 				return;
 			}
 
+			if (interval <= 0)
+			{
+				Debug.LogWarning("timer interval is negative, " + interval + "," + repeat);
+				return;
+			}
+			
 			Anymous_T t;
 			if (_items.TryGetValue(callback, out t))
 			{
@@ -188,32 +194,36 @@ namespace FairyGUI
 					i.elapsed += elapsed;
 					if (i.elapsed < i.interval)
 						continue;
+					
+					// NOTE: i.interval <= 0 result in endless loop!
+					// We should really check that in Add()
+					System.Diagnostics.Debug.Assert(i.interval > 0, "interval <= 0 result endless loop!");
+					// Use a loop to consume all the elapsed time, in case elapsed is far more large than interval,
+					// which is the case when fps is very slow.
+					// Even we do this, the real callback times is not guaranteed in case of exception.
+					// Maybe we should clarify this in the doc?
+					while (i.elapsed >= i.interval && !i.deleted) {
+						i.elapsed -= i.interval;
+//						if (i.elapsed < 0 || i.elapsed > 0.03f)
+//							i.elapsed = 0;
 
-					i.elapsed -= i.interval;
-					if (i.elapsed < 0 || i.elapsed > 0.03f)
-						i.elapsed = 0;
-
-					if (i.repeat > 0)
-					{
-						i.repeat--;
-						if (i.repeat == 0)
-						{
-							i.deleted = true;
-							_toRemove.Add(i);
+						if (i.repeat > 0) {
+							i.repeat--;
+							if (i.repeat == 0) {
+								i.deleted = true;
+								_toRemove.Add(i);
+							}
 						}
-					}
-					repeat = i.repeat;
-					if (i.callback != null)
-					{
-						try
-						{
-							i.callback(i.param);
-						}
-						catch (System.Exception e)
-						{
-							i.deleted = true;
-							Debug.Log("timer callback failed, " + i.interval + "," + i.repeat);
-							Debug.LogException(e);
+						repeat = i.repeat;
+						if (i.callback != null) {
+							try {
+								i.callback(i.param);
+							}
+							catch (System.Exception e) {
+								i.deleted = true;
+								Debug.Log("timer callback failed, " + i.interval + "," + i.repeat);
+								Debug.LogException(e);
+							}
 						}
 					}
 				}
