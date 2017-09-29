@@ -259,6 +259,8 @@ namespace FairyGUI
 			if (!_editing)
 				Stage.inst.focus = this;
 
+			textField.Redraw();
+
 			int t0, t1;
 			if (_selectionStart != _caretPosition)
 			{
