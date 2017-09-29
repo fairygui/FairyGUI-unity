@@ -573,6 +573,10 @@ namespace FairyGUI
 			{
 				_skew = value;
 				_outlineChanged = true;
+
+				if (!Application.isPlaying) //编辑期间不支持！！
+					return;
+
 				UpdateTransformMatrix();
 			}
 		}
