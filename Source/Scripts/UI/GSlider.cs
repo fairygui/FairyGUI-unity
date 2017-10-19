@@ -148,21 +148,49 @@ namespace FairyGUI
 			if (!_reverse)
 			{
 				if (_barObjectH != null)
-					_barObjectH.width = fullWidth * percent;
+				{
+					if ((_barObjectH is GImage) && ((GImage)_barObjectH).fillMethod != FillMethod.None)
+						((GImage)_barObjectH).fillAmount = percent;
+					else if ((_barObjectH is GLoader) && ((GLoader)_barObjectH).fillMethod != FillMethod.None)
+						((GLoader)_barObjectH).fillAmount = percent;
+					else
+						_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
+				}
 				if (_barObjectV != null)
-					_barObjectV.height = fullHeight * percent;
+				{
+					if ((_barObjectV is GImage) && ((GImage)_barObjectV).fillMethod != FillMethod.None)
+						((GImage)_barObjectV).fillAmount = percent;
+					else if ((_barObjectV is GLoader) && ((GLoader)_barObjectV).fillMethod != FillMethod.None)
+						((GLoader)_barObjectV).fillAmount = percent;
+					else
+						_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
+				}
 			}
 			else
 			{
 				if (_barObjectH != null)
 				{
-					_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
-					_barObjectH.x = _barStartX + (fullWidth - _barObjectH.width);
+					if ((_barObjectH is GImage) && ((GImage)_barObjectH).fillMethod != FillMethod.None)
+						((GImage)_barObjectH).fillAmount = 1 - percent;
+					else if ((_barObjectH is GLoader) && ((GLoader)_barObjectH).fillMethod != FillMethod.None)
+						((GLoader)_barObjectH).fillAmount = 1 - percent;
+					else
+					{
+						_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
+						_barObjectH.x = _barStartX + (fullWidth - _barObjectH.width);
+					}
 				}
 				if (_barObjectV != null)
 				{
-					_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
-					_barObjectV.y = _barStartY + (fullHeight - _barObjectV.height);
+					if ((_barObjectV is GImage) && ((GImage)_barObjectV).fillMethod != FillMethod.None)
+						((GImage)_barObjectV).fillAmount = 1 - percent;
+					else if ((_barObjectV is GLoader) && ((GLoader)_barObjectV).fillMethod != FillMethod.None)
+						((GLoader)_barObjectV).fillAmount = 1 - percent;
+					else
+					{
+						_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
+						_barObjectV.y = _barStartY + (fullHeight - _barObjectV.height);
+					}
 				}
 			}
 

@@ -129,6 +129,7 @@ namespace FairyGUI
 				Timers.inst.Remove(this.RefreshVirtualList);
 
 			_selectionController = null;
+			scrollItemToViewOnClick = false;
 
 			base.Dispose();
 		}

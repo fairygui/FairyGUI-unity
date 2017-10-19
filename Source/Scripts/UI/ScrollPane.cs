@@ -1218,7 +1218,7 @@ namespace FairyGUI
 			}
 
 			if (!_maskDisabled)
-				_maskContainer.clipRect = new Rect(-owner._alignOffset.x, -owner._alignOffset.y, _viewSize.x, _viewSize.y);
+				_maskContainer.clipRect = new Rect(-_owner._alignOffset.x, -_owner._alignOffset.y, _viewSize.x, _viewSize.y);
 
 			if (_scrollType == ScrollType.Horizontal || _scrollType == ScrollType.Both)
 				_overlapSize.x = Mathf.CeilToInt(Math.Max(0, _contentSize.x - _viewSize.x));
@@ -1321,7 +1321,7 @@ namespace FairyGUI
 				{
 					if (_container.x != 0)
 						_container.x = 0;
-					pos.x = _container.x;
+					pos.x = 0;
 				}
 				if (_overlapSize.y > 0)
 					pos.y = -(int)_yPos;
@@ -1329,7 +1329,7 @@ namespace FairyGUI
 				{
 					if (_container.y != 0)
 						_container.y = 0;
-					pos.y = _container.y;
+					pos.y = 0;
 				}
 
 				if (pos.x != _container.x || pos.y != _container.y)
@@ -1849,7 +1849,7 @@ namespace FairyGUI
 			{
 				float halfSize = GetLoopPartSize(2, axis);
 				float tmp = _tweenStart[axis] + halfSize;
-				if (tmp <= 0 && tmp >= -_overlapSize.x)
+				if (tmp <= 0 && tmp >= -_overlapSize[axis])
 				{
 					endPos[axis] += halfSize;
 					_tweenStart[axis] = tmp;

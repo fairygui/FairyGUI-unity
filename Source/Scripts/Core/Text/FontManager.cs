@@ -17,11 +17,7 @@ namespace FairyGUI
 		static public void RegisterFont(BaseFont font, string alias)
 		{
 			if (!sFontFactory.ContainsKey(font.name))
-			{
 				sFontFactory.Add(font.name, font);
-				if (font is BitmapFont)
-					sFontFactory.Add(((BitmapFont)font).url, font);
-			}
 			if (alias != null)
 			{
 				if (!sFontFactory.ContainsKey(alias))
@@ -36,8 +32,6 @@ namespace FairyGUI
 		static public void UnregisterFont(BaseFont font)
 		{
 			sFontFactory.Remove(font.name);
-			if (font is BitmapFont)
-				sFontFactory.Remove(((BitmapFont)font).url);
 		}
 
 		/// <summary>
@@ -47,6 +41,10 @@ namespace FairyGUI
 		/// <returns></returns>
 		static public BaseFont GetFont(string name)
 		{
+			string url = UIPackage.NormalizeURL(name);
+			if (url != null)
+				name = url;
+
 			BaseFont ret;
 			if (!sFontFactory.TryGetValue(name, out ret))
 			{
