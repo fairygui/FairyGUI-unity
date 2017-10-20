@@ -476,7 +476,7 @@ namespace FairyGUI
 			{
 				Camera cam = this.renderCamera;
 				if (cam == null)
-					cam = Camera.main;
+					cam = HitTestContext.cachedMainCamera;
 				if (cam == null)
 					cam = StageCamera.main;
 				return cam;

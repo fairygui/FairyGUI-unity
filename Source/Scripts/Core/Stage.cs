@@ -487,8 +487,8 @@ namespace FairyGUI
 		/// <param name="buttonDown"></param>
 		public void SetCustomInput(ref RaycastHit hit, bool buttonDown)
 		{
-			Vector2 screenPos = Camera.main.WorldToScreenPoint(hit.point);
-			HitTestContext.CacheRaycastHit(Camera.main, ref hit);
+			Vector2 screenPos = HitTestContext.cachedMainCamera.WorldToScreenPoint(hit.point);
+			HitTestContext.CacheRaycastHit(HitTestContext.cachedMainCamera, ref hit);
 			SetCustomInput(screenPos, buttonDown);
 		}
 
@@ -500,8 +500,8 @@ namespace FairyGUI
 		/// <param name="buttonUp"></param>
 		public void SetCustomInput(ref RaycastHit hit, bool buttonDown, bool buttonUp)
 		{
-			Vector2 screenPos = Camera.main.WorldToScreenPoint(hit.point);
-			HitTestContext.CacheRaycastHit(Camera.main, ref hit);
+			Vector2 screenPos = HitTestContext.cachedMainCamera.WorldToScreenPoint(hit.point);
+			HitTestContext.CacheRaycastHit(HitTestContext.cachedMainCamera, ref hit);
 			SetCustomInput(screenPos, buttonDown, buttonUp);
 		}
 

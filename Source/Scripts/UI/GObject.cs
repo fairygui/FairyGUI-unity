@@ -1426,7 +1426,7 @@ namespace FairyGUI
 		/// <returns></returns>
 		public Vector2 WorldToLocal(Vector3 pt)
 		{
-			return WorldToLocal(pt, Camera.main);
+			return WorldToLocal(pt, HitTestContext.cachedMainCamera);
 		}
 
 		/// <summary>

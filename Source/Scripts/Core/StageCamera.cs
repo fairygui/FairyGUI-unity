@@ -123,6 +123,8 @@ namespace FairyGUI
 				int layer = LayerMask.NameToLayer(LayerName);
 				CreateCamera(Name, 1 << layer);
 			}
+
+			HitTestContext.cachedMainCamera = Camera.main;
 		}
 
 		/// <summary>

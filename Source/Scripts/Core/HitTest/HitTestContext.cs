@@ -17,6 +17,8 @@ namespace FairyGUI
 		public static int layerMask = -1;
 		public static float maxDistance = Mathf.Infinity;
 
+		public static Camera cachedMainCamera;
+
 		static Dictionary<Camera, RaycastHit?> raycastHits = new Dictionary<Camera, RaycastHit?>();
 
 		/// <summary>
