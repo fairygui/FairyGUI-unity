@@ -34,11 +34,6 @@ namespace FairyGUI
 		/// </summary>
 		public EventListener onStageResized { get; private set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onTouchMove { get; private set; }
-
 		DisplayObject _touchTarget;
 		DisplayObject _focused;
 		InputTextField _lastInput;
@@ -171,7 +166,6 @@ namespace FairyGUI
 			_rollOverChain = new List<DisplayObject>();
 
 			onStageResized = new EventListener(this, "onStageResized");
-			onTouchMove = new EventListener(this, "onTouchMove");
 
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
@@ -559,6 +553,7 @@ namespace FairyGUI
 
 					_touchTarget = null;
 					TouchInfo touch = null;
+					TouchInfo free = null;
 					for (int j = 0; j < 5; j++)
 					{
 						if (_touches[j].touchId == uTouch.fingerId)
@@ -568,21 +563,19 @@ namespace FairyGUI
 						}
 
 						if (_touches[j].touchId == -1)
-						{
-							touch = _touches[j];
-							//下面的赋值避免了touchMove在touchDown前触发
-							touch.x = uTouch.position.x;
-							touch.y = stageHeight - uTouch.position.y;
-						}
+							free = _touches[j];
 					}
 					if (touch == null)
-						return;
+					{
+						touch = free;
+						if (touch == null)
+							return;
 
-					touch.touchId = uTouch.fingerId;
-					DisplayObject ht = HitTest(pos, true);
-					touch.target = ht;
-					if (ht != null)
-						_touchTarget = ht;
+						touch.touchId = uTouch.fingerId;
+					}
+
+					_touchTarget = HitTest(pos, true);
+					touch.target = _touchTarget;
 				}
 			}
 			else
@@ -648,6 +641,7 @@ namespace FairyGUI
 					touch.mouseWheelDelta = (int)evt.delta.y;
 					touch.UpdateEvent();
 					_touchTarget.onMouseWheel.BubbleCall(touch.evt);
+					touch.mouseWheelDelta = 0;
 				}
 			}
 		}
@@ -745,32 +739,29 @@ namespace FairyGUI
 			{
 				touch.x = pos.x;
 				touch.y = pos.y;
-				touch.UpdateEvent();
-				onTouchMove.Call(touch.evt);
-
-				if (touch.lastRollOver != touch.target)
-					HandleRollOver(touch);
+				touch.Move();
 			}
+
+			if (touch.lastRollOver != touch.target)
+				HandleRollOver(touch);
 
 			if (_customInputButtonDown)
 			{
 				if (!touch.began)
 				{
 					_touchCount = 1;
-					touch.begin();
+					touch.Begin();
+					touch.button = 0;
 					this.focus = touch.target;
 
-					if (touch.target != null)
-					{
-						touch.UpdateEvent();
-						touch.target.onTouchBegin.BubbleCall(touch.evt);
-					}
+					touch.UpdateEvent();
+					touch.target.onTouchBegin.BubbleCall(touch.evt);
 				}
 			}
 			else if (touch.began)
 			{
 				_touchCount = 0;
-				touch.end();
+				touch.End();
 
 				DisplayObject clickTarget = touch.ClickTest();
 				if (clickTarget != null)
@@ -778,6 +769,8 @@ namespace FairyGUI
 					touch.UpdateEvent();
 					clickTarget.onClick.BubbleCall(touch.evt);
 				}
+
+				touch.button = -1;
 			}
 		}
 
@@ -788,27 +781,23 @@ namespace FairyGUI
 			{
 				touch.x = _touchPosition.x;
 				touch.y = _touchPosition.y;
-				touch.UpdateEvent();
-				onTouchMove.Call(touch.evt);
-
-				if (touch.lastRollOver != touch.target)
-					HandleRollOver(touch);
+				touch.Move();
 			}
+
+			if (touch.lastRollOver != touch.target)
+				HandleRollOver(touch);
 
 			if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
 			{
 				if (!touch.began)
 				{
 					_touchCount = 1;
-					touch.begin();
+					touch.Begin();
 					touch.button = Input.GetMouseButtonDown(2) ? 2 : (Input.GetMouseButtonDown(1) ? 1 : 0);
 					this.focus = touch.target;
 
-					if (touch.target != null)
-					{
-						touch.UpdateEvent();
-						touch.target.onTouchBegin.BubbleCall(touch.evt);
-					}
+					touch.UpdateEvent();
+					touch.target.onTouchBegin.BubbleCall(touch.evt);
 				}
 			}
 			if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
@@ -816,18 +805,20 @@ namespace FairyGUI
 				if (touch.began)
 				{
 					_touchCount = 0;
-					touch.end();
+					touch.End();
 
 					DisplayObject clickTarget = touch.ClickTest();
 					if (clickTarget != null)
 					{
 						touch.UpdateEvent();
 
-						if (Input.GetMouseButtonUp(1))
+						if (Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
 							clickTarget.onRightClick.BubbleCall(touch.evt);
 						else
 							clickTarget.onClick.BubbleCall(touch.evt);
 					}
+
+					touch.button = -1;
 				}
 			}
 		}
@@ -861,26 +852,24 @@ namespace FairyGUI
 				{
 					touch.x = pos.x;
 					touch.y = pos.y;
-					touch.UpdateEvent();
-					onTouchMove.Call(touch.evt);
-
-					if (touch.lastRollOver != touch.target)
-						HandleRollOver(touch);
+					if (touch.began)
+						touch.Move();
 				}
+
+				if (touch.lastRollOver != touch.target)
+					HandleRollOver(touch);
 
 				if (uTouch.phase == TouchPhase.Began)
 				{
 					if (!touch.began)
 					{
 						_touchCount++;
-						touch.begin();
+						touch.Begin();
+						touch.button = 0;
 						this.focus = touch.target;
 
-						if (touch.target != null)
-						{
-							touch.UpdateEvent();
-							touch.target.onTouchBegin.BubbleCall(touch.evt);
-						}
+						touch.UpdateEvent();
+						touch.target.onTouchBegin.BubbleCall(touch.evt);
 					}
 				}
 				else if (uTouch.phase == TouchPhase.Canceled || uTouch.phase == TouchPhase.Ended)
@@ -888,21 +877,24 @@ namespace FairyGUI
 					if (touch.began)
 					{
 						_touchCount--;
-						touch.end();
+						touch.End();
 
-						DisplayObject clickTarget = touch.ClickTest();
-						if (clickTarget != null)
+						if (uTouch.phase != TouchPhase.Canceled)
 						{
-							touch.clickCount = uTouch.tapCount;
-							touch.UpdateEvent();
-							clickTarget.onClick.BubbleCall(touch.evt);
+							DisplayObject clickTarget = touch.ClickTest();
+							if (clickTarget != null)
+							{
+								touch.clickCount = uTouch.tapCount;
+								touch.UpdateEvent();
+								clickTarget.onClick.BubbleCall(touch.evt);
+							}
 						}
 
 						touch.target = null;
 						HandleRollOver(touch);
-					}
 
-					touch.Reset();
+						touch.touchId = -1;
+					}
 				}
 			}
 		}
@@ -967,13 +959,13 @@ namespace FairyGUI
 		public void ApplyPanelOrder(Container target)
 		{
 			int sortingOrder = target._panelOrder;
-			int numChildren = Stage.inst.numChildren;
+			int numChildren = this.numChildren;
 			int i = 0;
 			int j;
 			int curIndex = -1;
 			for (; i < numChildren; i++)
 			{
-				DisplayObject obj = Stage.inst.GetChildAt(i);
+				DisplayObject obj = GetChildAt(i);
 				if (obj == target)
 				{
 					curIndex = i;
@@ -990,14 +982,14 @@ namespace FairyGUI
 				if (sortingOrder <= j)
 				{
 					if (curIndex != -1)
-						Stage.inst.AddChildAt(target, i - 1);
+						AddChildAt(target, i - 1);
 					else
-						Stage.inst.AddChildAt(target, i);
+						AddChildAt(target, i);
 					break;
 				}
 			}
 			if (i == numChildren)
-				Stage.inst.AddChild(target);
+				AddChild(target);
 		}
 
 		/// <summary>
@@ -1012,10 +1004,10 @@ namespace FairyGUI
 				sTempList2 = new List<int>();
 			}
 
-			int numChildren = Stage.inst.numChildren;
+			int numChildren = this.numChildren;
 			for (int i = 0; i < numChildren; i++)
 			{
-				Container obj = Stage.inst.GetChildAt(i) as Container;
+				Container obj = GetChildAt(i) as Container;
 				if (obj == null || obj.renderMode != RenderMode.WorldSpace || obj._panelOrder != panelSortingOrder)
 					continue;
 
@@ -1083,22 +1075,29 @@ namespace FairyGUI
 			}
 		}
 
-		internal void AddTouchEndMonitor(int touchId, EventDispatcher target)
+		public void AddTouchMonitor(int touchId, EventDispatcher target)
 		{
 			TouchInfo touch = null;
-			if (touchId == -1)
-				touch = _touches[0];
-			else
+			for (int j = 0; j < 5; j++)
 			{
-				for (int j = 0; j < 5; j++)
-				{
-					touch = _touches[j];
-					if (touch.touchId == touchId)
-						break;
-				}
+				touch = _touches[j];
+				if (touchId == -1 && touch.touchId != -1
+					|| touchId != -1 && touch.touchId == touchId)
+					break;
 			}
-			if (touch.touchEndMonitors.IndexOf(target) == -1)
-				touch.touchEndMonitors.Add(target);
+			if (touch.touchMonitors.IndexOf(target) == -1)
+				touch.touchMonitors.Add(target);
+		}
+
+		public void RemoveTouchMonitor(EventDispatcher target)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				TouchInfo touch = _touches[j];
+				int i = touch.touchMonitors.IndexOf(target);
+				if (i != -1)
+					touch.touchMonitors[i] = null;
+			}
 		}
 
 		internal Transform CreatePoolManager(string name)
@@ -1133,7 +1132,7 @@ namespace FairyGUI
 		public DisplayObject target;
 		public List<DisplayObject> downTargets;
 		public DisplayObject lastRollOver;
-		public List<EventDispatcher> touchEndMonitors;
+		public List<EventDispatcher> touchMonitors;
 
 		public InputEvent evt;
 
@@ -1143,7 +1142,7 @@ namespace FairyGUI
 		{
 			evt = new InputEvent();
 			downTargets = new List<DisplayObject>();
-			touchEndMonitors = new List<EventDispatcher>();
+			touchMonitors = new List<EventDispatcher>();
 			Reset();
 		}
 
@@ -1153,7 +1152,7 @@ namespace FairyGUI
 			x = 0;
 			y = 0;
 			clickCount = 0;
-			button = 0;
+			button = -1;
 			keyCode = KeyCode.None;
 			character = '\0';
 			modifiers = 0;
@@ -1164,7 +1163,7 @@ namespace FairyGUI
 			downTargets.Clear();
 			lastRollOver = null;
 			clickCancelled = false;
-			touchEndMonitors.Clear();
+			touchMonitors.Clear();
 		}
 
 		public void UpdateEvent()
@@ -1180,7 +1179,7 @@ namespace FairyGUI
 			evt.button = this.button;
 		}
 
-		public void begin()
+		public void Begin()
 		{
 			began = true;
 			clickCancelled = false;
@@ -1200,27 +1199,55 @@ namespace FairyGUI
 			}
 		}
 
-		public void end()
+		public void Move()
+		{
+			UpdateEvent();
+
+			if (touchMonitors.Count > 0)
+			{
+				int len = touchMonitors.Count;
+				for (int i = 0; i < len; i++)
+				{
+					EventDispatcher e = touchMonitors[i];
+					if (e != null)
+					{
+						if ((e is DisplayObject) && ((DisplayObject)e).stage == null)
+							continue;
+						if ((e is GObject) && !((GObject)e).onStage)
+							continue;
+						e.GetChainBridges("onTouchMove", sHelperChain, false);
+					}
+				}
+
+				Stage.inst.BubbleEvent("onTouchMove", evt, sHelperChain);
+				sHelperChain.Clear();
+			}
+			else
+				Stage.inst.onTouchMove.Call(evt);
+		}
+
+		public void End()
 		{
 			began = false;
 
-			if (target != null)
+			UpdateEvent();
+
+			if (touchMonitors.Count > 0)
 			{
-				UpdateEvent();
-
-				if (touchEndMonitors.Count > 0)
+				int len = touchMonitors.Count;
+				for (int i = 0; i < len; i++)
 				{
-					int len = touchEndMonitors.Count;
-					for (int i = 0; i < len; i++)
-						touchEndMonitors[i].GetChainBridges("onTouchEnd", sHelperChain, false);
-					target.BubbleEvent("onTouchEnd", evt, sHelperChain);
-					sHelperChain.Clear();
+					EventDispatcher e = touchMonitors[i];
+					if (e != null)
+						e.GetChainBridges("onTouchEnd", sHelperChain, false);
 				}
-				else
-					target.onTouchEnd.BubbleCall(evt);
-			}
+				target.BubbleEvent("onTouchEnd", evt, sHelperChain);
 
-			touchEndMonitors.Clear();
+				touchMonitors.Clear();
+				sHelperChain.Clear();
+			}
+			else
+				target.onTouchEnd.BubbleCall(evt);
 
 			if (Time.realtimeSinceStartup - lastClickTime < 0.35f)
 			{
@@ -1254,6 +1281,8 @@ namespace FairyGUI
 
 				obj = obj.parent;
 			}
+
+			downTargets.Clear();
 
 			return obj;
 		}

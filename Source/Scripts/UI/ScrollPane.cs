@@ -75,7 +75,6 @@ namespace FairyGUI
 		bool _isHoldAreaDone;
 		int _aniFlag;
 		bool _scrollBarVisible;
-		int _touchId;
 		internal int _loop;
 		int _headerLockedSize;
 		int _footerLockedSize;
@@ -87,8 +86,6 @@ namespace FairyGUI
 		Vector2 _tweenDuration;
 
 		EventCallback0 _refreshDelegate;
-		EventCallback1 _touchEndDelegate;
-		EventCallback1 _touchMoveDelegate;
 		TimerCallback _tweenUpdateDelegate;
 		TimerCallback _showScrollBarDelegate;
 
@@ -124,8 +121,6 @@ namespace FairyGUI
 
 			_refreshDelegate = Refresh;
 			_tweenUpdateDelegate = TweenUpdate;
-			_touchEndDelegate = __touchEnd;
-			_touchMoveDelegate = __touchMove;
 			_showScrollBarDelegate = __showScrollBar;
 
 			_owner = owner;
@@ -254,6 +249,8 @@ namespace FairyGUI
 
 			_owner.rootContainer.onMouseWheel.Add(__mouseWheel);
 			_owner.rootContainer.onTouchBegin.Add(__touchBegin);
+			_owner.rootContainer.onTouchMove.Add(__touchMove);
+			_owner.rootContainer.onTouchEnd.Add(__touchEnd);
 		}
 
 		/// <summary>
@@ -896,8 +893,7 @@ namespace FairyGUI
 		/// </summary>
 		public void CancelDragging()
 		{
-			Stage.inst.onTouchMove.Remove(_touchMoveDelegate);
-			Stage.inst.onTouchEnd.Remove(_touchEndDelegate);
+			Stage.inst.RemoveTouchMonitor(_owner.rootContainer);
 
 			if (draggingPane == this)
 				draggingPane = null;
@@ -1398,13 +1394,17 @@ namespace FairyGUI
 				return;
 
 			InputEvent evt = context.inputEvent;
+			if (evt.button != 0)
+				return;
+
+			context.CaptureTouch();
+
 			Vector2 pt = _owner.GlobalToLocal(evt.position);
-			_touchId = evt.touchId;
 
 			if (_tweening != 0)
 			{
 				KillTween();
-				Stage.inst.CancelClick(_touchId);
+				Stage.inst.CancelClick(evt.touchId);
 
 				//立刻停止惯性滚动，可能位置不对齐，设定这个标志，使touchEnd时归位
 				_isMouseMoved = true;
@@ -1419,23 +1419,14 @@ namespace FairyGUI
 			_velocity = Vector2.zero;
 			_velocityScale = 1;
 			_lastMoveTime = Time.unscaledTime;
-
-			Stage.inst.onTouchMove.Add(_touchMoveDelegate);
-			Stage.inst.onTouchEnd.Add(_touchEndDelegate);
 		}
 
 		private void __touchMove(EventContext context)
 		{
-			if (!_touchEffect || _owner.displayObject == null || _owner.displayObject.isDisposed)
-				return;
-
-			if (draggingPane != null && draggingPane != this || GObject.draggingObject != null) //已经有其他拖动
+			if (!_touchEffect || draggingPane != null && draggingPane != this || GObject.draggingObject != null) //已经有其他拖动
 				return;
 
 			InputEvent evt = context.inputEvent;
-			if (_touchId != evt.touchId)
-				return;
-
 			Vector2 pt = _owner.GlobalToLocal(evt.position);
 			if (float.IsNaN(pt.x))
 				return;
@@ -1612,20 +1603,12 @@ namespace FairyGUI
 
 		private void __touchEnd(EventContext context)
 		{
-			InputEvent evt = context.inputEvent;
-			if (_touchId != evt.touchId)
-				return;
-
-			Stage.inst.onTouchMove.Remove(_touchMoveDelegate);
-			Stage.inst.onTouchEnd.Remove(_touchEndDelegate);
-
 			if (draggingPane == this)
 				draggingPane = null;
 
 			_gestureFlag = 0;
 
-			if (!_isMouseMoved || _owner.displayObject == null || _owner.displayObject.isDisposed
-				 || !_touchEffect || _inertiaDisabled)
+			if (!_isMouseMoved || !_touchEffect || _inertiaDisabled)
 			{
 				_isMouseMoved = false;
 				return;
@@ -1701,7 +1684,11 @@ namespace FairyGUI
 
 				_tweenChange = endPos - _tweenStart;
 				if (_tweenChange.x == 0 && _tweenChange.y == 0)
+				{
+					if (_scrollBarDisplayAuto)
+						ShowScrollBar(false);
 					return;
+				}
 
 				//如果目标位置已调整，随之调整需要时间
 				if (_pageMode || _snapToItem)

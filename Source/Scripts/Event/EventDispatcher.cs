@@ -273,11 +273,11 @@ namespace FairyGUI
 			for (int i = length - 1; i >= 0; i--)
 			{
 				bubbleChain[i].CallCaptureInternal(context);
-				if (context._touchEndCapture)
+				if (context._touchCapture)
 				{
-					context._touchEndCapture = false;
+					context._touchCapture = false;
 					if (strType == "onTouchBegin")
-						Stage.inst.AddTouchEndMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
+						Stage.inst.AddTouchMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
 				}
 			}
 
@@ -289,11 +289,11 @@ namespace FairyGUI
 					if (context._stopsPropagation)
 						break;
 
-					if (context._touchEndCapture)
+					if (context._touchCapture)
 					{
-						context._touchEndCapture = false;
+						context._touchCapture = false;
 						if (strType == "onTouchBegin")
-							Stage.inst.AddTouchEndMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
+							Stage.inst.AddTouchMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
 					}
 				}
 

@@ -491,7 +491,12 @@ namespace FairyGUI
 		public DisplayObject HitTest(Vector2 stagePoint, bool forTouch)
 		{
 			if (StageCamera.main == null)
-				return null;
+			{
+				if (this is Stage)
+					return this;
+				else
+					return null;
+			}
 
 			HitTestContext.screenPoint = new Vector2(stagePoint.x, Screen.height - stagePoint.y);
 			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(HitTestContext.screenPoint);

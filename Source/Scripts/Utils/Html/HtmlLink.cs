@@ -28,7 +28,6 @@ namespace FairyGUI.Utils
 			};
 			_rolloverHandler = (EventContext context) =>
 			{
-				context.CaptureTouch();
 				if (_owner.htmlParseOptions.linkHoverBgColor.a > 0)
 					_shape.color = _owner.htmlParseOptions.linkHoverBgColor;
 			};
@@ -64,16 +63,8 @@ namespace FairyGUI.Utils
 			_owner = owner;
 			_element = element;
 			_shape.onClick.Add(_clickHandler);
-			if (!Stage.touchScreen)
-			{
-				_shape.onRollOver.Add(_rolloverHandler);
-				_shape.onRollOut.Add(_rolloutHandler);
-			}
-			else
-			{
-				_shape.onTouchBegin.Add(_rolloverHandler);
-				_shape.onTouchEnd.Add(_rolloutHandler);
-			}
+			_shape.onRollOver.Add(_rolloverHandler);
+			_shape.onRollOut.Add(_rolloutHandler);
 			_shape.color = _owner.htmlParseOptions.linkBgColor;
 		}
 

@@ -99,6 +99,11 @@ namespace FairyGUI
 		public EventListener onTouchBegin { get; private set; }
 
 		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onTouchMove { get; private set; }
+
+		/// <summary>
 		/// Dispatched when the finger was lifted from the screen or from the mouse button. 
 		/// </summary>
 		public EventListener onTouchEnd { get; private set; }
@@ -229,6 +234,7 @@ namespace FairyGUI
 			onClick = new EventListener(this, "onClick");
 			onRightClick = new EventListener(this, "onRightClick");
 			onTouchBegin = new EventListener(this, "onTouchBegin");
+			onTouchMove = new EventListener(this, "onTouchMove");
 			onTouchEnd = new EventListener(this, "onTouchEnd");
 			onRollOver = new EventListener(this, "onRollOver");
 			onRollOut = new EventListener(this, "onRollOut");
@@ -1728,7 +1734,6 @@ namespace FairyGUI
 		}
 
 		#region Drag support
-		int _dragTouchId;
 		Vector2 _dragTouchStartPos;
 
 		static Vector2 sGlobalDragStart = new Vector2();
@@ -1738,146 +1743,117 @@ namespace FairyGUI
 		private void InitDrag()
 		{
 			if (_draggable)
+			{
 				onTouchBegin.Add(__touchBegin);
+				onTouchMove.Add(__touchMove);
+				onTouchEnd.Add(__touchEnd);
+			}
 			else
+			{
 				onTouchBegin.Remove(__touchBegin);
+				onTouchMove.Remove(__touchMove);
+				onTouchEnd.Remove(__touchEnd);
+			}
 		}
 
 		private void DragBegin(int touchId)
 		{
 			if (draggingObject != null)
 			{
+				GObject tmp = draggingObject;
 				draggingObject.StopDrag();
 				draggingObject = null;
+				tmp.onDragEnd.Call();
 			}
 
-			_dragTouchId = touchId;
 			sGlobalDragStart = Stage.inst.GetTouchPosition(touchId);
 			sGlobalRect = this.LocalToGlobal(new Rect(0, 0, this.width, this.height));
 
 			draggingObject = this;
-			Stage.inst.onTouchEnd.Add(__touchEnd2);
-			Stage.inst.onTouchMove.Add(__touchMove2);
+			Stage.inst.AddTouchMonitor(touchId, this);
 		}
 
 		private void DragEnd()
 		{
 			if (draggingObject == this)
 			{
-				Stage.inst.onTouchEnd.Remove(__touchEnd2);
-				Stage.inst.onTouchMove.Remove(__touchMove2);
+				Stage.inst.RemoveTouchMonitor(this);
 				draggingObject = null;
 			}
-		}
-
-		private void Reset()
-		{
-			Stage.inst.onTouchEnd.Remove(__touchEnd);
-			Stage.inst.onTouchMove.Remove(__touchMove);
 		}
 
 		private void __touchBegin(EventContext context)
 		{
 			InputEvent evt = context.inputEvent;
-			_dragTouchId = evt.touchId;
 			_dragTouchStartPos = evt.position;
-
-			Stage.inst.onTouchEnd.Add(__touchEnd);
-			Stage.inst.onTouchMove.Add(__touchMove);
-		}
-
-		private void __touchEnd(EventContext context)
-		{
-			if (_dragTouchId != context.inputEvent.touchId)
-				return;
-
-			Reset();
+			context.CaptureTouch();
 		}
 
 		private void __touchMove(EventContext context)
 		{
 			InputEvent evt = context.inputEvent;
-			if (_dragTouchId != evt.touchId)
-				return;
 
-			int sensitivity;
-			if (Stage.touchScreen)
-				sensitivity = UIConfig.touchDragSensitivity;
-			else
-				sensitivity = UIConfig.clickDragSensitivity;
-			if (Mathf.Abs(_dragTouchStartPos.x - evt.x) < sensitivity
-				&& Mathf.Abs(_dragTouchStartPos.y - evt.y) < sensitivity)
-				return;
+			if (draggingObject != this)
+			{
+				int sensitivity;
+				if (Stage.touchScreen)
+					sensitivity = UIConfig.touchDragSensitivity;
+				else
+					sensitivity = UIConfig.clickDragSensitivity;
+				if (Mathf.Abs(_dragTouchStartPos.x - evt.x) < sensitivity
+					&& Mathf.Abs(_dragTouchStartPos.y - evt.y) < sensitivity)
+					return;
 
-			Reset();
-
-			if (displayObject == null || displayObject.isDisposed)
-				return;
-
-			if (!onDragStart.Call(_dragTouchId))
-				DragBegin(evt.touchId);
-		}
-
-		private void __touchEnd2(EventContext context)
-		{
-			InputEvent evt = context.inputEvent;
-			if (_dragTouchId != -1 && _dragTouchId != evt.touchId)
-				return;
+				if (!onDragStart.Call(evt.touchId))
+					DragBegin(evt.touchId);
+			}
 
 			if (draggingObject == this)
 			{
-				StopDrag();
+				float xx = evt.x - sGlobalDragStart.x + sGlobalRect.x;
+				float yy = evt.y - sGlobalDragStart.y + sGlobalRect.y;
 
-				if (displayObject == null || displayObject.isDisposed)
+				if (dragBounds != null)
+				{
+					Rect rect = GRoot.inst.LocalToGlobal((Rect)dragBounds);
+					if (xx < rect.x)
+						xx = rect.x;
+					else if (xx + sGlobalRect.width > rect.xMax)
+					{
+						xx = rect.xMax - sGlobalRect.width;
+						if (xx < rect.x)
+							xx = rect.x;
+					}
+
+					if (yy < rect.y)
+						yy = rect.y;
+					else if (yy + sGlobalRect.height > rect.yMax)
+					{
+						yy = rect.yMax - sGlobalRect.height;
+						if (yy < rect.y)
+							yy = rect.y;
+					}
+				}
+
+				Vector2 pt = this.parent.GlobalToLocal(new Vector2(xx, yy));
+				if (float.IsNaN(pt.x))
 					return;
 
-				onDragEnd.Call();
+				sUpdateInDragging = true;
+				this.SetXY(Mathf.RoundToInt(pt.x), Mathf.RoundToInt(pt.y));
+				sUpdateInDragging = false;
+
+				onDragMove.Call();
 			}
 		}
 
-		private void __touchMove2(EventContext context)
+		private void __touchEnd(EventContext context)
 		{
-			InputEvent evt = context.inputEvent;
-			if (_dragTouchId != -1 && _dragTouchId != evt.touchId || this.parent == null)
-				return;
-
-			if (displayObject == null || displayObject.isDisposed)
-				return;
-
-			float xx = evt.x - sGlobalDragStart.x + sGlobalRect.x;
-			float yy = evt.y - sGlobalDragStart.y + sGlobalRect.y;
-
-			if (dragBounds != null)
+			if (draggingObject == this)
 			{
-				Rect rect = GRoot.inst.LocalToGlobal((Rect)dragBounds);
-				if (xx < rect.x)
-					xx = rect.x;
-				else if (xx + sGlobalRect.width > rect.xMax)
-				{
-					xx = rect.xMax - sGlobalRect.width;
-					if (xx < rect.x)
-						xx = rect.x;
-				}
-
-				if (yy < rect.y)
-					yy = rect.y;
-				else if (yy + sGlobalRect.height > rect.yMax)
-				{
-					yy = rect.yMax - sGlobalRect.height;
-					if (yy < rect.y)
-						yy = rect.y;
-				}
+				draggingObject = null;
+				onDragEnd.Call();
 			}
-
-			Vector2 pt = this.parent.GlobalToLocal(new Vector2(xx, yy));
-			if (float.IsNaN(pt.x))
-				return;
-
-			sUpdateInDragging = true;
-			this.SetXY(Mathf.RoundToInt(pt.x), Mathf.RoundToInt(pt.y));
-			sUpdateInDragging = false;
-
-			onDragMove.Call();
 		}
 		#endregion
 

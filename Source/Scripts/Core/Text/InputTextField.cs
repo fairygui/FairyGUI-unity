@@ -94,8 +94,6 @@ namespace FairyGUI
 		int _composing;
 		char _highSurrogateChar;
 
-		EventCallback1 _touchMoveDelegate;
-
 		static Shape _caret;
 		static SelectionShape _selectionShape;
 		static float _nextBlink;
@@ -124,13 +122,11 @@ namespace FairyGUI
 			this.hitArea = new RectHitTest();
 			this.touchChildren = false;
 
-			_touchMoveDelegate = __touchMove;
-
 			onFocusIn.Add(__focusIn);
 			onFocusOut.AddCapture(__focusOut);
 			onKeyDown.AddCapture(__keydown);
 			onTouchBegin.AddCapture(__touchBegin);
-			onTouchEnd.AddCapture(__touchEnd);
+			onTouchMove.AddCapture(__touchMove);
 		}
 
 		/// <summary>
@@ -823,7 +819,6 @@ namespace FairyGUI
 			AdjustCaret(cp, true);
 
 			context.CaptureTouch();
-			Stage.inst.onTouchMove.AddCapture(_touchMoveDelegate);
 		}
 
 		void __touchMove(EventContext context)
@@ -839,11 +834,6 @@ namespace FairyGUI
 			TextField.CharPosition cp = GetCharPosition(v);
 			if (cp.charIndex != _caretPosition)
 				AdjustCaret(cp);
-		}
-
-		void __touchEnd(EventContext context)
-		{
-			Stage.inst.onTouchMove.RemoveCapture(_touchMoveDelegate);
 		}
 
 		void __focusIn(EventContext context)

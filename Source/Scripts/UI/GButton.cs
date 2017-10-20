@@ -546,6 +546,9 @@ namespace FairyGUI
 
 		private void __touchBegin(EventContext context)
 		{
+			if (context.inputEvent.button != 0)
+				return;
+
 			_down = true;
 			context.CaptureTouch();
 
@@ -570,9 +573,6 @@ namespace FairyGUI
 		{
 			if (_down)
 			{
-				if (this.displayObject == null || this.displayObject.isDisposed)
-					return;
-
 				_down = false;
 				if (_mode == ButtonMode.Common)
 				{

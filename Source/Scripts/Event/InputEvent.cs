@@ -43,7 +43,7 @@ namespace FairyGUI
 		public int touchId { get; internal set; }
 
 		/// <summary>
-		/// 0-left 1-right 2-middle
+		/// -1-none,0-left,1-right,2-middle
 		/// </summary>
 		public int button { get; internal set; }
 

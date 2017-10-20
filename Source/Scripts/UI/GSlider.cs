@@ -24,14 +24,11 @@ namespace FairyGUI
 		GObject _gripObject;
 		Vector2 _clickPos;
 		float _clickPercent;
-		int _touchId;
 		float _barStartX;
 		float _barStartY;
 
 		public bool changeOnClick;
 		public bool canDrag;
-
-		EventCallback1 _touchMoveDelegate;
 
 		/// <summary>
 		/// 
@@ -52,8 +49,6 @@ namespace FairyGUI
 
 			onChanged = new EventListener(this, "onChanged");
 			onGripTouchEnd = new EventListener(this, "onGripTouchEnd");
-
-			_touchMoveDelegate = __gripTouchMove;
 		}
 
 		/// <summary>
@@ -232,6 +227,7 @@ namespace FairyGUI
 			if (_gripObject != null)
 			{
 				_gripObject.onTouchBegin.Add(__gripTouchBegin);
+				_gripObject.onTouchMove.Add(__gripTouchMove);
 				_gripObject.onTouchEnd.Add(__gripTouchEnd);
 			}
 
@@ -267,16 +263,17 @@ namespace FairyGUI
 		private void __gripTouchBegin(EventContext context)
 		{
 			this.canDrag = true;
+
 			context.StopPropagation();
 
 			InputEvent evt = context.inputEvent;
-			_touchId = evt.touchId;
+			if (evt.button != 0)
+				return;
+
+			context.CaptureTouch();
 
 			_clickPos = this.GlobalToLocal(new Vector2(evt.x, evt.y));
 			_clickPercent = (float)(_value / _max);
-
-			context.CaptureTouch();
-			Stage.inst.onTouchMove.Add(_touchMoveDelegate);
 		}
 
 		private void __gripTouchMove(EventContext context)
@@ -285,9 +282,6 @@ namespace FairyGUI
 				return;
 
 			InputEvent evt = context.inputEvent;
-			if (_touchId != evt.touchId)
-				return;
-
 			Vector2 pt = this.GlobalToLocal(new Vector2(evt.x, evt.y));
 			if (float.IsNaN(pt.x))
 				return;
@@ -321,15 +315,6 @@ namespace FairyGUI
 
 		private void __gripTouchEnd(EventContext context)
 		{
-			InputEvent evt = context.inputEvent;
-			if (_touchId != evt.touchId)
-				return;
-
-			Stage.inst.onTouchMove.Remove(_touchMoveDelegate);
-
-			if (displayObject == null || displayObject.isDisposed)
-				return;
-
 			onGripTouchEnd.Call();
 		}
 

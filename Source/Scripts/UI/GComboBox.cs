@@ -514,9 +514,6 @@ namespace FairyGUI
 		{
 			if (_down)
 			{
-				if (this.displayObject == null || this.displayObject.isDisposed)
-					return;
-
 				_down = false;
 				if (dropdown != null && dropdown.parent != null)
 					SetCurrentState();
