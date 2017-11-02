@@ -1,4 +1,4 @@
-FairyGUI Unity SDK
+ FairyGUI Unity SDK
 ====
 
 A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.  
@@ -15,11 +15,10 @@ FairyGUI还对所有输入方式进行了完整的封装，无论是鼠标、单
 Get Started
 ====
 - Examples.Unity4  
-如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity4.x版本的工程(这里使用的Unity版本是4.6.6)。
+如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity4.x版本的例子工程，但版本不能低于4.6.0。
 
 - Examples.Unity5  
-如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的工程(这里使用的Unity版本是5.5.0)。
-如果你使用的Unity版本>=5.4，Unity 可能报错“FairyGUI: texture 'atlas0.png' not fount in XXXX”,具体问题可查看[问答社区](http://ask.fairygui.com/question/5-5-sdk-%E7%9A%84%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98)。
+如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的例子工程，这个工程是在Unity5.5.0上制作的，如果你使用的是其他的Unity5或者Unity2017版本，可以从[这里](https://github.com/fairygui/FairyGUI-unity/releases)下载FairyGUI-Unity-Plugin.zip，然后用里面对应你Unity版本的DLL替换工程内Assets/Plugins目录下的DLL即可。
 
 - Source  
 这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
@@ -27,7 +26,6 @@ Get Started
 
 - LuaSupport  
 FairyGUI对Lua十分友好，如果你使用Lua开发Unity游戏，这里为你准备了非常便利的支持。
-
 
 Learn
 ====
