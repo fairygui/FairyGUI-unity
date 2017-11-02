@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -15,6 +16,7 @@ namespace FairyGUI
 
 		protected GameObject _wrapTarget;
 		protected Renderer[] _renderers;
+		protected int[] _sortingOrders;
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 		protected Canvas _canvas;
 #endif
@@ -58,13 +60,14 @@ namespace FairyGUI
 			set
 			{
 				if (_wrapTarget != null)
-					_wrapTarget.transform.parent = null;
+					ToolSet.SetParent(_wrapTarget.transform, null);
 
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				_canvas = null;
 #endif
 				_renderers = null;
 				_wrapTarget = value;
+				_sortingOrders = null;
 
 				if (_wrapTarget != null)
 				{
@@ -123,6 +126,16 @@ namespace FairyGUI
 						r.sharedMaterial.renderQueue = 3000;
 				}
 			}
+
+			Array.Sort(_renderers, CompareSortingOrder);
+			_sortingOrders = new int[cnt];
+			for (int i = 0; i < cnt; i++)
+				_sortingOrders[i] = _renderers[i].sortingOrder;
+		}
+
+		static int CompareSortingOrder(Renderer c1, Renderer c2)
+		{
+			return c1.sortingOrder - c2.sortingOrder;
 		}
 
 		public override int renderingOrder
@@ -147,7 +160,11 @@ namespace FairyGUI
 					{
 						Renderer r = _renderers[i];
 						if (r != null)
+						{
+							if (i != 0 && _sortingOrders[i] != _sortingOrders[i - 1])
+								value = UpdateContext.current.renderingOrder++;
 							r.sortingOrder = value;
+						}
 					}
 				}
 			}
@@ -232,7 +249,7 @@ namespace FairyGUI
 		{
 			if (_wrapTarget != null)
 			{
-				Object.Destroy(_wrapTarget);
+				UnityEngine.Object.Destroy(_wrapTarget);
 				_wrapTarget = null;
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				_canvas = null;
