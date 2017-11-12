@@ -408,7 +408,7 @@ namespace FairyGUI
 				}
 			}
 
-			if (parent != null && _pageIds.Count >= 0)
+			if (parent != null && _pageIds.Count > 0)
 				_selectedIndex = 0;
 			else
 				_selectedIndex = -1;
