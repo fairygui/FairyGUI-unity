@@ -98,7 +98,7 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (!_textField.textFormat.color.Equals(value))
+				if (_textField.textFormat.color != value)
 				{
 					TextFormat tf = _textField.textFormat;
 					tf.color = value;

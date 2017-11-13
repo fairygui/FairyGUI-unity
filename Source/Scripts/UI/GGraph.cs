@@ -123,7 +123,7 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (_shape != null && !_shape.color.Equals(value))
+				if (_shape != null && _shape.color != value)
 				{
 					_shape.color = value;
 					UpdateGear(4);

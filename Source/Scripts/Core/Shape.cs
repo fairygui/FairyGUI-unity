@@ -40,7 +40,7 @@ namespace FairyGUI
 			get { return _fillColor; }
 			set
 			{
-				if (!_fillColor.Equals(value))
+				if (_fillColor != value)
 				{
 					_fillColor = value;
 					_requireUpdateMesh = true;

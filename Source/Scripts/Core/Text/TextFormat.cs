@@ -98,7 +98,7 @@ namespace FairyGUI
 		/// <returns></returns>
 		public bool EqualStyle(TextFormat aFormat)
 		{
-			return size == aFormat.size && color.Equals(aFormat.color)
+			return size == aFormat.size && color == aFormat.color
 				&& bold == aFormat.bold && underline == aFormat.underline
 				&& italic == aFormat.italic
 				&& gradientColor == aFormat.gradientColor

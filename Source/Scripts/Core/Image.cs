@@ -80,7 +80,7 @@ namespace FairyGUI
 			get { return _color; }
 			set
 			{
-				if (!_color.Equals(value))
+				if (_color != value)
 				{
 					_color = value;
 					graphics.Tint(_color);
