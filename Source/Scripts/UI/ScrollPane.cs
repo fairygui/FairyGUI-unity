@@ -875,13 +875,13 @@ namespace FairyGUI
 			if (_overlapSize.y > 0)
 			{
 				float dist = obj.y + _container.y;
-				if (dist < -obj.height - 20 || dist > _viewSize.y + 20)
+				if (dist <= -obj.height || dist >= _viewSize.y)
 					return false;
 			}
 			if (_overlapSize.x > 0)
 			{
 				float dist = obj.x + _container.x;
-				if (dist < -obj.width - 20 || dist > _viewSize.x + 20)
+				if (dist <= -obj.width || dist >= _viewSize.x)
 					return false;
 			}
 
@@ -1507,7 +1507,7 @@ namespace FairyGUI
 			{
 				if (newPos.y > 0)
 				{
-					if (!_bouncebackEffect || _inertiaDisabled)
+					if (!_bouncebackEffect)
 						_container.y = 0;
 					else if (_header != null && _header.maxHeight != 0)
 						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _header.maxHeight);
@@ -1516,7 +1516,7 @@ namespace FairyGUI
 				}
 				else if (newPos.y < -_overlapSize.y)
 				{
-					if (!_bouncebackEffect || _inertiaDisabled)
+					if (!_bouncebackEffect)
 						_container.y = -_overlapSize.y;
 					else if (_footer != null && _footer.maxHeight > 0)
 						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_footer.maxHeight) - _overlapSize.y;
@@ -1531,7 +1531,7 @@ namespace FairyGUI
 			{
 				if (newPos.x > 0)
 				{
-					if (!_bouncebackEffect || _inertiaDisabled)
+					if (!_bouncebackEffect)
 						_container.x = 0;
 					else if (_header != null && _header.maxWidth != 0)
 						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _header.maxWidth);
@@ -1540,7 +1540,7 @@ namespace FairyGUI
 				}
 				else if (newPos.x < 0 - _overlapSize.x)
 				{
-					if (!_bouncebackEffect || _inertiaDisabled)
+					if (!_bouncebackEffect)
 						_container.x = -_overlapSize.x;
 					else if (_footer != null && _footer.maxWidth > 0)
 						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_footer.maxWidth) - _overlapSize.x;
@@ -1608,7 +1608,7 @@ namespace FairyGUI
 
 			_gestureFlag = 0;
 
-			if (!_isMouseMoved || !_touchEffect || _inertiaDisabled)
+			if (!_isMouseMoved || !_touchEffect)
 			{
 				_isMouseMoved = false;
 				return;
@@ -1669,12 +1669,17 @@ namespace FairyGUI
 			else
 			{
 				//更新速度
-				float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
-				if (elapsed > 1)
-					_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+				if (!_inertiaDisabled)
+				{
+					float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+					if (elapsed > 1)
+						_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
 
-				//根据速度计算目标位置和需要时间
-				endPos = UpdateTargetAndDuration(_tweenStart);
+					//根据速度计算目标位置和需要时间
+					endPos = UpdateTargetAndDuration(_tweenStart);
+				}
+				else
+					_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
 				Vector2 oldChange = endPos - _tweenStart;
 
 				//调整目标位置
