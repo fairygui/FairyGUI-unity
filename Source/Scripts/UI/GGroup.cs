@@ -437,6 +437,23 @@ namespace FairyGUI
 			}
 		}
 
+		override protected void UpdateVisible()
+		{
+			if (parent == null)
+				return;
+
+			int cnt = parent.numChildren;
+			int i;
+			bool v = this.visible;
+			GObject child;
+			for (i = 0; i < cnt; i++)
+			{
+				child = parent.GetChildAt(i);
+				if (child.group == this)
+					child.visible = v;
+			}
+		}
+
 		override public void Setup_BeforeAdd(XML xml)
 		{
 			base.Setup_BeforeAdd(xml);
@@ -450,6 +467,14 @@ namespace FairyGUI
 				_lineGap = xml.GetAttributeInt("lineGap");
 				_columnGap = xml.GetAttributeInt("colGap");
 			}
+		}
+
+		override public void Setup_AfterAdd(XML xml)
+		{
+			base.Setup_AfterAdd(xml);
+
+			if (!this.visible)
+				UpdateVisible();
 		}
 	}
 }

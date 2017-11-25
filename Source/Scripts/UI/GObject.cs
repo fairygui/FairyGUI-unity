@@ -815,22 +815,24 @@ namespace FairyGUI
 				if (_visible != value)
 				{
 					_visible = value;
-					if (displayObject != null)
-						displayObject.visible = _visible;
+					UpdateVisible();
 					if (parent != null)
-					{
-						parent.ChildStateChanged(this);
 						parent.SetBoundsChangedFlag();
-					}
 				}
 			}
 		}
 
-		internal bool finalVisible
+		virtual protected void UpdateVisible()
+		{
+			if (displayObject != null)
+				displayObject.visible = _visible;
+		}
+
+		internal bool internalVisible
 		{
 			get
 			{
-				return _visible && _internalVisible && (group == null || group.finalVisible);
+				return _internalVisible && (group == null || group.internalVisible);
 			}
 		}
 
