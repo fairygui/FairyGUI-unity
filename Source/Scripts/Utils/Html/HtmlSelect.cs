@@ -63,14 +63,8 @@ namespace FairyGUI.Utils
 
 			comboBox.onChanged.Add(_changeHandler);
 
-			int width = element.GetInt("width", 0);
-			int height = element.GetInt("height", 0);
-
-			if (width == 0)
-				width = comboBox.sourceWidth;
-			if (height == 0)
-				height = comboBox.sourceHeight;
-
+			int width = element.GetInt("width", comboBox.sourceWidth);
+			int height = element.GetInt("height", comboBox.sourceHeight);
 			comboBox.SetSize(width, height);
 			comboBox.items = (string[])element.Get("items");
 			comboBox.values = (string[])element.Get("values");

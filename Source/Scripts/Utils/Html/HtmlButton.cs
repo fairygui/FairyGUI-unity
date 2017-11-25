@@ -62,14 +62,8 @@ namespace FairyGUI.Utils
 				return;
 
 			button.onClick.Add(_clickHandler);
-			int width = element.GetInt("width", 0);
-			int height = element.GetInt("height", 0);
-
-			if (width == 0)
-				width = button.sourceWidth;
-			if (height == 0)
-				height = button.sourceHeight;
-
+			int width = element.GetInt("width", button.sourceWidth);
+			int height = element.GetInt("height", button.sourceHeight);
 			button.SetSize(width, height);
 			button.text = element.GetString("value");
 		}
