@@ -584,13 +584,10 @@ namespace FairyGUI
 				pos.y = stageHeight - pos.y;
 
 				TouchInfo touch = _touches[0];
-				if (pos.x < 0 || pos.y < 0)
-				{
-					pos.x = touch.x;
-					pos.y = touch.y;
-				}
-
-				_touchTarget = HitTest(pos, true);
+				if (pos.x < 0 || pos.y < 0) //outside of the window
+					_touchTarget = this;
+				else
+					_touchTarget = HitTest(pos, true);
 				touch.target = _touchTarget;
 			}
 
