@@ -138,6 +138,16 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="length"></param>
+		public void SetSelection(int start, int length)
+		{
+			inputTextField.SetSelection(start, length);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="value"></param>
 		public void ReplaceSelection(string value)
 		{
