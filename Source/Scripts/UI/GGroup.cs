@@ -419,9 +419,9 @@ namespace FairyGUI
 			_updating &= 1;
 		}
 
-		override protected void UpdateAlpha()
+		override protected void HandleAlphaChanged()
 		{
-			base.UpdateAlpha();
+			base.HandleAlphaChanged();
 
 			if (this.underConstruct)
 				return;
@@ -437,7 +437,7 @@ namespace FairyGUI
 			}
 		}
 
-		override protected void UpdateVisible()
+		override protected void HandleVisibleChanged()
 		{
 			if (parent == null)
 				return;
@@ -474,7 +474,7 @@ namespace FairyGUI
 			base.Setup_AfterAdd(xml);
 
 			if (!this.visible)
-				UpdateVisible();
+				HandleVisibleChanged();
 		}
 	}
 }

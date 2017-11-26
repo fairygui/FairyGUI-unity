@@ -789,15 +789,15 @@ namespace FairyGUI
 			set
 			{
 				_alpha = value;
-				UpdateAlpha();
+				HandleAlphaChanged();
+				UpdateGear(3);
 			}
 		}
 
-		virtual protected void UpdateAlpha()
+		virtual protected void HandleAlphaChanged()
 		{
 			if (displayObject != null)
 				displayObject.alpha = _alpha;
-			UpdateGear(3);
 		}
 
 		/// <summary>
@@ -815,14 +815,14 @@ namespace FairyGUI
 				if (_visible != value)
 				{
 					_visible = value;
-					UpdateVisible();
+					HandleVisibleChanged();
 					if (parent != null)
 						parent.SetBoundsChangedFlag();
 				}
 			}
 		}
 
-		virtual protected void UpdateVisible()
+		virtual protected void HandleVisibleChanged()
 		{
 			if (displayObject != null)
 				displayObject.visible = _visible;
