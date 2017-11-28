@@ -40,15 +40,17 @@ public class JoystickModule : EventDispatcher
 		touchId = -1;
 		radius = 150;
 
-		_touchArea.onTouchBegin.Add(this.onTouchDown);
+		_touchArea.onTouchBegin.Add(this.OnTouchBegin);
+		_touchArea.onTouchMove.Add(this.OnTouchMove);
+		_touchArea.onTouchEnd.Add(this.OnTouchEnd);
 	}
 
 	public void Trigger(EventContext context)
 	{
-		onTouchDown(context);
+		OnTouchBegin(context);
 	}
 
-	private void onTouchDown(EventContext context)
+	private void OnTouchBegin(EventContext context)
 	{
 		if (touchId == -1)//First touch
 		{
@@ -82,22 +84,19 @@ public class JoystickModule : EventDispatcher
 			_startStageY = by;
 
 			_center.visible = true;
-			_center.x = bx - _center.width / 2;
-			_center.y = by - _center.height / 2;
-			_button.x = bx - _button.width / 2;
-			_button.y = by - _button.height / 2;
+			_center.SetXY(bx - _center.width / 2, by - _center.height / 2);
+			_button.SetXY(bx - _button.width / 2, by - _button.height / 2);
 
 			float deltaX = bx - _InitX;
 			float deltaY = by - _InitY;
 			float degrees = Mathf.Atan2(deltaY, deltaX) * 180 / Mathf.PI;
 			_thumb.rotation = degrees + 90;
 
-			Stage.inst.onTouchMove.Add(this.OnTouchMove);
-			Stage.inst.onTouchEnd.Add(this.OnTouchUp);
+			context.CaptureTouch();
 		}
 	}
 
-	private void OnTouchUp(EventContext context)
+	private void OnTouchEnd(EventContext context)
 	{
 		InputEvent inputEvt = (InputEvent)context.data;
 		if (touchId != -1 && inputEvt.touchId == touchId)
@@ -111,13 +110,9 @@ public class JoystickModule : EventDispatcher
 				_button.selected = false;
 				_thumb.rotation = 0;
 				_center.visible = true;
-				_center.x = _InitX - _center.width / 2;
-				_center.y = _InitY - _center.height / 2;
+				_center.SetXY(_InitX - _center.width / 2, _InitY - _center.height / 2);
 			}
 			);
-
-			Stage.inst.onTouchMove.Remove(this.OnTouchMove);
-			Stage.inst.onTouchEnd.Remove(this.OnTouchUp);
 
 			this.onEnd.Call();
 		}
@@ -159,8 +154,7 @@ public class JoystickModule : EventDispatcher
 			if (buttonY > GRoot.inst.height)
 				buttonY = GRoot.inst.height;
 
-			_button.x = buttonX - _button.width / 2;
-			_button.y = buttonY - _button.height / 2;
+			_button.SetXY(buttonX - _button.width / 2, buttonY - _button.height / 2);
 
 			this.onMove.Call(degree);
 		}
