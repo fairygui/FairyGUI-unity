@@ -372,7 +372,7 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; ++i)
 			{
 				GObject child = _children[i];
-				if (child.internalVisible && child.name == name)
+				if (child.internalVisible && child.internalVisible2 && child.name == name)
 					return child;
 			}
 

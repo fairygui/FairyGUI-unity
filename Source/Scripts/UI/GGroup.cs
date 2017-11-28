@@ -427,30 +427,26 @@ namespace FairyGUI
 				return;
 
 			int cnt = parent.numChildren;
-			int i;
-			GObject child;
-			for (i = 0; i < cnt; i++)
+			float a = this.alpha;
+			for (int i = 0; i < cnt; i++)
 			{
-				child = parent.GetChildAt(i);
+				GObject child = parent.GetChildAt(i);
 				if (child.group == this)
-					child.alpha = this.alpha;
+					child.alpha = a;
 			}
 		}
 
-		override protected void HandleVisibleChanged()
+		override internal protected void HandleVisibleChanged()
 		{
 			if (parent == null)
 				return;
 
 			int cnt = parent.numChildren;
-			int i;
-			bool v = this.visible;
-			GObject child;
-			for (i = 0; i < cnt; i++)
+			for (int i = 0; i < cnt; i++)
 			{
-				child = parent.GetChildAt(i);
+				GObject child = parent.GetChildAt(i);
 				if (child.group == this)
-					child.visible = v;
+					child.HandleVisibleChanged();
 			}
 		}
 

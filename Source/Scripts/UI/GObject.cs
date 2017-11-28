@@ -794,12 +794,6 @@ namespace FairyGUI
 			}
 		}
 
-		virtual protected void HandleAlphaChanged()
-		{
-			if (displayObject != null)
-				displayObject.alpha = _alpha;
-		}
-
 		/// <summary>
 		/// The visibility of the object. An invisible object will be untouchable.
 		/// </summary>
@@ -822,17 +816,19 @@ namespace FairyGUI
 			}
 		}
 
-		virtual protected void HandleVisibleChanged()
-		{
-			if (displayObject != null)
-				displayObject.visible = _visible;
-		}
-
 		internal bool internalVisible
 		{
 			get
 			{
 				return _internalVisible && (group == null || group.internalVisible);
+			}
+		}
+
+		internal bool internalVisible2
+		{
+			get
+			{
+				return _visible && (group == null || group.internalVisible2);
 			}
 		}
 
@@ -1217,6 +1213,9 @@ namespace FairyGUI
 					_group = value;
 					if (_group != null)
 						_group.SetBoundsChangedFlag(true);
+					HandleVisibleChanged();
+					if (parent != null)
+						parent.ChildStateChanged(this);
 				}
 			}
 		}
@@ -1619,6 +1618,18 @@ namespace FairyGUI
 		{
 			if (displayObject != null)
 				displayObject.grayed = _grayed;
+		}
+
+		virtual protected void HandleAlphaChanged()
+		{
+			if (displayObject != null)
+				displayObject.alpha = _alpha;
+		}
+
+		virtual internal protected void HandleVisibleChanged()
+		{
+			if (displayObject != null)
+				displayObject.visible = internalVisible2;
 		}
 
 		virtual public void ConstructFromResource()
