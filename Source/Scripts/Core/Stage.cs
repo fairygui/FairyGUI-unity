@@ -542,6 +542,7 @@ namespace FairyGUI
 			}
 			else if (touchScreen)
 			{
+				_touchTarget = null;
 				for (int i = 0; i < Input.touchCount; ++i)
 				{
 					Touch uTouch = Input.GetTouch(i);
@@ -550,8 +551,7 @@ namespace FairyGUI
 
 					Vector2 pos = uTouch.position;
 					pos.y = stageHeight - pos.y;
-
-					_touchTarget = null;
+					
 					TouchInfo touch = null;
 					TouchInfo free = null;
 					for (int j = 0; j < 5; j++)
@@ -568,8 +568,8 @@ namespace FairyGUI
 					if (touch == null)
 					{
 						touch = free;
-						if (touch == null)
-							return;
+						if (touch == null || uTouch.phase != TouchPhase.Began)
+							continue;
 
 						touch.touchId = uTouch.fingerId;
 					}
