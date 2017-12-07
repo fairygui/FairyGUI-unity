@@ -1148,26 +1148,32 @@ namespace FairyGUI
 			string filePath = _assetNamePrefix + Path.GetFileNameWithoutExtension(fileName);
 			string ext = Path.GetExtension(fileName);
 
-			Texture2D tex;
+			Texture tex;
 			if (_resBundle != null)
 			{
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
-				tex = _resBundle.LoadAsset<Texture2D>(filePath);
+				tex = _resBundle.LoadAsset<Texture>(filePath);
 #else
 				tex = (Texture2D)_resBundle.Load(filePath, typeof(Texture2D));
 #endif
 			}
 			else
-				tex = (Texture2D)_loadFunc(filePath, ext, typeof(Texture2D));
+				tex = (Texture)_loadFunc(filePath, ext, typeof(Texture));
 			if (tex == null)
 			{
 				Debug.LogWarning("FairyGUI: texture '" + fileName + "' not found in " + this.name);
 				item.texture = NTexture.Empty;
 			}
+			else if (!(tex is Texture2D))
+			{
+				Debug.LogWarning("FairyGUI: settings for '" + filePath + "' is wrong! Correct values are: (Texture Type=Default, Texture Shape=2D)");
+				item.texture = NTexture.Empty;
+			}
 			else
 			{
-				if (tex.mipmapCount > 1)
-					Debug.LogWarning("FairyGUI: texture '" + fileName + "' in " + this.name + " is mipmaps enabled.");
+				if (((Texture2D)tex).mipmapCount > 1)
+					Debug.LogWarning("FairyGUI: settings for '" + filePath + "' is wrong! Correct values are: (Generate Mip Maps=unchecked)");
+
 				item.texture = new NTexture(tex, (float)tex.width / item.width, (float)tex.height / item.height);
 				item.texture.storedODisk = _resBundle == null;
 
