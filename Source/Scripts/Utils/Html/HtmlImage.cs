@@ -48,44 +48,42 @@ namespace FairyGUI.Utils
 			_owner = owner;
 			_element = element;
 
-			int width = element.GetInt("width", 0);
-			int height = element.GetInt("height", 0);
-
+			int sourceWidth = 0;
+			int sourceHeight = 0;
 			NTexture texture = owner.htmlPageContext.GetImageTexture(this);
 			if (texture != null)
 			{
-				if (width == 0)
-					width = texture.width;
-				if (height == 0)
-					height = texture.height;
+				sourceWidth = texture.width;
+				sourceHeight = texture.height;
 
-				loader.SetSize(width, height);
 				loader.texture = texture;
 				_externalTexture = true;
-
 			}
 			else
 			{
 				string src = element.GetString("src");
-				if (src != null && (width == 0 || height == 0))
+				if (src != null)
 				{
 					PackageItem pi = UIPackage.GetItemByURL(src);
 					if (pi != null)
 					{
-						width = pi.width;
-						height = pi.height;
+						sourceWidth = pi.width;
+						sourceHeight = pi.height;
 					}
 				}
 
-				if (width == 0)
-					width = 5;
-				if (height == 0)
-					height = 10;
-
-				loader.SetSize(width, height);
 				loader.url = src;
 				_externalTexture = false;
 			}
+
+			int width = element.GetInt("width", sourceWidth);
+			int height = element.GetInt("height", sourceHeight);
+
+			if (width == 0)
+				width = 5;
+			if (height == 0)
+				height = 10;
+			loader.SetSize(width, height);
 		}
 
 		public void SetPosition(float x, float y)

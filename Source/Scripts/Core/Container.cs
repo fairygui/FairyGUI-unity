@@ -266,11 +266,9 @@ namespace FairyGUI
 						child.onRemovedFromStage.Call();
 				}
 				_children.Remove(child);
+				InvalidateBatchingState(true);
 				if (!dispose)
-				{
 					child.InternalSetParent(null);
-					InvalidateBatchingState(true);
-				}
 				else
 					child.Dispose();
 

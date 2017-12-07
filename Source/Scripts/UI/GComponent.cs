@@ -372,7 +372,7 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; ++i)
 			{
 				GObject child = _children[i];
-				if (child.finalVisible && child.name == name)
+				if (child.internalVisible && child.internalVisible2 && child.name == name)
 					return child;
 			}
 
@@ -706,7 +706,7 @@ namespace FairyGUI
 			if (child.displayObject == null)
 				return;
 
-			if (child.finalVisible)
+			if (child.internalVisible)
 			{
 				if (child.displayObject.parent == null)
 				{
@@ -777,7 +777,7 @@ namespace FairyGUI
 						for (int i = 0; i < cnt; i++)
 						{
 							GObject child = _children[i];
-							if (child.displayObject != null && child.finalVisible)
+							if (child.displayObject != null && child.internalVisible)
 								container.AddChild(child.displayObject);
 						}
 					}
@@ -787,7 +787,7 @@ namespace FairyGUI
 						for (int i = cnt - 1; i >= 0; i--)
 						{
 							GObject child = _children[i];
-							if (child.displayObject != null && child.finalVisible)
+							if (child.displayObject != null && child.internalVisible)
 								container.AddChild(child.displayObject);
 						}
 					}
@@ -798,13 +798,13 @@ namespace FairyGUI
 						for (int i = 0; i < _apexIndex; i++)
 						{
 							GObject child = _children[i];
-							if (child.displayObject != null && child.finalVisible)
+							if (child.displayObject != null && child.internalVisible)
 								container.AddChild(child.displayObject);
 						}
 						for (int i = cnt - 1; i >= _apexIndex; i--)
 						{
 							GObject child = _children[i];
-							if (child.displayObject != null && child.finalVisible)
+							if (child.displayObject != null && child.internalVisible)
 								container.AddChild(child.displayObject);
 						}
 					}

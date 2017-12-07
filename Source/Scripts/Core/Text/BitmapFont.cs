@@ -59,6 +59,8 @@ namespace FairyGUI
 		{
 			if (resizable)
 				this.scale = (float)format.size / size * fontSizeScale;
+			else
+				this.scale = fontSizeScale;
 		}
 
 		override public bool GetGlyphSize(char ch, out float width, out float height)

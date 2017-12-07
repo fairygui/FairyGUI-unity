@@ -87,11 +87,22 @@ namespace FairyGUI.Utils
 			if (value == null || value.Length == 0)
 				return defValue;
 
-			int ret;
-			if (int.TryParse(value, out ret))
-				return ret;
+			if (value[value.Length - 1] == '%')
+			{
+				int ret;
+				if (int.TryParse(value.Substring(0, value.Length - 1), out ret))
+					return Mathf.CeilToInt(ret / 100.0f * defValue);
+				else
+					return defValue;
+			}
 			else
-				return defValue;
+			{
+				int ret;
+				if (int.TryParse(value, out ret))
+					return ret;
+				else
+					return defValue;
+			}
 		}
 
 		public float GetFloat(string attrName)

@@ -194,9 +194,7 @@ namespace FairyGUI
 			}
 			set
 			{
-				_caretPosition = value;
-				_selectionStart = value;
-				textField.Redraw();
+				SetSelection(value, 0);
 			}
 		}
 
@@ -233,6 +231,29 @@ namespace FairyGUI
 					_displayAsPassword = value;
 					UpdateText();
 				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="length">-1 means the rest count from start</param>
+		public void SetSelection(int start, int length)
+		{
+			if (!_editing)
+				Stage.inst.focus = this;
+
+			_selectionStart = start;
+			_caretPosition = start + (length < 0 ? int.MaxValue : length);
+			if (!textField.Redraw())
+			{
+				int cnt = textField.charPositions.Count;
+				if (_caretPosition >= cnt)
+					_caretPosition = cnt - 1;
+				if (_selectionStart >= cnt)
+					_selectionStart = cnt - 1;
+				UpdateCaret(false);
 			}
 		}
 
@@ -1126,7 +1147,7 @@ namespace FairyGUI
 			}
 		}
 
-		public void CheckComposition()
+		internal void CheckComposition()
 		{
 			if (_composing != 0 && Input.compositionString.Length == 0)
 				UpdateText();

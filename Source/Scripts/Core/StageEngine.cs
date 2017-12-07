@@ -13,6 +13,11 @@ namespace FairyGUI
 
 		public static bool beingQuit;
 
+		void Start()
+		{
+			useGUILayout = false;
+		}
+
 		void LateUpdate()
 		{
 			Stage.inst.InternalUpdate();

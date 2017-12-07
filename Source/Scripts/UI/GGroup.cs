@@ -419,21 +419,34 @@ namespace FairyGUI
 			_updating &= 1;
 		}
 
-		override protected void UpdateAlpha()
+		override protected void HandleAlphaChanged()
 		{
-			base.UpdateAlpha();
+			base.HandleAlphaChanged();
 
 			if (this.underConstruct)
 				return;
 
 			int cnt = parent.numChildren;
-			int i;
-			GObject child;
-			for (i = 0; i < cnt; i++)
+			float a = this.alpha;
+			for (int i = 0; i < cnt; i++)
 			{
-				child = parent.GetChildAt(i);
+				GObject child = parent.GetChildAt(i);
 				if (child.group == this)
-					child.alpha = this.alpha;
+					child.alpha = a;
+			}
+		}
+
+		override internal protected void HandleVisibleChanged()
+		{
+			if (parent == null)
+				return;
+
+			int cnt = parent.numChildren;
+			for (int i = 0; i < cnt; i++)
+			{
+				GObject child = parent.GetChildAt(i);
+				if (child.group == this)
+					child.HandleVisibleChanged();
 			}
 		}
 
@@ -450,6 +463,14 @@ namespace FairyGUI
 				_lineGap = xml.GetAttributeInt("lineGap");
 				_columnGap = xml.GetAttributeInt("colGap");
 			}
+		}
+
+		override public void Setup_AfterAdd(XML xml)
+		{
+			base.Setup_AfterAdd(xml);
+
+			if (!this.visible)
+				HandleVisibleChanged();
 		}
 	}
 }

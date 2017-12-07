@@ -22,28 +22,6 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="strType"></param>
 		/// <param name="callback"></param>
-		public void AddEventListener(string strType, EventCallback0 callback)
-		{
-			if (strType == null)
-				throw new Exception("event type cant be null");
-
-			if (_dic == null)
-				_dic = new Dictionary<string, EventBridge>();
-
-			EventBridge bridge = null;
-			if (!_dic.TryGetValue(strType, out bridge))
-			{
-				bridge = new EventBridge(this);
-				_dic[strType] = bridge;
-			}
-			bridge.Add(callback);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="strType"></param>
-		/// <param name="callback"></param>
 		public void AddEventListener(string strType, EventCallback1 callback)
 		{
 			if (strType == null)
@@ -66,7 +44,29 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="strType"></param>
 		/// <param name="callback"></param>
-		public void RemoveEventListener(string strType, EventCallback0 callback)
+		public void AddEventListener(string strType, EventCallback0 callback)
+		{
+			if (strType == null)
+				throw new Exception("event type cant be null");
+
+			if (_dic == null)
+				_dic = new Dictionary<string, EventBridge>();
+
+			EventBridge bridge = null;
+			if (!_dic.TryGetValue(strType, out bridge))
+			{
+				bridge = new EventBridge(this);
+				_dic[strType] = bridge;
+			}
+			bridge.Add(callback);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strType"></param>
+		/// <param name="callback"></param>
+		public void RemoveEventListener(string strType, EventCallback1 callback)
 		{
 			if (_dic == null)
 				return;
@@ -81,7 +81,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="strType"></param>
 		/// <param name="callback"></param>
-		public void RemoveEventListener(string strType, EventCallback1 callback)
+		public void RemoveEventListener(string strType, EventCallback0 callback)
 		{
 			if (_dic == null)
 				return;
