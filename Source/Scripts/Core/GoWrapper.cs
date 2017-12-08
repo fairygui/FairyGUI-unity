@@ -16,6 +16,7 @@ namespace FairyGUI
 
 		protected GameObject _wrapTarget;
 		protected List<Renderer> _renderers;
+		protected List<Material> _materialsBackup;
 		protected List<Material> _materials;
 		protected List<int> _sortingOrders;
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
@@ -26,19 +27,15 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public EventCallback0 onUpdate;
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public GoWrapper()
 		{
 			_skipInFairyBatching = true;
 
+			_materialsBackup = new List<Material>();
 			_materials = new List<Material>();
 			_renderers = new List<Renderer>();
 			_sortingOrders = new List<int>();
-			_cloneMaterial = true;
+			_cloneMaterial = false;
 
 			CreateGameObject("GoWrapper");
 		}
@@ -46,29 +43,31 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="go"></param>
+		/// <param name="go">包装对象。</param>
 		public GoWrapper(GameObject go) : this()
 		{
-			setWrapTarget(go, true);
+			setWrapTarget(go, false);
 		}
 
 		/// <summary>
 		/// 设置包装对象。注意如果原来有包装对象，设置新的包装对象后，原来的包装对象只会被删除引用，但不会被销毁。
-		/// 对象包含的所有材质都会被复制。
+		/// 对象包含的所有材质不会被复制，如果材质已经是公用的，这可能影响到其他对象。如果希望自动复制，改为使用setWrapTarget(target, true)设置。
 		/// </summary>
 		public GameObject wrapTarget
 		{
 			get { return _wrapTarget; }
-			set { setWrapTarget(value, true); }
+			set { setWrapTarget(value, false); }
 		}
 
 		/// <summary>
 		///  设置包装对象。注意如果原来有包装对象，设置新的包装对象后，原来的包装对象只会被删除引用，但不会被销毁。
 		/// </summary>
 		/// <param name="target"></param>
-		/// <param name="cloneMaterial">如果true，则复制材质，否则使用sharedMaterial。</param>
+		/// <param name="cloneMaterial">如果true，则复制材质，否则直接使用sharedMaterial。</param>
 		public void setWrapTarget(GameObject target, bool cloneMaterial)
 		{
+			RecoverMaterials();
+
 			_cloneMaterial = cloneMaterial;
 			if (_wrapTarget != null)
 				ToolSet.SetParent(_wrapTarget.transform, null);
@@ -125,6 +124,8 @@ namespace FairyGUI
 			if (_canvas != null)
 				return;
 #endif
+			RecoverMaterials();
+
 			_renderers.Clear();
 			_sortingOrders.Clear();
 			_materials.Clear();
@@ -132,23 +133,45 @@ namespace FairyGUI
 			_wrapTarget.GetComponentsInChildren<Renderer>(true, _renderers);
 
 			int cnt = _renderers.Count;
+			int k;
 			for (int i = 0; i < cnt; i++)
 			{
 				Renderer r = _renderers[i];
-				if (r.sharedMaterial != null)
+				if (r == null)
+					continue;
+
+				Material m = r.sharedMaterial;
+				if (m == null)
+					continue;
+
+				//确保相同的材质不会复制两次
+				k = _materialsBackup.IndexOf(m);
+				if (k == -1) //未备份
 				{
-					Material m;
+					_materialsBackup.Add(m);
 					if (_cloneMaterial)
-						r.sharedMaterial = r.material;
-					m = r.sharedMaterial;
-					_materials.Add(m);
-					if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
 					{
-						//Set the object rendering in Transparent Queue as UI objects
-						m.renderQueue = 3000;
+						m = r.material;//复制材质
+						r.sharedMaterial = m;
+						_materials.Add(m); //保存新创建的材质
 					}
+					else
+						_materials.Add(m); //直接使用已有材质
+				}
+				else if (_cloneMaterial)
+				{
+					r.sharedMaterial = _materials[k];
+				}
+
+				if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
+				{
+					//Set the object rendering in Transparent Queue as UI objects
+					r.sharedMaterial.renderQueue = 3000;
 				}
 			}
+
+			if (!_cloneMaterial)
+				_materialsBackup.Clear();
 
 			_renderers.Sort(CompareSortingOrder);
 			_sortingOrders.Capacity = cnt;
@@ -159,6 +182,35 @@ namespace FairyGUI
 		static int CompareSortingOrder(Renderer c1, Renderer c2)
 		{
 			return c1.sortingOrder - c2.sortingOrder;
+		}
+
+		void RecoverMaterials()
+		{
+			if (_materialsBackup.Count == 0)
+				return;
+
+			int cnt = _renderers.Count;
+			int k;
+			for (int i = 0; i < cnt; i++)
+			{
+				Renderer r = _renderers[i];
+				if (r == null)
+					continue;
+
+				Material m = r.sharedMaterial;
+				if (m == null)
+					continue;
+
+				k = _materials.IndexOf(m);
+				if (k != -1)
+					r.sharedMaterial = _materialsBackup[k];
+			}
+
+			cnt = _materials.Count;
+			for (int i = 0; i < cnt; i++)
+				Material.DestroyImmediate(_materials[i]);
+
+			_materialsBackup.Clear();
 		}
 
 		public override int renderingOrder
@@ -270,13 +322,21 @@ namespace FairyGUI
 			{
 				UnityEngine.Object.Destroy(_wrapTarget);
 				_wrapTarget = null;
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-				_canvas = null;
-#endif
+
+				if (_materialsBackup.Count > 0)
+				{ //如果有备份，说明材质是复制出来的，应该删除
+					int cnt = _materials.Count;
+					for (int i = 0; i < cnt; i++)
+						Material.DestroyImmediate(_materials[i]);
+				}
 			}
+
 			_renderers = null;
 			_materials = null;
-
+			_materialsBackup = null;
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+			_canvas = null;
+#endif
 			base.Dispose();
 		}
 	}
