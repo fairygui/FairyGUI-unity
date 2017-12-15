@@ -1748,6 +1748,7 @@ namespace FairyGUI
 
 		#region Drag support
 		Vector2 _dragTouchStartPos;
+		bool _dragTesting;
 
 		static Vector2 sGlobalDragStart = new Vector2();
 		static Rect sGlobalRect = new Rect();
@@ -1779,8 +1780,12 @@ namespace FairyGUI
 				tmp.onDragEnd.Call();
 			}
 
+			onTouchMove.Add(__touchMove);
+			onTouchEnd.Add(__touchEnd);
+
 			sGlobalDragStart = Stage.inst.GetTouchPosition(touchId);
 			sGlobalRect = this.LocalToGlobal(new Rect(0, 0, this.width, this.height));
+			_dragTesting = false;
 
 			draggingObject = this;
 			Stage.inst.AddTouchMonitor(touchId, this);
@@ -1790,7 +1795,7 @@ namespace FairyGUI
 		{
 			if (draggingObject == this)
 			{
-				Stage.inst.RemoveTouchMonitor(this);
+				_dragTesting = false;
 				draggingObject = null;
 			}
 		}
@@ -1799,6 +1804,7 @@ namespace FairyGUI
 		{
 			InputEvent evt = context.inputEvent;
 			_dragTouchStartPos = evt.position;
+			_dragTesting = true;
 			context.CaptureTouch();
 		}
 
@@ -1806,7 +1812,7 @@ namespace FairyGUI
 		{
 			InputEvent evt = context.inputEvent;
 
-			if (draggingObject != this)
+			if (_dragTesting && draggingObject != this)
 			{
 				int sensitivity;
 				if (Stage.touchScreen)
@@ -1817,6 +1823,7 @@ namespace FairyGUI
 					&& Mathf.Abs(_dragTouchStartPos.y - evt.y) < sensitivity)
 					return;
 
+				_dragTesting = false;
 				if (!onDragStart.Call(evt.touchId))
 					DragBegin(evt.touchId);
 			}
