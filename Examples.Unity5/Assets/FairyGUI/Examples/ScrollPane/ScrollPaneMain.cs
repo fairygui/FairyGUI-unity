@@ -86,7 +86,7 @@ public class ScrollPaneMain : MonoBehaviour
 		if (p == null)
 			return;
 		Debug.Log(obj.text);
-		DragDropManager.inst.StartDrag(obj, obj.icon, obj.parent.text);
+		DragDropManager.inst.StartDrag(obj, obj.icon, obj.text);
 	}
 
 	void OnDrop(EventContext context)
