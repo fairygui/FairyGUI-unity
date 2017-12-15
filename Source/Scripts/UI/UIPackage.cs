@@ -53,6 +53,7 @@ namespace FairyGUI
 		string _customId;
 		bool _fromBundle;
 		bool _loadingPackage;
+		bool _unloadBundleAfterLoaded;
 
 		class AtlasSprite
 		{
@@ -114,8 +115,9 @@ namespace FairyGUI
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle bundle)
 		{
-			return AddPackage(bundle, bundle, null);
+			return AddPackage(bundle, true);
 		}
+
 
 		/// <summary>
 		/// Add a UI package from two assetbundles. desc and res can be same.
@@ -125,7 +127,7 @@ namespace FairyGUI
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res)
 		{
-			return AddPackage(desc, res, null);
+			return AddPackage(desc, res, true);
 		}
 
 		/// <summary>
@@ -136,6 +138,42 @@ namespace FairyGUI
 		/// <param name="mainAssetName">Main asset name.</param>
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName)
+		{
+			return AddPackage(desc, res, mainAssetName, true);
+		}
+
+		/// <summary>
+		/// Add a UI package from assetbundle.
+		/// </summary>
+		/// <param name="bundle">A assetbundle.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <returns>UIPackage</returns>
+		public static UIPackage AddPackage(AssetBundle bundle, bool unloadBundleAfterLoaded)
+		{
+			return AddPackage(bundle, bundle, null, unloadBundleAfterLoaded);
+		}
+
+		/// <summary>
+		/// Add a UI package from two assetbundles. desc and res can be same.
+		/// </summary>
+		/// <param name="desc">A assetbunble contains description file.</param>
+		/// <param name="res">A assetbundle contains resources.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <returns>UIPackage</returns>
+		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, bool unloadBundleAfterLoaded)
+		{
+			return AddPackage(desc, res, null, unloadBundleAfterLoaded);
+		}
+
+		/// <summary>
+		/// Add a UI package from two assetbundles with a optional main asset name.
+		/// </summary>
+		/// <param name="desc">A assetbunble contains description file.</param>
+		/// <param name="res">A assetbundle contains resources.</param>
+		/// <param name="mainAssetName">Main asset name.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <returns>UIPackage</returns>
+		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName, bool unloadBundleAfterLoaded)
 		{
 			byte[] source = null;
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
@@ -178,11 +216,14 @@ namespace FairyGUI
 #endif
 			if (source == null)
 				throw new Exception("FairyGUI: invalid package.");
-			if (desc != res)
-				desc.Unload(true);
+			if (unloadBundleAfterLoaded)
+			{
+				if (desc != res)
+					desc.Unload(true);
+			}
 
 			UIPackage pkg = new UIPackage();
-			pkg.Create(source, res, mainAssetName, null);
+			pkg.Create(source, res, mainAssetName, null, unloadBundleAfterLoaded);
 			_packageInstById[pkg.id] = pkg;
 			_packageInstByName[pkg.name] = pkg;
 			_packageList.Add(pkg);
@@ -220,7 +261,7 @@ namespace FairyGUI
 			}
 
 			UIPackage pkg = new UIPackage();
-			pkg.Create(asset.bytes, null, assetPath, loadFunc);
+			pkg.Create(asset.bytes, null, assetPath, loadFunc, false);
 			if (_packageInstById.ContainsKey(pkg.id))
 				Debug.LogWarning("FairyGUI: Package id conflicts, '" + pkg.name + "' and '" + _packageInstById[pkg.id].name + "'");
 			_packageInstById[pkg.id] = pkg;
@@ -242,7 +283,7 @@ namespace FairyGUI
 		public static UIPackage AddPackage(byte[] descData, string assetNamePrefix, LoadResource loadFunc)
 		{
 			UIPackage pkg = new UIPackage();
-			pkg.Create(descData, null, assetNamePrefix, loadFunc);
+			pkg.Create(descData, null, assetNamePrefix, loadFunc, false);
 			if (_packageInstById.ContainsKey(pkg.id))
 				Debug.LogWarning("FairyGUI: Package id conflicts, '" + pkg.name + "' and '" + _packageInstById[pkg.id].name + "'");
 			_packageInstById[pkg.id] = pkg;
@@ -564,11 +605,12 @@ namespace FairyGUI
 				return null;
 		}
 
-		void Create(byte[] desc, AssetBundle res, string assetNamePrefix, LoadResource loadFunc)
+		void Create(byte[] desc, AssetBundle res, string assetNamePrefix, LoadResource loadFunc, bool unloadBundleAfterLoaded)
 		{
 			_descPack = new Dictionary<string, string>();
 			_resBundle = res;
 			_loadFunc = loadFunc;
+			_unloadBundleAfterLoaded = unloadBundleAfterLoaded;
 
 			if (!Application.isPlaying)
 				UIObjectFactory.Clear();
@@ -768,7 +810,7 @@ namespace FairyGUI
 			else
 				_items.Sort(ComparePackageItem);
 
-			if (_resBundle != null)
+			if (_resBundle != null && _unloadBundleAfterLoaded)
 			{
 				_resBundle.Unload(false);
 				_resBundle = null;
@@ -821,7 +863,7 @@ namespace FairyGUI
 			}
 			_items.Clear();
 
-			if (_resBundle != null)
+			if (_resBundle != null && _unloadBundleAfterLoaded)
 				_resBundle.Unload(true);
 		}
 
