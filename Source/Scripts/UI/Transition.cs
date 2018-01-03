@@ -293,6 +293,8 @@ namespace FairyGUI
 				return;
 
 			_playing = false;
+			_onComplete = null;
+
 			int cnt = _items.Count;
 			for (int i = 0; i < cnt; i++)
 			{

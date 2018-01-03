@@ -286,8 +286,6 @@ namespace FairyGUI
 				for (int i = 0; i < length; ++i)
 				{
 					bubbleChain[i].CallInternal(context);
-					if (context._stopsPropagation)
-						break;
 
 					if (context._touchCapture)
 					{
@@ -295,6 +293,9 @@ namespace FairyGUI
 						if (strType == "onTouchBegin")
 							Stage.inst.AddTouchMonitor(context.inputEvent.touchId, bubbleChain[i].owner);
 					}
+
+					if (context._stopsPropagation)
+						break;
 				}
 
 				if (addChain != null)
