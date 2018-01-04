@@ -106,7 +106,10 @@ namespace FairyGUI.Utils
 		{
 			loader.RemoveEventListeners();
 			if (_externalTexture)
+			{
 				_owner.htmlPageContext.FreeImageTexture(this, loader.texture);
+				_externalTexture = false;
+			}
 
 			loader.url = null;
 			_owner = null;
@@ -115,6 +118,8 @@ namespace FairyGUI.Utils
 
 		public void Dispose()
 		{
+			if (_externalTexture)
+				_owner.htmlPageContext.FreeImageTexture(this, loader.texture);
 			loader.Dispose();
 		}
 	}

@@ -780,6 +780,9 @@ namespace FairyGUI
 
 		public override void Dispose()
 		{
+			if (_disposed)
+				return;
+
 			if (_editing)
 			{
 				_caret.RemoveFromParent();

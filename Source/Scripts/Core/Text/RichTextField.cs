@@ -29,8 +29,6 @@ namespace FairyGUI
 		/// </summary>
 		public TextField textField { get; private set; }
 
-		List<IHtmlObject> _toCollect;
-
 		public RichTextField()
 		{
 			gameObject.name = "RichTextField";
@@ -162,6 +160,16 @@ namespace FairyGUI
 			base.Update(context);
 		}
 
+		public override void Dispose()
+		{
+			if (_disposed)
+				return;
+
+			CleanupObjects();
+
+			base.Dispose();
+		}
+
 		internal void CleanupObjects()
 		{
 			List<HtmlElement> elements = textField.htmlElements;
@@ -171,18 +179,8 @@ namespace FairyGUI
 				HtmlElement element = elements[i];
 				if (element.htmlObject != null)
 				{
-					if (UpdateContext.working)
-					{
-						//Update里不允许增删对象。放到延迟队列里
-						if (_toCollect == null)
-							_toCollect = new List<IHtmlObject>();
-						_toCollect.Add(element.htmlObject);
-					}
-					else
-					{
-						element.htmlObject.Remove();
-						htmlPageContext.FreeObject(element.htmlObject);
-					}
+					element.htmlObject.Remove();
+					htmlPageContext.FreeObject(element.htmlObject);
 				}
 			}
 		}
@@ -190,19 +188,7 @@ namespace FairyGUI
 		virtual internal void RefreshObjects()
 		{
 			List<HtmlElement> elements = textField.htmlElements;
-			int count = _toCollect != null ? _toCollect.Count : 0;
-			if (count > 0)
-			{
-				for (int i = 0; i < count; i++)
-				{
-					IHtmlObject htmlObject = _toCollect[i];
-					htmlObject.Remove();
-					htmlPageContext.FreeObject(htmlObject);
-				}
-				_toCollect.Clear();
-			}
-
-			count = elements.Count;
+			int count = elements.Count;
 			for (int i = 0; i < count; i++)
 			{
 				HtmlElement element = elements[i];

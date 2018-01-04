@@ -25,6 +25,9 @@ namespace FairyGUI.Utils
 			_buttonPool = new Stack<IHtmlObject>();
 			_selectPool = new Stack<IHtmlObject>();
 			_linkPool = new Stack<IHtmlObject>();
+
+			if (Application.isPlaying && _poolManager == null)
+				_poolManager = Stage.inst.CreatePoolManager("HtmlObjectPool");
 		}
 
 		virtual public IHtmlObject CreateObject(RichTextField owner, HtmlElement element)
@@ -32,14 +35,14 @@ namespace FairyGUI.Utils
 			IHtmlObject ret = null;
 			if (element.type == HtmlElementType.Image)
 			{
-				if (_imagePool.Count > 0 && Application.isPlaying)
+				if (_imagePool.Count > 0)
 					ret = _imagePool.Pop();
 				else
 					ret = new HtmlImage();
 			}
 			else if (element.type == HtmlElementType.Link)
 			{
-				if (_linkPool.Count > 0 && Application.isPlaying)
+				if (_linkPool.Count > 0)
 					ret = _linkPool.Pop();
 				else
 					ret = new HtmlLink();
@@ -51,14 +54,14 @@ namespace FairyGUI.Utils
 					type = type.ToLower();
 				if (type == "button" || type == "submit")
 				{
-					if (_buttonPool.Count > 0 && Application.isPlaying)
+					if (_buttonPool.Count > 0)
 						ret = _buttonPool.Pop();
 					else
 						ret = new HtmlButton();
 				}
 				else
 				{
-					if (_inputPool.Count > 0 && Application.isPlaying)
+					if (_inputPool.Count > 0)
 						ret = _inputPool.Pop();
 					else
 						ret = new HtmlInput();
@@ -66,7 +69,7 @@ namespace FairyGUI.Utils
 			}
 			else if (element.type == HtmlElementType.Select)
 			{
-				if (_selectPool.Count > 0 && Application.isPlaying)
+				if (_selectPool.Count > 0)
 					ret = _selectPool.Pop();
 				else
 					ret = new HtmlSelect();
@@ -84,8 +87,7 @@ namespace FairyGUI.Utils
 
 		virtual public void FreeObject(IHtmlObject obj)
 		{
-			obj.Release();
-			if (!Application.isPlaying)
+			if (_poolManager == null)
 			{
 				obj.Dispose();
 				return;
@@ -93,8 +95,12 @@ namespace FairyGUI.Utils
 
 			//可能已经被GameObject tree deleted了，不再回收
 			if (obj.displayObject != null && obj.displayObject.isDisposed)
+			{
+				obj.Dispose();
 				return;
+			}
 
+			obj.Release();
 			if (obj is HtmlImage)
 				_imagePool.Push(obj);
 			else if (obj is HtmlInput)
@@ -105,12 +111,7 @@ namespace FairyGUI.Utils
 				_linkPool.Push(obj);
 
 			if (obj.displayObject != null)
-			{
-				if (_poolManager == null)
-					_poolManager = Stage.inst.CreatePoolManager("HtmlObjectPool");
-
 				ToolSet.SetParent(obj.displayObject.cachedTransform, _poolManager);
-			}
 		}
 
 		virtual public NTexture GetImageTexture(HtmlImage image)

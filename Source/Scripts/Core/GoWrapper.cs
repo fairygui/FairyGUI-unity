@@ -318,6 +318,9 @@ namespace FairyGUI
 
 		public override void Dispose()
 		{
+			if (_disposed)
+				return;
+
 			if (_wrapTarget != null)
 			{
 				UnityEngine.Object.Destroy(_wrapTarget);

@@ -908,6 +908,9 @@ namespace FairyGUI
 
 		public override void Dispose()
 		{
+			if (_disposed)
+				return;
+
 			base.Dispose(); //Destroy GameObject tree first, avoid destroying each seperately;
 
 			int numChildren = _children.Count;
