@@ -1713,6 +1713,10 @@ namespace FairyGUI
 			str = xml.GetAttribute("tooltips");
 			if (str != null)
 				this.tooltips = str;
+
+			str = xml.GetAttribute("customData");
+			if (str != null)
+				this.data = str;
 		}
 
 		static Dictionary<string, int> GearXMLKeys = new Dictionary<string, int>()
