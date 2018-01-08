@@ -146,7 +146,7 @@ namespace FairyGUI
 		/// Add a UI package from assetbundle.
 		/// </summary>
 		/// <param name="bundle">A assetbundle.</param>
-		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the bundles after package loaded.</param>
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle bundle, bool unloadBundleAfterLoaded)
 		{
@@ -158,7 +158,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="desc">A assetbunble contains description file.</param>
 		/// <param name="res">A assetbundle contains resources.</param>
-		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the bundles after package loaded.</param>
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, bool unloadBundleAfterLoaded)
 		{
@@ -171,7 +171,7 @@ namespace FairyGUI
 		/// <param name="desc">A assetbunble contains description file.</param>
 		/// <param name="res">A assetbundle contains resources.</param>
 		/// <param name="mainAssetName">Main asset name.</param>
-		/// <param name="unloadBundleAfterLoaded">whether to unload the unload after package loaded.</param>
+		/// <param name="unloadBundleAfterLoaded">whether to unload the bundles after package loaded.</param>
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName, bool unloadBundleAfterLoaded)
 		{

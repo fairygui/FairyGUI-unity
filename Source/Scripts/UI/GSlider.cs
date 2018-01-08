@@ -308,7 +308,8 @@ namespace FairyGUI
 			if (newValue != _value)
 			{
 				_value = newValue;
-				onChanged.Call();
+				if (onChanged.Call())
+					return;
 			}
 			UpdateWidthPercent(percent);
 		}

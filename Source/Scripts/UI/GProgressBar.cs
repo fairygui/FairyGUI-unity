@@ -98,6 +98,12 @@ namespace FairyGUI
 			}
 		}
 
+		public bool reverse
+		{
+			get { return _reverse; }
+			set { _reverse = value; }
+		}
+
 		/// <summary>
 		/// 动态改变进度值。
 		/// </summary>
