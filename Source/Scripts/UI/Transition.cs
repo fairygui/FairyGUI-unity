@@ -262,9 +262,9 @@ namespace FairyGUI
 			}
 			else if (item.type == TransitionActionType.Shake)
 			{
-				if (Timers.inst.Exists(item.__Shake))
+				if (item.onShake != null)
 				{
-					Timers.inst.Remove(item.__Shake);
+					Timers.inst.Remove(item.onShake);
 					item.target._gearLocked = true;
 					item.target.SetXY(item.target.x - item.startValue.f1, item.target.y - item.startValue.f2);
 					item.target._gearLocked = false;
@@ -316,7 +316,8 @@ namespace FairyGUI
 				}
 				else if (item.type == TransitionActionType.Shake)
 				{
-					Timers.inst.Remove(item.__Shake);
+					if (item.onShake != null)
+						Timers.inst.Remove(item.onShake);
 				}
 			}
 		}
@@ -499,7 +500,9 @@ namespace FairyGUI
 			int cnt = source._items.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				_items.Add(source._items[i].Clone());
+				TransitionItem item = new TransitionItem(this, source._items[i].type);
+				item.Copy(source._items[i]);
+				_items.Add(item);
 			}
 		}
 
@@ -750,7 +753,7 @@ namespace FairyGUI
 				.SetUpdate(true)
 				.OnStart(() => { if (item.hook != null) item.hook(); })
 				.OnUpdate(() => { ApplyValue(item, item.value); })
-				.OnComplete(() => { tweenComplete(item); });
+				.OnComplete(() => { TweenComplete(item); });
 			if (delay > 0)
 				item.tweener.SetDelay(delay);
 			else
@@ -764,7 +767,7 @@ namespace FairyGUI
 			item.completed = false;
 		}
 
-		void tweenComplete(TransitionItem item)
+		void TweenComplete(TransitionItem item)
 		{
 			item.tweener = null;
 			item.completed = true;
@@ -780,7 +783,7 @@ namespace FairyGUI
 			CheckAllComplete();
 		}
 
-		void __playTransComplete(TransitionItem item)
+		internal void PlayTransComplete(TransitionItem item)
 		{
 			_totalTasks--;
 			item.completed = true;
@@ -934,9 +937,9 @@ namespace FairyGUI
 							item.completed = false;
 							_totalTasks++;
 							if (_reversed)
-								trans.PlayReverse(value.i, 0, () => { __playTransComplete(item); });
+								trans.PlayReverse(value.i, 0, item.onPlayComplete);
 							else
-								trans.Play(value.i, 0, () => { __playTransComplete(item); });
+								trans.Play(value.i, 0, item.onPlayComplete);
 							if (_timeScale != 1)
 								trans.timeScale = _timeScale;
 						}
@@ -953,7 +956,7 @@ namespace FairyGUI
 					item.startValue.f1 = 0; //offsetX
 					item.startValue.f2 = 0; //offsetY
 					item.startValue.f3 = item.value.f2;//shakePeriod
-					Timers.inst.AddUpdate(item.__Shake, this);
+					Timers.inst.AddUpdate(item.onShake);
 					_totalTasks++;
 					item.completed = false;
 					break;
@@ -1002,7 +1005,7 @@ namespace FairyGUI
 
 				item.completed = true;
 				_totalTasks--;
-				Timers.inst.Remove(item.__Shake);
+				Timers.inst.Remove(item.onShake);
 
 				CheckAllComplete();
 			}
@@ -1023,12 +1026,11 @@ namespace FairyGUI
 			while (et.MoveNext())
 			{
 				XML cxml = et.Current;
-				TransitionItem item = new TransitionItem();
+				TransitionItem item = new TransitionItem(this, FieldTypes.ParseTransitionActionType(cxml.GetAttribute("type")));
 				_items.Add(item);
 
 				item.time = (float)cxml.GetAttributeInt("time") / (float)FRAME_RATE;
 				item.targetId = cxml.GetAttribute("target", string.Empty);
-				item.type = FieldTypes.ParseTransitionActionType(cxml.GetAttribute("type"));
 				item.tween = cxml.GetAttributeBool("tween");
 				item.label = cxml.GetAttribute("label");
 				if (item.tween)
@@ -1200,36 +1202,39 @@ namespace FairyGUI
 		public bool filterCreated;
 		public uint displayLockToken;
 
-		public TransitionItem()
+		//cached delegates
+		public TimerCallback onShake;
+		public PlayCompleteCallback onPlayComplete;
+
+		public TransitionItem(Transition owner, TransitionActionType type)
 		{
+			this.type = type;
 			easeType = Ease.OutQuad;
 			value = new TransitionValue();
 			startValue = new TransitionValue();
 			endValue = new TransitionValue();
+
+			if (type == TransitionActionType.Shake)
+				onShake = (object param) => { owner.ShakeItem(this); };
+			else if (type == TransitionActionType.Transition)
+				onPlayComplete = () => { owner.PlayTransComplete(this); };
 		}
 
-		public TransitionItem Clone()
+		public void Copy(TransitionItem source)
 		{
-			TransitionItem item = new TransitionItem();
-			item.time = this.time;
-			item.targetId = this.targetId;
-			item.type = this.type;
-			item.duration = this.duration;
-			item.value.Copy(this.value);
-			item.startValue.Copy(this.startValue);
-			item.endValue.Copy(this.endValue);
-			item.easeType = this.easeType;
-			item.repeat = this.repeat;
-			item.yoyo = this.yoyo;
-			item.tween = this.tween;
-			item.label = this.label;
-			item.label2 = this.label2;
-			return item;
-		}
-
-		public void __Shake(object callback)
-		{
-			((Transition)callback).ShakeItem(this);
+			this.time = source.time;
+			this.targetId = source.targetId;
+			this.type = source.type;
+			this.duration = source.duration;
+			this.value.Copy(source.value);
+			this.startValue.Copy(source.startValue);
+			this.endValue.Copy(source.endValue);
+			this.easeType = source.easeType;
+			this.repeat = source.repeat;
+			this.yoyo = source.yoyo;
+			this.tween = source.tween;
+			this.label = source.label;
+			this.label2 = source.label2;
 		}
 	}
 
