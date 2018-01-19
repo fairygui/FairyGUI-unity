@@ -46,6 +46,11 @@ namespace FairyGUI
 			onChanged = new EventListener(this, "onChanged");
 		}
 
+		public void Dispose()
+		{
+			RemoveEventListeners();
+		}
+
 		/// <summary>
 		/// Current page index.
 		/// 获得或设置当前活动页面索引。

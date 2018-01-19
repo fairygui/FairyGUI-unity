@@ -258,6 +258,8 @@ namespace FairyGUI
 		/// </summary>
 		public void Dispose()
 		{
+			RemoveEventListeners();
+
 			if (_tweening != 0)
 				Timers.inst.Remove(_tweenUpdateDelegate);
 

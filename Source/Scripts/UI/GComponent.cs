@@ -68,11 +68,18 @@ namespace FairyGUI
 
 		override public void Dispose()
 		{
-			int transCnt = _transitions.Count;
-			for (int i = 0; i < transCnt; ++i)
+			int cnt = _transitions.Count;
+			for (int i = 0; i < cnt; ++i)
 			{
 				Transition trans = _transitions[i];
 				trans.Dispose();
+			}
+
+			cnt = _controllers.Count;
+			for (int i = 0; i < cnt; ++i)
+			{
+				Controller c = _controllers[i];
+				c.Dispose();
 			}
 
 			if (scrollPane != null)
@@ -80,8 +87,8 @@ namespace FairyGUI
 
 			base.Dispose(); //Dispose native tree first, avoid DisplayObject.RemoveFromParent call
 
-			int numChildren = _children.Count;
-			for (int i = numChildren - 1; i >= 0; --i)
+			cnt = _children.Count;
+			for (int i = cnt - 1; i >= 0; --i)
 			{
 				GObject obj = _children[i];
 				obj.InternalSetParent(null); //Avoid GObject.RemoveParent call
