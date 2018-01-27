@@ -664,13 +664,15 @@ namespace FairyGUI
 								lineBegin += line.charCount;
 								line.y = line.y2 = lineY;
 								lineY += (line.height + lineSpacing);
+								if (lineY < GUTTER_Y)
+									lineY = GUTTER_Y;
 								_lines.Add(line);
 
 								lastLineHeight = line.height;
 								if (line.width > _textWidth)
 									_textWidth = line.width;
-								if (subSpace > lineSpacing)
-									supSpace = subSpace - lineSpacing;
+								if (subSpace != 0 && subSpace > lineSpacing)
+									supSpace = subSpace - (lineSpacing > 0 ? lineSpacing : 0);
 								subSpace = 0;
 							}
 							else
@@ -787,13 +789,15 @@ namespace FairyGUI
 								lineBegin += line.charCount;
 								line.y = line.y2 = lineY;
 								lineY += (line.height + lineSpacing);
+								if (lineY < GUTTER_Y)
+									lineY = GUTTER_Y;
 								_lines.Add(line);
 
 								lastLineHeight = line.height;
 								if (line.width > _textWidth)
 									_textWidth = line.width;
-								if (subSpace > lineSpacing)
-									supSpace = subSpace - lineSpacing;
+								if (subSpace != 0 && subSpace > lineSpacing)
+									supSpace = subSpace - (lineSpacing > 0 ? lineSpacing : 0);
 								subSpace = 0;
 							}
 							else
@@ -850,6 +854,8 @@ namespace FairyGUI
 						lineTextHeight = 0;
 						line.y = line.y2 = lineY;
 						lineY += (line.height + lineSpacing);
+						if (lineY < GUTTER_Y)
+							lineY = GUTTER_Y;
 						line.charIndex = lineBegin;
 						line.charCount = lineChars;
 						lineBegin += line.charCount;
@@ -859,8 +865,8 @@ namespace FairyGUI
 						lastLineHeight = line.height;
 						if (line.width > _textWidth)
 							_textWidth = line.width;
-						if (subSpace > lineSpacing)
-							supSpace = subSpace - lineSpacing;
+						if (subSpace != 0 && subSpace > lineSpacing)
+							supSpace = subSpace - (lineSpacing > 0 ? lineSpacing : 0);
 						subSpace = 0;
 						continue;
 					}
@@ -952,13 +958,15 @@ namespace FairyGUI
 						lineBegin += line.charCount;
 						line.y = line.y2 = lineY;
 						lineY += (line.height + lineSpacing);
+						if (lineY < GUTTER_Y)
+							lineY = GUTTER_Y;
 						_lines.Add(line);
 
 						lastLineHeight = line.height;
 						if (line.width > _textWidth)
 							_textWidth = line.width;
-						if (subSpace > lineSpacing)
-							supSpace = subSpace - lineSpacing;
+						if (subSpace != 0 && subSpace > lineSpacing)
+							supSpace = subSpace - (lineSpacing > 0 ? lineSpacing : 0);
 						subSpace = 0;
 					}
 				}
