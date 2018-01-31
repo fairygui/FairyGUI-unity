@@ -1486,6 +1486,7 @@ namespace FairyGUI
 				displayObject.gOwner = null;
 				displayObject.Dispose();
 			}
+			data = null;
 		}
 
 		public GImage asImage

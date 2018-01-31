@@ -35,7 +35,7 @@ namespace FairyGUI
 		/// <param name="extension"></param>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public delegate UnityEngine.Object LoadResource(string name, string extension, System.Type type);
+		public delegate object LoadResource(string name, string extension, System.Type type);
 
 		/// <summary>
 		/// 

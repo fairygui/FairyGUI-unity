@@ -1774,7 +1774,10 @@ namespace FairyGUI
 		{
 			enterCounter++;
 			if (enterCounter > 3)
+			{
+				enterCounter--;
 				return;
+			}
 
 			float pos = scrollPane.scrollingPosY;
 			float max = pos + scrollPane.viewHeight;
