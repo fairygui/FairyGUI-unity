@@ -109,12 +109,12 @@ namespace FairyGUI
 		public EventListener onTouchEnd { get; private set; }
 
 		/// <summary>
-		/// Only available for mouse input: the cursor hovers over an object.
+		/// The cursor or finger hovers over an object.
 		/// </summary>
 		public EventListener onRollOver { get; private set; }
 
 		/// <summary>
-		/// Only available for mouse input: the cursor leave an object.
+		/// The cursor or finger leave an object.
 		/// </summary>
 		public EventListener onRollOut { get; private set; }
 
