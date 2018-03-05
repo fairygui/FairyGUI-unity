@@ -286,6 +286,22 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public GScrollBar hzScrollBar
+		{
+			get { return this._hzScrollBar; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public GScrollBar vtScrollBar
+		{
+			get { return this._vtScrollBar; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public GComponent header
 		{
 			get { return _header; }

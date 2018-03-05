@@ -490,13 +490,14 @@ namespace FairyGUI
 					if ((ii.obj is GButton) && ((GButton)ii.obj).selected
 						|| ii.obj == null && ii.selected)
 					{
+						int j = i;
 						if (_loop)
 						{
-							i = i % _numItems;
-							if (ret.Contains(i))
+							j = i % _numItems;
+							if (ret.Contains(j))
 								continue;
 						}
-						ret.Add(i);
+						ret.Add(j);
 					}
 				}
 			}
