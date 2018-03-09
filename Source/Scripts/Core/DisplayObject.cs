@@ -1349,7 +1349,7 @@ namespace FairyGUI
 							paintingTexture.Dispose(true);
 						if (textureWidth > 0 && textureHeight > 0)
 						{
-							paintingTexture = new NTexture(CaptureCamera.CreateRenderTexture(textureWidth, textureHeight, false));
+							paintingTexture = new NTexture(CaptureCamera.CreateRenderTexture(textureWidth, textureHeight, UIConfig.depthSupportForPaintingMode));
 							Stage.inst.MonitorTexture(paintingTexture);
 						}
 						else

@@ -163,6 +163,11 @@ namespace FairyGUI
 		/// </summary>
 		public static bool rightToLeftText = false;
 
+		/// <summary>
+		/// if RenderTexture using in paiting mode has depth support.
+		/// </summary>
+		public static bool depthSupportForPaintingMode = false;
+
 		public enum ConfigKey
 		{
 			DefaultFont,
