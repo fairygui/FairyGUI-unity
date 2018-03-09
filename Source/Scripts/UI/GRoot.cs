@@ -228,7 +228,7 @@ namespace FairyGUI
 
 			return null;
 		}
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -351,7 +351,7 @@ namespace FairyGUI
 
 		/// <summary>
 		/// Show a popup object along with the specific target object.
-		/// 显示一个popup。将popup显示在指定对象的上边或者下边。
+		/// 显示一个popup。将popup显示在指定对象的上方或者下方。
 		/// popup的特点是点击popup对象外的区域，popup对象将自动消失。
 		/// </summary>
 		/// <param name="popup"></param>
@@ -373,6 +373,23 @@ namespace FairyGUI
 				}
 			}
 			_popupStack.Add(popup);
+
+			if (target != null)
+			{
+				GObject p = target;
+				while (p != null)
+				{
+					if (p.parent == this)
+					{
+						if (popup.sortingOrder < p.sortingOrder)
+						{
+							popup.sortingOrder = p.sortingOrder;
+						}
+						break;
+					}
+					p = p.parent;
+				}
+			}
 
 			AddChild(popup);
 			AdjustModalLayer();
