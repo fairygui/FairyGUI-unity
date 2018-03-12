@@ -41,6 +41,7 @@ namespace FairyGUI
 		float _lastScale;
 		int[] _touches;
 		bool _started;
+		bool _touchBegan;
 
 		public PinchGesture(GObject host)
 		{
@@ -80,6 +81,7 @@ namespace FairyGUI
 			else
 			{
 				_started = false;
+				_touchBegan = false;
 				if (host == GRoot.inst)
 				{
 					Stage.inst.onTouchBegin.Remove(__touchBegin);
@@ -99,8 +101,9 @@ namespace FairyGUI
 		{
 			if (Stage.inst.touchCount == 2)
 			{
-				if (!_started)
+				if (!_started && !_touchBegan)
 				{
+					_touchBegan = true;
 					Stage.inst.GetAllTouch(_touches);
 					Vector2 pt1 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[0]));
 					Vector2 pt2 = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touches[1]));
@@ -113,7 +116,7 @@ namespace FairyGUI
 
 		void __touchMove(EventContext context)
 		{
-			if (Stage.inst.touchCount != 2)
+			if (!_touchBegan || Stage.inst.touchCount != 2)
 				return;
 
 			InputEvent evt = context.inputEvent;
@@ -142,6 +145,7 @@ namespace FairyGUI
 
 		void __touchEnd(EventContext context)
 		{
+			_touchBegan = false;
 			if (_started)
 			{
 				_started = false;

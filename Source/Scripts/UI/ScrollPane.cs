@@ -263,6 +263,9 @@ namespace FairyGUI
 			if (_tweening != 0)
 				Timers.inst.Remove(_tweenUpdateDelegate);
 
+			if (draggingPane == this)
+				draggingPane = null;
+
 			_pageController = null;
 
 			if (_hzScrollBar != null)

@@ -787,6 +787,7 @@ namespace FairyGUI
 			{
 				_caret.RemoveFromParent();
 				_selectionShape.RemoveFromParent();
+				_editing = false;
 			}
 			base.Dispose();
 		}
@@ -847,7 +848,7 @@ namespace FairyGUI
 
 		void __touchMove(EventContext context)
 		{
-			if (isDisposed)
+			if (!_editing)
 				return;
 
 			Vector3 v = Stage.inst.touchPosition;

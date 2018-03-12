@@ -62,7 +62,7 @@ namespace FairyGUI
 		Vector2 _lastPoint;
 		float _time;
 		bool _started;
-		bool _began;
+		bool _touchBegan;
 
 		public static int ACTION_DISTANCE = 200;
 
@@ -105,6 +105,7 @@ namespace FairyGUI
 			else
 			{
 				_started = false;
+				_touchBegan = false;
 				if (host == GRoot.inst)
 				{
 					Stage.inst.onTouchBegin.Remove(__touchBegin);
@@ -124,7 +125,7 @@ namespace FairyGUI
 		{
 			if (Stage.inst.touchCount > 1)
 			{
-				_began = false;
+				_touchBegan = false;
 				if (_started)
 				{
 					_started = false;
@@ -141,14 +142,14 @@ namespace FairyGUI
 			_started = false;
 			velocity = Vector2.zero;
 			position = Vector2.zero;
-			_began = true;
+			_touchBegan = true;
 
 			context.CaptureTouch();
 		}
 
 		void __touchMove(EventContext context)
 		{
-			if (Stage.inst.touchCount > 1 || !_began)
+			if (!_touchBegan || Stage.inst.touchCount > 1)
 				return;
 
 			InputEvent evt = context.inputEvent;
@@ -195,7 +196,7 @@ namespace FairyGUI
 				return;
 
 			_started = false;
-			_began = false;
+			_touchBegan = false;
 
 			InputEvent evt = context.inputEvent;
 			Vector2 pt = host.GlobalToLocal(new Vector2(evt.x, evt.y));
