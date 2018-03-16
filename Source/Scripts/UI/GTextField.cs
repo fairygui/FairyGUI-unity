@@ -207,15 +207,6 @@ namespace FairyGUI
 		}
 
 		/// <summary>
-		/// 设定文本是否从右向左显示（阿拉伯文字）。
-		/// </summary>
-		public bool rtl
-		{
-			get { return _textField.rtl; }
-			set { _textField.rtl = value; }
-		}
-
-		/// <summary>
 		/// 
 		/// </summary>
 		public float textWidth

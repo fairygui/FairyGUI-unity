@@ -155,6 +155,12 @@ namespace FairyGUI.Utils
 			attributes = XMLIterator.GetAttributes(attributes);
 		}
 
+
+		public bool isEntity
+		{
+			get { return type == HtmlElementType.Image || type == HtmlElementType.Select || type == HtmlElementType.Input || type == HtmlElementType.Object; }
+		}
+
 		#region Pool Support
 
 		static Stack<HtmlElement> elementPool = new Stack<HtmlElement>();

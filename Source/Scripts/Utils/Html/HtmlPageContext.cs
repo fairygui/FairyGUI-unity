@@ -35,14 +35,14 @@ namespace FairyGUI.Utils
 			IHtmlObject ret = null;
 			if (element.type == HtmlElementType.Image)
 			{
-				if (_imagePool.Count > 0)
+				if (_imagePool.Count > 0 && _poolManager != null)
 					ret = _imagePool.Pop();
 				else
 					ret = new HtmlImage();
 			}
 			else if (element.type == HtmlElementType.Link)
 			{
-				if (_linkPool.Count > 0)
+				if (_linkPool.Count > 0 && _poolManager != null)
 					ret = _linkPool.Pop();
 				else
 					ret = new HtmlLink();
@@ -54,14 +54,14 @@ namespace FairyGUI.Utils
 					type = type.ToLower();
 				if (type == "button" || type == "submit")
 				{
-					if (_buttonPool.Count > 0)
+					if (_buttonPool.Count > 0 && _poolManager != null)
 						ret = _buttonPool.Pop();
 					else
 						ret = new HtmlButton();
 				}
 				else
 				{
-					if (_inputPool.Count > 0)
+					if (_inputPool.Count > 0 && _poolManager != null)
 						ret = _inputPool.Pop();
 					else
 						ret = new HtmlInput();
@@ -69,7 +69,7 @@ namespace FairyGUI.Utils
 			}
 			else if (element.type == HtmlElementType.Select)
 			{
-				if (_selectPool.Count > 0)
+				if (_selectPool.Count > 0 && _poolManager != null)
 					ret = _selectPool.Pop();
 				else
 					ret = new HtmlSelect();
