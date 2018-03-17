@@ -86,17 +86,16 @@ namespace FairyGUI
 				EMRenderSupport.Remove(this);
 		}
 
-#if FAIRYGUI_DLL || UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
 		void OnGUI()
 		{
 			if (!Application.isPlaying)
 				EM_BeforeUpdate();
 		}
-#endif
-
 
 		void Start()
 		{
+			useGUILayout = false;
+
 			if (!_created && Application.isPlaying)
 				CreateUI();
 		}
