@@ -12,8 +12,9 @@
 
 *********************************************************************/
 using System.Collections.Generic;
+using System.Text;
 
-namespace Tadpole
+namespace FairyGUI
 {
     internal enum CharState
     {
@@ -24,7 +25,7 @@ namespace Tadpole
         number
     }
 
-    public class RTL
+    public class RTLSupport
     {
         private static Dictionary<int, char> final;
         private static Dictionary<int, char> init;
@@ -95,46 +96,6 @@ namespace Tadpole
             }
             return true;
         }
-
-        /*
-            public static string FixMultiline(string rawText, Text text)
-            {
-                if (text.horizontalOverflow == HorizontalWrapMode.Overflow)
-
-                    return PersianFixer.FixText(rawText);
-
-                string processedText = string.Empty;
-                string[] sentences = rawText.Split('\n');
-
-                foreach (string sentence in sentences)
-                {
-                    string processedLine = string.Empty;
-                    string[] words = sentence.Split(' ');
-
-                    processedLine += PersianFixer.FixText(words[0]);
-                    for (int i = 1; i < words.Length; i++)
-                    {
-                        float currentHeight = text.preferredHeight;
-                        //float currentHeight = 10;
-                        string tempLine = PersianFixer.FixText(words[i]) + " " + processedLine;
-
-                        text.text = tempLine;
-                        text.Rebuild(CanvasUpdate.Prelayout);
-                        if (text.preferredHeight > currentHeight)
-                        {
-                            processedText += processedLine + "\n";
-                            processedLine = PersianFixer.FixText(words[i]);
-                        }
-                        else
-                            processedLine = PersianFixer.FixText(words[i]) + " " + processedLine;
-                    }
-
-                    processedText += processedLine + "\n";
-                }
-
-                processedText = processedText.Remove(processedText.Length - 1);
-                return processedText;
-            }*/
 
         public static string Convert(string input)
         {
@@ -292,8 +253,38 @@ namespace Tadpole
                     }
                 }
             }
-            return str2;
+
+
+			return Reverse(str2);
         }
+
+		private static string Reverse(string source)
+		{
+			StringBuilder buffer = new StringBuilder();
+			int len = source.Length;
+			int i = len - 1;
+			while (i >= 0)
+			{
+				char ch = source[i];
+				if (ch == '\r' && i != len - 1 && source[i + 1] == '\n')
+				{
+					i--;
+					continue;
+				}
+
+				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
+				{
+					buffer.Append(source[i - 1]);
+					buffer.Append(ch);
+					i--;
+				}
+				else
+					buffer.Append(ch);
+				i--;
+			}
+
+			return buffer.ToString();
+		}
 
         private static void InitChars()
         {

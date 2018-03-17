@@ -619,7 +619,7 @@ namespace FairyGUI
 					}
 					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '.'
 #if RTL_TEXT_SUPPORT
-						|| (_rtl && Tadpole.RTL.IsArabicLetter(ch))
+						|| (_rtl && RTLSupport.IsArabicLetter(ch))
 #endif
 					))
 					{
@@ -775,7 +775,7 @@ namespace FairyGUI
 		void ParseText()
 		{
 #if RTL_TEXT_SUPPORT
-			_rtl = Tadpole.RTL.ContainsArabicLetters(_text);
+			_rtl = RTLSupport.ContainsArabicLetters(_text);
 #endif
 			if (_html)
 			{
@@ -790,8 +790,10 @@ namespace FairyGUI
 			int elementCount = _elements.Count;
 			if (elementCount == 0)
 			{
+#if RTL_TEXT_SUPPORT
 				if (_rtl)
-					_parsedText = ConvertRTL(_parsedText);
+					_parsedText = RTLSupport.Convert(_parsedText);
+#endif
 
 				bool flag = _input || _richTextField != null && _richTextField.emojies != null;
 				if (!flag)
@@ -827,8 +829,10 @@ namespace FairyGUI
 					element.charIndex = buffer.Length;
 					if (element.type == HtmlElementType.Text)
 					{
+#if RTL_TEXT_SUPPORT
 						if (_rtl)
-							element.text = ConvertRTL(element.text);
+							element.text = RTLSupport.Convert(element.text);
+#endif
 						i = ParseText(buffer, element.text, i);
 						elementCount = _elements.Count;
 					}
@@ -838,43 +842,6 @@ namespace FairyGUI
 				}
 				_parsedText = buffer.ToString();
 			}
-		}
-
-		string ConvertRTL(string source)
-		{
-			try
-			{
-				source = Tadpole.RTL.Convert(source);
-			}
-			catch (System.Exception ex)
-			{
-				Debug.LogWarning(ex.ToString());
-			}
-
-			StringBuilder buffer = new StringBuilder();
-			int len = source.Length;
-			int i = len - 1;
-			while (i >= 0)
-			{
-				char ch = source[i];
-				if (ch == '\r' && i != len - 1 && source[i + 1] == '\n')
-				{
-					i--;
-					continue;
-				}
-
-				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
-				{
-					buffer.Append(source[i - 1]);
-					buffer.Append(ch);
-					i--;
-				}
-				else
-					buffer.Append(ch);
-				i--;
-			}
-
-			return buffer.ToString();
 		}
 
 		int ParseText(StringBuilder buffer, string source, int elementIndex)
