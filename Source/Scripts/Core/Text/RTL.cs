@@ -243,7 +243,7 @@ namespace Tadpole
             {
                 char item = chArray2[(chArray2.Length - j) - 1];
                 int num4 = item;
-                if (((num4 <= 0x7e) && (num4 >= 0x20)) || ((num4 <= 0x669) && (num4 >= 0x660)))
+                if (((num4 <= 0x7e) && (num4 >= 0x20)) || ((num4 <= 0x669) && (num4 >= 0x660)) || char.IsSurrogate(item) || char.IsLowSurrogate(item))
                 {
                     if (string.IsNullOrEmpty(str))
                     {

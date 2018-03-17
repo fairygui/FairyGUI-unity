@@ -484,7 +484,7 @@ namespace FairyGUI
 			if (!_html)
 			{
 				_font.SetFormat(_textFormat, _fontSizeScale);
-				_font.PrepareCharacters(_text);
+				_font.PrepareCharacters(_parsedText);
 				_font.PrepareCharacters("_-*");
 			}
 			else
@@ -511,32 +511,7 @@ namespace FairyGUI
 
 			Cleanup();
 
-			_parsedText = _text;
-
-			if (_text.Length > 0)
-			{
-#if RTL_TEXT_SUPPORT
-				_rtl = Tadpole.RTL.ContainsArabicLetters(_text);
-				if (_rtl)
-				{
-					try
-					{
-						_parsedText = Tadpole.RTL.Convert(_text);
-					}
-					catch (System.Exception ex)
-					{
-						Debug.LogWarning(ex.ToString());
-					}
-				}
-#endif
-				if (_html)
-				{
-					HtmlParser.inst.Parse(_parsedText, _textFormat, _elements,
-						_richTextField != null ? _richTextField.htmlParseOptions : null);
-				}
-			}
-
-			if (_parsedText.Length == 0)
+			if (_text.Length == 0)
 			{
 				LineInfo emptyLine = LineInfo.Borrow();
 				emptyLine.width = emptyLine.height = 0;
@@ -551,6 +526,8 @@ namespace FairyGUI
 
 				return;
 			}
+
+			ParseText();
 
 			int letterSpacing = _textFormat.letterSpacing;
 			int lineSpacing = _textFormat.lineSpacing - 1;
@@ -574,34 +551,21 @@ namespace FairyGUI
 			_fontSizeScale = 1;
 
 			RequestText();
-			TidyText();
 
 			int elementCount = _elements.Count;
 			int elementIndex = 0;
 			HtmlElement element = null;
 			if (elementCount > 0)
-				element = _elements[0];
+				element = _elements[elementIndex];
+			int textLength = _parsedText.Length;
 
 			LineInfo line = LineInfo.Borrow();
 			_lines.Add(line);
 			line.y = line.y2 = GUTTER_Y;
 
-			int textLength = _parsedText.Length;
 			for (int charIndex = 0; charIndex < textLength; charIndex++)
 			{
 				char ch = _parsedText[charIndex];
-				if (ch == '\r')
-				{
-					if (charIndex != textLength - 1 && _parsedText[charIndex + 1] == '\n')
-						continue;
-
-					ch = '\n';
-				}
-				else if (ch == '\t')
-					ch = ' ';
-
-				if (char.IsHighSurrogate(ch) || char.IsLowSurrogate(ch))
-					continue;
 
 				glyphWidth = glyphHeight = 0;
 
@@ -626,7 +590,7 @@ namespace FairyGUI
 							glyphWidth = (int)htmlObject.width;
 							glyphHeight = (int)htmlObject.height;
 
-							glyphWidth += 3;
+							glyphWidth += 2;
 						}
 
 						if (element.isEntity)
@@ -654,7 +618,10 @@ namespace FairyGUI
 						wordPossible = true;
 					}
 					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '.'
-						|| (_rtl && Tadpole.RTL.IsArabicLetter(ch))))
+#if RTL_TEXT_SUPPORT
+						|| (_rtl && Tadpole.RTL.IsArabicLetter(ch))
+#endif
+					))
 					{
 						if (wordChars == 0)
 							wordStart = line.width;
@@ -802,21 +769,51 @@ namespace FairyGUI
 			else
 				_fontSizeScale = 1;
 
-			if (_rtl)
-				AdjustElementOrder();
-
 			BuildLinesFinal();
 		}
 
-		void TidyText()
+		void ParseText()
 		{
+#if RTL_TEXT_SUPPORT
+			_rtl = Tadpole.RTL.ContainsArabicLetters(_text);
+#endif
+			if (_html)
+			{
+				HtmlParser.inst.Parse(_text, _textFormat, _elements,
+					_richTextField != null ? _richTextField.htmlParseOptions : null);
+
+				_parsedText = string.Empty;
+			}
+			else
+				_parsedText = _text;
+
 			int elementCount = _elements.Count;
 			if (elementCount == 0)
 			{
-				if (_richTextField != null && _richTextField.emojies != null || _input)
+				if (_rtl)
+					_parsedText = ConvertRTL(_parsedText);
+
+				bool flag = _input || _richTextField != null && _richTextField.emojies != null;
+				if (!flag)
+				{
+					//检查文本中是否有需要转换的字符，如果没有，节省一个new StringBuilder的操作。
+					int cnt = _parsedText.Length;
+					for (int i = 0; i < cnt; i++)
+					{
+						char ch = _parsedText[i];
+						if (ch == '\r' || ch == '\t' || char.IsHighSurrogate(ch))
+						{
+							flag = true;
+							break;
+						}
+					}
+				}
+
+				if (flag)
 				{
 					StringBuilder buffer = new StringBuilder();
-					TidyPartText(buffer, _parsedText, -1);
+					ParseText(buffer, _parsedText, -1);
+					elementCount = _elements.Count;
 					_parsedText = buffer.ToString();
 				}
 			}
@@ -830,7 +827,9 @@ namespace FairyGUI
 					element.charIndex = buffer.Length;
 					if (element.type == HtmlElementType.Text)
 					{
-						i = TidyPartText(buffer, element.text, i);
+						if (_rtl)
+							element.text = ConvertRTL(element.text);
+						i = ParseText(buffer, element.text, i);
 						elementCount = _elements.Count;
 					}
 					else if (element.isEntity)
@@ -839,18 +838,46 @@ namespace FairyGUI
 				}
 				_parsedText = buffer.ToString();
 			}
-
-			if (_rtl)
-			{
-				char[] chars = _parsedText.ToCharArray();
-				Array.Reverse(chars);
-				_parsedText = new string(chars);
-
-				_elements.Reverse();
-			}
 		}
 
-		int TidyPartText(StringBuilder buffer, string source, int elementIndex)
+		string ConvertRTL(string source)
+		{
+			try
+			{
+				source = Tadpole.RTL.Convert(source);
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogWarning(ex.ToString());
+			}
+
+			StringBuilder buffer = new StringBuilder();
+			int len = source.Length;
+			int i = len - 1;
+			while (i >= 0)
+			{
+				char ch = source[i];
+				if (ch == '\r' && i != len - 1 && source[i + 1] == '\n')
+				{
+					i--;
+					continue;
+				}
+
+				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
+				{
+					buffer.Append(source[i - 1]);
+					buffer.Append(ch);
+					i--;
+				}
+				else
+					buffer.Append(ch);
+				i--;
+			}
+
+			return buffer.ToString();
+		}
+
+		int ParseText(StringBuilder buffer, string source, int elementIndex)
 		{
 			int textLength = source.Length;
 			int j = 0;
@@ -866,6 +893,12 @@ namespace FairyGUI
 						j++;
 					appendPos = j + 1;
 					buffer.Append('\n');
+				}
+				else if (ch == '\t')
+				{
+					buffer.Append(source, appendPos, j - appendPos);
+					appendPos = j + 1;
+					buffer.Append(' ');
 				}
 				else
 				{
@@ -912,32 +945,6 @@ namespace FairyGUI
 				buffer.Append(source, appendPos, j - appendPos);
 
 			return elementIndex;
-		}
-
-		//因为渲染时每行的字符顺序会倒转，这里也要重新设置element顺序
-		void AdjustElementOrder()
-		{
-			int checkIndex = 0;
-			int startInLine = -1;
-			int lineCount = _lines.Count;
-			int elementCount = _elements.Count;
-			for (int i = 0; i < lineCount; ++i)
-			{
-				LineInfo line = _lines[i];
-				for (; checkIndex < elementCount; checkIndex++)
-				{
-					HtmlElement element = _elements[checkIndex];
-					if (element.charIndex < line.charIndex + line.charCount)
-					{
-						if (startInLine == -1)
-							startInLine = checkIndex;
-						else
-							_elements.Insert(startInLine, element);
-					}
-					else
-						break;
-				}
-			}
 		}
 
 		bool _updatingSize; //防止重复调用BuildLines
@@ -1031,14 +1038,13 @@ namespace FairyGUI
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
 			AlignType lineAlign;
+			float lastGlyphHeight = 0;
+
 			int elementIndex = 0;
 			int elementCount = _elements.Count;
 			HtmlElement element = null;
 			if (elementCount > 0)
-				element = _elements[0];
-			int charIndex = 0;
-			bool skipChar = false;
-			float lastGlyphHeight = 0;
+				element = _elements[elementIndex];
 
 			int lineCount = _lines.Count;
 			for (int i = 0; i < lineCount; ++i)
@@ -1049,31 +1055,46 @@ namespace FairyGUI
 
 				lineClipped = clipped && i != 0 && line.y + line.height > _contentRect.height; //超出区域，剪裁
 				lineAlign = format.align;
-				if (element != null)
-				{
-					if (element.charIndex == (_rtl ? (line.charIndex + line.charCount - 1) : line.charIndex))
-						lineAlign = element.format.align;
-				}
+				if (element != null && element.charIndex == line.charIndex)
+					lineAlign = element.format.align;
 				else
 					lineAlign = format.align;
-				if (lineAlign == AlignType.Center)
-					xIndent = (int)((rectWidth - line.width) / 2);
-				else
+#if RTL_TEXT_SUPPORT
+				if (_rtl)
 				{
-					if (lineAlign == AlignType.Right)
+					if (lineAlign == AlignType.Center)
+						xIndent = (int)((rectWidth + line.width) / 2);
+					else if (lineAlign == AlignType.Right)
+						xIndent = rectWidth;
+					else
+						xIndent = Mathf.Ceil(line.width) + GUTTER_X * 2;
+
+					if (_input && xIndent > rectWidth)
+						xIndent = rectWidth;
+
+					charX = xIndent - GUTTER_X;
+				}
+				else
+#endif
+				{
+					if (lineAlign == AlignType.Center)
+						xIndent = (int)((rectWidth - line.width) / 2);
+					else if (lineAlign == AlignType.Right)
 						xIndent = rectWidth - line.width;
 					else
 						xIndent = 0;
+
+					if (_input && xIndent < 0)
+						xIndent = 0;
+
+					charX = GUTTER_X + xIndent;
 				}
-				if (_input && xIndent < 0)
-					xIndent = 0;
 
-				charX = GUTTER_X + xIndent;
-
-				int j = 0;
-				while (j < line.charCount)
+				for (int j = 0; j < line.charCount; j++)
 				{
-					charIndex = _rtl ? (line.charIndex + line.charCount - 1 - j) : (line.charIndex + j);
+					int charIndex = line.charIndex + j;
+					char ch = _parsedText[charIndex];
+
 					while (element != null && charIndex == element.charIndex)
 					{
 						if (element.type == HtmlElementType.Text)
@@ -1108,6 +1129,9 @@ namespace FairyGUI
 							IHtmlObject htmlObj = element.htmlObject;
 							if (htmlObj != null)
 							{
+								if (_rtl)
+									charX -= htmlObj.width - 2;
+
 								if (_charPositions != null)
 								{
 									CharPosition cp = new CharPosition();
@@ -1123,34 +1147,48 @@ namespace FairyGUI
 									element.status |= 1;
 								else
 									element.status &= 254;
-								charX += htmlObj.width + letterSpacing + 2;
-								skipChar = true;
+
+								if (_rtl)
+									charX -= letterSpacing;
+								else
+									charX += htmlObj.width + letterSpacing + 2;
 							}
 						}
+
+						if (element.isEntity)
+							ch = '\0';
 
 						elementIndex++;
 						if (elementIndex < elementCount)
 							element = _elements[elementIndex];
 						else
 							element = null;
-						continue;
 					}
 
-					j++;
-					if (skipChar)
-					{
-						skipChar = false;
+					if (ch == '\0')
 						continue;
-					}
-					char ch = _parsedText[charIndex];
-					if (ch == '\t')
-						ch = ' ';
+
 					if (_font.GetGlyph(ch, glyph))
 					{
-						if (lineClipped || clipped && charX != (GUTTER_X + xIndent) && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
+#if RTL_TEXT_SUPPORT
+						if (_rtl)
 						{
-							charX += letterSpacing + glyph.width;
-							continue;
+							if (lineClipped || clipped && charX != (xIndent - GUTTER_X) && charX < GUTTER_X - 0.5f) //超出区域，剪裁
+							{
+								charX -= (letterSpacing + glyph.width);
+								continue;
+							}
+
+							charX -= glyph.width;
+						}
+						else
+#endif
+						{
+							if (lineClipped || clipped && charX != (GUTTER_X + xIndent) && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
+							{
+								charX += letterSpacing + glyph.width;
+								continue;
+							}
 						}
 
 						yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
@@ -1305,8 +1343,17 @@ namespace FairyGUI
 							cp.offsetX = (int)charX;
 							_charPositions.Add(cp);
 						}
+#if RTL_TEXT_SUPPORT
+						if (_rtl)
+						{
+							charX -= letterSpacing;
+						}
+						else
+#endif
+						{
 
-						charX += letterSpacing + glyph.width;
+							charX += letterSpacing + glyph.width;
+						}
 					}
 					else //if GetGlyph failed
 					{
@@ -1320,7 +1367,16 @@ namespace FairyGUI
 							_charPositions.Add(cp);
 						}
 
-						charX += letterSpacing;
+#if RTL_TEXT_SUPPORT
+						if (_rtl)
+						{
+							charX -= letterSpacing;
+						}
+#endif
+						else
+						{
+							charX += letterSpacing;
+						}
 					}
 				}//text loop
 			}//line loop
@@ -1439,6 +1495,7 @@ namespace FairyGUI
 			LineInfo.Return(_lines);
 			_textWidth = 0;
 			_textHeight = 0;
+			_parsedText = string.Empty;
 			_rtl = false;
 			if (_charPositions != null)
 				_charPositions.Clear();
