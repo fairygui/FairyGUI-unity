@@ -534,11 +534,9 @@ namespace FairyGUI
 				FillVerts(0, drawRect);
 				FillUV(0, uvRect);
 
-				Vector2 camPos = cameraPosition != null ? (Vector2)cameraPosition : Vector2.zero;
-				if (camPos.x == 0)
-					camPos.x = drawRect.x + drawRect.width / 2;
-				if (camPos.y == 0)
-					camPos.y = -(drawRect.y + drawRect.height / 2);
+				Vector2 camPos;
+				camPos.x = drawRect.x + drawRect.width / 2;
+				camPos.y = -(drawRect.y + drawRect.height / 2);
 				float cx = uvRect.x + (camPos.x - drawRect.x) / drawRect.width * uvRect.width;
 				float cy = uvRect.y - (camPos.y - drawRect.y) / drawRect.height * uvRect.height;
 
