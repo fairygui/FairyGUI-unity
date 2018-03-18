@@ -2879,6 +2879,9 @@ namespace FairyGUI
 					str = ix.GetAttribute("name");
 					if (str != null)
 						obj.name = str;
+					str = ix.GetAttribute("selectedIcon");
+					if (str != null && (obj is GButton))
+						(obj as GButton).selectedIcon = str;
 				}
 			}
 		}
