@@ -1,5 +1,5 @@
 ﻿/********************************************************************
-				Copyright (c) 2017, Tadpole Studio
+				Copyright (c) 2018, Tadpole Studio
 					All rights reserved
  
 	文件名称：	RTL.cs
@@ -204,7 +204,9 @@ namespace FairyGUI
             {
                 char item = chArray2[(chArray2.Length - j) - 1];
                 int num4 = item;
-                if (((num4 <= 0x7e) && (num4 >= 0x20)) || ((num4 <= 0x669) && (num4 >= 0x660)) || char.IsSurrogate(item) || char.IsLowSurrogate(item))
+                if (((num4 >= 0x20) && (num4 <= 0x7e) && !_IsBracket(item)) || 
+                    ((num4 >= 0x660) && (num4 <= 0x669)) || 
+                    char.IsSurrogate(item) || char.IsLowSurrogate(item))
                 {
                     if (string.IsNullOrEmpty(str))
                     {
@@ -220,6 +222,7 @@ namespace FairyGUI
                         list2.Add(str);
                     }
                     str = "";
+		    item = _ProcessBracket(item);
                     list.Add(item);
                 }
             }
@@ -524,6 +527,53 @@ namespace FairyGUI
                     return (char)unicode;
             }
             return '*';
+        }
+	    
+	        // 是否括号
+        private static bool _IsBracket(char uc)
+        {
+            return (uc == ')' || uc == '(' ||
+                    uc == ']' || uc == '[' ||
+                    uc == '}' || uc == '{' ||
+                    uc == '>' || uc == '<');
+        }
+
+        private static char _ProcessBracket(char uc)
+        {
+            // 这些配对符,在从右至左排列中应该逆序显示
+            if (uc == '[')
+            {
+                return ']';
+            }
+            else if (uc == ']')
+            {
+                return '[';
+            }
+            else if (uc == '{')
+            {
+                return '}';
+            }
+            else if (uc == '}')
+            {
+                return '{';
+            }
+            else if (uc == '(')
+            {
+                return ')';
+            }
+            else if (uc == ')')
+            {
+                return '(';
+            }
+            else if (uc == '<')
+            {
+                return '>';
+            }
+            else if (uc == '>')
+            {
+                return '<';
+            }
+            else return uc;
         }
     }
 }
