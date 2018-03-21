@@ -102,11 +102,7 @@ public class RenderImage
 			rect = this._image.TransformRect(new Rect(0, 0, this._width, this._height), source2);
 			source2.PrintTo(mesh, rect);
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			mesh.uv2 = mesh.uv;
-#else
-			mesh.uv2 = mesh.uv;
-#endif
 			mesh.uv = tmp;
 		}
 
