@@ -90,6 +90,8 @@ namespace FairyGUI
 		Vector2 _itemSize;
 		int _virtualListChanged; //1-content changed, 2-size changed
 		bool _eventLocked;
+		uint itemInfoVer; //用来标志item是否在本次处理中已经被重用了
+		uint enterCounter; //因为HandleScroll是会重入的，这个用来避免极端情况下的死锁
 
 		class ItemInfo
 		{
@@ -1750,6 +1752,7 @@ namespace FairyGUI
 			if (_eventLocked)
 				return;
 
+			enterCounter = 0;
 			if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 			{
 				HandleScroll1(forceUpdate);
@@ -1768,15 +1771,12 @@ namespace FairyGUI
 			_boundsChanged = false;
 		}
 
-		static uint itemInfoVer = 0; //用来标志item是否在本次处理中已经被重用了
-		static uint enterCounter = 0; //因为HandleScroll是会重入的，这个用来避免极端情况下的死锁
-
 		void HandleScroll1(bool forceUpdate)
 		{
 			enterCounter++;
 			if (enterCounter > 3)
 			{
-				enterCounter--;
+				Debug.Log("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
 				return;
 			}
 
@@ -1787,10 +1787,7 @@ namespace FairyGUI
 			//寻找当前位置的第一条项目
 			int newFirstIndex = GetIndexOnPos1(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
-			{
-				enterCounter--;
 				return;
-			}
 
 			int oldFirstIndex = _firstIndex;
 			_firstIndex = newFirstIndex;
@@ -1939,15 +1936,16 @@ namespace FairyGUI
 
 			if (curIndex > 0 && this.numChildren > 0 && this.container.y < 0 && GetChildAt(0).y > -this.container.y)//最后一页没填满！
 				HandleScroll1(false);
-
-			enterCounter--;
 		}
 
 		void HandleScroll2(bool forceUpdate)
 		{
 			enterCounter++;
 			if (enterCounter > 3)
+			{
+				Debug.Log("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
 				return;
+			}
 
 			float pos = scrollPane.scrollingPosX;
 			float max = pos + scrollPane.viewWidth;
@@ -1956,10 +1954,7 @@ namespace FairyGUI
 			//寻找当前位置的第一条项目
 			int newFirstIndex = GetIndexOnPos2(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
-			{
-				enterCounter--;
 				return;
-			}
 
 			int oldFirstIndex = _firstIndex;
 			_firstIndex = newFirstIndex;
@@ -2107,8 +2102,6 @@ namespace FairyGUI
 
 			if (curIndex > 0 && this.numChildren > 0 && this.container.x < 0 && GetChildAt(0).x > -this.container.x)//最后一页没填满！
 				HandleScroll2(false);
-
-			enterCounter--;
 		}
 
 		void HandleScroll3(bool forceUpdate)
