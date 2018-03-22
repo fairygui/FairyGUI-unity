@@ -328,15 +328,24 @@ namespace FairyGUI
 			Stats.GraphicsCount++;
 
 			NMaterial nm = null;
-			if (_manager != null && !_customMatarial)
+			if (!_customMatarial)
 			{
-				nm = _manager.GetMaterial(this, context);
-				_material = nm.material;
-				if ((object)_material != (object)meshRenderer.sharedMaterial && (object)_material.mainTexture != null)
-					meshRenderer.sharedMaterial = _material;
+				if (_manager != null)
+				{
+					nm = _manager.GetMaterial(this, context);
+					_material = nm.material;
+					if ((object)_material != (object)meshRenderer.sharedMaterial && (object)_material.mainTexture != null)
+						meshRenderer.sharedMaterial = _material;
 
-				if (nm.combined)
-					_material.SetTexture("_AlphaTex", _manager.texture.alphaTexture.nativeTexture);
+					if (nm.combined)
+						_material.SetTexture("_AlphaTex", _manager.texture.alphaTexture.nativeTexture);
+				}
+				else
+				{
+					_material = null;
+					if ((object)meshRenderer.sharedMaterial != null)
+						meshRenderer.sharedMaterial = null;
+				}
 			}
 
 			if (maskFrameId != 0 && maskFrameId != UpdateContext.frameId)
