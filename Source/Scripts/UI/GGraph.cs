@@ -176,10 +176,40 @@ namespace FairyGUI
 			this.shape.DrawRect(lineSize, lineColor, fillColor);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="aWidth"></param>
+		/// <param name="aHeight"></param>
+		/// <param name="fillColor"></param>
+		/// <param name="corner"></param>
+		public void DrawRoundRect(float aWidth, float aHeight, Color fillColor, float[] corner)
+		{
+			this.SetSize(aWidth, aHeight);
+			this.shape.DrawRoundRect(fillColor, corner);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="aWidth"></param>
+		/// <param name="aHeight"></param>
+		/// <param name="fillColor"></param>
 		public void DrawEllipse(float aWidth, float aHeight, Color fillColor)
 		{
 			this.SetSize(aWidth, aHeight);
 			this.shape.DrawEllipse(fillColor);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="fillColor"></param>
+		public void DrawPolygon(float aWidth, float aHeight, Vector2[] points, Color fillColor)
+		{
+			this.SetSize(aWidth, aHeight);
+			this.shape.DrawPolygon(points, fillColor);
 		}
 
 		override public void Setup_BeforeAdd(XML xml)
@@ -218,8 +248,28 @@ namespace FairyGUI
 				else
 					fillColor = Color.white;
 
+				float[] cornerRadius = null;
+				string[] arr;
+				arr = xml.GetAttributeArray("corner");
+				if (arr != null && arr.Length > 0)
+				{
+					cornerRadius = new float[4];
+					for (int i = 0; i < 4; i++)
+					{
+						if (i < arr.Length)
+							cornerRadius[i] = float.Parse(arr[i]);
+						else
+							cornerRadius[i] = cornerRadius[i - 1];
+					}
+				}
+
 				if (type == "rect")
-					DrawRect(this.width, this.height, lineSize, lineColor, fillColor);
+				{
+					if (cornerRadius != null)
+						DrawRoundRect(this.width, this.height, fillColor, cornerRadius);
+					else
+						DrawRect(this.width, this.height, lineSize, lineColor, fillColor);
+				}
 				else
 					DrawEllipse(this.width, this.height, fillColor);
 			}
