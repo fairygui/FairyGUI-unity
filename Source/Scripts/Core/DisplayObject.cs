@@ -1359,9 +1359,10 @@ namespace FairyGUI
 
 					if (paintingTexture != null)
 					{
-						paintingGraphics.SetOneQuadMesh(
+						paintingGraphics.DrawRect(
 							new Rect(-_paintingMargin.left, -_paintingMargin.top, paintingTexture.width, paintingTexture.height),
 							new Rect(0, 0, 1, 1), Color.white);
+						paintingGraphics.UpdateMesh();
 					}
 					else
 						paintingGraphics.ClearMesh();

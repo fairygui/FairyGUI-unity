@@ -529,31 +529,30 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="drawRect"></param>
+		/// <param name="vertRect"></param>
 		/// <param name="uvRect"></param>
 		/// <param name="color"></param>
-		/// <param name="allColors"></param>
-		public void SetOneQuadMesh(Rect drawRect, Rect uvRect, Color color, Color[] allColors = null, bool uvRotated = false)
+		public void DrawRect(Rect vertRect, Rect uvRect, Color color)
 		{
 			//当四边形发生形变时，只用两个三角面表达会造成图形的变形较严重，这里做一个优化，自动增加更多的面
 			if (vertexMatrix != null)
 			{
 				Alloc(9);
 
-				FillVerts(0, drawRect);
+				FillVerts(0, vertRect);
 				FillUV(0, uvRect);
 
 				Vector2 camPos;
-				camPos.x = drawRect.x + drawRect.width / 2;
-				camPos.y = -(drawRect.y + drawRect.height / 2);
-				float cx = uvRect.x + (camPos.x - drawRect.x) / drawRect.width * uvRect.width;
-				float cy = uvRect.y - (camPos.y - drawRect.y) / drawRect.height * uvRect.height;
+				camPos.x = vertRect.x + vertRect.width / 2;
+				camPos.y = -(vertRect.y + vertRect.height / 2);
+				float cx = uvRect.x + (camPos.x - vertRect.x) / vertRect.width * uvRect.width;
+				float cy = uvRect.y - (camPos.y - vertRect.y) / vertRect.height * uvRect.height;
 
 				vertices[4] = new Vector3(camPos.x, camPos.y, 0);
-				vertices[5] = new Vector3(drawRect.xMin, camPos.y, 0);
-				vertices[6] = new Vector3(camPos.x, -drawRect.yMin, 0);
-				vertices[7] = new Vector3(drawRect.xMax, camPos.y, 0);
-				vertices[8] = new Vector3(camPos.x, -drawRect.yMax, 0);
+				vertices[5] = new Vector3(vertRect.xMin, camPos.y, 0);
+				vertices[6] = new Vector3(camPos.x, -vertRect.yMin, 0);
+				vertices[7] = new Vector3(vertRect.xMax, camPos.y, 0);
+				vertices[8] = new Vector3(camPos.x, -vertRect.yMax, 0);
 
 				uv[4] = new Vector2(cx, cy);
 				uv[5] = new Vector2(uvRect.xMin, cy);
@@ -566,40 +565,27 @@ namespace FairyGUI
 			else
 			{
 				Alloc(4);
-				FillVerts(0, drawRect);
+				FillVerts(0, vertRect);
 				FillUV(0, uvRect);
 				this.triangles = TRIANGLES;
 			}
 
-			if (allColors != null)
-			{
-				Color32[] arr = this.colors;
-				int count = arr.Length;
-				for (int i = 0; i < count; i++)
-					arr[i] = allColors[i % allColors.Length];
-			}
-			else
-				FillColors(color);
-
-			if (uvRotated)
-				RotateUV(this.uv, ref uvRect);
-
-			UpdateMesh();
+			FillColors(color);
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
 		/// <param name="lineSize"></param>
 		/// <param name="lineColor"></param>
 		/// <param name="fillColor"></param>
-		/// <param name="allColors"></param>
-		public void DrawRect(Rect vertRect, int lineSize, Color lineColor, Color fillColor, Color[] allColors)
+		public void DrawRect(Rect vertRect, Rect uvRect, int lineSize, Color lineColor, Color fillColor)
 		{
 			if (lineSize == 0)
 			{
-				SetOneQuadMesh(new Rect(0, 0, vertRect.width, vertRect.height), new Rect(0, 0, 1, 1), fillColor, allColors);
+				DrawRect(vertRect, uvRect, fillColor);
 			}
 			else
 			{
@@ -622,47 +608,135 @@ namespace FairyGUI
 				rect = Rect.MinMaxRect(lineSize, lineSize, vertRect.width - lineSize, vertRect.height - lineSize);
 				FillVerts(16, rect);
 
-				rect = new Rect(0, 0, 1, 1);
-				int i;
-				for (i = 0; i < 5; i++)
-					FillUV(i * 4, rect);
+				FillShapeUV(ref vertRect, ref uvRect);
 
 				Color32[] arr = this.colors;
-				if (allColors != null)
+				Color32 col32 = lineColor;
+				for (int i = 0; i < 16; i++)
+					arr[i] = col32;
+
+				col32 = fillColor;
+				for (int i = 16; i < 20; i++)
+					arr[i] = col32;
+
+				FillTriangles();
+			}
+		}
+
+		static float[] sCornerRadius = new float[] { 0, 0, 0, 0 };
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
+		/// <param name="fillColor"></param>
+		/// <param name="topLeftRadius"></param>
+		/// <param name="topRightRadius"></param>
+		/// <param name="bottomLeftRadius"></param>
+		/// <param name="bottomRightRadius"></param>
+		public void DrawRoundRect(Rect vertRect, Rect uvRect, Color fillColor,
+			float topLeftRadius, float topRightRadius, float bottomLeftRadius, float bottomRightRadius)
+		{
+			sCornerRadius[0] = topRightRadius;
+			sCornerRadius[1] = topLeftRadius;
+			sCornerRadius[2] = bottomLeftRadius;
+			sCornerRadius[3] = bottomRightRadius;
+
+			int numSides = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				float radius = sCornerRadius[i];
+
+				if (radius != 0)
 				{
-					int colorCnt = allColors.Length;
-					for (i = 0; i < 20; i++)
-						arr[i] = allColors[i % colorCnt];
+					float radiusX = Mathf.Min(radius, vertRect.width / 2);
+					float radiusY = Mathf.Min(radius, vertRect.height / 2);
+					numSides += Mathf.Max(1, Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4 / 4)) + 1;
+				}
+				else
+					numSides++;
+			}
+
+			Alloc(numSides + 1);
+			Vector3[] vertices = this.vertices;
+
+			vertices[0] = new Vector3(vertRect.width / 2, -vertRect.height / 2);
+			int k = 1;
+
+			for (int i = 0; i < 4; i++)
+			{
+				float radius = sCornerRadius[i];
+
+				float radiusX = Mathf.Min(radius, vertRect.width / 2);
+				float radiusY = Mathf.Min(radius, vertRect.height / 2);
+
+				float offsetX = 0;
+				float offsetY = 0;
+
+				if (i == 0 || i == 3)
+					offsetX = vertRect.width - radiusX * 2;
+				if (i == 2 || i == 3)
+					offsetY = radiusY * 2 - vertRect.height;
+
+				if (radius != 0)
+				{
+					float partNumSides = Mathf.Max(1, Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4 / 4)) + 1;
+					float angleDelta = Mathf.PI / 2 / partNumSides;
+					float angle = Mathf.PI / 2 * i;
+					float startAngle = angle;
+
+					for (int j = 1; j <= partNumSides; j++)
+					{
+						if (j == partNumSides) //消除精度误差带来的不对齐
+							angle = startAngle + Mathf.PI / 2;
+						vertices[k] = new Vector3(offsetX + Mathf.Cos(angle) * radiusX + radiusX,
+							offsetY + Mathf.Sin(angle) * radiusY - radiusY, 0);
+						angle += angleDelta;
+						k++;
+					}
 				}
 				else
 				{
-					Color32 col32 = lineColor;
-					for (i = 0; i < 16; i++)
-						arr[i] = col32;
-
-					col32 = fillColor;
-					for (i = 16; i < 20; i++)
-						arr[i] = col32;
+					vertices[k] = new Vector3(offsetX, offsetY, 0);
+					k++;
 				}
-
-				FillTriangles();
-				UpdateMesh();
 			}
+
+			FillShapeUV(ref vertRect, ref uvRect);
+
+			AllocTriangleArray(numSides * 3);
+			int[] triangles = this.triangles;
+
+			k = 0;
+			for (int i = 1; i < numSides; i++)
+			{
+				triangles[k++] = i + 1;
+				triangles[k++] = i;
+				triangles[k++] = 0;
+			}
+			triangles[k++] = 1;
+			triangles[k++] = numSides;
+			triangles[k++] = 0;
+
+			FillColors(fillColor);
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
 		/// <param name="fillColor"></param>
-		/// <param name="allColors"></param>
-		public void DrawEllipse(Rect vertRect, Color fillColor, Color[] allColors)
+		public void DrawEllipse(Rect vertRect, Rect uvRect, Color fillColor)
 		{
 			float radiusX = vertRect.width / 2;
 			float radiusY = vertRect.height / 2;
 			int numSides = Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4);
 			if (numSides < 6) numSides = 6;
+
 			Alloc(numSides + 1);
+			Vector3[] vertices = this.vertices;
 
 			float angleDelta = 2 * Mathf.PI / numSides;
 			float angle = 0;
@@ -675,9 +749,11 @@ namespace FairyGUI
 				angle += angleDelta;
 			}
 
-			AllocTriangleArray(numSides * 3);
+			FillShapeUV(ref vertRect, ref uvRect);
 
+			AllocTriangleArray(numSides * 3);
 			int[] triangles = this.triangles;
+
 			int k = 0;
 			for (int i = 1; i < numSides; i++)
 			{
@@ -689,19 +765,7 @@ namespace FairyGUI
 			triangles[k++] = numSides;
 			triangles[k++] = 0;
 
-			if (allColors != null)
-			{
-				int colorCnt = allColors.Length;
-				Color32[] arr = this.colors;
-				arr[0] = allColors[0];
-				colorCnt--;
-				for (int i = 1; i <= numSides; i++)
-					arr[i] = allColors[(i - 1) % colorCnt + 1];
-			}
-			else
-				FillColors(fillColor);
-
-			UpdateMesh();
+			FillColors(fillColor);
 		}
 
 		static List<int> sRestIndices = new List<int>();
@@ -709,10 +773,11 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
 		/// <param name="points"></param>
 		/// <param name="fillColor"></param>
-		/// <param name="allColors"></param>
-		public void DrawPolygon(Vector2[] points, Color fillColor, Color[] allColors)
+		public void DrawPolygon(Rect vertRect, Rect uvRect, Vector2[] points, Color fillColor)
 		{
 			int numVertices = points.Length;
 			if (numVertices < 3)
@@ -723,9 +788,12 @@ namespace FairyGUI
 			int k = 0;
 
 			Alloc(numVertices);
+			Vector3[] vertices = this.vertices;
 
 			for (i = 0; i < numVertices; i++)
 				vertices[i] = new Vector3(points[i].x, -points[i].y);
+
+			FillShapeUV(ref vertRect, ref uvRect);
 
 			// Algorithm "Ear clipping method" described here:
 			// -> https://en.wikipedia.org/wiki/Polygon_triangulation
@@ -735,6 +803,7 @@ namespace FairyGUI
 			// -> Starling
 
 			AllocTriangleArray(numTriangles * 3);
+			int[] triangles = this.triangles;
 
 			sRestIndices.Clear();
 			for (i = 0; i < numVertices; ++i)
@@ -795,29 +864,20 @@ namespace FairyGUI
 			triangles[k++] = sRestIndices[1];
 			triangles[k++] = sRestIndices[2];
 
-			if (allColors != null)
-			{
-				int colorCnt = allColors.Length;
-				Color32[] arr = this.colors;
-				for (i = 0; i < numVertices; i++)
-					arr[i] = allColors[i % colorCnt];
-			}
-			else
-				FillColors(fillColor);
-
-			UpdateMesh();
+			FillColors(fillColor);
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="vertRect"></param>
+		/// <param name="uvRect"></param>
 		/// <param name="method"></param>
 		/// <param name="amount"></param>
 		/// <param name="origin"></param>
 		/// <param name="clockwise"></param>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		public void Fill(FillMethod method, float amount, int origin, bool clockwise, Rect vertRect, Rect uvRect)
+		public void DrawRectWithFillMethod(Rect vertRect, Rect uvRect, Color fillColor,
+			FillMethod method, float amount, int origin, bool clockwise)
 		{
 			amount = Mathf.Clamp01(amount);
 			switch (method)
@@ -846,6 +906,22 @@ namespace FairyGUI
 					Alloc(12);
 					FillUtils.FillRadial360((Origin360)origin, amount, clockwise, vertRect, uvRect, vertices, uv);
 					break;
+			}
+
+			FillColors(fillColor);
+			FillTriangles();
+		}
+
+		void FillShapeUV(ref Rect vertRect, ref Rect uvRect)
+		{
+			Vector3[] vertices = this.vertices;
+			Vector2[] uv = this.uv;
+
+			int len = vertices.Length;
+			for (int i = 0; i < len; i++)
+			{
+				uv[i] = new Vector2(Mathf.Lerp(uvRect.xMin, uvRect.xMax, (vertices[i].x - vertRect.xMin) / vertRect.width),
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-vertices[i].y - vertRect.yMin) / vertRect.height));
 			}
 		}
 
@@ -886,6 +962,19 @@ namespace FairyGUI
 			Color32 col32 = value;
 			for (int i = 0; i < count; i++)
 				arr[i] = col32;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		public void FillColors(Color[] value)
+		{
+			Color32[] arr = this.colors;
+			int count = arr.Length;
+			int count2 = value.Length;
+			for (int i = 0; i < count; i++)
+				arr[i] = value[i % count2];
 		}
 
 		void AllocTriangleArray(int requestSize)

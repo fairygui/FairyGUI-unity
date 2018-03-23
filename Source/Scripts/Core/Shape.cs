@@ -13,6 +13,7 @@ namespace FairyGUI
 		Color _fillColor;
 		Color[] _colors;
 		Vector2[] _polygonPoints;
+		float[] _cornerRadius;
 
 		/// <summary>
 		/// 
@@ -76,6 +77,16 @@ namespace FairyGUI
 			_type = 1;
 			_lineSize = lineSize;
 			_colors = colors;
+
+			_touchDisabled = false;
+			_requireUpdateMesh = true;
+		}
+
+		public void DrawRoundRect(Color fillColor, float[] cornerRadius)
+		{
+			_type = 4;
+			_fillColor = fillColor;
+			_cornerRadius = cornerRadius;
 
 			_touchDisabled = false;
 			_requireUpdateMesh = true;
@@ -162,12 +173,34 @@ namespace FairyGUI
 				{
 					if (_contentRect.width > 0 && _contentRect.height > 0)
 					{
-						if (_type == 1)
-							graphics.DrawRect(_contentRect, _lineSize, _lineColor, _fillColor, _colors);
-						else if (_type == 2)
-							graphics.DrawEllipse(_contentRect, _fillColor, _colors);
-						else
-							graphics.DrawPolygon(_polygonPoints, _fillColor, _colors);
+						switch (_type)
+						{
+							case 1:
+								graphics.DrawRect(_contentRect, new Rect(0, 0, 1, 1), _lineSize, _lineColor, _fillColor);
+								if (_colors != null)
+									graphics.FillColors(_colors);
+								break;
+							case 2:
+								graphics.DrawEllipse(_contentRect, new Rect(0, 0, 1, 1), _fillColor);
+								if (_colors != null)
+									graphics.FillColors(_colors);
+								break;
+							case 3:
+								graphics.DrawPolygon(_contentRect, new Rect(0, 0, 1, 1), _polygonPoints, _fillColor);
+								if (_colors != null)
+									graphics.FillColors(_colors);
+								break;
+							case 4:
+								if (_cornerRadius.Length >= 4)
+									graphics.DrawRoundRect(_contentRect, new Rect(0, 0, 1, 1), _fillColor, _cornerRadius[0], _cornerRadius[1], _cornerRadius[2], _cornerRadius[3]);
+								else
+									graphics.DrawRoundRect(_contentRect, new Rect(0, 0, 1, 1), _fillColor, _cornerRadius[0], _cornerRadius[0], _cornerRadius[0], _cornerRadius[0]);
+								break;
+							default:
+								break;
+						}
+
+						graphics.UpdateMesh();
 					}
 					else
 						graphics.ClearMesh();
