@@ -88,12 +88,17 @@ namespace FairyGUI
 			}
 		}
 
-		/// <summary>
-		/// 如果是true，表示触摸输入，将使用Input.GetTouch接口读取触摸屏输入。
-		/// 如果是false，表示使用鼠标输入，将使用Input.GetMouseButtonXXX接口读取鼠标输入。
-		/// 一般来说，不需要设置，底层会自动根据系统环境设置正确的值。
-		/// </summary>
-		public static bool touchScreen
+        [LuaInterface.NoToLua]
+        public static void ClearStageStatic()
+        {
+            _inst = null;
+        }
+        /// <summary>
+        /// 如果是true，表示触摸输入，将使用Input.GetTouch接口读取触摸屏输入。
+        /// 如果是false，表示使用鼠标输入，将使用Input.GetMouseButtonXXX接口读取鼠标输入。
+        /// 一般来说，不需要设置，底层会自动根据系统环境设置正确的值。
+        /// </summary>
+        public static bool touchScreen
 		{
 			get { return _touchScreen; }
 			set
@@ -176,7 +181,7 @@ namespace FairyGUI
 			this.gameObject.AddComponent<StageEngine>();
 			this.gameObject.AddComponent<UIContentScaler>();
 			this.gameObject.SetActive(true);
-			Object.DontDestroyOnLoad(this.gameObject);
+            this.gameObject.DontDestroyOnLoad();
 
 			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
 
@@ -646,7 +651,42 @@ namespace FairyGUI
 			}
 		}
 
-		void HandleEvents()
+        internal void HandleEmulatedEvents(EmulateGUIEvent evt)
+        {
+            if (evt.type == EmulateGUIEventType.KeyDown)
+            {
+                TouchInfo touch = _touches[0];
+                touch.keyCode = evt.keyCode;
+                touch.modifiers = evt.modifiers;
+                touch.character = evt.character;
+                InputEvent.shiftDown = (evt.modifiers & EventModifiers.Shift) != 0;
+
+                touch.UpdateEvent();
+                DisplayObject f = this.focus;
+                if (f != null)
+                    f.onKeyDown.BubbleCall(touch.evt);
+                else
+                    this.onKeyDown.Call(touch.evt);
+            }
+            else if (evt.type == EmulateGUIEventType.KeyUp)
+            {
+                TouchInfo touch = _touches[0];
+                touch.modifiers = evt.modifiers;
+            }
+            else if (evt.type == EmulateGUIEventType.scrollWheel)
+            {
+                if (_touchTarget != null)
+                {
+                    TouchInfo touch = _touches[0];
+                    touch.mouseWheelDelta = (int)evt.delta.y;
+                    touch.UpdateEvent();
+                    _touchTarget.onMouseWheel.BubbleCall(touch.evt);
+                    touch.mouseWheelDelta = 0;
+                }
+            }
+        }
+
+        void HandleEvents()
 		{
 			GetHitTarget();
 

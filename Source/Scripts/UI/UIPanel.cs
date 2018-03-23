@@ -60,7 +60,7 @@ namespace FairyGUI
 		[SerializeField]
 		Vector3 rotation = new Vector3(0, 0, 0);
 		[SerializeField]
-		bool fairyBatching = false;
+		bool fairyBatching = true;
 		[SerializeField]
 		bool touchDisabled = false;
 		[SerializeField]

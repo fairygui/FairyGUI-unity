@@ -149,7 +149,15 @@ namespace FairyGUI
 
 		internal static uint _gInstanceCounter;
 
-		public DisplayObject()
+
+        [LuaInterface.NoToLua]
+        static public void ClearStatic()
+        {
+            _gInstanceCounter = 0;
+        }
+
+
+        public DisplayObject()
 		{
 			_alpha = 1;
 			_visible = true;
@@ -180,7 +188,7 @@ namespace FairyGUI
 			gameObject = new GameObject(gameObjectName);
 			cachedTransform = gameObject.transform;
 			if (Application.isPlaying)
-				Object.DontDestroyOnLoad(gameObject);
+                gameObject.DontDestroyOnLoad();
 			gameObject.hideFlags = DisplayOptions.hideFlags;
 			gameObject.SetActive(false);
 			_ownsGameObject = true;
@@ -1446,7 +1454,7 @@ namespace FairyGUI
 					{
 						ToolSet.SetParent(cachedTransform, _home);
 						if (_home == null)
-							Object.DontDestroyOnLoad(this.gameObject);
+                            this.gameObject.DontDestroyOnLoad();
 					}
 				}
 

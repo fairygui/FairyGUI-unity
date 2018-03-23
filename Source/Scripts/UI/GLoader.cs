@@ -39,7 +39,13 @@ namespace FairyGUI
 			showErrorSign = true;
 		}
 
-		override protected void CreateDisplayObject()
+        [LuaInterface.NoToLua]
+        public static void ClearStaticGLoader()
+        {
+            errorSignPool = null;
+        }
+
+        override protected void CreateDisplayObject()
 		{
 			displayObject = new Container("GLoader");
 			displayObject.gOwner = this;

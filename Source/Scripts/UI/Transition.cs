@@ -925,26 +925,8 @@ namespace FairyGUI
 					break;
 
 				case TransitionActionType.Transition:
-					Transition trans = ((GComponent)item.target).GetTransition(value.s);
-					if (trans != null)
-					{
-						if (value.i == 0)
-							trans.Stop(false, true);
-						else if (trans.playing)
-							trans._totalTimes = value.i;
-						else
-						{
-							item.completed = false;
-							_totalTasks++;
-							if (_reversed)
-								trans.PlayReverse(value.i, 0, item.onPlayComplete);
-							else
-								trans.Play(value.i, 0, item.onPlayComplete);
-							if (_timeScale != 1)
-								trans.timeScale = _timeScale;
-						}
-					}
-					break;
+                    ApplyTrasition(item, value);
+                    break;
 
 				case TransitionActionType.Sound:
 					AudioClip sound = UIConfig.LoadSound(value.s);
@@ -982,6 +964,29 @@ namespace FairyGUI
 
 			item.target._gearLocked = false;
 		}
+
+        void ApplyTrasition(TransitionItem item, TransitionValue value)
+        {
+            Transition trans = ((GComponent)item.target).GetTransition(value.s);
+            if (trans != null)
+            {
+                if (value.i == 0)
+                    trans.Stop(false, true);
+                else if (trans.playing)
+                    trans._totalTimes = value.i;
+                else
+                {
+                    item.completed = false;
+                    _totalTasks++;
+                    if (_reversed)
+                        trans.PlayReverse(value.i, 0, () => { PlayTransComplete(item); });
+                    else
+                        trans.Play(value.i, 0, () => { PlayTransComplete(item); });
+                    if (_timeScale != 1)
+                        trans.timeScale = _timeScale;
+                }
+            }
+        }
 
 		internal void ShakeItem(TransitionItem item)
 		{

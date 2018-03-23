@@ -439,7 +439,7 @@ namespace FairyGUI
 		{
 			UpdateDropdownList();
 			if (_list.selectionMode == ListSelectionMode.Single)
-				_list.selectedIndex = -1;
+				_list.selectedIndex = selectedIndex;
 			dropdown.width = this.width;
 
 			this.root.TogglePopup(dropdown, this, _popupDirection == "up" ? (object)false : (_popupDirection == "auto" ? null : (object)true));

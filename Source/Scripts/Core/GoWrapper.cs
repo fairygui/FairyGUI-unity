@@ -163,11 +163,12 @@ namespace FairyGUI
 					r.sharedMaterial = _materials[k];
 				}
 
+				/*
 				if ((r is SkinnedMeshRenderer) || (r is MeshRenderer))
 				{
 					//Set the object rendering in Transparent Queue as UI objects
 					r.sharedMaterial.renderQueue = 3000;
-				}
+				}*/
 			}
 
 			if (!_cloneMaterial)

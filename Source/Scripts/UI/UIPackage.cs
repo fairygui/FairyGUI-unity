@@ -73,6 +73,16 @@ namespace FairyGUI
 		internal static int _constructing;
 		internal static string URL_PREFIX = "ui://";
 
+        static void ClearStatic()
+        {
+            _packageInstById.Clear();
+            _packageInstByName.Clear();
+            _packageList.Clear();
+            _stringsSource.Clear();
+            _constructing = 0;
+            URL_PREFIX = "ui://";
+        }
+
 		public UIPackage()
 		{
 			_items = new List<PackageItem>();
@@ -376,6 +386,32 @@ namespace FairyGUI
 			else
 				return null;
 		}
+
+        /// <summary>
+        /// Create a UI object.
+        /// </summary>
+        /// <param name="pkgName">Package name.</param>
+        /// <param name="resName">Resource name.</param>
+        /// <returns>A UI object.</returns>
+        public static GObject CreateObjectLTR(string pkgName, string resName)
+        {
+            UIPackage pkg = GetByName(pkgName);
+            if (null == pkg)
+            {
+                return null;
+            }
+            RTLSettingBaseProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(RTLSettingBaseProxy)) as RTLSettingBaseProxy;
+            if (sSetting.IsNeedLTR())
+            {
+                string resTLRName = resName + "_LTR";
+                PackageItem pi;
+                if (pkg._itemsByName.TryGetValue(resTLRName, out pi))
+                {
+                    resName = resTLRName;
+                }
+            }
+            return CreateObject(pkgName, resName);
+        }
 
 		/// <summary>
 		///  Create a UI object.

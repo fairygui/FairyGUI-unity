@@ -42,6 +42,13 @@ namespace FairyGUI
 			get { return _targets.Count > 0; }
 		}
 
+        public static void ClearStatic()
+        {
+            orderChanged = false;
+            _updateContext = null;
+            _targets.Clear();
+            packageListReady = false;
+        }
 		/// <summary>
 		/// 
 		/// </summary>

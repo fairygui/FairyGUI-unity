@@ -40,6 +40,12 @@ namespace FairyGUI
 				_main = this;
 		}
 
+        public static void ClearStatic()
+        {
+            _main = null;
+            _layer = -1;
+            _hiddenLayer = -1;
+        }
 		/// <summary>
 		/// 
 		/// </summary>

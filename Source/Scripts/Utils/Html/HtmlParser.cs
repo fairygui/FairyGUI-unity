@@ -12,6 +12,11 @@ namespace FairyGUI.Utils
 	{
 		public static HtmlParser inst = new HtmlParser();
 
+        public static void ClearStatic()
+        {
+            inst = new HtmlParser();
+        }
+
 		protected class TextFormat2 : TextFormat
 		{
 			public bool colorChanged;

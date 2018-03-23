@@ -221,6 +221,11 @@ namespace FairyGUI
 		{
 			get { return _textField.textHeight; }
 		}
+        
+        public TextField.LineInfo[] lines
+        {
+            get { return _textField.lines.ToArray(); }
+        }
 
 		protected void UpdateSize()
 		{

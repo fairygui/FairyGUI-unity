@@ -302,14 +302,16 @@ namespace FairyGUI
 				url = defaultItem;
 
 			GObject ret = _pool.GetObject(url);
-			if (ret != null)
+            if (scaleX < 0) { ret.scaleX = -ret.scaleX; }
+            if (ret != null)
 				ret.visible = true;
 			return ret;
 		}
 
 		void ReturnToPool(GObject obj)
 		{
-			_pool.ReturnObject(obj);
+            if (scaleX < 0) { obj.scaleX = -obj.scaleX; }
+            _pool.ReturnObject(obj);
 		}
 
 		/// <summary>
@@ -357,6 +359,19 @@ namespace FairyGUI
 
 			return child;
 		}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="child"></param>
+        public void AddChildByReverse(GObject child)
+        {
+            if (scaleX < 0)
+            {
+                child.scaleX = -child.scaleX;
+            }
+            AddChild(child);
+        }
 
 		/// <summary>
 		/// 
@@ -1771,7 +1786,14 @@ namespace FairyGUI
 		static uint itemInfoVer = 0; //用来标志item是否在本次处理中已经被重用了
 		static uint enterCounter = 0; //因为HandleScroll是会重入的，这个用来避免极端情况下的死锁
 
-		void HandleScroll1(bool forceUpdate)
+        [LuaInterface.NoToLua]
+        public static void ClearGLlistStatic()
+        {
+            itemInfoVer = 0;
+            enterCounter = 0;
+        }
+
+        void HandleScroll1(bool forceUpdate)
 		{
 			enterCounter++;
 			if (enterCounter > 3)
@@ -1875,6 +1897,7 @@ namespace FairyGUI
 					else
 					{
 						ii.obj = _pool.GetObject(url);
+                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
 						if (forward)
 							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
 						else
@@ -2043,7 +2066,8 @@ namespace FairyGUI
 					else
 					{
 						ii.obj = _pool.GetObject(url);
-						if (forward)
+                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
+                        if (forward)
 							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
 						else
 							this.AddChild(ii.obj);
@@ -2203,7 +2227,8 @@ namespace FairyGUI
 						}
 
 						ii.obj = _pool.GetObject(url);
-						this.AddChildAt(ii.obj, insertIndex);
+                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
+                        this.AddChildAt(ii.obj, insertIndex);
 					}
 					else
 					{

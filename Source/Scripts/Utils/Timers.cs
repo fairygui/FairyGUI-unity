@@ -33,14 +33,20 @@ namespace FairyGUI
 				return _inst;
 			}
 		}
+        
+        [LuaInterface.NoToLua]
+        public static void ClearStatic()
+        {
+            _inst = null;
+        }
 
-		public Timers()
+        public Timers()
 		{
 			_inst = this;
 			gameObject = new GameObject("[Timers]");
 			gameObject.hideFlags = HideFlags.HideInHierarchy;
 			gameObject.SetActive(true);
-			Object.DontDestroyOnLoad(gameObject);
+            gameObject.DontDestroyOnLoad();
 
 			_engine = gameObject.AddComponent<TimersEngine>();
 

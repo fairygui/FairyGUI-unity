@@ -178,7 +178,7 @@ namespace FairyGUI
 				if (Stage.touchScreen)
 					sensitivity = UIConfig.touchDragSensitivity;
 				else
-					sensitivity = 5;
+					sensitivity = 2;
 
 				if (Mathf.Abs(delta.x) < sensitivity && Mathf.Abs(delta.y) < sensitivity)
 					return;

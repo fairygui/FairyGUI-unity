@@ -8,7 +8,12 @@ namespace FairyGUI.Utils
 	public class UBBParser
 	{
 		public static UBBParser inst = new UBBParser();
-
+        
+        [LuaInterface.NoToLua]
+        public static void ClearStatic()
+        {
+            inst = new UBBParser();
+        }
 		string _text;
 		int _readPos;
 
@@ -33,9 +38,9 @@ namespace FairyGUI.Utils
 			handlers["font"] = onTag_FONT;
 			handlers["size"] = onTag_SIZE;
 			handlers["align"] = onTag_ALIGN;
-		}
+        }
 
-		protected string onTag_URL(string tagName, bool end, string attr)
+        protected string onTag_URL(string tagName, bool end, string attr)
 		{
 			if (!end)
 			{

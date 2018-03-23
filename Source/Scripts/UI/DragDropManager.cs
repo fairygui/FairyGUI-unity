@@ -25,7 +25,13 @@ namespace FairyGUI
 			}
 		}
 
-		public DragDropManager()
+        [LuaInterface.NoToLua]
+        public static  void ClearStatic()
+        {
+            _inst = null;
+        }
+
+        public DragDropManager()
 		{
 			_agent = (GLoader)UIObjectFactory.NewObject("loader");
 			_agent.gameObjectName = "DragDropAgent";

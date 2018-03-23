@@ -35,6 +35,13 @@ namespace FairyGUI
 			}
 		}
 
+        [LuaInterface.NoToLua]
+        public static void ClearInst()
+        {
+            inst.Dispose();
+            _inst = null;
+        }
+
 		public GRoot()
 		{
 			this.name = this.rootContainer.name = this.rootContainer.gameObject.name = "GRoot";

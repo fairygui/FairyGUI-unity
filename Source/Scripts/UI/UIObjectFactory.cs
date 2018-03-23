@@ -15,6 +15,11 @@ namespace FairyGUI
 		static Dictionary<string, GComponentCreator> packageItemExtensions = new Dictionary<string, GComponentCreator>();
 		static GLoaderCreator loaderCreator;
 
+        public static void ClearStatic()
+        {
+            packageItemExtensions.Clear();
+            loaderCreator = null;
+        }
 		/// <summary>
 		/// 
 		/// </summary>

@@ -217,7 +217,14 @@ namespace FairyGUI
 
 		internal static uint _gInstanceCounter;
 
-		public GObject()
+        [LuaInterface.NoToLua]
+        static public void ClearStatic()
+        {
+            _gInstanceCounter = 0;
+            draggingObject = null;
+        }
+
+        public GObject()
 		{
 			_width = 0;
 			_height = 0;
@@ -638,6 +645,14 @@ namespace FairyGUI
 			get { return new Vector2(_pivotX, _pivotY); }
 			set { SetPivot(value.x, value.y); }
 		}
+
+        /// <summary>
+        /// 是否将轴心作为锚点.
+        /// </summary>
+        public bool IsPivotAsAnchor
+        {
+            get { return _pivotAsAnchor; }
+        }
 
 		/// <summary>
 		/// Change the x and y coordinates of the object's origin in its own coordinate space.

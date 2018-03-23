@@ -21,6 +21,17 @@ namespace FairyGUI
 
 		static Dictionary<Camera, RaycastHit?> raycastHits = new Dictionary<Camera, RaycastHit?>();
 
+        public static void ClearStatic()
+        {
+            screenPoint = default(Vector2);
+            worldPoint = default(Vector2);
+            direction = default(Vector2);
+            forTouch = false;
+            layerMask = -1;
+            maxDistance = Mathf.Infinity;
+            cachedMainCamera = null;
+            raycastHits.Clear();
+        }
 		/// <summary>
 		/// 
 		/// </summary>
