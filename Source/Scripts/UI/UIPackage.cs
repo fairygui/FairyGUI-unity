@@ -930,7 +930,7 @@ namespace FairyGUI
 			if (item.type == PackageItemType.Component)
 			{
 				if (userClass != null)
-					g = (GComponent)userClass.Assembly.CreateInstance(userClass.FullName);
+					g = (GComponent)Activator.CreateInstance(userClass);
 				else
 					g = UIObjectFactory.NewObject(item);
 			}
