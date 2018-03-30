@@ -41,7 +41,8 @@ namespace FairyGUI
 		Scale,
 		ScaleMatchHeight,
 		ScaleMatchWidth,
-		ScaleFree
+		ScaleFree,
+		ScaleNoBorder
 	}
 
 	public enum AutoSizeType
@@ -281,6 +282,8 @@ namespace FairyGUI
 					return FillType.ScaleMatchWidth;
 				case "scaleFree":
 					return FillType.ScaleFree;
+				case "scaleNoBorder":
+					return FillType.ScaleNoBorder;
 				default:
 					return FillType.None;
 			}

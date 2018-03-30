@@ -475,6 +475,13 @@ namespace FairyGUI
 						else
 							sy = sx;
 					}
+					else if (_fill == FillType.ScaleNoBorder)
+					{
+						if (sx > sy)
+							sy = sx;
+						else
+							sx = sy;
+					}
 					_contentWidth = Mathf.FloorToInt(_contentSourceWidth * sx);
 					_contentHeight = Mathf.FloorToInt(_contentSourceHeight * sy);
 				}
