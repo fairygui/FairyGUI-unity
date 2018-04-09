@@ -162,6 +162,16 @@ namespace FairyGUI
 			}
 			nm.material.hideFlags = DisplayOptions.hideFlags;
 
+			switch (blendMode)
+			{
+				case BlendMode.Multiply:
+				case BlendMode.Screen:
+					nm.material.EnableKeyword("PREMULALPHA");
+					break;
+				default:
+					break;
+			}
+
 			return nm;
 		}
 
