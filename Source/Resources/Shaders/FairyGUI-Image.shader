@@ -49,6 +49,7 @@ Shader "FairyGUI/Image"
 				#pragma multi_compile NOT_COMBINED COMBINED
 				#pragma multi_compile NOT_GRAYED GRAYED COLOR_FILTER
 				#pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED ALPHA_MASK
+				#pragma multi_compile NOT_PREMULALPHA PREMULALPHA
 				#pragma vertex vert
 				#pragma fragment frag
 				
@@ -152,6 +153,10 @@ Shader "FairyGUI/Image"
 					col2.b = dot(col, _ColorMatrix[2])+_ColorOffset.z;
 					col2.a = dot(col, _ColorMatrix[3])+_ColorOffset.w;
 					col = col2;
+					#endif
+
+					#ifdef PREMULALPHA
+					col.rgb *= col.a;
 					#endif
 
 					#ifdef ALPHA_MASK
