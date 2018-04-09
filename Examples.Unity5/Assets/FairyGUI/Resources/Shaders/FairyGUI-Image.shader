@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "FairyGUI/Image"
@@ -48,7 +50,7 @@ Shader "FairyGUI/Image"
 		Pass
 		{
 			CGPROGRAM
-				#pragma multi_compile NOT_COMBINED COMBINED
+				#pragma multi_compile NOT_COMBINED COMBINED GAMMA_SPACE_CORRECT
 				#pragma multi_compile NOT_GRAYED GRAYED COLOR_FILTER
 				#pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED ALPHA_MASK
 				#pragma vertex vert
@@ -101,9 +103,13 @@ Shader "FairyGUI/Image"
 				v2f vert (appdata_t v)
 				{
 					v2f o;
-					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.vertex = UnityObjectToClipPos(v.vertex);
 					o.texcoord = v.texcoord;
+					#ifdef GAMMA_SPACE_CORRECT
+					o.color = pow( v.color, 2.2 );
+					#else
 					o.color = v.color;
+					#endif
 
 					#ifdef CLIPPED
 					o.clipPos = mul(unity_ObjectToWorld, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
