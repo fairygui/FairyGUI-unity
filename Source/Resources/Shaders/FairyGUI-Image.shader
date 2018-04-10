@@ -101,7 +101,12 @@ Shader "FairyGUI/Image"
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 					o.texcoord = v.texcoord;
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 500)
+					o.color.rgb = GammaToLinearSpace(v.color.rgb);
+					o.color.a = v.color.a;
+					#else
 					o.color = v.color;
+					#endif
 
 					#ifdef CLIPPED
 					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
