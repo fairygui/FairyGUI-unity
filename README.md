@@ -4,7 +4,7 @@
 A flexible UI framework for Unity3D, working with the FREE professional Game UI Editor: FairyGUI Editor.  
 Download the editor from here: [www.fairygui.com](http://www.fairygui.com/product)  
 
-FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity、Cocos2d-x、Cry Egine, Havok Vision/Project Anarchy、白鹭、LayaAir、Haxe、Pixi、Flash、Starling等多个主流应用和游戏平台。<br>
+FairyGUI UI编辑器 操作简单，使用习惯与Adobe系列软件保持一致，策划和美术设计师可以轻松上手。在编辑器即可组合各种复杂UI组件，以及为UI设计动画效果，无需编写任何代码。可一键导出到Unity、Cocos2d-x、Cry Engine, Havok Vision/Project Anarchy、白鹭、LayaAir、Haxe、Pixi、Flash、Starling等多个主流应用和游戏平台。<br>
 下载UI编辑器：[www.fairygui.com](http://www.fairygui.com/product)
 
 与NGUI、UGUI等传统Unity UI引擎相比，FairyGUI使用一种更接近设计师的思维方式去重新定义UI的制作过程，大大减轻了程序员在制作UI需要投入的时间。<br>
