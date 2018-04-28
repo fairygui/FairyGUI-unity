@@ -149,7 +149,7 @@ namespace FairyGUI.Utils
 
 		public static void SetParent(Transform t, Transform parent)
 		{
-			if ((object)t.parent == (object)t)
+			if ((object)t.parent == (object)parent)
 				return;
 
 #if (UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)

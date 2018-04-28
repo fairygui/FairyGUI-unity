@@ -76,7 +76,8 @@ namespace FairyGUI
 					_contentPane = value;
 					if (_contentPane != null)
 					{
-						this.gameObjectName = _contentPane.gameObjectName;
+						this.gameObjectName = "Window - " + _contentPane.gameObjectName;
+						_contentPane.gameObjectName = "ContentPane";
 
 						AddChild(_contentPane);
 						this.SetSize(_contentPane.width, _contentPane.height);
@@ -91,7 +92,10 @@ namespace FairyGUI
 						}
 					}
 					else
+					{
 						_frame = null;
+						this.gameObjectName = "Window";
+					}
 				}
 			}
 			get

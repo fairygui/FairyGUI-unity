@@ -132,6 +132,8 @@ namespace FairyGUI
 
 			_selectionController = null;
 			scrollItemToViewOnClick = false;
+			itemRenderer = null;
+			itemProvider = null;
 
 			base.Dispose();
 		}

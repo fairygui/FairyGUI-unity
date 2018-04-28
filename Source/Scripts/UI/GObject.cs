@@ -472,7 +472,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="wv">Width value.</param>
 		/// <param name="hv">Height value.</param>
-		/// <param name="ignorePivot">If pivot is set, the object's positon will change when its size change. Set ignorePivot=false to keep the position.</param>
+		/// <param name="ignorePivot">If pivot is set, the object's positon will change when its size change. Set ignorePivot=true to keep the position.</param>
 		public void SetSize(float wv, float hv, bool ignorePivot)
 		{
 			if (_rawWidth != wv || _rawHeight != hv)

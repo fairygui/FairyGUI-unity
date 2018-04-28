@@ -543,7 +543,9 @@ namespace FairyGUI
 			bool wrap;
 			if (_input)
 			{
+#if !RTL_TEXT_SUPPORT
 				letterSpacing++;
+#endif
 				wrap = !_singleLine;
 			}
 			else
@@ -976,8 +978,10 @@ namespace FairyGUI
 			Color32 color = format.color;
 			Color32[] gradientColor = format.gradientColor;
 			bool boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
+#if !RTL_TEXT_SUPPORT
 			if (_input)
 				letterSpacing++;
+#endif
 			if (_charPositions != null)
 				_charPositions.Clear();
 
