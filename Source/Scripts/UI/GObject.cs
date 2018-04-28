@@ -321,6 +321,20 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="xv"></param>
+		/// <param name="yv"></param>
+		/// <param name="topLeft"></param>
+		public void SetXY(float xv, float yv, bool topLeftValue)
+		{
+			if (_pivotAsAnchor)
+				SetPosition(xv + _pivotX * _width, yv + _pivotY * _height, _z);
+			else
+				SetPosition(xv, yv, _z);
+		}
+
+		/// <summary>
 		/// change the x,y,z coordinates of the object relative to the local coordinates of the parent.
 		/// </summary>
 		/// <param name="xv">x value.</param>
@@ -386,7 +400,7 @@ namespace FairyGUI
 			else
 				r = this.root;
 
-			this.SetXY((int)((r.width - this.width) / 2), (int)((r.height - this.height) / 2));
+			this.SetXY((int)((r.width - this.width) / 2), (int)((r.height - this.height) / 2), true);
 			if (restraint)
 			{
 				this.AddRelation(r, RelationType.Center_Center);
@@ -489,6 +503,8 @@ namespace FairyGUI
 					hv = maxHeight;
 				float dWidth = wv - _width;
 				float dHeight = hv - _height;
+				float rightExt = dWidth;
+				float bottomExt = dHeight;
 				_width = wv;
 				_height = hv;
 
@@ -499,12 +515,22 @@ namespace FairyGUI
 					if (!_pivotAsAnchor)
 					{
 						if (!ignorePivot)
+						{
 							this.SetXY(_x - _pivotX * dWidth, _y - _pivotY * dHeight);
+
+							rightExt = dWidth * (1 - _pivotX);
+							bottomExt = dHeight * (1 - pivotY);
+						}
 						else
 							this.HandlePositionChanged();
 					}
 					else
+					{
 						this.HandlePositionChanged();
+
+						rightExt = dWidth * (1 - _pivotX);
+						bottomExt = dHeight * (1 - pivotY);
+					}
 				}
 
 				if (this is GGroup)
@@ -514,7 +540,7 @@ namespace FairyGUI
 
 				if (parent != null)
 				{
-					relations.OnOwnerSizeChanged(dWidth, dHeight);
+					relations.OnOwnerSizeChanged(rightExt, bottomExt);
 					parent.SetBoundsChangedFlag();
 					if (_group != null)
 						_group.SetBoundsChangedFlag(true);
@@ -534,6 +560,42 @@ namespace FairyGUI
 				hv = 0;
 			_width = wv;
 			_height = hv;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public float xMin
+		{
+			get
+			{
+				return _pivotAsAnchor ? (_x - _width * _pivotX) : _x;
+			}
+			set
+			{
+				if (_pivotAsAnchor)
+					SetPosition(value + _width * _pivotX, _y, _z);
+				else
+					SetPosition(value, _y, _z);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public float yMin
+		{
+			get
+			{
+				return _pivotAsAnchor ? (_y - _height * _pivotY) : _y;
+			}
+			set
+			{
+				if (_pivotAsAnchor)
+					SetPosition(_x, value + _height * _pivotY, _z);
+				else
+					SetPosition(_x, value, _z);
+			}
 		}
 
 		/// <summary>
@@ -637,6 +699,15 @@ namespace FairyGUI
 		{
 			get { return new Vector2(_pivotX, _pivotY); }
 			set { SetPivot(value.x, value.y); }
+		}
+
+		public bool pivotAsAnchor
+		{
+			get { return _pivotAsAnchor; }
+			set
+			{
+				SetPivot(_pivotX, _pivotY, value);
+			}
 		}
 
 		/// <summary>
