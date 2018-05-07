@@ -239,7 +239,9 @@ namespace FairyGUI
 					if (parent != null && _visible)
 					{
 						gameObject.SetActive(true);
-						this.InvalidateBatchingState();
+						InvalidateBatchingState();
+						if (this is Container)
+							((Container)this).InvalidateBatchingState(true);
 					}
 					else
 						gameObject.SetActive(false);
