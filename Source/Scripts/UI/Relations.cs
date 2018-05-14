@@ -345,16 +345,16 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="dWidth"></param>
-		/// <param name="dHeight"></param>
-		public void OnOwnerSizeChanged(float dWidth, float dHeight)
+		/// <param name="rightExt"></param>
+		/// <param name="bottomExt"></param>
+		public void OnOwnerSizeChanged(float rightExt, float bottomExt)
 		{
 			int cnt = _items.Count;
 			if (cnt == 0)
 				return;
 
 			for (int i = 0; i < cnt; i++)
-				_items[i].ApplyOnSelfSizeChanged(dWidth, dHeight);
+				_items[i].ApplyOnSelfSizeChanged(rightExt, bottomExt);
 		}
 
 		/// <summary>

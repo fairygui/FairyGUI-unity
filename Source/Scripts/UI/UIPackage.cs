@@ -850,14 +850,16 @@ namespace FairyGUI
 			{
 				//https://forum.unity.com/threads/opening-file-failed-opening-file-archive-cab-ca6e2cdc278a53641b19581a975bffc5-cab-ca6e2cdc278a53641.488402/
 				//if you still encouter this problem, try AddPackage(bundle, false);
-				Timers.inst.Add(0.5f, 1, (object param) =>
-				{
-					((AssetBundle)param).Unload(false);
-				}, _resBundle);
+				Timers.inst.Add(0.5f, 1, UnloadResBundle, _resBundle);
 				_resBundle = null;
 			}
 
 			_loadingPackage = false;
+		}
+
+		void UnloadResBundle(object param)
+		{
+			((AssetBundle)param).Unload(false);
 		}
 
 		static int ComparePackageItem(PackageItem p1, PackageItem p2)
@@ -966,7 +968,7 @@ namespace FairyGUI
 			if (item.type == PackageItemType.Component)
 			{
 				if (userClass != null)
-					g = (GComponent)userClass.Assembly.CreateInstance(userClass.FullName);
+					g = (GComponent)Activator.CreateInstance(userClass);
 				else
 					g = UIObjectFactory.NewObject(item);
 			}

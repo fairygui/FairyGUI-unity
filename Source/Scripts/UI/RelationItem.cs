@@ -8,11 +8,13 @@ namespace FairyGUI
 	{
 		public bool percent;
 		public RelationType type;
+		public int axis;
 
 		public void copyFrom(RelationDef source)
 		{
 			this.percent = source.percent;
 			this.type = source.type;
+			this.axis = source.axis;
 		}
 	}
 
@@ -76,6 +78,7 @@ namespace FairyGUI
 			RelationDef info = new RelationDef();
 			info.percent = usePercent;
 			info.type = relationType;
+			info.axis = (relationType <= RelationType.Right_Right || relationType == RelationType.Width || relationType >= RelationType.LeftExt_Left && relationType <= RelationType.RightExt_Right) ? 0 : 1;
 			_defs.Add(info);
 
 			//当使用中线关联时，因为需要除以2，很容易因为奇数宽度/高度造成小数点坐标；当使用百分比时，也会造成小数坐标；
@@ -132,7 +135,7 @@ namespace FairyGUI
 			get { return _defs.Count == 0; }
 		}
 
-		public void ApplyOnSelfSizeChanged(float dWidth, float dHeight)
+		public void ApplyOnSelfSizeChanged(float rightExt, float bottomExt)
 		{
 			int cnt = _defs.Count;
 			if (cnt == 0)
@@ -148,21 +151,21 @@ namespace FairyGUI
 				{
 					case RelationType.Center_Center:
 					case RelationType.Right_Center:
-						_owner.x -= dWidth / 2;
+						_owner.x -= rightExt / 2;
 						break;
 
 					case RelationType.Right_Left:
 					case RelationType.Right_Right:
-						_owner.x -= dWidth;
+						_owner.x -= rightExt;
 						break;
 
 					case RelationType.Middle_Middle:
 					case RelationType.Bottom_Middle:
-						_owner.y -= dHeight / 2;
+						_owner.y -= bottomExt / 2;
 						break;
 					case RelationType.Bottom_Top:
 					case RelationType.Bottom_Bottom:
-						_owner.y -= dHeight;
+						_owner.y -= bottomExt;
 						break;
 				}
 			}
@@ -185,6 +188,7 @@ namespace FairyGUI
 
 		void ApplyOnXYChanged(RelationDef info, float dx, float dy)
 		{
+			float tmp;
 			switch (info.type)
 			{
 				case RelationType.Left_Left:
@@ -213,135 +217,160 @@ namespace FairyGUI
 
 				case RelationType.LeftExt_Left:
 				case RelationType.LeftExt_Right:
-					_owner.x += dx;
+					tmp = _owner.xMin;
 					_owner.width = _owner._rawWidth - dx;
+					_owner.xMin = tmp + dx;
 					break;
 
 				case RelationType.RightExt_Left:
 				case RelationType.RightExt_Right:
+					tmp = _owner.xMin;
 					_owner.width = _owner._rawWidth + dx;
+					_owner.xMin = tmp;
 					break;
 
 				case RelationType.TopExt_Top:
 				case RelationType.TopExt_Bottom:
-					_owner.y += dy;
+					tmp = _owner.yMin;
 					_owner.height = _owner._rawHeight - dy;
+					_owner.yMin = tmp + dy;
 					break;
 
 				case RelationType.BottomExt_Top:
 				case RelationType.BottomExt_Bottom:
+					tmp = _owner.yMin;
 					_owner.height = _owner._rawHeight + dy;
+					_owner.yMin = tmp;
 					break;
 			}
 		}
 
 		void ApplyOnSizeChanged(RelationDef info)
 		{
-			float targetX, targetY;
-			if (_target != _owner.parent)
+			float pos = 0, pivot = 0, delta = 0;
+			if (info.axis == 0)
 			{
-				targetX = _target.x;
-				targetY = _target.y;
+				if (_target != _owner.parent)
+				{
+					pos = _target.x;
+					if (_target.pivotAsAnchor)
+						pivot = _target.pivotX;
+				}
+
+				if (info.percent)
+				{
+					if (_targetData.z != 0)
+						delta = _target._width / _targetData.z;
+				}
+				else
+					delta = _target._width - _targetData.z;
 			}
 			else
 			{
-				targetX = 0;
-				targetY = 0;
+				if (_target != _owner.parent)
+				{
+					pos = _target.y;
+					if (_target.pivotAsAnchor)
+						pivot = _target.pivotY;
+				}
+
+				if (info.percent)
+				{
+					if (_targetData.w != 0)
+						delta = _target._height / _targetData.w;
+				}
+				else
+					delta = _target._height - _targetData.w;
 			}
+
 			float v, tmp;
 
 			switch (info.type)
 			{
 				case RelationType.Left_Left:
-					if (info.percent && _target == _owner.parent)
-					{
-						v = _owner.x - targetX;
-						if (info.percent)
-							v = v / _targetData.z * _target._width;
-						_owner.x = targetX + v;
-					}
+					if (info.percent)
+						_owner.xMin = pos + (_owner.xMin - pos) * delta;
+					else if (pivot != 0)
+						_owner.x += delta * (-pivot);
 					break;
 				case RelationType.Left_Center:
-					v = _owner.x - (targetX + _targetData.z / 2);
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + _target._width / 2 + v;
+						_owner.xMin = pos + (_owner.xMin - pos) * delta;
+					else
+						_owner.x += delta * (0.5f - pivot);
 					break;
 				case RelationType.Left_Right:
-					v = _owner.x - (targetX + _targetData.z);
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + _target._width + v;
+						_owner.xMin = pos + (_owner.xMin - pos) * delta;
+					else
+						_owner.x += delta * (1 - pivot);
 					break;
 				case RelationType.Center_Center:
-					v = _owner.x + _owner._rawWidth / 2 - (targetX + _targetData.z / 2);
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + _target._width / 2 + v - _owner._rawWidth / 2;
+						_owner.xMin = pos + (_owner.xMin + _owner._rawWidth * 0.5f - pos) * delta - _owner._rawWidth * 0.5f;
+					else
+						_owner.x += delta * (0.5f - pivot);
 					break;
 				case RelationType.Right_Left:
-					v = _owner.x + _owner._rawWidth - targetX;
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + v - _owner._rawWidth;
+						_owner.xMin = pos + (_owner.xMin + _owner._rawWidth - pos) * delta - _owner._rawWidth;
+					else if (pivot != 0)
+						_owner.x += delta * (-pivot);
 					break;
 				case RelationType.Right_Center:
-					v = _owner.x + _owner._rawWidth - (targetX + _targetData.z / 2);
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + _target._width / 2 + v - _owner._rawWidth;
+						_owner.xMin = pos + (_owner.xMin + _owner._rawWidth - pos) * delta - _owner._rawWidth;
+					else
+						_owner.x += delta * (0.5f - pivot);
 					break;
 				case RelationType.Right_Right:
-					v = _owner.x + _owner._rawWidth - (targetX + _targetData.z);
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					_owner.x = targetX + _target._width + v - _owner._rawWidth;
+						_owner.xMin = pos + (_owner.xMin + _owner._rawWidth - pos) * delta - _owner._rawWidth;
+					else
+						_owner.x += delta * (1 - pivot);
 					break;
 
 				case RelationType.Top_Top:
-					if (info.percent && _target == _owner.parent)
-					{
-						v = _owner.y - targetY;
-						if (info.percent)
-							v = v / _targetData.w * _target._height;
-						_owner.y = targetY + v;
-					}
+					if (info.percent)
+						_owner.yMin = pos + (_owner.yMin - pos) * delta;
+					else if (pivot != 0)
+						_owner.y += delta * (-pivot);
 					break;
 				case RelationType.Top_Middle:
-					v = _owner.y - (targetY + _targetData.w / 2);
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + _target._height / 2 + v;
+						_owner.yMin = pos + (_owner.yMin - pos) * delta;
+					else
+						_owner.y += delta * (0.5f - pivot);
 					break;
 				case RelationType.Top_Bottom:
-					v = _owner.y - (targetY + _targetData.w);
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + _target._height + v;
+						_owner.yMin = pos + (_owner.yMin - pos) * delta;
+					else
+						_owner.y += delta * (1 - pivot);
 					break;
 				case RelationType.Middle_Middle:
-					v = _owner.y + _owner._rawHeight / 2 - (targetY + _targetData.w / 2);
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + _target._height / 2 + v - _owner._rawHeight / 2;
+						_owner.yMin = pos + (_owner.yMin + _owner._rawHeight * 0.5f - pos) * delta - _owner._rawHeight * 0.5f;
+					else
+						_owner.y += delta * (0.5f - pivot);
 					break;
 				case RelationType.Bottom_Top:
-					v = _owner.y + _owner._rawHeight - targetY;
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + v - _owner._rawHeight;
+						_owner.yMin = pos + (_owner.yMin + _owner._rawHeight - pos) * delta - _owner._rawHeight;
+					else if (pivot != 0)
+						_owner.y += delta * (-pivot);
 					break;
 				case RelationType.Bottom_Middle:
-					v = _owner.y + _owner._rawHeight - (targetY + _targetData.w / 2);
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + _target._height / 2 + v - _owner._rawHeight;
+						_owner.yMin = pos + (_owner.yMin + _owner._rawHeight - pos) * delta - _owner._rawHeight;
+					else
+						_owner.y += delta * (0.5f - pivot);
 					break;
 				case RelationType.Bottom_Bottom:
-					v = _owner.y + _owner._rawHeight - (targetY + _targetData.w);
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					_owner.y = targetY + _target._height + v - _owner._rawHeight;
+						_owner.yMin = pos + (_owner.yMin + _owner._rawHeight - pos) * delta - _owner._rawHeight;
+					else
+						_owner.y += delta * (1 - pivot);
 					break;
 
 				case RelationType.Width:
@@ -350,9 +379,18 @@ namespace FairyGUI
 					else
 						v = _owner._rawWidth - _targetData.z;
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
+						v = v * delta;
 					if (_target == _owner.parent)
-						_owner.SetSize(_target._width + v, _owner._rawHeight, true);
+					{
+						if (_owner.pivotAsAnchor)
+						{
+							tmp = _owner.xMin;
+							_owner.SetSize(_target._width + v, _owner._rawHeight, true);
+							_owner.xMin = tmp;
+						}
+						else
+							_owner.SetSize(_target._width + v, _owner._rawHeight, true);
+					}
 					else
 						_owner.width = _target._width + v;
 					break;
@@ -362,64 +400,147 @@ namespace FairyGUI
 					else
 						v = _owner._rawHeight - _targetData.w;
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
+						v = v * delta;
 					if (_target == _owner.parent)
-						_owner.SetSize(_owner._rawWidth, _target._height + v, true);
+					{
+						if (_owner.pivotAsAnchor)
+						{
+							tmp = _owner.yMin;
+							_owner.SetSize(_owner._rawWidth, _target._height + v, true);
+							_owner.yMin = tmp;
+						}
+						else
+							_owner.SetSize(_owner._rawWidth, _target._height + v, true);
+					}
 					else
 						_owner.height = _target._height + v;
 					break;
 
 				case RelationType.LeftExt_Left:
+					tmp = _owner.xMin;
+					if (info.percent)
+						v = pos + (tmp - pos) * delta - tmp;
+					else
+						v = delta * (-pivot);
+					_owner.width = _owner._rawWidth - v;
+					_owner.xMin = tmp + v;
 					break;
 				case RelationType.LeftExt_Right:
-					v = _owner.x - (targetX + _targetData.z);
+					tmp = _owner.xMin;
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					tmp = _owner.x;
-					_owner.x = targetX + _target._width + v;
-					_owner.width = _owner._rawWidth - (_owner.x - tmp);
+						v = pos + (tmp - pos) * delta - tmp;
+					else
+						v = delta * (1 - pivot);
+					_owner.width = _owner._rawWidth - v;
+					_owner.xMin = tmp + v;
 					break;
 				case RelationType.RightExt_Left:
+					tmp = _owner.xMin;
+					if (info.percent)
+						v = pos + (tmp + _owner._rawWidth - pos) * delta - (tmp + _owner._rawWidth);
+					else
+						v = delta * (-pivot);
+					_owner.width = _owner._rawWidth + v;
+					_owner.xMin = tmp;
 					break;
 				case RelationType.RightExt_Right:
-					if (_owner.underConstruct && _owner == _target.parent)
-						v = _owner.sourceWidth - (targetX + _target.initWidth);
-					else
-						v = _owner._rawWidth - (targetX + _targetData.z);
-					if (_owner != _target.parent)
-						v += _owner.x;
+					tmp = _owner.xMin;
 					if (info.percent)
-						v = v / _targetData.z * _target._width;
-					if (_owner != _target.parent)
-						_owner.width = targetX + _target._width + v - _owner.x;
+					{
+						if (_owner == _target.parent)
+						{
+							if (_owner.underConstruct)
+								_owner.width = pos + _target._width - _target._width * pivot +
+									(_owner.sourceWidth - pos - _target.initWidth + _target.initWidth * pivot) * delta;
+							else
+								_owner.width = pos + (_owner._rawWidth - pos) * delta;
+						}
+						else
+						{
+							v = pos + (tmp + _owner._rawWidth - pos) * delta - (tmp + _owner._rawWidth);
+							_owner.width = _owner._rawWidth + v;
+							_owner.xMin = tmp;
+						}
+					}
 					else
-						_owner.width = targetX + _target._width + v;
+					{
+						if (_owner == _target.parent)
+						{
+							if (_owner.underConstruct)
+								_owner.width = _owner.sourceWidth + (_target._width - _target.initWidth) * (1 - pivot);
+							else
+								_owner.width = _owner._rawWidth + delta * (1 - pivot);
+						}
+						else
+						{
+							v = delta * (1 - pivot);
+							_owner.width = _owner._rawWidth + v;
+							_owner.xMin = tmp;
+						}
+					}
 					break;
 				case RelationType.TopExt_Top:
+					tmp = _owner.yMin;
+					if (info.percent)
+						v = pos + (tmp - pos) * delta - tmp;
+					else
+						v = delta * (-pivot);
+					_owner.height = _owner._rawHeight - v;
+					_owner.yMin = tmp + v;
 					break;
 				case RelationType.TopExt_Bottom:
-					v = _owner.y - (targetY + _targetData.w);
+					tmp = _owner.yMin;
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					tmp = _owner.y;
-					_owner.y = targetY + _target._height + v;
-					_owner.height = _owner._rawHeight - (_owner.y - tmp);
+						v = pos + (tmp - pos) * delta - tmp;
+					else
+						v = delta * (1 - pivot);
+					_owner.height = _owner._rawHeight - v;
+					_owner.yMin = tmp + v;
 					break;
 				case RelationType.BottomExt_Top:
+					tmp = _owner.yMin;
+					if (info.percent)
+						v = pos + (tmp + _owner._rawHeight - pos) * delta - (tmp + _owner._rawHeight);
+					else
+						v = delta * (-pivot);
+					_owner.height = _owner._rawHeight + v;
+					_owner.yMin = tmp;
 					break;
 				case RelationType.BottomExt_Bottom:
-					if (_owner.underConstruct && _owner == _target.parent)
-						v = _owner.sourceHeight - (targetY + _target.initHeight);
-					else
-						v = _owner._rawHeight - (targetY + _targetData.w);
-					if (_owner != _target.parent)
-						v += _owner.y;
+					tmp = _owner.yMin;
 					if (info.percent)
-						v = v / _targetData.w * _target._height;
-					if (_owner != _target.parent)
-						_owner.height = targetY + _target._height + v - _owner.y;
+					{
+						if (_owner == _target.parent)
+						{
+							if (_owner.underConstruct)
+								_owner.height = pos + _target._height - _target._height * pivot +
+									(_owner.sourceHeight - pos - _target.initHeight + _target.initHeight * pivot) * delta;
+							else
+								_owner.height = pos + (_owner._rawHeight - pos) * delta;
+						}
+						else
+						{
+							v = pos + (tmp + _owner._rawHeight - pos) * delta - (tmp + _owner._rawHeight);
+							_owner.height = _owner._rawHeight + v;
+							_owner.yMin = tmp;
+						}
+					}
 					else
-						_owner.height = targetY + _target._height + v;
+					{
+						if (_owner == _target.parent)
+						{
+							if (_owner.underConstruct)
+								_owner.height = _owner.sourceHeight + (_target._height - _target.initHeight) * (1 - pivot);
+							else
+								_owner.height = _owner._rawHeight + delta * (1 - pivot);
+						}
+						else
+						{
+							v = delta * (1 - pivot);
+							_owner.height = _owner._rawHeight + v;
+							_owner.yMin = tmp;
+						}
+					}
 					break;
 			}
 		}
