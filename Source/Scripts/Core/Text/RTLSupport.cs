@@ -119,7 +119,8 @@ namespace FairyGUI
             {
                 if (IsNumericChar(chArray[i]))
                 {
-                    chArray2[i] = ReplaceChar(chArray[i], CharState.number);
+                    //chArray2[i] = ReplaceChar(chArray[i], CharState.number);
+                    chArray2[i] = chArray[i];
                 }
                 else if ((i + 1) == chArray.Length)
                 {
@@ -199,13 +200,13 @@ namespace FairyGUI
             List<string> list2 = new List<string>();
             string str = "";
             int num2 = 0;
-            bool bPre = true;   // Pre is RTL
             for (int j = 0; j < chArray2.Length; j++)
             {
                 char item = chArray2[(chArray2.Length - j) - 1];
-                bool bIsRTLChar = _IsRTLChar(item, bPre);
-                bPre = bIsRTLChar;
-                if (!bIsRTLChar)
+                int num4 = item;
+                if (((num4 >= 0x20) && (num4 <= 0x7e) && !_IsBracket(item)) || 
+                    ((num4 >= 0x660) && (num4 <= 0x669)) || 
+                    char.IsSurrogate(item) || char.IsLowSurrogate(item))
                 {
                     if (string.IsNullOrEmpty(str))
                     {
@@ -221,7 +222,7 @@ namespace FairyGUI
                         list2.Add(str);
                     }
                     str = "";
-		            item = _ProcessBracket(item);
+		    item = _ProcessBracket(item);
                     list.Add(item);
                 }
             }
@@ -305,16 +306,16 @@ namespace FairyGUI
             numbers.Add(0x667, '٧');
             numbers.Add(0x668, '٨');
             numbers.Add(0x669, '٩');
-//             numbers.Add(0x30, '٠');
-//             numbers.Add(0x31, '١');
-//             numbers.Add(50, '٢');
-//             numbers.Add(0x33, '٣');
-//             numbers.Add(0x34, '٤');
-//             numbers.Add(0x35, '٥');
-//             numbers.Add(0x36, '٦');
-//             numbers.Add(0x37, '٧');
-//             numbers.Add(0x38, '٨');
-//             numbers.Add(0x39, '٩');
+            numbers.Add(0x30, '٠');
+            numbers.Add(0x31, '١');
+            numbers.Add(50, '٢');
+            numbers.Add(0x33, '٣');
+            numbers.Add(0x34, '٤');
+            numbers.Add(0x35, '٥');
+            numbers.Add(0x36, '٦');
+            numbers.Add(0x37, '٧');
+            numbers.Add(0x38, '٨');
+            numbers.Add(0x39, '٩');
             init.Add(0x622, (char)0xfe81);
             init.Add(0x627, (char)0xfe8d);
             init.Add(0x628, (char)0xfe91);
@@ -527,51 +528,14 @@ namespace FairyGUI
             }
             return '*';
         }
-
-        // 是否中立方向字符
-        private static bool _IsNeutrality(char uc)
-        {
-            return (uc == ':' || uc == '：' || uc == ' ' || uc == '%' ||
-                (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
-        }
 	    
-        // 判断字符方向
-        private static bool _IsRTLChar(char uc, bool pre)
-        {
-            bool bRTL = true;
-            int uni = uc;
-
-            if (_IsBracket(uc))
-            {
-                bRTL = true;
-            }
-            else if (IsArabicLetter(uc))
-            {
-                bRTL = true;
-            }
-            else if (_IsNeutrality(uc))    // 中立方向字符，方向就和上一个字符一样 [2018/3/24 16:03:27 --By aq_1000]
-            {
-                bRTL = pre;
-            }
-            else if (((uni >= 0x20) && (uni <= 0x7e)) || 
-                ((uni >= 0x660) && (uni <= 0x669)) || // 这个是阿拉伯字符的数字，很特殊，和英文的阿拉伯数字一样从左到右 [2018/3/24 16:03:29 --By aq_1000]
-                char.IsSurrogate(uc) || char.IsLowSurrogate(uc))
-            {
-                bRTL = false;
-            }
-
-            return bRTL;
-        }
-
-	    // 是否括号
+	        // 是否括号
         private static bool _IsBracket(char uc)
         {
-            return (uc == ')' || uc == '(' || uc == '）' || uc == '（' ||
-                    uc == ']' || uc == '[' || uc == '】' || uc == '【' ||
-                    uc == '}' || uc == '{' || 
-                    uc == '≥' || uc == '≤' ||
-                    uc == '>' || uc == '<' || uc == '》' || uc == '《' ||
-                    uc == '“' || uc == '”');
+            return (uc == ')' || uc == '(' ||
+                    uc == ']' || uc == '[' ||
+                    uc == '}' || uc == '{' ||
+                    uc == '>' || uc == '<');
         }
 
         private static char _ProcessBracket(char uc)
@@ -585,16 +549,6 @@ namespace FairyGUI
             {
                 return '[';
             }
-
-            else if(uc == '【')
-            {
-                return '】';
-            }
-            else if (uc == '】')
-            {
-                return '【';
-            }
-
             else if (uc == '{')
             {
                 return '}';
@@ -603,7 +557,6 @@ namespace FairyGUI
             {
                 return '{';
             }
-
             else if (uc == '(')
             {
                 return ')';
@@ -612,16 +565,6 @@ namespace FairyGUI
             {
                 return '(';
             }
-
-            else if (uc == '（')
-            {
-                return '）';
-            }
-            else if (uc == '）')
-            {
-                return '（';
-            }
-
             else if (uc == '<')
             {
                 return '>';
@@ -629,33 +572,6 @@ namespace FairyGUI
             else if (uc == '>')
             {
                 return '<';
-            }
-
-            else if (uc == '《')
-            {
-                return '》';
-            }
-            else if (uc == '》')
-            {
-                return '《';
-            }
-
-            else if (uc == '≤')
-            {
-                return '≥';
-            }
-            else if (uc == '≥')
-            {
-                return '≤';
-            }
-
-            else if (uc == '”')
-            {
-                return '“';
-            }
-            else if (uc == '”')
-            {
-                return '“';
             }
             else return uc;
         }
