@@ -11,22 +11,32 @@
 	概	述：		新建
 
 *********************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace FairyGUI
 {
-    internal enum CharState
-    {
-        init,
-        middle,
-        final,
-        isolated,
-        number
-    }
-
     public class RTLSupport
     {
+        internal enum CharState
+        {
+            init,
+            middle,
+            final,
+            isolated,
+            number
+        }
+
+        // 字符书写类型: Bidirectional Character Types
+        internal enum CharType
+        {
+            UNKNOW = 0,
+            LTR,
+            RTL,
+            NEUTRAL,
+        }
+
         private static Dictionary<int, char> final;
         private static Dictionary<int, char> init;
         private static bool isCharsInitialized = false;
@@ -90,7 +100,8 @@ namespace FairyGUI
         private static bool CheckSpecific(char input)
         {
             int num = input;
-            if ((((num != 0x622) && (num != 0x623)) && ((num != 0x627) && (num != 0x62f))) && (((num != 0x630) && (num != 0x631)) && (((num != 0x632) && (num != 0x698)) && (num != 0x648))))
+            if ((((num != 0x622) && (num != 0x623)) && ((num != 0x627) && (num != 0x62f)) && (num != 0x625)) && 
+                (((num != 0x630) && (num != 0x631)) && (((num != 0x632) && (num != 0x698)) && (num != 0x648))))
             {
                 return false;
             }
@@ -114,13 +125,11 @@ namespace FairyGUI
 
             char[] chArray = input.ToCharArray();
             char[] chArray2 = new char[chArray.Length];
-            List<char> list = new List<char>();
             for (int i = 0; i < chArray.Length; i++)
             {
                 if (IsNumericChar(chArray[i]))
                 {
-                    //chArray2[i] = ReplaceChar(chArray[i], CharState.number);
-                    chArray2[i] = chArray[i];
+                    chArray2[i] = ReplaceChar(chArray[i], CharState.number);
                 }
                 else if ((i + 1) == chArray.Length)
                 {
@@ -197,68 +206,113 @@ namespace FairyGUI
                     chArray2[i] = ReplaceChar(chArray[i], CharState.middle);
                 }
             }
-            List<string> list2 = new List<string>();
-            string str = "";
-            int num2 = 0;
+            List<char> listR = new List<char>();
+            List<string> listL = new List<string>();
+            StringBuilder sbL = new StringBuilder();
+            StringBuilder sbN = new StringBuilder();
+            int iReplace = 0;
+            CharType ePre = CharType.UNKNOW;
             for (int j = 0; j < chArray2.Length; j++)
             {
                 char item = chArray2[(chArray2.Length - j) - 1];
-                int num4 = item;
-                if (((num4 >= 0x20) && (num4 <= 0x7e) && !_IsBracket(item)) || 
-                    ((num4 >= 0x660) && (num4 <= 0x669)) || 
-                    char.IsSurrogate(item) || char.IsLowSurrogate(item))
+                CharType eCType = _IsRTLChar(item, ePre);
+                if (eCType == CharType.LTR)
                 {
-                    if (string.IsNullOrEmpty(str))
+                    if (sbL.Length == 0)
                     {
-                        list.Add('\x00bf');
-                        num2++;
+                        listR.Add('\x00bf');
+                        iReplace++;
                     }
-                    str = str + item.ToString();
+
+                    if (sbN.Length > 0)
+                        sbL.Append(sbN.ToString());
+                    sbN.Length = 0;
+                    sbL.Append(item);
+                }
+                else if (eCType == CharType.RTL)
+                {
+                    if (sbL.Length > 0)
+                    {
+                        listL.Add(sbL.ToString());
+                    }
+                    sbL.Length = 0;
+
+                    if (sbN.Length > 0)
+                    {
+                        for (int n = 0; n < sbN.Length; ++n)
+                        {
+                            listR.Add(sbN[n]);
+                        }
+                    }
+                    sbN.Length = 0;
+
+                    item = _ProcessBracket(item);
+                    listR.Add(item);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(str))
-                    {
-                        list2.Add(str);
-                    }
-                    str = "";
-		    item = _ProcessBracket(item);
-                    list.Add(item);
+                    sbN.Append(item);
                 }
+                ePre = eCType;
             }
-            if (!string.IsNullOrEmpty(str))
+            if (sbL.Length > 0)
             {
-                list2.Add(str);
+                listL.Add(sbL.ToString());
             }
-            string str2 = "";
-            for (int k = 0; k < list.Count; k++)
+
+            StringBuilder sbRep = new StringBuilder();
+            StringBuilder sbSpace = new StringBuilder();
+            StringBuilder sbFinal = new StringBuilder();
+            sbFinal.Append(listR.ToArray());
+            for (int m = 0; m < iReplace; m++)
             {
-                if (list[k] != '\0')
+                for (int n = 0; n < sbFinal.Length; n++)
                 {
-                    str2 = str2 + list[k].ToString();
-                }
-            }
-            for (int m = 0; m < num2; m++)
-            {
-                for (int n = 0; n < str2.Length; n++)
-                {
-                    if (str2[n] == '\x00bf')
+                    if (sbFinal[n] == '\x00bf')
                     {
-                        string str3 = "";
-                        string str4 = list2[0];
-                        list2.RemoveAt(0);
-                        for (int num8 = 0; num8 < str4.Length; num8++)
+                        char[] array4 = listL[0].ToCharArray();
+
+                        // 非纯数字和运算符，需要进行反转
+//                         bool bReverse = false;
+//                         for (int num4 = 0; num4 < array4.Length; num4++)
+//                         {
+//                             int uni = array4[num4];
+//                             if ((array4[num4] != ' ' && uni < 0x2A) || uni > 0x39)
+//                             {
+//                                 bReverse = true;
+//                                 break;
+//                             }
+//                         }
+//                         if (bReverse)
+                            Array.Reverse(array4);
+                        sbRep.Length = 0;
+                        sbRep.Append(array4);
+                        listL.RemoveAt(0);
+
+                        // 字符串反向的时候造成末尾空格跑到词首 [2018/4/11 20:04:35 --By aq_1000]
+                        sbSpace.Length = 0;
+                        for (int num4 = 0; num4 < sbRep.Length; num4++)
                         {
-                            str3 = str3 + str4[(str4.Length - num8) - 1];
+                            if (!_IsNeutrality(sbRep[num4])) 
+                                break;
+                            sbSpace.Append(sbRep[num4]);
                         }
-                        str2 = str2.Remove(n, 1).Insert(n, str3);
+                        if (sbSpace.Length > 0)    // 词首空格重新放到词尾
+                        {
+                            sbRep.Remove(0, sbSpace.Length);
+                            for (int iSpace = sbSpace.Length - 1; iSpace >= 0; --iSpace)   // 空格也要取反
+                            {
+                                sbRep.Append(sbSpace[iSpace]);
+                            }
+                        }
+
+                        sbFinal.Replace(sbFinal[n].ToString(), sbRep.ToString(), n, 1);
                         break;
                     }
                 }
             }
 
-
-			return Reverse(str2);
+			return Reverse(sbFinal.ToString());
         }
 
 		private static string Reverse(string source)
@@ -306,16 +360,16 @@ namespace FairyGUI
             numbers.Add(0x667, '٧');
             numbers.Add(0x668, '٨');
             numbers.Add(0x669, '٩');
-            numbers.Add(0x30, '٠');
-            numbers.Add(0x31, '١');
-            numbers.Add(50, '٢');
-            numbers.Add(0x33, '٣');
-            numbers.Add(0x34, '٤');
-            numbers.Add(0x35, '٥');
-            numbers.Add(0x36, '٦');
-            numbers.Add(0x37, '٧');
-            numbers.Add(0x38, '٨');
-            numbers.Add(0x39, '٩');
+//             numbers.Add(0x30, '٠');
+//             numbers.Add(0x31, '١');
+//             numbers.Add(50, '٢');
+//             numbers.Add(0x33, '٣');
+//             numbers.Add(0x34, '٤');
+//             numbers.Add(0x35, '٥');
+//             numbers.Add(0x36, '٦');
+//             numbers.Add(0x37, '٧');
+//             numbers.Add(0x38, '٨');
+//             numbers.Add(0x39, '٩');
             init.Add(0x622, (char)0xfe81);
             init.Add(0x627, (char)0xfe8d);
             init.Add(0x628, (char)0xfe91);
@@ -347,8 +401,9 @@ namespace FairyGUI
             init.Add(0x644, (char)0xfedf);
             init.Add(0x645, (char)0xfee3);
             init.Add(0x646, (char)0xfee7);
-            init.Add(0x648, (char)0xfeed);
             init.Add(0x647, (char)0xfeeb);
+            init.Add(0x648, (char)0xfeed);
+            init.Add(0x649, (char)0xfef3);
             init.Add(0x6be, (char)0xfeeb);
             init.Add(0x6cc, (char)0xfef3);
             init.Add(0x64a, (char)0xfef3);
@@ -386,8 +441,9 @@ namespace FairyGUI
             middle.Add(0x644, (char)0xfee0);
             middle.Add(0x645, (char)0xfee4);
             middle.Add(0x646, (char)0xfee8);
-            middle.Add(0x648, (char)0xfeee);
             middle.Add(0x647, (char)0xfeec);
+            middle.Add(0x648, (char)0xfeee);
+            middle.Add(0x649, (char)0xfef4);
             middle.Add(0x6be, (char)0xfeec);
             middle.Add(0x6cc, (char)0xfef4);
             middle.Add(0x64a, (char)0xfef4);
@@ -397,6 +453,7 @@ namespace FairyGUI
             final.Add(0x622, (char)0xfe81);
             final.Add(0x627, (char)0xfe8e);
             final.Add(0x628, (char)0xfe90);
+            final.Add(0x629, (char)0xfe94);     // 该字符只会出现在末尾 [2018/4/10 16:04:18 --By aq_1000]
             final.Add(0x67e, (char)0xfb57);
             final.Add(0x62a, (char)0xfe96);
             final.Add(0x62b, (char)0xfe9a);
@@ -420,20 +477,23 @@ namespace FairyGUI
             final.Add(0x641, (char)0xfed2);
             final.Add(0x642, (char)0xfed6);
             final.Add(0x6a9, (char)0xfb8f);
-            final.Add(0x643, (char)0xfb8f);
+            final.Add(0x643, (char)0xfeda);
             final.Add(0x6af, (char)0xfb93);
             final.Add(0x644, (char)0xfede);
             final.Add(0x645, (char)0xfee2);
             final.Add(0x646, (char)0xfee6);
-            final.Add(0x648, (char)0xfeee);
             final.Add(0x647, (char)0xfeea);
+            final.Add(0x648, (char)0xfeee);
+            final.Add(0x649, (char)0xfef0);
             final.Add(0x6be, (char)0xfeea);
             final.Add(0x6cc, (char)0xfef0);
-            final.Add(0x64a, (char)0xfef0);
+            final.Add(0x64a, (char)0xfef2);
             final.Add(0x623, (char)0xfe84);
             final.Add(0x621, (char)0xfe8a);
-            final.Add(0x626, (char)0xfe80);
+            final.Add(0x626, (char)0xfe8a);
+            isolate.Add(0x621, (char)0xfe80);
             isolate.Add(0x622, (char)0xfe81);
+            isolate.Add(0x626, (char)0xfe89);
             isolate.Add(0x627, (char)0xfe8d);
             isolate.Add(0x628, (char)0xfe8f);
             isolate.Add(0x67e, (char)0xfb56);
@@ -459,23 +519,18 @@ namespace FairyGUI
             isolate.Add(0x641, (char)0xfed1);
             isolate.Add(0x642, (char)0xfed5);
             isolate.Add(0x6a9, (char)0xfb8e);
-            isolate.Add(0x643, (char)0xfb8e);
+            isolate.Add(0x643, (char)0xfed9);
             isolate.Add(0x6af, (char)0xfb92);
             isolate.Add(0x644, (char)0xfedd);
             isolate.Add(0x645, (char)0xfee1);
             isolate.Add(0x646, (char)0xfee5);
-            isolate.Add(0x648, (char)0xfeed);
             isolate.Add(0x647, (char)0xfee9);
+            isolate.Add(0x648, (char)0xfeed);
+            isolate.Add(0x649, (char)0xfeef);
             isolate.Add(0x6be, (char)0xfee9);
             isolate.Add(0x6cc, (char)0xfeef);
-            isolate.Add(0x64a, (char)0xfeef);
-            isolate.Add(0x623, (char)0xfe83);
-
-            // 这两个字符相互兑换错了 [2018/3/13 17:03:20 --By aq_1000]
-            //             isolate.Add(0x621, (char)0xfe89);
-            //             isolate.Add(0x626, (char)0xfe80);
-            isolate.Add(0x621, (char)0xfe80);
-            isolate.Add(0x626, (char)0xfe89);
+            isolate.Add(0x64a, (char)0xfef1);
+            isolate.Add(0x623, (char)0xfe83); 
         }
 
         private static bool IsNumericChar(int unicode)
@@ -528,14 +583,55 @@ namespace FairyGUI
             }
             return '*';
         }
+
+        // 是否中立方向字符
+        private static bool _IsNeutrality(char uc)
+        {
+            return (uc == ':' || uc == '：' || uc == ' ' || uc == '%' || uc == '+' || uc == '-' ||
+                (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
+        }
 	    
-	        // 是否括号
+        // 判断字符方向
+        private static CharType _IsRTLChar(char uc, CharType ePre)
+        {
+            CharType eCType = CharType.RTL;
+            int uni = uc;
+
+            if (_IsBracket(uc))
+            {
+                eCType = CharType.RTL;
+            }
+            else if (IsArabicLetter(uc))
+            {
+                eCType = CharType.RTL;
+            }
+            else if (_IsNeutrality(uc))    // 中立方向字符，方向就和上一个字符一样 [2018/3/24 16:03:27 --By aq_1000]
+            {
+                if (ePre == CharType.UNKNOW)
+                {
+                    eCType = CharType.NEUTRAL;
+                }
+                else
+                    eCType = ePre;
+            }
+            else if (((uni >= 0x20) && (uni <= 0x7e)) || 
+                ((uni >= 0x660) && (uni <= 0x669)) || // 这个是阿拉伯字符的数字，很特殊，和英文的阿拉伯数字一样从左到右 [2018/3/24 16:03:29 --By aq_1000]
+                char.IsSurrogate(uc) || char.IsLowSurrogate(uc))
+            {
+                eCType = CharType.LTR;
+            }
+
+            return eCType;
+        }
+
+	    // 是否括号
         private static bool _IsBracket(char uc)
         {
-            return (uc == ')' || uc == '(' ||
-                    uc == ']' || uc == '[' ||
-                    uc == '}' || uc == '{' ||
-                    uc == '>' || uc == '<');
+            return (uc == ')' || uc == '(' || uc == '）' || uc == '（' ||
+                    uc == ']' || uc == '[' || uc == '】' || uc == '【' ||
+                    uc == '}' || uc == '{' || 
+ //                   uc == '≥' || uc == '≤' || uc == '>' || uc == '<' || 
+                    uc == '》' || uc == '《' || uc == '“' || uc == '”');
         }
 
         private static char _ProcessBracket(char uc)
@@ -549,6 +645,16 @@ namespace FairyGUI
             {
                 return '[';
             }
+
+            else if(uc == '【')
+            {
+                return '】';
+            }
+            else if (uc == '】')
+            {
+                return '【';
+            }
+
             else if (uc == '{')
             {
                 return '}';
@@ -557,6 +663,7 @@ namespace FairyGUI
             {
                 return '{';
             }
+
             else if (uc == '(')
             {
                 return ')';
@@ -565,6 +672,16 @@ namespace FairyGUI
             {
                 return '(';
             }
+
+            else if (uc == '（')
+            {
+                return '）';
+            }
+            else if (uc == '）')
+            {
+                return '（';
+            }
+
             else if (uc == '<')
             {
                 return '>';
@@ -572,6 +689,33 @@ namespace FairyGUI
             else if (uc == '>')
             {
                 return '<';
+            }
+
+            else if (uc == '《')
+            {
+                return '》';
+            }
+            else if (uc == '》')
+            {
+                return '《';
+            }
+
+            else if (uc == '≤')
+            {
+                return '≥';
+            }
+            else if (uc == '≥')
+            {
+                return '≤';
+            }
+
+            else if (uc == '”')
+            {
+                return '“';
+            }
+            else if (uc == '”')
+            {
+                return '“';
             }
             else return uc;
         }

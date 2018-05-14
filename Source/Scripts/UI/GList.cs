@@ -302,7 +302,7 @@ namespace FairyGUI
 				url = defaultItem;
 
 			GObject ret = _pool.GetObject(url);
-            if (scaleX < 0) { ret.scaleX = -ret.scaleX; }
+            //if (scaleX < 0) { ret.scaleX = -ret.scaleX; }
             if (ret != null)
 				ret.visible = true;
 			return ret;
@@ -310,7 +310,7 @@ namespace FairyGUI
 
 		void ReturnToPool(GObject obj)
 		{
-            if (scaleX < 0) { obj.scaleX = -obj.scaleX; }
+            //if (scaleX < 0) { obj.scaleX = -obj.scaleX; }
             _pool.ReturnObject(obj);
 		}
 
@@ -345,7 +345,11 @@ namespace FairyGUI
 		/// <returns></returns>
 		override public GObject AddChildAt(GObject child, int index)
 		{
-			base.AddChildAt(child, index);
+            if (scaleX < 0)
+            {
+                child.scaleX = -child.scaleX;
+            }
+            base.AddChildAt(child, index);
 			if (child is GButton)
 			{
 				GButton button = (GButton)child;
@@ -358,20 +362,7 @@ namespace FairyGUI
 			child.onRightClick.Add(_itemClickDelegate);
 
 			return child;
-		}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="child"></param>
-        public void AddChildByReverse(GObject child)
-        {
-            if (scaleX < 0)
-            {
-                child.scaleX = -child.scaleX;
-            }
-            AddChild(child);
-        }
+		}        
 
 		/// <summary>
 		/// 
@@ -385,8 +376,11 @@ namespace FairyGUI
 			child.onTouchBegin.Remove(_itemTouchBeginDelegate);
 			child.onClick.Remove(_itemClickDelegate);
 			child.onRightClick.Remove(_itemClickDelegate);
-
-			return child;
+            if (!dispose && scaleX < 0)
+            {
+                child.scaleX = -child.scaleX;
+            }
+            return child;
 		}
 
 		/// <summary>
@@ -1897,7 +1891,7 @@ namespace FairyGUI
 					else
 					{
 						ii.obj = _pool.GetObject(url);
-                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
+                        //if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
 						if (forward)
 							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
 						else
@@ -2066,7 +2060,7 @@ namespace FairyGUI
 					else
 					{
 						ii.obj = _pool.GetObject(url);
-                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
+                        //if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
                         if (forward)
 							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
 						else
@@ -2227,7 +2221,7 @@ namespace FairyGUI
 						}
 
 						ii.obj = _pool.GetObject(url);
-                        if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
+                        //if (scaleX < 0) { ii.obj.scaleX = -ii.obj.scaleX; }
                         this.AddChildAt(ii.obj, insertIndex);
 					}
 					else
