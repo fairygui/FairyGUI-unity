@@ -708,15 +708,9 @@ namespace FairyGUI
 			set { SetPivot(value.x, value.y); }
 		}
 
-<<<<<<< HEAD
         /// <summary>
         /// 是否将轴心作为锚点.
         /// </summary>
-        public bool IsPivotAsAnchor
-        {
-            get { return _pivotAsAnchor; }
-        }
-=======
 		public bool pivotAsAnchor
 		{
 			get { return _pivotAsAnchor; }
@@ -725,7 +719,6 @@ namespace FairyGUI
 				SetPivot(_pivotX, _pivotY, value);
 			}
 		}
->>>>>>> upstream/master
 
 		/// <summary>
 		/// Change the x and y coordinates of the object's origin in its own coordinate space.

@@ -28,7 +28,7 @@ public class EmojiUBBParser : UBBParser
         //var tarName = tagName.Substring(1).ToLower();
         var tarName = tagName;
 
-        var url = UIPackage.GetItemURL("ChatUI", tarName);
+        var url = UIPackage.GetItemURLLTR("ChatUI", tarName);
         return "<img src='" + url + "'/>";
     }
     public new string Parse(string text)

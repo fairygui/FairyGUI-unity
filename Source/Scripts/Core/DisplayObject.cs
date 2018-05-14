@@ -18,20 +18,40 @@ namespace FairyGUI
 		/// </summary>
 		public Container parent { get; private set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public GameObject gameObject { get; protected set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        private GameObject _gameObject;
+        public GameObject gameObject
+        {
+            get {
+                return _gameObject;
+            }
+            protected set {
+                _gameObject = value;
+            }
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public Transform cachedTransform { get; protected set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        private Transform _cachedTransform;
+        public Transform cachedTransform
+        {
+            get
+            {
+                return _cachedTransform;
+            }
+            protected set
+            {
+                _cachedTransform = value;
+            }
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public NGraphics graphics { get; protected set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public NGraphics graphics { get; protected set; }
 
 		/// <summary>
 		/// 
@@ -188,7 +208,7 @@ namespace FairyGUI
 			gameObject = new GameObject(gameObjectName);
 			cachedTransform = gameObject.transform;
 			if (Application.isPlaying)
-                gameObject.DontDestroyOnLoad();
+                GameObject.DontDestroyOnLoad(gameObject);
 			gameObject.hideFlags = DisplayOptions.hideFlags;
 			gameObject.SetActive(false);
 			_ownsGameObject = true;
@@ -247,9 +267,7 @@ namespace FairyGUI
 					if (parent != null && _visible)
 					{
 						gameObject.SetActive(true);
-						InvalidateBatchingState();
-						if (this is Container)
-							((Container)this).InvalidateBatchingState(true);
+						this.InvalidateBatchingState();
 					}
 					else
 						gameObject.SetActive(false);
@@ -1457,7 +1475,7 @@ namespace FairyGUI
 					{
 						ToolSet.SetParent(cachedTransform, _home);
 						if (_home == null)
-                            this.gameObject.DontDestroyOnLoad();
+                            GameObject.DontDestroyOnLoad(this.gameObject);
 					}
 				}
 
@@ -1494,6 +1512,7 @@ namespace FairyGUI
 				}
 			}
 			DestroyGameObject();
+            home = null;
 		}
 	}
 }

@@ -42,6 +42,10 @@ namespace FairyGUI
         [LuaInterface.NoToLua]
         public static void ClearStaticGLoader()
         {
+            if (errorSignPool != null)
+            {
+                errorSignPool.Clear();
+            }
             errorSignPool = null;
         }
 

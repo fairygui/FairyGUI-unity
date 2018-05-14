@@ -73,8 +73,9 @@ namespace FairyGUI
 		internal static int _constructing;
 		internal static string URL_PREFIX = "ui://";
 
-        static void ClearStatic()
+        static public void ClearStatic()
         {
+            RemoveAllPackages(true);
             _packageInstById.Clear();
             _packageInstByName.Clear();
             _packageList.Clear();
@@ -523,8 +524,30 @@ namespace FairyGUI
 
 			return URL_PREFIX + pkg.id + pi.id;
 		}
+        public static string GetItemURLLTR(string pkgName, string resName)
+        {
+            UIPackage pkg = GetByName(pkgName);
+            if (pkg == null)
+                return null;
 
-		public static PackageItem GetItemByURL(string url)
+            PackageItem pi;
+            RTLSettingBaseProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(RTLSettingBaseProxy)) as RTLSettingBaseProxy;
+            if (sSetting.IsNeedLTR())
+            {
+                string resTLRName = resName + "_LTR";
+                if (pkg._itemsByName.TryGetValue(resTLRName, out pi))
+                {
+                   return  URL_PREFIX + pkg.id + pi.id;
+                }
+            }
+            if (!pkg._itemsByName.TryGetValue(resName, out pi))
+                return null;
+
+            return URL_PREFIX + pkg.id + pi.id;
+           
+        }
+
+        public static PackageItem GetItemByURL(string url)
 		{
 			if (url == null)
 				return null;

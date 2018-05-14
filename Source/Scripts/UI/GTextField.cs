@@ -61,9 +61,14 @@ namespace FairyGUI
 		virtual protected void SetTextFieldText()
 		{
 			if (_ubbEnabled)
-				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
+             {
+                _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
+             }
 			else
-				_textField.text = _text;
+			{
+			    string parseTxt = UBBParser.inst.GetRemoveParase(_text);
+			    _textField.text = parseTxt;
+			}
 		}
 
 		virtual protected void GetTextFieldText()

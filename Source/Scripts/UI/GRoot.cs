@@ -243,22 +243,22 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_modalLayer == null)
-					CreateModalLayer();
+                if (_modalLayer == null)
+                    _modalLayer = CreateModalLayer();
 
 				return _modalLayer;
 			}
 		}
 
-		void CreateModalLayer()
-		{
-			_modalLayer = new GGraph();
-			_modalLayer.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
-			_modalLayer.AddRelation(this, RelationType.Size);
-			_modalLayer.name = _modalLayer.gameObjectName = "ModalLayer";
-			_modalLayer.SetHome(this);
-		}
-
+        public GGraph CreateModalLayer()
+        {
+           var modal = new GGraph();
+            modal.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
+            modal.AddRelation(this, RelationType.Size);
+            modal.name = modal.gameObjectName = "ModalLayer";
+            modal.SetHome(this);
+            return modal;
+        }
 		/// <summary>
 		/// Return true if a modal window is on stage.
 		/// </summary>
@@ -308,9 +308,7 @@ namespace FairyGUI
 
 		private void AdjustModalLayer()
 		{
-			if (_modalLayer == null)
-				CreateModalLayer();
-
+            var modal = modalLayer;           
 			int cnt = this.numChildren;
 
 			if (_modalWaitPane != null && _modalWaitPane.parent != null)
@@ -321,16 +319,16 @@ namespace FairyGUI
 				GObject g = this.GetChildAt(i);
 				if ((g is Window) && (g as Window).modal)
 				{
-					if (_modalLayer.parent == null)
-						AddChildAt(_modalLayer, i);
+					if (modal.parent == null)
+						AddChildAt(modal, i);
 					else
-						SetChildIndexBefore(_modalLayer, i);
+						SetChildIndexBefore(modal, i);
 					return;
 				}
 			}
 
-			if (_modalLayer.parent != null)
-				RemoveChild(_modalLayer);
+			if (modal.parent != null)
+				RemoveChild(modal);
 		}
 
 		/// <summary>

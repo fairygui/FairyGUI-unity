@@ -91,6 +91,7 @@ namespace FairyGUI
         [LuaInterface.NoToLua]
         public static void ClearStageStatic()
         {
+            _inst.Dispose();
             _inst = null;
         }
         /// <summary>
@@ -181,7 +182,7 @@ namespace FairyGUI
 			this.gameObject.AddComponent<StageEngine>();
 			this.gameObject.AddComponent<UIContentScaler>();
 			this.gameObject.SetActive(true);
-            this.gameObject.DontDestroyOnLoad();
+            GameObject.DontDestroyOnLoad(this.gameObject);
 
 			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
 

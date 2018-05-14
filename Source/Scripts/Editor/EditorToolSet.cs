@@ -59,7 +59,13 @@ namespace FairyGUIEditor
 			ReloadPackages();
 		}
 
-		static void EditorApplication_Update()
+        [MenuItem("Tools/Clear User Registry")]
+        static void PlayerPrefsDeleteAll()
+        {
+            UnityEngine.PlayerPrefs.DeleteAll();
+        }
+
+        static void EditorApplication_Update()
 		{
 			if (Application.isPlaying)
 				return;

@@ -978,11 +978,14 @@ namespace FairyGUI
 			Color32 color = format.color;
 			Color32[] gradientColor = format.gradientColor;
 			bool boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
-#if !RTL_TEXT_SUPPORT
-			if (_input)
-				letterSpacing++;
+#if RTL_TEXT_SUPPORT
+            if (!_rtl && _input)
+                letterSpacing++;
+#else
+            if (_input)
+                letterSpacing++;
 #endif
-			if (_charPositions != null)
+            if (_charPositions != null)
 				_charPositions.Clear();
 
 			if (_fontSizeScale != 1) //不为1，表示在Shrink的作用下，字体变小了，所以要重新请求

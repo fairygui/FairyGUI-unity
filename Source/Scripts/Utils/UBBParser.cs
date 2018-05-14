@@ -121,7 +121,23 @@ namespace FairyGUI.Utils
 				_readPos = pos;
 			return ret;
 		}
-
+		// 同一ubb文本多处调用但不是所有的控件都是支持ubb
+        public string GetRemoveParase(string text)
+        {
+            _text = text;
+            int pos1 = 0, pos2, pos3;
+        	while ((pos2 = _text.IndexOf("[", pos1)) != -1)
+        	{
+        		pos1 = pos2;
+        		pos2 = _text.IndexOf("]", pos1);
+        		if (pos2 == -1)
+        			break;
+        	    pos2++;
+        		_readPos = pos2;
+        		_text = _text.Substring(0, pos1) + _text.Substring(_readPos);
+        	}
+        	return _text;
+        }
 		public string Parse(string text)
 		{
 			_text = text;

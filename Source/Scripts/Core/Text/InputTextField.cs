@@ -101,7 +101,24 @@ namespace FairyGUI
 		const int GUTTER_X = 2;
 		const int GUTTER_Y = 2;
 
-		public InputTextField()
+        static new public void ClearStatic()
+        {
+            if (_caret != null)
+            {
+                _caret.Dispose();
+            }
+            if (_selectionShape != null)
+            {
+                _selectionShape.Dispose();
+            }
+            _caret = null;
+            _selectionShape = null;
+            _nextBlink = 0;
+            onCopy = null;
+            onPaste = null;
+        }
+
+        public InputTextField()
 		{
 			gameObject.name = "InputTextField";
 
