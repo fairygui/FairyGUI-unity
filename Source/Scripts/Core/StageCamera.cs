@@ -118,13 +118,15 @@ namespace FairyGUI
 		/// </summary>
 		public static void CheckMainCamera()
 		{
-			if (GameObject.Find(Name) == null)
-			{
-				int layer = LayerMask.NameToLayer(LayerName);
-				CreateCamera(Name, 1 << layer);
-			}
-
-			HitTestContext.cachedMainCamera = Camera.main;
+// 			if (GameObject.Find(Name) == null)
+// 			{
+// 				int layer = LayerMask.NameToLayer(LayerName);
+// 				CreateCamera(Name, 1 << layer);
+// 			}
+            if (HitTestContext.cachedMainCamera == null)
+            {
+                HitTestContext.cachedMainCamera = Camera.main;
+            }
 		}
 
 		/// <summary>
