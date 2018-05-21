@@ -58,7 +58,7 @@ namespace FairyGUI
 		{
 			RelationItem newItem = new RelationItem(_owner);
 			newItem.target = target;
-			
+
 			int start = 0;
 			int end = 0;
 			int ms;
@@ -74,7 +74,7 @@ namespace FairyGUI
 				if (end == -1)
 					end = sidePairs.Length;
 				usePercent = sidePairs[end - 1] == '%';
-				ms = sidePairs.IndexOf('-', start, end-start);
+				ms = sidePairs.IndexOf('-', start, end - start);
 				end++;
 				if (ms != -1)
 				{
@@ -345,16 +345,17 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="rightExt"></param>
-		/// <param name="bottomExt"></param>
-		public void OnOwnerSizeChanged(float rightExt, float bottomExt)
+		/// <param name="dWidth"></param>
+		/// <param name="dHeight"></param>
+		/// <param name="applyPivot"></param>
+		public void OnOwnerSizeChanged(float dWidth, float dHeight, bool applyPivot)
 		{
 			int cnt = _items.Count;
 			if (cnt == 0)
 				return;
 
 			for (int i = 0; i < cnt; i++)
-				_items[i].ApplyOnSelfSizeChanged(rightExt, bottomExt);
+				_items[i].ApplyOnSelfSizeChanged(dWidth, dHeight, applyPivot);
 		}
 
 		/// <summary>

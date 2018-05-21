@@ -503,8 +503,6 @@ namespace FairyGUI
 					hv = maxHeight;
 				float dWidth = wv - _width;
 				float dHeight = hv - _height;
-				float rightExt = dWidth;
-				float bottomExt = dHeight;
 				_width = wv;
 				_height = hv;
 
@@ -515,22 +513,12 @@ namespace FairyGUI
 					if (!_pivotAsAnchor)
 					{
 						if (!ignorePivot)
-						{
-							this.SetXY(_x - _pivotX * dWidth, _y - _pivotY * dHeight);
-
-							rightExt = dWidth * (1 - _pivotX);
-							bottomExt = dHeight * (1 - pivotY);
-						}
+							SetXY(_x - _pivotX * dWidth, _y - _pivotY * dHeight);
 						else
-							this.HandlePositionChanged();
+							HandlePositionChanged();
 					}
 					else
-					{
-						this.HandlePositionChanged();
-
-						rightExt = dWidth * (1 - _pivotX);
-						bottomExt = dHeight * (1 - pivotY);
-					}
+						HandlePositionChanged();
 				}
 
 				if (this is GGroup)
@@ -540,7 +528,7 @@ namespace FairyGUI
 
 				if (parent != null)
 				{
-					relations.OnOwnerSizeChanged(rightExt, bottomExt);
+					relations.OnOwnerSizeChanged(dWidth, dHeight, _pivotAsAnchor || !ignorePivot);
 					parent.SetBoundsChangedFlag();
 					if (_group != null)
 						_group.SetBoundsChangedFlag(true);
