@@ -1381,11 +1381,10 @@ namespace FairyGUI
 			if (softness.x != 0 || softness.y != 0)
 			{
 				_maskContainer.clipSoftness = new Vector4(
-					//左边缘和上边缘感觉不需要效果，所以注释掉
-					(_xPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
-					(_yPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
-					(_overlapSize.x == 0 || _xPos - _overlapSize.x > -0.01f) ? 0 : softness.x,
-					(_overlapSize.y == 0 || _yPos - _overlapSize.y > -0.01f) ? 0 : softness.y);
+					(_container.x >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
+					(_container.y >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
+					(-_container.x - _overlapSize.x >= 0) ? 0 : softness.x,
+					(-_container.y - _overlapSize.y >= 0) ? 0 : softness.y);
 			}
 			else
 				_maskContainer.clipSoftness = null;
