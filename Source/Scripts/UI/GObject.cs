@@ -1951,6 +1951,7 @@ namespace FairyGUI
 			return DOTween.To(() => this.xy, x => this.xy = x, endValue, duration)
 				.SetOptions(_pixelSnapping)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1959,6 +1960,7 @@ namespace FairyGUI
 			return DOTween.To(() => this.x, x => this.x = x, endValue, duration)
 				.SetOptions(_pixelSnapping)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1967,6 +1969,7 @@ namespace FairyGUI
 			return DOTween.To(() => this.y, x => this.y = x, endValue, duration)
 				.SetOptions(_pixelSnapping)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1974,6 +1977,7 @@ namespace FairyGUI
 		{
 			return DOTween.To(() => this.scale, x => this.scale = x, endValue, duration)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1981,6 +1985,7 @@ namespace FairyGUI
 		{
 			return DOTween.To(() => this.scaleX, x => this.scaleX = x, endValue, duration)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1988,6 +1993,7 @@ namespace FairyGUI
 		{
 			return DOTween.To(() => this.scaleY, x => this.scaleY = x, endValue, duration)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -1996,6 +2002,7 @@ namespace FairyGUI
 			return DOTween.To(() => this.size, x => this.size = x, endValue, duration)
 				.SetOptions(_pixelSnapping)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -2003,6 +2010,7 @@ namespace FairyGUI
 		{
 			return DOTween.To(() => this.alpha, x => this.alpha = x, endValue, duration)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 
@@ -2010,6 +2018,7 @@ namespace FairyGUI
 		{
 			return DOTween.To(() => this.rotation, x => this.rotation = x, endValue, duration)
 				.SetUpdate(true)
+				.SetRecyclable()
 				.SetTarget(this);
 		}
 		#endregion

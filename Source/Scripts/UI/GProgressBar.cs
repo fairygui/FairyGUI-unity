@@ -119,6 +119,7 @@ namespace FairyGUI
 				double oldValue = _value;
 				_value = value;
 				_tweener = DOTween.To(() => oldValue, v => { Update(v); }, value, duration)
+					.SetRecyclable()
 					.SetEase(Ease.Linear).OnComplete(() => { _tweener = null; });
 
 				return _tweener;
