@@ -102,7 +102,7 @@ Shader "FairyGUI/Image"
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 					o.texcoord = v.texcoord;
-					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 500)
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 540)
 					o.color.rgb = GammaToLinearSpace(v.color.rgb);
 					o.color.a = v.color.a;
 					#else
