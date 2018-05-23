@@ -284,36 +284,23 @@ namespace FairyGUI
 
 		public void Dispose()
 		{
-			if (_playing)
+			int cnt = _items.Count;
+			for (int i = 0; i < cnt; i++)
 			{
-				int cnt = _items.Count;
-				for (int i = 0; i < cnt; i++)
+				TransitionItem item = _items[i];
+				if (item.tweener != null)
 				{
-					TransitionItem item = _items[i];
-					if (item.target == null || item.completed)
-						continue;
+					item.tweener.Kill();
+					item.tweener = null;
+				}
+				else if (_playing && item.type == TransitionActionType.Shake)
+				{
+					((TransitionItem_Shake)item).Stop(false);
+				}
 
-					if (item.tweener != null)
-					{
-						item.tweener.Kill();
-						item.tweener = null;
-					}
-					else if (item.type == TransitionActionType.Shake)
-					{
-						((TransitionItem_Shake)item).Stop(false);
-					}
-				}
-			}
-			else
-			{
-				int cnt = _items.Count;
-				for (int i = 0; i < cnt; i++)
-				{
-					TransitionItem item = _items[i];
-					item.target = null;
-					item.hook = null;
-					item.hook2 = null;
-				}
+				item.target = null;
+				item.hook = null;
+				item.hook2 = null;
 			}
 
 			_items.Clear();
