@@ -696,9 +696,6 @@ namespace FairyGUI
 			set { SetPivot(value.x, value.y); }
 		}
 
-        /// <summary>
-        /// 是否将轴心作为锚点.
-        /// </summary>
 		public bool pivotAsAnchor
 		{
 			get { return _pivotAsAnchor; }

@@ -401,7 +401,7 @@ namespace FairyGUI
             {
                 return null;
             }
-            RTLSettingBaseProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(RTLSettingBaseProxy)) as RTLSettingBaseProxy;
+            UniteSettingsProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(UniteSettingsProxy)) as UniteSettingsProxy;
             if (sSetting.IsNeedLTR())
             {
                 string resTLRName = resName + "_LTR";
@@ -531,7 +531,7 @@ namespace FairyGUI
                 return null;
 
             PackageItem pi;
-            RTLSettingBaseProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(RTLSettingBaseProxy)) as RTLSettingBaseProxy;
+            UniteSettingsProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(UniteSettingsProxy)) as UniteSettingsProxy;
             if (sSetting.IsNeedLTR())
             {
                 string resTLRName = resName + "_LTR";

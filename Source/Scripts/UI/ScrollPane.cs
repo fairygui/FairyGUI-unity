@@ -103,7 +103,13 @@ namespace FairyGUI
 		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
 		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
 		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
-
+        
+        [LuaInterface.NoToLua]
+        public static void ClearStatic()
+        {
+            draggingPane = null;
+            _gestureFlag = 0;
+        }
 		public ScrollPane(GComponent owner,
 									ScrollType scrollType,
 									Margin scrollBarMargin,
@@ -1380,11 +1386,25 @@ namespace FairyGUI
 			Vector2 softness = _owner.clipSoftness;
 			if (softness.x != 0 || softness.y != 0)
 			{
+			    float x = 0.0f;
+			    float z = 0.0f;
+			    if (_owner.scaleX < 0)  //list颠倒的时候虚化效果也要颠倒
+            	{
+                    x = (_overlapSize.x == 0 || _xPos - _overlapSize.x > -0.01f) ? 0 : softness.x;
+                    z = (_xPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.x;
+            	}
+            	else
+                {
+            	    x = (_xPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.x;
+            	    z = (_overlapSize.x == 0 || _xPos - _overlapSize.x > -0.01f) ? 0 : softness.x;
+            	}
 				_maskContainer.clipSoftness = new Vector4(
-					(_container.x >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
-					(_container.y >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
-					(-_container.x - _overlapSize.x >= 0) ? 0 : softness.x,
-					(-_container.y - _overlapSize.y >= 0) ? 0 : softness.y);
+					//左边缘和上边缘感觉不需要效果，所以注释掉
+					x,
+					(_yPos < 0.01f || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
+					z,
+					(_overlapSize.y == 0 || _yPos - _overlapSize.y > -0.01f) ? 0 : softness.y);
+
 			}
 			else
 				_maskContainer.clipSoftness = null;
