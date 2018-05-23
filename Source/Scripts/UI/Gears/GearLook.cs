@@ -105,6 +105,7 @@ namespace FairyGUI
 					}, new Vector2(gv.alpha, gv.rotation), tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
+					.SetRecyclable()
 					.OnUpdate(() =>
 					{
 						if (b)

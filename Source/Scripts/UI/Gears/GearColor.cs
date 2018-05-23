@@ -116,6 +116,7 @@ namespace FairyGUI
 					}, gv.color, tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
+					.SetRecyclable()
 					.OnUpdate(() =>
 					{
 						_owner.InvalidateBatchingState();

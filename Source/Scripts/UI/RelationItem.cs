@@ -135,7 +135,7 @@ namespace FairyGUI
 			get { return _defs.Count == 0; }
 		}
 
-		public void ApplyOnSelfSizeChanged(float rightExt, float bottomExt)
+		public void ApplyOnSelfSizeChanged(float dWidth, float dHeight, bool applyPivot)
 		{
 			int cnt = _defs.Count;
 			if (cnt == 0)
@@ -150,22 +150,23 @@ namespace FairyGUI
 				switch (info.type)
 				{
 					case RelationType.Center_Center:
-					case RelationType.Right_Center:
-						_owner.x -= rightExt / 2;
+						_owner.x -= (0.5f - (applyPivot ? _owner.pivotX : 0)) * dWidth;
 						break;
 
+					case RelationType.Right_Center:
 					case RelationType.Right_Left:
 					case RelationType.Right_Right:
-						_owner.x -= rightExt;
+						_owner.x -= (1 - (applyPivot ? _owner.pivotX : 0)) * dWidth;
 						break;
 
 					case RelationType.Middle_Middle:
-					case RelationType.Bottom_Middle:
-						_owner.y -= bottomExt / 2;
+						_owner.y -= (0.5f - (applyPivot ? _owner.pivotY : 0)) * dHeight;
 						break;
+
+					case RelationType.Bottom_Middle:
 					case RelationType.Bottom_Top:
 					case RelationType.Bottom_Bottom:
-						_owner.y -= bottomExt;
+						_owner.y -= (1 - (applyPivot ? _owner.pivotY : 0)) * dHeight;
 						break;
 				}
 			}

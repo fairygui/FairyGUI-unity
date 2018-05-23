@@ -87,6 +87,7 @@ namespace FairyGUI
 					}, new Vector2(gv.x, gv.y), tweenTime)
 					.SetEase(easeType)
 					.SetUpdate(true)
+					.SetRecyclable()
 					.OnUpdate(() =>
 					{
 						_owner.InvalidateBatchingState();

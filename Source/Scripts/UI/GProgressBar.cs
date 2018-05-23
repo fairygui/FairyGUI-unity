@@ -119,6 +119,7 @@ namespace FairyGUI
 				double oldValue = _value;
 				_value = value;
 				_tweener = DOTween.To(() => oldValue, v => { Update(v); }, value, duration)
+					.SetRecyclable()
 					.SetEase(Ease.Linear).OnComplete(() => { _tweener = null; });
 
 				return _tweener;
@@ -133,7 +134,7 @@ namespace FairyGUI
 		/// <param name="newValue"></param>
 		public void Update(double newValue)
 		{
-			float percent = (float)Math.Min(newValue / _max, 1);
+			float percent = _max != 0 ? (float)Math.Min(newValue / _max, 1) : 0;
 			if (_titleObject != null)
 			{
 				switch (_titleType)
