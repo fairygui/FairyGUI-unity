@@ -79,6 +79,8 @@ namespace FairyGUI
 				result.frameId = _manager.frameId;
 				result.clipId = _manager.clipId;
 				result.blendMode = _manager.blendMode;
+				if (BlendModeUtils.Factors[(int)result.blendMode].pma)
+					result.material.EnableKeyword("COLOR_FILTER");
 				items.Add(result);
 			}
 

@@ -94,6 +94,7 @@ Shader "FairyGUI/Image"
 				#ifdef COLOR_FILTER
 				float4x4 _ColorMatrix;
 				float4 _ColorOffset;
+				float _ColorOption = 0;
 				#endif
 
 				v2f vert (appdata_t v)
@@ -151,12 +152,17 @@ Shader "FairyGUI/Image"
 					#endif
 
 					#ifdef COLOR_FILTER
-					fixed4 col2 = col;
-					col2.r = dot(col, _ColorMatrix[0])+_ColorOffset.x;
-					col2.g = dot(col, _ColorMatrix[1])+_ColorOffset.y;
-					col2.b = dot(col, _ColorMatrix[2])+_ColorOffset.z;
-					col2.a = dot(col, _ColorMatrix[3])+_ColorOffset.w;
-					col = col2;
+					if (_ColorOption == 0)
+					{
+						fixed4 col2 = col;
+						col2.r = dot(col, _ColorMatrix[0]) + _ColorOffset.x;
+						col2.g = dot(col, _ColorMatrix[1]) + _ColorOffset.y;
+						col2.b = dot(col, _ColorMatrix[2]) + _ColorOffset.z;
+						col2.a = dot(col, _ColorMatrix[3]) + _ColorOffset.w;
+						col = col2;
+					}
+					else //premultiply alpha
+						col.rgb *= col.a;
 					#endif
 
 					#ifdef ALPHA_MASK
