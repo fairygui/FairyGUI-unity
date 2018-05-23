@@ -284,7 +284,7 @@ namespace FairyGUI
 
 		public void Dispose()
 		{
-			if (!_playing)
+			if (_playing)
 			{
 				int cnt = _items.Count;
 				for (int i = 0; i < cnt; i++)
