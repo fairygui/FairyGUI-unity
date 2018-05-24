@@ -633,7 +633,11 @@ namespace FairyGUI
 				TouchInfo touch = _touches[0];
 				touch.modifiers = evt.modifiers;
 			}
+#if UNITY_2017_1_OR_NEWER
+			else if (evt.type == EventType.ScrollWheel)
+#else
 			else if (evt.type == EventType.scrollWheel)
+#endif
 			{
 				if (_touchTarget != null)
 				{
