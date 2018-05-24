@@ -4,7 +4,7 @@
 FairyGUI is a Cross Platform UI Editor & UI framework.
 [Get FairyGUI-Editor](http://en.fairygui.com/product)  
 
-FairyGUI Editor is a professional Game UI Editor, easy to use, no need to write code and write any configuration files, you can build a variety of complex game interface, support Unity、Cocos2dx、Cry Engine、 Havok Vision/Project Anarchy、Egret、LayaAir、Haxe、Pixi、Flash、Starling，and Unreal、LibGDX、Three.js in the future.<br>
+By using FairyGUI Editor, you can build a variety of complex game interface without writing code or any configuration files. Support Unity、Cocos2dx、Cry Engine、 Havok Vision/Project Anarchy、Egret、LayaAir、Haxe、Pixi、Flash、Starling，and Unreal、LibGDX、Three.js in the future.<br>
 
 Compared with traditional Unity UI engines such as NGUI and UGUI, FairyGUI uses a way of thinking closer to the designer to redefine the production process of the UI, which greatly reduces the time the programmer needs to invest in making the UI.<br>
 
@@ -26,22 +26,26 @@ FairyGUI还对所有输入方式进行了完整的封装，无论是鼠标、单
 
 Get Started
 ====
-- Examples.Unity5
-If you are exploring FairyGUI for the first time, it is highly recommended that you start with the Examples project. This is an example project for the Unity 5.x version. This project was created on Unity 5.5.0. If you are using another version of Unity, you can read it from [here] (https://github.com/fairygui/FairyGUI -unity/releases) Download FairyGUI-Unity-Plugin.zip, then replace the DLL in the Assets/Plugins directory inside the project with the DLL that corresponds to your Unity version.<br>
 
-如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的例子工程，这个工程是在Unity5.5.0上制作的，如果你使用的是其他版本的Unity，可以从[这里](https://github.com/fairygui/FairyGUI-unity/releases)下载FairyGUI-Unity-Plugin.zip，然后用里面对应你Unity版本的DLL替换工程内Assets/Plugins目录下的DLL即可。
+- Examples.Unity5
+- 
+  If you are exploring FairyGUI for the first time, it is highly recommended that you start with the Examples project. This is an example project for the Unity 5.x version. This project was created on Unity 5.5.0. If you are using another version of Unity, you can read it from [here] (https://github.com/fairygui/FairyGUI -unity/releases) Download FairyGUI-Unity-Plugin.zip, then replace the DLL in the Assets/Plugins directory inside the project with the DLL that corresponds to your Unity version.<br>
+
+  如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的例子工程，这个工程是在Unity5.5.0上制作的，如果你使用的是其他版本的Unity，可以从[这里](https://github.com/fairygui/FairyGUI-unity/releases)下载FairyGUI-Unity-Plugin.zip，然后用里面对应你Unity版本的DLL替换工程内Assets/Plugins目录下的DLL即可。
 
 - Source
-Here is the source code of FairyGUI. If it is used for a new project, The are the required files. In addition, you also need to place DOTween's DLL.
+
+  Here is the source code of FairyGUI. If it is used for a new project, The are the required files. In addition, you also need to place DOTween's DLL.
 The source code and shaders here are common to all versions of Unity.<br>
 
-这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
+  这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
 这里的源码和着色器都是Unity所有版本通用的。
 
-- LuaSupport  
-FairyGUI is very friendly to Lua. If you use Lua to develop Unity games, this is very convenient for you.<br>
+- LuaSupport
+ 
+  FairyGUI is very friendly to Lua. If you use Lua to develop Unity games, this is very convenient for you.<br>
 
-FairyGUI对Lua十分友好，如果你使用Lua开发Unity游戏，这里为你准备了非常便利的支持。
+  FairyGUI对Lua十分友好，如果你使用Lua开发Unity游戏，这里为你准备了非常便利的支持。
 
 Learn
 ====
