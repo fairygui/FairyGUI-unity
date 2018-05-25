@@ -51,10 +51,13 @@ namespace FairyGUI
 			{
 				if (value == null)
 					value = string.Empty;
-				_text = value;
-				SetTextFieldText();
-				UpdateSize();
-				UpdateGear(6);
+                if (_text != value)
+                {
+                    _text = value;
+                    SetTextFieldText();
+                    UpdateSize();
+                    UpdateGear(6);
+                }
 			}
 		}
 
