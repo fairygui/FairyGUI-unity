@@ -543,9 +543,7 @@ namespace FairyGUI
 			bool wrap;
 			if (_input)
 			{
-#if !RTL_TEXT_SUPPORT
 				letterSpacing++;
-#endif
 				wrap = !_singleLine;
 			}
 			else
@@ -1147,7 +1145,7 @@ namespace FairyGUI
 #if RTL_TEXT_SUPPORT
 						if (_rtl)
 						{
-							if (lineClipped || clipped && (rectWidth < 7 || charX != (xIndent - GUTTER_X)) && charX < GUTTER_X - 0.5f) //超出区域，剪裁
+							if (lineClipped || clipped && charX != (xIndent - GUTTER_X) && charX < GUTTER_X - 0.5f) //超出区域，剪裁
 							{
 								charX -= (letterSpacing + glyph.width);
 								continue;
@@ -1158,7 +1156,7 @@ namespace FairyGUI
 						else
 #endif
 						{
-							if (lineClipped || clipped && (rectWidth < 7 || charX != (GUTTER_X + xIndent)) && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
+							if (lineClipped || clipped && charX != (GUTTER_X + xIndent) && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
 							{
 								charX += letterSpacing + glyph.width;
 								continue;
