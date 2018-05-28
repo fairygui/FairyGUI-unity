@@ -58,15 +58,20 @@ namespace FairyGUI
                     UpdateSize();
                     UpdateGear(6);
                 }
+                else
+                {
+                    _text = value;
+                    SetTextFieldText();
+                }
 			}
 		}
 
 		virtual protected void SetTextFieldText()
 		{
 			if (_ubbEnabled)
-             {
-                _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
-             }
+            {
+               _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
+            }
 			else
 			{
 			    string parseTxt = UBBParser.inst.GetRemoveParase(_text);
