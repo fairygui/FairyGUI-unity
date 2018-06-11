@@ -587,7 +587,7 @@ namespace FairyGUI
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || uc == '%' || uc == '+' || /*uc == '-' ||*/
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 	    
@@ -601,7 +601,7 @@ namespace FairyGUI
             {
                 eCType = CharType.RTL;
             }
-            else if (IsArabicLetter(uc) || uc == '-')
+            else if (IsArabicLetter(uc) || uc == '-' || uc == '%')
             {
                 eCType = CharType.RTL;
             }
