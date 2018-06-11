@@ -614,12 +614,14 @@ namespace FairyGUI
                 else
                     eCType = ePre;
             }
-            else if (((uni >= 0x20) && (uni <= 0x7e)) || 
-                ((uni >= 0x660) && (uni <= 0x669)) || // 这个是阿拉伯字符的数字，很特殊，和英文的阿拉伯数字一样从左到右 [2018/3/24 16:03:29 --By aq_1000]
-                char.IsSurrogate(uc) || char.IsLowSurrogate(uc))
-            {
+//             else if (((uni >= 0x20) && (uni <= 0x7e)) || 
+//                 ((uni >= 0x660) && (uni <= 0x669)) || // 这个是阿拉伯字符的数字，很特殊，和英文的阿拉伯数字一样从左到右 [2018/3/24 16:03:29 --By aq_1000]
+//                 char.IsSurrogate(uc) || char.IsLowSurrogate(uc))
+//             {
+//                 eCType = CharType.LTR;
+//             }
+            else
                 eCType = CharType.LTR;
-            }
 
             return eCType;
         }
