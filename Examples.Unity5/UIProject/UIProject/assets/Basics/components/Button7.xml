@@ -1,0 +1,14 @@
+<component size="69,62" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="rpmbo" name="n1" xy="0,0" aspect="true">
+      <gearDisplay controller="button" pages="0,2"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+    <image id="n2" src="rpmbn" name="n2" xy="0,0" aspect="true">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width,height"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>

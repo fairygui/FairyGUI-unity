@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="ddm193o7" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="fou90" name="CutScene.xml" path="/" exported="true"/>
+    <component id="fou91" name="ProgressBar5.xml" path="/"/>
+    <image id="fou92" name="loading.png.jpg" path="/"/>
+    <image id="fou93" name="huawen1_png.png" path="/"/>
+    <image id="fou94" name="huawen2_png.png" path="/"/>
+    <movieclip id="fou95" name="pet.jta" path="/"/>
+    <component id="fou96" name="Main.xml" path="/" exported="true"/>
+    <component id="fou97" name="Button1.xml" path="/"/>
+  </resources>
+  <publish name="CutScene">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

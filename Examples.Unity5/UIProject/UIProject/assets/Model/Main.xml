@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n1" name="n1" src="rpol1" xy="352,50"/>
+    <graph id="n0" name="holder" xy="451,424" size="100,100"/>
+    <jta id="n3" name="n3" src="rpol2" xy="456,269"/>
+  </displayList>
+</component>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="131,168" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="2"/>
+  <displayList>
+    <image id="n1" name="n1" src="g40j9" xy="0,0" color="#a0a0a0" forHitTest="true">
+      <relation target="" sidePair="width-width,height-height"/>
+      <gearColor controller="button" pages="0,1,2,3" values="#ffffff|#a0a0a0|#a0a0a0|#a0a0a0" default="#ffffff"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>

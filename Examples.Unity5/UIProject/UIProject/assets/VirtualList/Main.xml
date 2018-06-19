@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="c8s21" xy="185,56" size="404,562"/>
+    <image id="n1" name="n1" src="c8s22" xy="197,70" size="384,63"/>
+    <image id="n2" name="n2" src="c8s23" xy="315,82"/>
+    <list id="n3" name="mailList" xy="197,130" size="380,473" overflow="scroll" scrollBarFlags="2" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://qkteqwfpc8s24"/>
+    <text id="n4" name="n4" xy="171,15" size="425,28" fontSize="24" color="#ffffff" text="The below list contains 1000 items."/>
+    <component id="n6" name="n6" src="rpolb" xy="693,153" size="183,48">
+      <Button title="Select 500th"/>
+    </component>
+    <component id="n7" name="n7" src="rpolb" xy="693,224" size="183,48">
+      <Button title="Top"/>
+    </component>
+    <component id="n8" name="n8" src="rpolb" xy="693,300" size="183,48">
+      <Button title="Bottom"/>
+    </component>
+  </displayList>
+</component>

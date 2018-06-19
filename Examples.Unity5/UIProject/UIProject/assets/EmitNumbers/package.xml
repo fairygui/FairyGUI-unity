@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="t7096b8q" jpegQuality="80" compressPNG="true">
+  <resources>
+    <font id="mulj0" name="number1.fnt" path="/" exported="true"/>
+    <image id="mulj1" name="0(2)5_png.png" path="/"/>
+    <image id="mulj2" name="1(2)5_png.png" path="/"/>
+    <image id="mulj3" name="2(2)5_png.png" path="/"/>
+    <image id="mulj4" name="3(2)5_png.png" path="/"/>
+    <image id="mulj5" name="4(2)5_png.png" path="/"/>
+    <image id="mulj6" name="5(2)5_png.png" path="/"/>
+    <image id="mulj7" name="6(2)5_png.png" path="/"/>
+    <image id="mulj8" name="7(2)5_png.png" path="/"/>
+    <image id="mulj9" name="8(2)5_png.png" path="/"/>
+    <image id="mulja" name="9(2)5_png.png" path="/"/>
+    <image id="muljb" name="m2_png.png" path="/"/>
+    <font id="muljc" name="number2.fnt" path="/" exported="true"/>
+    <image id="muljd" name="0(4)_png.png" path="/"/>
+    <image id="mulje" name="1(4)_png.png" path="/"/>
+    <image id="muljf" name="2(4)_png.png" path="/"/>
+    <image id="muljg" name="3(4)_png.png" path="/"/>
+    <image id="muljh" name="4(4)_png.png" path="/"/>
+    <image id="mulji" name="5(4)_png.png" path="/"/>
+    <image id="muljj" name="6(4)_png.png" path="/"/>
+    <image id="muljk" name="7(4)_png.png" path="/"/>
+    <image id="muljl" name="8(4)_png.png" path="/"/>
+    <image id="muljm" name="9(4)_png.png" path="/"/>
+    <image id="muljn" name="m1_png.png" path="/"/>
+    <image id="muljo" name="critical.png" path="/" exported="true"/>
+    <component id="muljp" name="Main.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="EmitNumbers">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

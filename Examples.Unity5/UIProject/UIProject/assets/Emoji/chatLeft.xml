@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="900,94" extention="Button">
+  <displayList>
+    <image id="n7" name="n7" src="fymi18" xy="1,2" size="86,86"/>
+    <image id="n0" name="n0" src="kfcb1i" xy="88,33" size="700,55">
+      <relation target="n3" sidePair="height-height,width-width"/>
+    </image>
+    <loader id="n1" name="icon" xy="4,5" size="80,80" align="center" vAlign="middle" fill="scale"/>
+    <richtext id="n3" name="msg" xy="112,46" size="663,28" fontSize="24" leading="5" autoSize="height" text=""/>
+    <text id="n8" name="name" xy="94,4" size="40,26" fontSize="22" singleLine="true" text=""/>
+  </displayList>
+  <Button/>
+  <relation target="n0" sidePair="height-height"/>
+</component>

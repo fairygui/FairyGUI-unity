@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <graph id="n27" name="n27" xy="32,61" size="528,337" type="rect" lineColor="#49959595" fillColor="#ff233e43"/>
+    <image id="n18" name="n18" src="a7vt7m" xy="32,23" size="527,39"/>
+    <list id="n19" name="list1" xy="32,61" size="527,336" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://9leh0eyfa7vt7n">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <text id="n20" name="n20" xy="41,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Order"/>
+    <text id="n21" name="n21" xy="432,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Stars"/>
+    <text id="n23" name="n23" xy="338,29" size="60,26" group="n25" fontSize="22" color="#ccffff" text="Color"/>
+    <text id="n24" name="n24" xy="178,29" size="49,26" group="n25" fontSize="22" color="#ccffff" text="Name"/>
+    <group id="n25" name="n25" xy="41,29" size="451,26" advanced="true"/>
+    <graph id="n28" name="n28" xy="585,59" size="527,337" type="rect" lineColor="#49959595" fillColor="#ff233e43"/>
+    <image id="n29" name="n29" src="a7vt7m" xy="585,21" size="527,39"/>
+    <list id="n30" name="list2" xy="585,59" size="526,336" selectionMode="none" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://9leh0eyfatih7o">
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <text id="n32" name="n32" xy="998,27" size="60,26" group="n35" fontSize="22" color="#ccffff" text="Power"/>
+    <text id="n33" name="n33" xy="887,27" size="60,26" group="n35" fontSize="22" color="#ccffff" text="Color"/>
+    <text id="n34" name="n34" xy="647,26" size="49,26" group="n35" fontSize="22" color="#ccffff" text="Name"/>
+    <group id="n35" name="n35" xy="647,26" size="411,27" advanced="true"/>
+  </displayList>
+</component>

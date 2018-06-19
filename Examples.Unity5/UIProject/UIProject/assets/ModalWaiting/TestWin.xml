@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="500,500">
+  <displayList>
+    <component id="n0" name="frame" src="p6037" xy="0,0" size="500,500">
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <component id="n1" name="n1" src="p603d" xy="179,334" size="145,48">
+      <Button title="Refresh"/>
+    </component>
+  </displayList>
+</component>

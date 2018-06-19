@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640" overflow="hidden">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <displayList>
+    <graph id="n26" name="n26" xy="0,70" size="1136,570" type="rect" lineSize="0" fillColor="#ff9f9f9f">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n25" name="container" src="f2ax74" xy="-1143,70" size="1136,570">
+      <gearDisplay controller="c1" pages="1"/>
+      <gearXY controller="c1" pages="0" values="-1143,70" default="0,70" tween="true"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <graph id="n21" name="n21" xy="0,0" size="1136,70" type="rect" fillColor="#ff006699">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <component id="n22" name="btn_Back" src="hixt1j" xy="963,-1">
+      <relation target="" sidePair="right-right"/>
+      <Button title="&lt;&lt;Back"/>
+    </component>
+    <component id="n2" name="btn_Button" src="hixt1j" xy="462,298" group="n23">
+      <Button title="Button"/>
+    </component>
+    <component id="n3" name="btn_Image" src="hixt1j" xy="274,100" group="n23">
+      <Button title="Image"/>
+    </component>
+    <component id="n4" name="btn_Graph" src="hixt1j" xy="86,100" group="n23">
+      <Button title="Graph"/>
+    </component>
+    <component id="n5" name="btn_MovieClip" src="hixt1j" xy="462,100" group="n23">
+      <Button title="MovieClip"/>
+    </component>
+    <component id="n6" name="btn_Depth" src="hixt1j" xy="650,397" group="n23">
+      <Button title="Depth"/>
+    </component>
+    <component id="n7" name="btn_Loader" src="hixt1j" xy="838,100" group="n23">
+      <Button title="Loader"/>
+    </component>
+    <component id="n8" name="btn_List" src="hixt1j" xy="86,199" group="n23">
+      <Button title="List"/>
+    </component>
+    <component id="n9" name="btn_ProgressBar" src="hixt1j" xy="86,397" group="n23">
+      <Button title="ProgressBar"/>
+    </component>
+    <component id="n10" name="btn_Slider" src="hixt1j" xy="838,298" group="n23">
+      <Button title="Slider"/>
+    </component>
+    <component id="n11" name="btn_ComboBox" src="hixt1j" xy="650,298" group="n23">
+      <Button title="ComboBox"/>
+    </component>
+    <component id="n12" name="btn_Clip&amp;Scroll" src="hixt1j" xy="838,199" size="163,69" group="n23">
+      <Button title="Clip&amp;Scroll"/>
+    </component>
+    <component id="n13" name="btn_Controller" src="hixt1j" xy="462,199" group="n23">
+      <Button title="Controller"/>
+    </component>
+    <component id="n14" name="btn_Relation" src="hixt1j" xy="650,199" group="n23">
+      <Button title="Relation"/>
+    </component>
+    <component id="n17" name="btn_Label" src="hixt1j" xy="274,298" group="n23">
+      <Button title="Label"/>
+    </component>
+    <component id="n18" name="btn_Popup" src="hixt1j" xy="274,397" group="n23">
+      <Button title="Popup"/>
+    </component>
+    <component id="n19" name="btn_Window" src="hixt1j" xy="462,397" group="n23">
+      <Button title="Window"/>
+    </component>
+    <component id="n20" name="btn_Drag&amp;Drop" src="hixt1j" xy="838,397" group="n23">
+      <Button title="Drag&amp;Drop"/>
+    </component>
+    <component id="n27" name="btn_Component" src="hixt1j" xy="86,298" group="n23">
+      <Button title="Component"/>
+    </component>
+    <component id="n28" name="btn_Grid" src="hixt1j" xy="274,199" group="n23">
+      <Button title="Grid"/>
+    </component>
+    <component id="n29" name="btn_Text" src="hixt1j" xy="650,100" group="n23">
+      <Button title="Text"/>
+    </component>
+    <group id="n23" name="btns" xy="86,100" size="915,366" advanced="true">
+      <gearDisplay controller="c1" pages="0"/>
+      <gearXY controller="c1" pages="0,1" values="86,100|1159,100" tween="true"/>
+    </group>
+    <text id="n24" name="n24" xy="13,12" size="276,50" font="微软雅黑" fontSize="35" color="#ff9900" bold="true" text="FairyGUI-Demo"/>
+  </displayList>
+</component>

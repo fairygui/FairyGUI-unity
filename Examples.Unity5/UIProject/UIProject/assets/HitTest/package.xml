@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="ezq9a8mh" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="d7yq0" name="Main.xml" path="/" exported="true"/>
+    <image id="zis77" name="change.png" path="/"/>
+    <image id="g40j8" name="2.png" path="/"/>
+    <image id="g40j9" name="1.png" path="/"/>
+    <image id="g40ja" name="0.png" path="/"/>
+    <component id="g40je" name="button1.xml" path="/"/>
+    <component id="g40jf" name="button2.xml" path="/"/>
+    <component id="g40jg" name="button3.xml" path="/"/>
+    <component id="g40jh" name="component1.xml" path="/"/>
+  </resources>
+  <publish name="HitTest">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

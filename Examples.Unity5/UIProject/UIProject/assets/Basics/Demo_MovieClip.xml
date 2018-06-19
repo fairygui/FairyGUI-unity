@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <text id="n0" name="n0" xy="16,9" size="605,71" fontSize="22" autoSize="none" text="1. Import gif directly&#xA;2. Use builtin tool to create movieclip"/>
+    <jta id="n8" name="n8" src="hixt1v" xy="44,109"/>
+    <jta id="n13" name="n13" src="hixt1v" xy="52,243" color="#0066cc"/>
+    <jta id="n14" name="n14" src="hixt1v" xy="70,416" frame="1" playing="false"/>
+    <jta id="n15" name="n15" src="hixt1v" xy="298,227" pivot="0.5,0.5" size="155,144" alpha="0.33" rotation="-49" frame="1"/>
+    <component id="n18" name="n18" src="rpmb10" xy="170,426" size="84,42">
+      <Button title="点我" icon="ui://9leh0eyfhixt1v"/>
+    </component>
+    <jta id="n19" name="n19" src="t9fj5f" xy="172,111"/>
+    <jta id="n22" name="n22" src="hixt1v" xy="176,243" grayed="true"/>
+  </displayList>
+</component>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="qnypfqdk" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="xcfj0" name="Main.xml" path="/" exported="true"/>
+    <component id="mn711" name="Panel.xml" path="/" exported="true"/>
+    <image id="mn712" name="5.png" path="/"/>
+    <component id="mn713" name="button1.xml" path="/"/>
+    <image id="mn714" name="3.png" path="/" scale="9grid" scale9grid="25,11,50,5"/>
+    <image id="mn715" name="1.png" path="/" scale="9grid" scale9grid="25,11,50,7"/>
+    <image id="mn716" name="4.png" path="/" scale="9grid" scale9grid="25,11,50,6"/>
+    <image id="mn717" name="2.png" path="/" scale="9grid" scale9grid="25,11,50,8"/>
+    <movieclip id="mn718" name="pet.jta" path="/"/>
+    <component id="mn719" name="Panel2.xml" path="/" exported="true"/>
+    <image id="mn71a" name="12.png" path="/" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="mn71b" name="32.png" path="/" scale="9grid" scale9grid="110,16,33,32"/>
+    <image id="mn71c" name="42.png" path="/"/>
+    <component id="mn71d" name="mailItem.xml" path="/"/>
+    <image id="mn71e" name="22.png" path="/" scale="9grid" scale9grid="25,26,26,90"/>
+    <image id="mn71f" name="0.png" path="/" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="mn71g" name="7.png" path="/"/>
+    <image id="mn71h" name="9.png" path="/"/>
+    <image id="mn71i" name="6.png" path="/"/>
+    <image id="mn71j" name="8.png" path="/"/>
+  </resources>
+  <publish name="Perspective">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

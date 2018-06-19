@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <component id="n0" name="btn0" src="gkq0b" xy="85,64" size="121,42" group="n3">
+      <Button title="Play1"/>
+    </component>
+    <component id="n1" name="btn1" src="gkq0b" xy="260,64" size="121,42" group="n3">
+      <Button title="Play2"/>
+    </component>
+    <component id="n2" name="btn2" src="gkq0b" xy="435,64" size="121,42" group="n3">
+      <Button title="Play3"/>
+    </component>
+    <component id="n4" name="btn3" src="gkq0b" xy="610,64" size="121,42" group="n3">
+      <Button title="Play4"/>
+    </component>
+    <component id="n5" name="btn4" src="gkq0b" xy="785,62" size="121,42" group="n3">
+      <Button title="Play5"/>
+    </component>
+    <group id="n3" name="g0" xy="85,62" size="821,44" advanced="true"/>
+  </displayList>
+</component>

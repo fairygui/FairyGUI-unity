@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="2mabf2jp" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="pclm0" name="Main.xml" path="/" exported="true"/>
+    <component id="mlvd1" name="TreeExpandButton.xml" path="/" exported="true"/>
+    <image id="mlvd2" name="i3.png.png" path="/Images/" exported="true"/>
+    <image id="mlvd3" name="i4.png.png" path="/Images/" exported="true"/>
+    <component id="mlvd4" name="TreeItem.xml" path="/" exported="true"/>
+    <image id="mlvd7" name="folder_closed.png" path="/Icons/" exported="true"/>
+    <image id="mlvd8" name="folder_opened.png" path="/Icons/" exported="true"/>
+    <image id="mlvd9" name="file.png" path="/Icons/" exported="true"/>
+    <movieclip id="mlvdc" name="heart.jta" path="/Icons/" exported="true"/>
+  </resources>
+  <publish name="TreeView"/>
+</packageDescription>

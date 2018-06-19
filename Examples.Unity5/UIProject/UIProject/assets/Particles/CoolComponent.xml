@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="90,100" extention="Button">
+  <displayList>
+    <graph id="n3" name="effect" xy="32,85" size="28,27"/>
+    <jta id="n5" name="n5" src="chmf8" xy="-11,33"/>
+    <text id="n4" name="n4" xy="4,-2" size="90,27" fontSize="22" color="#ffffff" autoSize="none" strokeColor="#000000" text="Drag Me"/>
+  </displayList>
+  <Button/>
+</component>

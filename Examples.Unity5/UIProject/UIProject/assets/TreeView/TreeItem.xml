@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="240,48" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <graph id="n10" name="n10" xy="0,0" size="240,48" type="rect" lineSize="0" fillColor="#7a0066cc">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n2" name="title" xy="105,8" size="134,32" fontSize="28" autoSize="none" singleLine="true" text="Title">
+      <relation target="" sidePair="width-width"/>
+      <relation target="n6" sidePair="leftext-right"/>
+    </text>
+    <graph id="n3" name="indent" xy="0,0" size="16,48"/>
+    <loader id="n6" name="icon" xy="55,0" size="50,48" url="ui://2mabf2jpmlvd7" align="center" vAlign="middle">
+      <relation target="n3" sidePair="left-right"/>
+    </loader>
+    <component id="n7" name="expandButton" src="mlvd1" xy="15,9">
+      <relation target="n3" sidePair="left-right"/>
+    </component>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

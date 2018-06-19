@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="400,203">
+  <displayList>
+    <component id="n0" name="frame" src="niii7d" xy="68,0" size="332,203">
+      <relation target="" sidePair="width-width,height-height"/>
+      <Label title="窗口B"/>
+    </component>
+    <image id="n7" name="n7" src="sner1h" xy="-29,-91"/>
+    <text id="n10" name="n10" xy="191,20" size="156,39" font="Comic Sans MS" fontSize="27" color="#ff3366" text="Hello World"/>
+    <component id="n12" name="n12" src="t9fj57" xy="185,139" scale="0.70,1.00">
+      <ProgressBar value="80" max="100"/>
+    </component>
+  </displayList>
+  <transition name="t1">
+    <item time="0" type="XY" target="n7" tween="true" startValue="-29,-" endValue="-9,-" duration="8" repeat="11" yoyo="true"/>
+  </transition>
+</component>

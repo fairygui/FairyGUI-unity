@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <controller name="c2" pages="0,,1," selected="0"/>
+  <displayList>
+    <graph id="n3" name="n3" xy="181,271" size="100,100" type="rect" fillColor="#ff666699">
+      <gearXY controller="c1" pages="0,1" values="181,271|60,328" default="174,120" tween="true"/>
+      <gearSize controller="c1" pages="1" values="196,174,1,1" default="100,100,1,1" tween="true"/>
+    </graph>
+    <text id="n0" name="n0" xy="18,21" size="1086,131" fontSize="23" autoSize="height" text="Controller is one of the key technologies of FairyGUI. Controller contains multiple pages. Elements can be in different status in different pages. Click the button below to observe the different effects.&#xA;控制器是FairyGUI核心特色功能之一。控制器包含多个页面，元件可以在不同页面中具有不同状态。点击下面的按钮，观察不同效果。"/>
+    <graph id="n5" name="n5" xy="65,271" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="65,271|252,190" default="36,310" tween="true"/>
+    </graph>
+    <text id="n6" name="n6" xy="191,341" size="69,20" fontSize="16" color="#ffffff" text="FairyGUI">
+      <gearColor controller="c1" pages="1" values="#000000" default="#ffffff"/>
+    </text>
+    <image id="n7" name="n7" src="h5p722" xy="133,393" pivot="0.5,0.5" size="90,90" aspect="true">
+      <gearXY controller="c1" pages="0,1" values="133,393|314,349" default="126,242" tween="true"/>
+      <gearSize controller="c1" pages="1" values="132,132,1,1" default="90,90,1,1" tween="true"/>
+      <gearLook controller="c1" pages="1" values="0.54,180,0" default="1,0,0" tween="true"/>
+    </image>
+    <image id="n8" name="n8" src="wa8u2t" xy="256,194">
+      <gearDisplay controller="c1" pages="1"/>
+    </image>
+    <image id="n9" name="n9" src="wa8u2u" xy="65,276">
+      <gearColor controller="c1" pages="1" values="#66ff99" default="#ffffff"/>
+    </image>
+    <jta id="n10" name="n10" src="hixt1v" xy="422,285">
+      <gearAni controller="c1" pages="1" values="0,s" default="0,p"/>
+    </jta>
+    <component id="n11" name="n11" src="rpmb12" xy="89,195">
+      <Button controller="c1" page="1"/>
+    </component>
+    <image id="n13" name="n13" src="h5p722" xy="1383,450" group="n16"/>
+    <image id="n14" name="n14" src="h5p722" xy="1265,450" group="n16"/>
+    <image id="n15" name="n15" src="h5p722" xy="1154,450" group="n16"/>
+    <group id="n16" name="n16" xy="1154,450" size="319,90" advanced="true">
+      <gearDisplay controller="c2" pages="1"/>
+      <gearXY controller="c2" pages="0" values="1154,450" default="661,450" tween="true"/>
+      <relation target="" sidePair="bottom-bottom,right-right"/>
+    </group>
+    <component id="n12" name="switchBtn" src="gojg7s" xy="1015,449">
+      <relation target="" sidePair="right-right,bottom-bottom"/>
+      <Button controller="c2" page="1"/>
+    </component>
+  </displayList>
+</component>

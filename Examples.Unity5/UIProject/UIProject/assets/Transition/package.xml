@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="zgmoraj4" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="gkq00" name="BOSS.xml" path="/" exported="true"/>
+    <image id="gkq01" name="2.png" path="/images/"/>
+    <image id="gkq02" name="3.png" path="/images/"/>
+    <sound id="gkq03" name="BUZZ4.wav" path="/images/"/>
+    <component id="gkq04" name="BOSS_SKILL.xml" path="/" exported="true"/>
+    <image id="gkq05" name="0.png" path="/images/"/>
+    <image id="gkq06" name="1.png" path="/images/"/>
+    <component id="gkq07" name="TRAP.xml" path="/" exported="true"/>
+    <image id="gkq08" name="4.png" path="/images/"/>
+    <component id="gkq0a" name="Main.xml" path="/" exported="true"/>
+    <component id="gkq0b" name="Button1.xml" path="/"/>
+    <component id="nra4c" name="PowerUp.xml" path="/" exported="true"/>
+    <image id="nra4d" name="red.png" path="/images/"/>
+    <image id="nra4e" name="power.png" path="/images/"/>
+    <font id="nra4f" name="number1.fnt" path="/" exported="true"/>
+    <image id="nra4g" name="0000_9_png.png" path="/images/"/>
+    <image id="nra4h" name="0001_8_png.png" path="/images/"/>
+    <image id="nra4i" name="0002_7_png.png" path="/images/"/>
+    <image id="nra4j" name="0003_6_png.png" path="/images/"/>
+    <image id="nra4k" name="0004_5_png.png" path="/images/"/>
+    <image id="nra4l" name="0005_4_png.png" path="/images/"/>
+    <image id="nra4m" name="0006_3_png.png" path="/images/"/>
+    <image id="nra4n" name="0007_2_png.png" path="/images/"/>
+    <image id="nra4o" name="0008_1_png.png" path="/images/"/>
+    <image id="nra4p" name="0009_0-_png.png" path="/images/"/>
+    <font id="nra4q" name="number2.fnt" path="/" exported="true"/>
+    <image id="nra4r" name="0000_+.png" path="/images/"/>
+    <image id="nra4s" name="0001_9.png" path="/images/"/>
+    <image id="nra4t" name="0002_8.png" path="/images/"/>
+    <image id="nra4u" name="0003_7.png" path="/images/"/>
+    <image id="nra4v" name="0004_6.png" path="/images/"/>
+    <image id="nra4w" name="0005_5.png" path="/images/"/>
+    <image id="nra4x" name="0006_4.png" path="/images/"/>
+    <image id="nra4y" name="0007_3.png" path="/images/"/>
+    <image id="nra4z" name="0008_2.png" path="/images/"/>
+    <image id="nra410" name="0009_1.png" path="/images/"/>
+    <image id="nra411" name="0010_0.png" path="/images/"/>
+    <movieclip id="nra412" name="U1UIT17.jta" path="/images/"/>
+    <component id="nra413" name="GoodHit.xml" path="/" exported="true"/>
+    <image id="nra414" name="blood.png" path="/images/"/>
+    <image id="nra415" name="bangjile.png" path="/images/"/>
+    <font id="fou916" name="number3.fnt" path="/" exported="true"/>
+    <image id="fou917" name="h0.png" path="/"/>
+    <image id="fou918" name="h1.png" path="/"/>
+    <image id="fou919" name="h2.png" path="/"/>
+    <image id="fou91a" name="h3.png" path="/"/>
+    <image id="fou91b" name="h4.png" path="/"/>
+    <image id="fou91c" name="h5.png" path="/"/>
+    <image id="fou91d" name="h6.png" path="/"/>
+    <image id="fou91e" name="h7.png" path="/"/>
+    <image id="fou91f" name="h8.png" path="/"/>
+    <image id="fou91g" name="h9.png" path="/"/>
+  </resources>
+  <publish name="Transition">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

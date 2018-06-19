@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="oqv64gwp" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="p6030" name="GlobalModalWaiting.xml" path="/" exported="true"/>
+    <image id="p6032" name="0.png" path="/"/>
+    <image id="p6033" name="1.png" path="/"/>
+    <component id="p6034" name="WindowModalWaiting.xml" path="/" exported="true"/>
+    <image id="p6035" name="2.png" path="/" scale="9grid" scale9grid="18,18,36,36"/>
+    <movieclip id="p6036" name="qtm011.jta" path="/"/>
+    <component id="p6037" name="WindowFrame.xml" path="/"/>
+    <image id="p6038" name="5.png" path="/" scale="9grid" scale9grid="64,54,484,303"/>
+    <component id="p6039" name="CloseButton.xml" path="/"/>
+    <image id="p603a" name="02.png" path="/"/>
+    <image id="p603b" name="4.png" path="/"/>
+    <component id="p603c" name="TestWin.xml" path="/" exported="true"/>
+    <component id="p603d" name="Button1.xml" path="/"/>
+    <component id="p603e" name="Main.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="ModalWaiting">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

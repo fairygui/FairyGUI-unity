@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="y768eypa" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="fvaib" name="Main.xml" path="/" exported="true"/>
+    <image id="fymi17" name="3.png" path="/images/" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="fymi18" name="9.png" path="/images/" scale="9grid" scale9grid="12,10,24,20"/>
+    <component id="fymi19" name="Button2.xml" path="/"/>
+    <image id="fymi1a" name="8.png" path="/images/"/>
+    <component id="fymi1b" name="Button.xml" path="/"/>
+    <image id="fymi1c" name="0.png" path="/images/" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="fymi1d" name="1.png" path="/images/" scale="9grid" scale9grid="40,17,80,34"/>
+    <component id="kfcb1e" name="ScrollBar_VT.xml" path="/" exported="true"/>
+    <image id="kfcb1f" name="5.png" path="/images/" scale="9grid" scale9grid="3,9,2,360"/>
+    <image id="kfcb1g" name="4.png" path="/images/" scale="9grid" scale9grid="2,6,4,193"/>
+    <component id="kfcb1h" name="chatLeft.xml" path="/" exported="true"/>
+    <image id="kfcb1i" name="6.png" path="/images/" scale="9grid" scale9grid="27,21,334,18"/>
+    <component id="kfcb1j" name="chatRight.xml" path="/" exported="true"/>
+    <image id="kfcb1k" name="7.png" path="/images/" scale="9grid" scale9grid="19,23,229,37"/>
+    <image id="l7d51l" name="r1.png" path="/images/" exported="true"/>
+    <image id="l7d51m" name="r0.png" path="/images/" exported="true"/>
+    <component id="iy2u1n" name="faceSub.xml" path="/"/>
+    <image id="iy2u1o" name="2.png" path="/images/" scale="9grid" scale9grid="17,16,74,73"/>
+    <movieclip id="iy2u1q" name="88.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1r" name="am.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1s" name="bs.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1t" name="bz.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1u" name="ch.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1v" name="cool.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1w" name="dhq.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1x" name="dn.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1y" name="fd.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u1z" name="gz.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u20" name="han.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u21" name="hx.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u22" name="hxiao.jta" path="/emoji/" exported="true"/>
+    <movieclip id="iy2u23" name="hxiu.jta" path="/emoji/" exported="true"/>
+    <component id="iy2u24" name="EmojiSelectUI.xml" path="/" exported="true"/>
+    <image id="mwdy25" name="1f626.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy26" name="1f625.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy27" name="1f624.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy28" name="1f623.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy29" name="1f622.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2a" name="1f621.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2b" name="1f620.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2c" name="1f619.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2d" name="1f618.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2e" name="1f617.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2f" name="1f616.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2g" name="1f615.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2h" name="1f614.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2i" name="1f613.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2j" name="1f612.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2k" name="1f611.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2l" name="1f610.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2m" name="1f609.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2n" name="1f608.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2o" name="1f607.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2p" name="1f606.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2q" name="1f605.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2r" name="1f604.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2s" name="1f603.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2t" name="1f602.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2u" name="1f601.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2v" name="1f600.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2w" name="1f637.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2x" name="1f636.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2y" name="1f635.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy2z" name="1f634.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy30" name="1f633.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy31" name="1f632.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy32" name="1f631.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy33" name="1f630.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy34" name="1f629.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy35" name="1f628.png" path="/emoji_ios/" exported="true"/>
+    <image id="mwdy36" name="1f627.png" path="/emoji_ios/" exported="true"/>
+    <component id="mwdy37" name="EmojiSelectUI_ios.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="Emoji">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

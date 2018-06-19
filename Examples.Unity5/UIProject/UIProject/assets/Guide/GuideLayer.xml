@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640" opaque="false">
+  <displayList>
+    <graph id="n0" name="n0" xy="0,0" size="409,640" type="rect" lineSize="0" fillColor="#5c000000">
+      <relation target="n11" sidePair="rightext-left"/>
+      <relation target="" sidePair="height-height"/>
+    </graph>
+    <graph id="n4" name="n4" xy="409,0" size="312,221" type="rect" lineSize="0" fillColor="#5c000000">
+      <relation target="n11" sidePair="bottomext-top,width-width"/>
+      <relation target="n11" sidePair="left-left"/>
+    </graph>
+    <graph id="n5" name="n5" xy="721,0" size="415,640" type="rect" lineSize="0" fillColor="#5c000000">
+      <relation target="n11" sidePair="leftext-right"/>
+      <relation target="" sidePair="height-height,width-width"/>
+    </graph>
+    <graph id="n8" name="n8" xy="409,403" size="312,237" type="rect" lineSize="0" fillColor="#5c000000">
+      <relation target="n11" sidePair="topext-bottom,width-width"/>
+      <relation target="n11" sidePair="left-left"/>
+      <relation target="n0" sidePair="bottomext-bottom"/>
+    </graph>
+    <graph id="n11" name="window" xy="409,221" size="312,182" touchable="false" type="rect" lineSize="0" fillColor="#00000000"/>
+    <jta id="n12" name="n12" src="xcfj6" xy="330,288">
+      <relation target="n11" sidePair="left-left,middle-middle"/>
+    </jta>
+  </displayList>
+</component>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <component id="n29" name="n29" src="gxip82" xy="841,98" group="n30"/>
+    <text id="n28" name="n28" xy="856,59" size="126,26" group="n30" fontSize="22" text="Custom Mask"/>
+    <group id="n30" name="n30" xy="841,59" size="282,539"/>
+    <component id="n0" name="n0" src="es412z" xy="43,42" group="n8"/>
+    <text id="n7" name="n7" xy="67,8" size="181,26" group="n8" fontSize="22" text="Overflow: hidden"/>
+    <group id="n8" name="n8" xy="43,8" size="224,344"/>
+    <graph id="n4" name="n4" xy="15,398" size="341,151" group="n12" type="rect" fillColor="#ff000000"/>
+    <component id="n3" name="n3" src="smv73f" xy="15,398" group="n12"/>
+    <group id="n12" name="n12" xy="15,398" size="341,151"/>
+    <component id="n2" name="n2" src="smv731" xy="321,41" group="n13"/>
+    <text id="n9" name="n9" xy="313,10" size="236,26" group="n13" fontSize="22" text="Overflow: Free Scroll"/>
+    <group id="n13" name="n13" xy="313,10" size="236,341"/>
+    <graph id="n17" name="n17" xy="594,35" size="225,343" group="n16" type="rect" fillColor="#ff000000"/>
+    <component id="n14" name="n14" src="smv73g" xy="594,35" group="n16"/>
+    <text id="n15" name="n15" xy="598,6" size="412,26" group="n16" fontSize="22" text="Overflow: Vertical scroll and margins"/>
+    <group id="n16" name="n16" xy="594,6" size="416,372"/>
+    <graph id="n19" name="n19" xy="374,399" size="341,151" group="n21" type="rect" fillColor="#ff000000"/>
+    <component id="n18" name="n18" src="smv73h" xy="374,399" group="n21"/>
+    <group id="n21" name="n21" xy="374,399" size="341,151"/>
+    <graph id="n24" name="n24" xy="739,421" size="387,120" group="n26" type="rect" fillColor="#ff000000"/>
+    <component id="n22" name="n22" src="smv73i" xy="739,422" size="387,120" group="n26"/>
+    <group id="n26" name="n26" xy="739,421" size="387,121"/>
+  </displayList>
+</component>
