@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="9leh0eyf" jpegQuality="80" compressPNG="true">
+  <resources>
+    <image id="rpmb1" name="VIP_png.png" path="/images/"/>
+    <image id="rpmb2" name="a1_png.png" path="/images/"/>
+    <image id="rpmb3" name="a2_png.png" path="/images/"/>
+    <image id="rpmb4" name="a3_png.png" path="/images/"/>
+    <image id="rpmb5" name="a4_png.png" path="/images/"/>
+    <image id="rpmb6" name="angry_smile_png.png" path="/images/"/>
+    <image id="rpmb7" name="b1.png.jpg" path="/images/"/>
+    <image id="rpmb8" name="b12_png.png" path="/images/"/>
+    <image id="rpmb9" name="b13_png.png" path="/images/"/>
+    <image id="rpmba" name="b2.png.jpg" path="/images/"/>
+    <image id="rpmbb" name="b3.png.jpg" path="/images/"/>
+    <image id="rpmbc" name="b4.png.jpg" path="/images/"/>
+    <image id="rpmbd" name="b5_png.png" path="/images/" scale="9grid" scale9grid="12,7,61,14"/>
+    <image id="rpmbe" name="b6_png.png" path="/images/" scale="9grid" scale9grid="9,5,66,16"/>
+    <image id="rpmbf" name="b7_png.png" path="/images/" scale="9grid" scale9grid="8,7,66,14"/>
+    <image id="rpmbg" name="long_dead_png.png" path="/images/"/>
+    <image id="rpmbh" name="plus_smile_png.png" path="/images/"/>
+    <image id="rpmbi" name="b1.png" path="/images/"/>
+    <image id="rpmbj" name="k3.png" path="/images/" scale="9grid" scale9grid="16,9,32,6"/>
+    <image id="rpmbk" name="k4.png" path="/images/"/>
+    <image id="rpmbl" name="k5.png" path="/images/"/>
+    <image id="rpmbm" name="k6.png" path="/images/" scale="9grid" scale9grid="16,11,32,7"/>
+    <image id="rpmbn" name="k8.png" path="/images/"/>
+    <image id="rpmbo" name="k9.png" path="/images/"/>
+    <image id="rpmbp" name="k10.png" path="/images/"/>
+    <image id="rpmbq" name="k11.png" path="/images/"/>
+    <image id="rpmbr" name="k12.png" path="/images/" scale="9grid" scale9grid="40,19,80,18"/>
+    <image id="rpmbs" name="k14.png" path="/images/" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbt" name="k13.png" path="/images/" scale="9grid" scale9grid="40,13,80,26"/>
+    <image id="rpmbu" name="k18.png" path="/images/"/>
+    <image id="rpmbv" name="k20.png" path="/images/"/>
+    <image id="rpmbw" name="k25.png" path="/images/"/>
+    <image id="rpmbx" name="k26.png" path="/images/"/>
+    <component id="rpmbz" name="Button.xml" path="/components/"/>
+    <component id="rpmb10" name="Button2.xml" path="/components/"/>
+    <component id="rpmb11" name="Button3.xml" path="/components/"/>
+    <component id="rpmb12" name="Button4.xml" path="/components/"/>
+    <component id="rpmb13" name="Button5.xml" path="/components/"/>
+    <component id="rpmb14" name="Button6.xml" path="/components/"/>
+    <component id="rpmb15" name="Button7.xml" path="/components/"/>
+    <component id="rpmb16" name="Button8.xml" path="/components/"/>
+    <component id="rpmb17" name="Button9.xml" path="/components/"/>
+    <component id="rpmb18" name="Checkbox.xml" path="/components/"/>
+    <component id="rpmb19" name="OnOffButton.xml" path="/components/"/>
+    <component id="rpmb1a" name="RadioButton.xml" path="/components/"/>
+    <component id="rpmb1b" name="Demo_Button.xml" path="/" exported="true"/>
+    <component id="rpmb1c" name="Main.xml" path="/" exported="true"/>
+    <image id="sner1h" name="pic.png" path="/images/"/>
+    <component id="sner1i" name="Demo_Image.xml" path="/" exported="true"/>
+    <component id="hixt1j" name="Button10.xml" path="/components/"/>
+    <image id="hixt1k" name="b4.png" path="/images/" scale="9grid" scale9grid="40,17,80,34"/>
+    <image id="hixt1l" name="b5.png" path="/images/" scale="9grid" scale9grid="40,17,80,34"/>
+    <component id="hixt1m" name="Demo_Graph.xml" path="/" exported="true"/>
+    <component id="hixt1n" name="Demo_MovieClip.xml" path="/" exported="true"/>
+    <movieclip id="hixt1v" name="nlge1k.jta" path="/images/"/>
+    <component id="nz0z1z" name="Demo_Text.xml" path="/" exported="true"/>
+    <image id="nz0z20" name="long_dead2_png.png" path="/images/" scale="tile"/>
+    <image id="h5p722" name="i256.png" path="/images/"/>
+    <image id="wa8u2q" name="k27.png" path="/images/"/>
+    <font id="wa8u2r" name="BMFontTest.fnt" path="/font/" exported="true" texture="jb800"/>
+    <image id="jb800" name="BMFontTest_atlas.png" path="/font/"/>
+    <component id="wa8u2s" name="Demo_Loader.xml" path="/" exported="true"/>
+    <image id="wa8u2t" name="r3.png" path="/images/" exported="true"/>
+    <image id="wa8u2u" name="r4.png" path="/images/" exported="true"/>
+    <component id="wa8u2v" name="Demo_Controller.xml" path="/" exported="true"/>
+    <swf id="wa8u2w" name="qtm01d.swf" path="/images/"/>
+    <component id="wa8u2x" name="Demo_Relation.xml" path="/" exported="true"/>
+    <component id="es412y" name="Demo_Clip&amp;Scroll.xml" path="/" exported="true"/>
+    <component id="es412z" name="Component1.xml" path="/components/"/>
+    <image id="es4130" name="change.png" path="/images/" scale="tile"/>
+    <component id="smv731" name="Component7.xml" path="/components/"/>
+    <component id="smv73f" name="Component2.xml" path="/components/"/>
+    <component id="smv73g" name="Component8.xml" path="/components/"/>
+    <component id="smv73h" name="Component9.xml" path="/components/"/>
+    <component id="smv73i" name="Component10.xml" path="/components/"/>
+    <component id="w42o3j" name="Demo_Label.xml" path="/" exported="true"/>
+    <component id="rt103l" name="WindowFrame.xml" path="/components/"/>
+    <image id="rt103m" name="6_png.png" path="/images/" scale="9grid" scale9grid="40,40,80,142"/>
+    <component id="rt103n" name="WindowCloseButton.xml" path="/components/"/>
+    <image id="rt103o" name="10_png.png" path="/images/"/>
+    <image id="rt103p" name="9_png.png" path="/images/"/>
+    <image id="rt103q" name="8_png.png" path="/images/"/>
+    <component id="rt103r" name="Component3.xml" path="/components/"/>
+    <component id="rt103s" name="Demo_ComboBox.xml" path="/" exported="true"/>
+    <component id="rt103t" name="ComboBox.xml" path="/components/"/>
+    <image id="rt103u" name="c1_png.png" path="/images/" scale="9grid" scale9grid="7,5,73,10"/>
+    <image id="rt103v" name="c3_png.png" path="/images/" scale="9grid" scale9grid="11,5,71,10"/>
+    <image id="rt103w" name="c2_png.png" path="/images/" scale="9grid" scale9grid="8,5,73,10"/>
+    <image id="rt103x" name="b7(2)_png.png" path="/images/"/>
+    <component id="rt103y" name="ComboBoxPopup.xml" path="/components/"/>
+    <image id="rt103z" name="p1_png.png" path="/images/" scale="9grid" scale9grid="7,4,144,49"/>
+    <component id="rt1040" name="ComboBoxItem.xml" path="/components/"/>
+    <component id="zd9g41" name="Dropdown.xml" path="/components/"/>
+    <component id="zd9g42" name="Button15.xml" path="/components/"/>
+    <image id="zd9g43" name="k30.png" path="/images/" scale="9grid" scale9grid="33,10,57,20"/>
+    <image id="zd9g44" name="k28.png" path="/images/" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g45" name="k31.png" path="/images/" scale="9grid" scale9grid="33,10,55,20"/>
+    <image id="zd9g46" name="k29.png" path="/images/" scale="9grid" scale9grid="33,10,53,20"/>
+    <component id="zd9g47" name="Dropdown2.xml" path="/components/"/>
+    <image id="zd9g48" name="k32.png" path="/images/" scale="9grid" scale9grid="26,11,52,22"/>
+    <component id="zd9g49" name="Button14.xml" path="/components/"/>
+    <image id="zd9g4a" name="k23.png" path="/images/" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4b" name="k21.png" path="/images/" scale="9grid" scale9grid="11,7,82,26"/>
+    <image id="zd9g4c" name="k24.png" path="/images/" scale="9grid" scale9grid="26,10,52,20"/>
+    <image id="zd9g4d" name="k22.png" path="/images/" scale="9grid" scale9grid="26,10,52,20"/>
+    <component id="zd9g4e" name="Demo_Slider.xml" path="/" exported="true"/>
+    <component id="zd9g4f" name="Demo_ProgressBar.xml" path="/" exported="true"/>
+    <component id="zd9g4g" name="Demo_List.xml" path="/" exported="true"/>
+    <component id="suiz4i" name="Slider_HZ.xml" path="/components/"/>
+    <image id="suiz4j" name="p10_png.png" path="/images/"/>
+    <image id="suiz4k" name="p11_png.png" path="/images/"/>
+    <component id="suiz4l" name="SliderArrow_HZ.xml" path="/components/"/>
+    <image id="suiz4m" name="p14_png.png" path="/images/"/>
+    <image id="suiz4n" name="p15_png.png" path="/images/"/>
+    <component id="suiz4o" name="Slider_VT.xml" path="/components/"/>
+    <image id="suiz4p" name="p13_png.png" path="/images/"/>
+    <image id="suiz4q" name="p12_png.png" path="/images/"/>
+    <component id="suiz4r" name="SliderArrow_VT.xml" path="/components/"/>
+    <image id="suiz4s" name="p8_png.png" path="/images/"/>
+    <image id="suiz4t" name="p9_png.png" path="/images/"/>
+    <component id="eut94u" name="Slider1.xml" path="/components/"/>
+    <image id="eut94v" name="k33.png" path="/images/"/>
+    <image id="eut94w" name="k34.png" path="/images/" scale="9grid" scale9grid="41,4,342,5"/>
+    <component id="eut94x" name="Button13.xml" path="/components/"/>
+    <image id="eut94y" name="b3.png" path="/images/"/>
+    <image id="eut94z" name="b2.png" path="/images/"/>
+    <component id="t9fj50" name="ProgressBar.xml" path="/components/"/>
+    <image id="t9fj51" name="p2_png.png" path="/images/" scale="9grid" scale9grid="10,4,121,4"/>
+    <image id="t9fj52" name="p3_png.png" path="/images/"/>
+    <component id="t9fj53" name="ProgressBar6.xml" path="/components/"/>
+    <image id="t9fj54" name="k17.png" path="/images/" scale="9grid" scale9grid="27,9,54,2"/>
+    <image id="t9fj55" name="k16.jpg" path="/images/" scale="9grid" scale9grid="8,5,16,2"/>
+    <image id="t9fj56" name="k7.png" path="/images/"/>
+    <component id="t9fj57" name="ProgressBar3.xml" path="/components/"/>
+    <image id="t9fj58" name="caiji.png" path="/images/"/>
+    <component id="t9fj59" name="ProgressBar1.xml" path="/components/"/>
+    <image id="t9fj5a" name="caiji2.png" path="/images/"/>
+    <component id="t9fj5b" name="ProgressBar5.xml" path="/components/"/>
+    <image id="t9fj5c" name="loading.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="t9fj5d" name="huawen1_png.png" path="/images/"/>
+    <image id="t9fj5e" name="huawen2_png.png" path="/images/"/>
+    <movieclip id="t9fj5f" name="pet.jta" path="/images/"/>
+    <component id="t9fj5g" name="ProgressBar4.xml" path="/components/"/>
+    <component id="t9fj5h" name="ProgressBar2.xml" path="/components/"/>
+    <component id="i3s65i" name="ScrollBar_HZ.xml" path="/scrollbars/" exported="true"/>
+    <image id="i3s65j" name="s10.png.jpg" path="/images/" duplicatePadding="true"/>
+    <component id="i3s65k" name="ScrollUpButton.xml" path="/scrollbars/"/>
+    <image id="i3s65l" name="s6.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65m" name="s4.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65n" name="s5.png.jpg" path="/images/" duplicatePadding="true"/>
+    <component id="i3s65o" name="ScrollDownButton.xml" path="/scrollbars/"/>
+    <image id="i3s65p" name="s9.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65q" name="s7.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65r" name="s8.png.jpg" path="/images/" duplicatePadding="true"/>
+    <component id="i3s65s" name="GripButton_HZ.xml" path="/scrollbars/"/>
+    <image id="i3s65t" name="s1.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65u" name="s2.png.jpg" path="/images/" duplicatePadding="true"/>
+    <image id="i3s65v" name="s3.png.jpg" path="/images/" duplicatePadding="true"/>
+    <component id="i3s65w" name="ScrollBar_VT.xml" path="/scrollbars/" exported="true"/>
+    <component id="i3s65x" name="GripButton_VT.xml" path="/scrollbars/"/>
+    <component id="kpev60" name="BagGridSub.xml" path="/components/"/>
+    <image id="kpev61" name="k0.png" path="/images/"/>
+    <image id="kpev62" name="k2.png" path="/images/"/>
+    <image id="kpev63" name="k1.png" path="/images/" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="kpev64" name="k19.png" path="/images/"/>
+    <font id="duef6m" name="HitNumber.fnt" path="/font/" exported="true"/>
+    <image id="duef6n" name="h0.png" path="/images/"/>
+    <image id="duef6o" name="h1.png" path="/images/"/>
+    <image id="duef6p" name="h2.png" path="/images/"/>
+    <image id="duef6q" name="h3.png" path="/images/"/>
+    <image id="duef6r" name="h4.png" path="/images/"/>
+    <image id="duef6s" name="h5.png" path="/images/"/>
+    <image id="duef6t" name="h6.png" path="/images/"/>
+    <image id="duef6u" name="h7.png" path="/images/"/>
+    <image id="duef6v" name="h8.png" path="/images/"/>
+    <image id="duef6w" name="h9.png" path="/images/"/>
+    <component id="l6f46x" name="PopupMenu.xml" path="/popupmenu/" exported="true"/>
+    <image id="l6f46y" name="p16_png.png" path="/images/" scale="9grid" scale9grid="7,4,144,49"/>
+    <component id="l6f46z" name="PopupMenuItem.xml" path="/popupmenu/"/>
+    <image id="l6f470" name="a8_png.png" path="/images/" scale="9grid" scale9grid="8,5,70,10"/>
+    <image id="l6f471" name="VtSeperator.jpg" path="/images/"/>
+    <image id="l6f472" name="a18_png.png" path="/images/"/>
+    <component id="l6f473" name="WindowA.xml" path="/" exported="true"/>
+    <component id="f2ax74" name="Component4.xml" path="/components/"/>
+    <component id="gx2b76" name="Demo_Popup.xml" path="/" exported="true"/>
+    <component id="gx2b77" name="Demo_Window.xml" path="/" exported="true"/>
+    <component id="gx2b78" name="Demo_Drag&amp;Drop.xml" path="/" exported="true"/>
+    <component id="gx2b79" name="BagGridSub2.xml" path="/components/"/>
+    <component id="796x7a" name="WindowB.xml" path="/" exported="true"/>
+    <component id="niii7b" name="CloseButton.xml" path="/components/"/>
+    <image id="niii7c" name="close_png.png" path="/images/"/>
+    <component id="niii7d" name="WindowFrameB.xml" path="/components/"/>
+    <component id="poiq7e" name="Button1.xml" path="/components/"/>
+    <component id="t24n7f" name="Demo_Component.xml" path="/" exported="true"/>
+    <component id="t24n7g" name="Component5.xml" path="/components/"/>
+    <component id="qa477h" name="Component6.xml" path="/components/"/>
+    <component id="dyz47i" name="Button52.xml" path="/components/"/>
+    <component id="fjqr7j" name="Component11.xml" path="/components/"/>
+    <image id="fjqr7k" name="start.png" path="/images/" scale="tile"/>
+    <component id="c2z47l" name="Demo_Grid.xml" path="/" exported="true"/>
+    <image id="a7vt7m" name="grid_header_png.png" path="/images/" scale="9grid" scale9grid="50,5,100,10"/>
+    <component id="a7vt7n" name="GridItem.xml" path="/components/"/>
+    <component id="atih7o" name="GridItem2.xml" path="/components/"/>
+    <component id="mulj7p" name="Component12.xml" path="/components/" exported="true"/>
+    <component id="fou97q" name="Demo_Depth.xml" path="/" exported="true"/>
+    <component id="fou97r" name="Component13.xml" path="/components/"/>
+    <component id="gojg7s" name="Button16.xml" path="/components/"/>
+    <image id="gojg7t" name="22.png" path="/images/"/>
+    <sound id="gojg7u" name="tabswitch.wav" path="/sound/" exported="true"/>
+    <sound id="o4lt7w" name="click.wav" path="/sound/" exported="true"/>
+    <component id="iehu7x" name="Button82.xml" path="/components/"/>
+    <image id="iehu7y" name="k36.png" path="/images/"/>
+    <image id="iehu7z" name="k35.png" path="/images/"/>
+    <image id="gzpr80" name="Shape 1 copy 4.png" path="/images/"/>
+    <component id="gzpr81" name="CircleProgress.xml" path="/" exported="true"/>
+    <component id="gxip82" name="Component14.xml" path="/components/"/>
+    <image id="srct83" name="back btn.png" path="/images/"/>
+    <image id="srct84" name="full bar.png" path="/images/" scale="9grid" scale9grid="15,6,109,12"/>
+    <image id="srct85" name="background.png" path="/images/" scale="9grid" scale9grid="24,6,319,13"/>
+    <component id="srct86" name="Slider2_grip.xml" path="/components/"/>
+    <component id="srct87" name="Slider2.xml" path="/components/"/>
+    <movieclip id="iwqq89" name="gz.jta" path="/images/"/>
+  </resources>
+  <publish name="Basics" packageCount="1">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

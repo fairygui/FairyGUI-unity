@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n1" name="n1" src="chmf1" xy="52,46"/>
+    <graph id="n6" name="holder" xy="199,454" size="63,48"/>
+    <component id="n3" name="c0" src="chmf5" xy="607,158"/>
+    <component id="n5" name="c1" src="chmf5" xy="829,368"/>
+  </displayList>
+</component>

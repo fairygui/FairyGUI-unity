@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <graph id="n1" name="n1" xy="42,102" size="100,100" type="rect" lineSize="0" corner="20"/>
+    <graph id="n2" name="n2" xy="207,101" size="100,100" type="rect" lineSize="5" lineColor="#ffffff66" fillColor="#ffcc9933"/>
+    <graph id="n3" name="n3" xy="363,107" size="100,100" type="rect" lineSize="5" lineColor="#ff663333" fillColor="#ff33cccc"/>
+    <graph id="n4" name="n4" xy="427,146" size="100,100" type="eclipse" lineSize="0" fillColor="#6866cc33"/>
+    <graph id="n5" name="n5" xy="66,299" pivot="0.5,0.5" size="206,113" skew="60,30" type="rect" lineSize="0" fillColor="#ff006600"/>
+    <graph id="n6" name="n6" xy="347,288" size="206,113" type="eclipse" lineSize="0" fillColor="#ff336699"/>
+    <graph id="n7" name="n7" xy="602,122" size="46,256" grayed="true" type="rect" lineSize="15" lineColor="#ffff99ff" fillColor="#ffff6600"/>
+    <text id="n8" name="n8" xy="13,10" size="742,26" fontSize="22" text="Simple graphics. (Empty graph is usually for place holder purpose.)"/>
+  </displayList>
+</component>

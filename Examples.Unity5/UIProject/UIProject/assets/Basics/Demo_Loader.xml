@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <text id="n0" name="n0" xy="14,10" size="588,29" fontSize="22" leading="6" text="Loader is for loading image or movieclip dynamically."/>
+    <loader id="n1" name="n1" xy="27,67" size="90,90" url="ui://9leh0eyfwa8u2t"/>
+    <loader id="n2" name="n2" xy="142,65" size="133,131" url="ui://9leh0eyfwa8u2t" fill="scale"/>
+    <loader id="n3" name="n3" xy="295,66" size="133,131" scale="2.00,2.00" url="ui://9leh0eyfwa8u2u" align="center" vAlign="middle"/>
+    <loader id="n4" name="n4" xy="47,184" size="60,60" url="ui://9leh0eyfhixt1v"/>
+    <loader id="n5" name="n5" xy="66,270" size="183,121" url="ui://9leh0eyft9fj5f" align="center" vAlign="middle"/>
+  </displayList>
+</component>

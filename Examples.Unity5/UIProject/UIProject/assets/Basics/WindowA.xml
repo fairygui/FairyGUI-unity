@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="400,400">
+  <displayList>
+    <component id="n0" name="frame" src="rt103l" xy="0,0" size="400,400">
+      <relation target="" sidePair="width-width,height-height"/>
+      <Label title="Window A"/>
+    </component>
+    <component id="n2" name="n2" src="zd9g41" xy="33,47">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n5" name="n5" src="rpmb13" xy="108,320" pivot="0.5,0.5">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <list id="n6" name="n6" xy="39,98" size="335,215" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60"/>
+  </displayList>
+</component>

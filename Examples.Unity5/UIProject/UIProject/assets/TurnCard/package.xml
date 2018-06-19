@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="f3xz8s8w" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="c5s80" name="Main.xml" path="/" exported="true"/>
+    <image id="c5s81" name="card_back.png" path="/"/>
+    <image id="c5s82" name="card_k.png" path="/"/>
+    <component id="c5s83" name="CardComponent.xml" path="/"/>
+    <image id="c5s84" name="card_a.png" path="/"/>
+  </resources>
+  <publish name="TurnCard"/>
+</packageDescription>

@@ -1,0 +1,16 @@
+{
+	"textColor": "#000000",
+	"scrollBars": {
+		"defaultDisplay": "visible",
+		"horizontal": "ui://9leh0eyfi3s65i",
+		"vertical": "ui://9leh0eyfi3s65w"
+	},
+	"font": "Heiti SC Medium,SimSun",
+	"fontSize": 12,
+	"colorScheme": [
+		"Custom color #FF0000"
+	],
+	"fontSizeScheme": [
+		"Custom font size 30"
+	]
+}

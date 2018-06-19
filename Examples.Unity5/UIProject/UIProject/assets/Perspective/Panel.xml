@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="650,260" designImageOffsetX="-308" designImageOffsetY="-238">
+  <displayList>
+    <image id="n0" name="n0" src="mn712" xy="-28,-132"/>
+    <text id="n1" name="n1" xy="158,123" size="277,35" fontSize="24" color="#736b5d" letterSpacing="1" autoSize="none" text="Demo Demo Demo"/>
+    <component id="n5" name="reliveBtn" src="mn713" xy="158,190">
+      <Button title="OK"/>
+    </component>
+    <component id="n6" name="cancleBtn" src="mn713" xy="392,189">
+      <Button title="Cancel"/>
+    </component>
+  </displayList>
+</component>

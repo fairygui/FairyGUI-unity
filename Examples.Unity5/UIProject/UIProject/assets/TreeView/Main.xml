@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640" bgColor="#3f3f3f">
+  <displayList>
+    <graph id="n2" name="n2" xy="277,16" size="424,594" type="rect" lineSize="2"/>
+    <list id="n0" name="tree" xy="279,18" size="419,589" overflow="scroll" margin="0,0,0,0" defaultItem="ui://2mabf2jpmlvd4">
+      <item/>
+      <item/>
+      <item/>
+    </list>
+  </displayList>
+</component>

@@ -1,0 +1,10 @@
+<component size="84,84" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="3"/>
+  <displayList>
+    <image id="n3" name="n3" src="fymi1a" xy="9,9" size="65,65">
+      <gearXY controller="button" pages="0,1,2,3" values="-|9,9|-|9,9" default="6,6"/>
+      <gearSize controller="button" pages="0,1,2,3" values="-|65,65|-|65,65" default="71,71"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>

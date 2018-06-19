@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <component id="n2" name="c0" src="c5s83" xy="131,91">
+      <Button icon="ui://f3xz8s8wc5s82"/>
+    </component>
+    <component id="n3" name="c1" src="c5s83" xy="667,90">
+      <Button icon="ui://f3xz8s8wc5s84"/>
+    </component>
+    <text id="n4" name="n4" xy="193,28" size="200,34" fontSize="30" color="#ffffff" text="Common Effect"/>
+    <text id="n5" name="n5" xy="671,11" size="335,67" fontSize="30" color="#ffffff" align="center" text="Simulate Perspertive&#xA;in Orthographic Camera"/>
+  </displayList>
+</component>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="100,100" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n13" name="n13" src="kpev61" xy="5,4"/>
+    <loader id="n4" name="icon" xy="6,6" size="88,88" align="center" vAlign="middle" fill="scale"/>
+    <image id="n12" name="n12" src="kpev62" xy="0,0"/>
+    <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
+    <image id="n11" name="n11" src="kpev63" xy="-4,-4">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

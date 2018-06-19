@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="8rugjhhl" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="n38w0" name="Main.xml" path="/" exported="true"/>
+    <component id="qujq2" name="item.xml" path="/"/>
+    <image id="qujq4" name="Seperator1.png" path="/" scale=""/>
+    <component id="qujq5" name="Button1.xml" path="/"/>
+    <component id="qujq7" name="Button2.xml" path="/"/>
+    <image id="dliz8" name="logo.jpg" path="/"/>
+    <component id="c5529" name="Box.xml" path="/"/>
+  </resources>
+  <publish name="ScrollPane"/>
+</packageDescription>

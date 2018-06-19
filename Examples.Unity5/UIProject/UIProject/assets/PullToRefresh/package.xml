@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="3u9795n0" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="mwdy0" name="Main.xml" path="/" exported="true"/>
+    <component id="n3qdm" name="item.xml" path="/"/>
+    <image id="n3qdn" name="logo.jpg" path="/"/>
+    <image id="n3qdo" name="Seperator1.png" path="/"/>
+    <component id="n3qdp" name="Button1.xml" path="/"/>
+    <component id="n3qdq" name="Button2.xml" path="/"/>
+    <component id="n3qdr" name="Header.xml" path="/"/>
+    <image id="n3qds" name="refresh.png" path="/"/>
+    <image id="n3qdt" name="arrow.png" path="/"/>
+    <component id="9sflu" name="Footer.xml" path="/"/>
+  </resources>
+  <publish name="PullToRefresh"/>
+</packageDescription>

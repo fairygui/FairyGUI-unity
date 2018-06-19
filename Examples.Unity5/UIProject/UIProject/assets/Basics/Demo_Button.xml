@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <controller name="RadioGroup" pages="0,,1,,2," selected="0"/>
+  <controller name="tab" pages="0,,1,,2," selected="0"/>
+  <displayList>
+    <graph id="n26" name="n26" xy="705,154" size="246,116" type="rect" fillColor="#ff333333"/>
+    <component id="n3" name="n3" src="rpmbz" xy="30,26">
+      <Button title="Simple"/>
+    </component>
+    <component id="n4" name="n4" src="rpmb18" xy="42,145" size="88,19">
+      <Button title="CheckBox"/>
+    </component>
+    <component id="n5" name="n5" src="rpmb1a" xy="161,145" size="86,19">
+      <Button title="Radio"/>
+    </component>
+    <component id="n6" name="n6" src="rpmb10" xy="158,19" size="113,40">
+      <Button title="Click Me" icon="ui://9leh0eyfrpmb6"/>
+    </component>
+    <component id="n7" name="n7" src="rpmb12" xy="278,298"/>
+    <text id="n8" name="n8" xy="38,308" size="203,26" fontSize="22" text="Transition Effect:"/>
+    <component id="n11" name="n11" src="rpmb11" xy="330,22" size="88,40">
+      <Button title="点我" icon="ui://9leh0eyfrpmb6"/>
+    </component>
+    <component id="n12" name="n12" src="rpmb16" xy="281,129">
+      <Button checked="true"/>
+    </component>
+    <component id="n13" name="n13" src="rpmb13" xy="489,20">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <component id="n15" name="n15" src="rpmb15" xy="704,19"/>
+    <component id="n16" name="n16" src="rpmb19" xy="473,300">
+      <Button title="On" selectedTitle="Off"/>
+    </component>
+    <component id="n17" name="n17" src="rpmb17" xy="627,289">
+      <Button title="Fade In Out"/>
+    </component>
+    <component id="n18" name="n18" src="rpmb1a" xy="408,158" size="86,19">
+      <Button checked="true" title="Option1" controller="RadioGroup" page="0"/>
+    </component>
+    <component id="n19" name="n19" src="rpmb1a" xy="408,190" size="86,19">
+      <Button title="Option2" controller="RadioGroup" page="1"/>
+    </component>
+    <component id="n20" name="n20" src="rpmb1a" xy="408,220" size="86,19">
+      <Button title="Option3" controller="RadioGroup" page="2"/>
+    </component>
+    <text id="n21" name="n21" xy="410,125" size="115,26" fontSize="22" text="RadioGroup"/>
+    <text id="n22" name="n22" xy="728,123" size="49,26" fontSize="22" text="Tabs"/>
+    <component id="n23" name="n23" src="rpmb14" xy="725,161">
+      <Button checked="true" title="Tab1" controller="tab" page="0"/>
+    </component>
+    <component id="n24" name="n24" src="rpmb14" xy="794,161">
+      <Button title="Tab2" controller="tab" page="1"/>
+    </component>
+    <component id="n25" name="n25" src="rpmb14" xy="867,161">
+      <Button title="Tab3" controller="tab" page="2"/>
+    </component>
+    <image id="n29" name="n29" src="rpmb6" xy="815,221">
+      <gearDisplay controller="tab" pages="0"/>
+    </image>
+    <image id="n30" name="n30" src="rpmbg" xy="816,221">
+      <gearDisplay controller="tab" pages="1"/>
+    </image>
+    <image id="n31" name="n31" src="rpmbh" xy="815,221">
+      <gearDisplay controller="tab" pages="2"/>
+    </image>
+    <component id="n32" name="n32" src="rpmb13" xy="48,413" touchable="false" grayed="true">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <text id="n33" name="n33" xy="38,373" size="390,26" fontSize="22" text="Disable button: grayed+no touchable"/>
+    <component id="n34" name="n34" src="poiq7e" xy="832,28" size="145,48">
+      <Button title="简单按钮"/>
+    </component>
+    <component id="n35" name="n35" src="dyz47i" xy="469,437" grayed="true">
+      <Button icon="ui://9leh0eyfrpmbu"/>
+    </component>
+    <text id="n36" name="n36" xy="451,374" size="376,51" fontSize="22" autoSize="height" text="Custom grayed&#xA;(Use a controller named 'grayed')"/>
+    <text id="n37" name="n37" xy="849,369" size="282,51" fontSize="22" autoSize="height" text="Custom grayed&#xA;(Use disabled page)"/>
+    <component id="n38" name="n38" src="iehu7x" xy="870,437" grayed="true">
+      <Button checked="true"/>
+    </component>
+  </displayList>
+</component>

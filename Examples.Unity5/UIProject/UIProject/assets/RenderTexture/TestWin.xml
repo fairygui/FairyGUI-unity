@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="478,544">
+  <displayList>
+    <component id="n16" name="frame" src="iitt6" xy="0,0" size="483,544">
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <image id="n14" name="n14" src="iittf" xy="51,52" size="367,458"/>
+    <image id="n20" name="n20" src="kotx15" xy="-16,81"/>
+    <graph id="n15" name="holder" xy="80,101" size="303,376"/>
+    <component id="n17" name="btnLeft" src="kotx12" xy="86,330"/>
+    <component id="n18" name="btnRight" src="kotxz" xy="323,330"/>
+  </displayList>
+</component>
