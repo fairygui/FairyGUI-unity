@@ -869,6 +869,9 @@ namespace FairyGUI
 			for (int i = 0; i < count; i++)
 			{
 				DisplayObject child = _children[i];
+				if (!child.visible)
+					continue;
+
 				if (child is Container)
 				{
 					Container container = (Container)child;

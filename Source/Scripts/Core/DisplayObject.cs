@@ -236,6 +236,7 @@ namespace FairyGUI
 				if (_visible != value)
 				{
 					_visible = value;
+					_outlineChanged = true;
 					if (parent != null && _visible)
 					{
 						gameObject.SetActive(true);
