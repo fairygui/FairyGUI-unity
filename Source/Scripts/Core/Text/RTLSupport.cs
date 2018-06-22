@@ -587,7 +587,7 @@ namespace FairyGUI
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 	    
@@ -633,7 +633,7 @@ namespace FairyGUI
                     uc == ']' || uc == '[' || uc == '】' || uc == '【' ||
                     uc == '}' || uc == '{' || 
  //                   uc == '≥' || uc == '≤' || uc == '>' || uc == '<' || 
-                    uc == '》' || uc == '《' || uc == '“' || uc == '”');
+                    uc == '》' || uc == '《' || uc == '“' || uc == '”' || uc == '"');
         }
 
         private static char _ProcessBracket(char uc)
