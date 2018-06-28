@@ -90,7 +90,8 @@ namespace FairyGUI
 
         private static bool CheckSeparator(char input)
         {
-            if ((((input != ' ') && (input != '!')) && ((input != '.') && (input != '،'))) && ((input != '?') && (input != '؟')))
+            if ((input != ' ') && (input != '\t') && (input != '!') && 
+                (input != '.') && (input != '،') && (input != '?') && (input != '؟'))
             {
                 return false;
             }
@@ -100,8 +101,8 @@ namespace FairyGUI
         private static bool CheckSpecific(char input)
         {
             int num = input;
-            if ((((num != 0x622) && (num != 0x623)) && ((num != 0x627) && (num != 0x62f)) && (num != 0x625)) && 
-                (((num != 0x630) && (num != 0x631)) && (((num != 0x632) && (num != 0x698)) && (num != 0x648))))
+            if ((num != 0x622) && (num != 0x623) && (num != 0x627) && (num != 0x62f) && (num != 0x625) && 
+                (num != 0x630) && (num != 0x631) && (num != 0x632) && (num != 0x698) && (num != 0x648))
             {
                 return false;
             }
@@ -587,7 +588,7 @@ namespace FairyGUI
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' ||
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 	    
