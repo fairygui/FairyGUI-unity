@@ -132,13 +132,8 @@ Shader "FairyGUI/Text"
 					col.a *= tex2D(_MainTex, i.texcoord).a;
 
 					#ifdef GRAYED
-					if(i.flag==1)
-					{
-						fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));  
-						col.rgb = fixed3(grey, grey, grey); 
-					}
-					else
-						col.rgb = fixed3(0.8, 0.8, 0.8);
+					fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));  
+					col.rgb = fixed3(grey, grey, grey);
 					#endif
 
 					#ifdef SOFT_CLIPPED
