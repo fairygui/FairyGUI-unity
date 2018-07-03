@@ -575,7 +575,11 @@ namespace FairyGUI
 					else
 						startTime += item.time;
 					if (startTime == 0)
+					{
 						ApplyValue(item, item.value);
+						if (item.hook != null)
+							item.hook();
+					}
 					else
 					{
 						item.completed = false;
