@@ -360,7 +360,7 @@ namespace FairyGUI
 						break;
 
 					case TransitionActionType.Rotation:
-						value.f1 = Convert.ToInt32(aParams[0]);
+						value.f1 = Convert.ToSingle(aParams[0]);
 						break;
 
 					case TransitionActionType.Color:
@@ -1022,7 +1022,7 @@ namespace FairyGUI
 					break;
 
 				case TransitionActionType.Rotation:
-					value.f1 = int.Parse(str);
+					value.f1 = float.Parse(str);
 					break;
 
 				case TransitionActionType.Scale:

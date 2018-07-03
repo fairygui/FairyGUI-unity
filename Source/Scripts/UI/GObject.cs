@@ -1739,7 +1739,7 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("rotation");
 			if (str != null)
-				this.rotation = int.Parse(str);
+				this.rotation = float.Parse(str);
 
 			arr = xml.GetAttributeArray("pivot");
 			if (arr != null)
