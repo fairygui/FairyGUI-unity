@@ -2877,6 +2877,22 @@ namespace FairyGUI
 					str = ix.GetAttribute("selectedIcon");
 					if (str != null && (obj is GButton))
 						(obj as GButton).selectedIcon = str;
+					str = ix.GetAttribute("selectedTitle");
+					if (str != null && (obj is GButton))
+						(obj as GButton).selectedTitle = str;
+					if (obj is GComponent)
+					{
+						arr = ix.GetAttributeArray("controllers");
+						if (arr != null)
+						{
+							for (int i = 0; i < arr.Length; i += 2)
+							{
+								Controller cc = (obj as GComponent).GetController(arr[i]);
+								if (cc != null)
+									cc.selectedPageId = arr[i + 1];
+							}
+						}
+					}
 				}
 			}
 		}
