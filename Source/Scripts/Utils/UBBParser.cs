@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace FairyGUI.Utils
 {
@@ -107,14 +108,33 @@ namespace FairyGUI.Utils
 
 		protected string GetTagText(bool remove)
 		{
-			int pos = _text.IndexOf("[", _readPos);
-			if (pos == -1)
+			int pos1 = _readPos;
+			int pos2;
+			StringBuilder buffer = null;
+			while ((pos2 = _text.IndexOf('[', pos1)) != -1)
+			{
+				if (buffer == null)
+					buffer = new StringBuilder();
+
+				if (_text[pos2 - 1] == '\\')
+				{
+					buffer.Append(_text, pos1, pos2 - pos1 - 1);
+					buffer.Append('[');
+					pos1 = pos2 + 1;
+				}
+				else
+				{
+					buffer.Append(_text, pos1, pos2 - pos1);
+					break;
+				}
+			}
+			if (pos2 == -1)
 				return null;
 
-			string ret = _text.Substring(_readPos, pos - _readPos);
 			if (remove)
-				_readPos = pos;
-			return ret;
+				_readPos = pos2;
+
+			return buffer.ToString();
 		}
 
 		public string Parse(string text)
@@ -124,22 +144,41 @@ namespace FairyGUI.Utils
 			bool end;
 			string tag, attr;
 			string repl;
+			StringBuilder buffer = null;
 			TagHandler func;
-			while ((pos2 = _text.IndexOf("[", pos1)) != -1)
+			while ((pos2 = _text.IndexOf('[', pos1)) != -1)
 			{
+				if (buffer == null)
+					buffer = new StringBuilder();
+
+				if (pos2 > 0 && _text[pos2 - 1] == '\\')
+				{
+					buffer.Append(_text, pos1, pos2 - pos1 - 1);
+					buffer.Append('[');
+					pos1 = pos2 + 1;
+					continue;
+				}
+
+				buffer.Append(_text, pos1, pos2 - pos1);
 				pos1 = pos2;
-				pos2 = _text.IndexOf("]", pos1);
+				pos2 = _text.IndexOf(']', pos1);
 				if (pos2 == -1)
 					break;
+
+				if (pos2 == pos1 + 1)
+				{
+					buffer.Append(_text, pos1, 2);
+					pos1 = pos2 + 1;
+					continue;
+				}
 
 				end = _text[pos1 + 1] == '/';
 				pos3 = end ? pos1 + 2 : pos1 + 1;
 				tag = _text.Substring(pos3, pos2 - pos3);
-				pos2++;
-				_readPos = pos2;
+				_readPos = pos2 + 1;
 				attr = null;
 				repl = null;
-				pos3 = tag.IndexOf("=");
+				pos3 = tag.IndexOf('=');
 				if (pos3 != -1)
 				{
 					attr = tag.Substring(pos3 + 1);
@@ -149,17 +188,25 @@ namespace FairyGUI.Utils
 				if (handlers.TryGetValue(tag, out func))
 				{
 					repl = func(tag, end, attr);
-					if (repl == null)
-						repl = "";
+					if (repl != null)
+						buffer.Append(repl);
 				}
-				else
-				{
-					pos1 = pos2;
-					continue;
-				}
-				_text = _text.Substring(0, pos1) + repl + _text.Substring(_readPos);
+				pos1 = _readPos;
 			}
-			return _text;
+
+			if (buffer == null)
+			{
+				_text = null;
+				return text;
+			}
+			else
+			{
+				if (pos1 < _text.Length)
+					buffer.Append(_text, pos1, _text.Length - pos1);
+
+				_text = null;
+				return buffer.ToString();
+			}
 		}
 	}
 }

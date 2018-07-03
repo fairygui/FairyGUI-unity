@@ -30,10 +30,14 @@ namespace FairyGUI
 
 		override protected void SetTextFieldText()
 		{
+			string str = _text;
+			if (_templateVars != null)
+				str = ParseTemplate(str);
+
 			if (_ubbEnabled)
-				richTextField.htmlText = UBBParser.inst.Parse(_text);
+				richTextField.htmlText = UBBParser.inst.Parse(str);
 			else
-				richTextField.htmlText = _text;
+				richTextField.htmlText = str;
 		}
 
 		override protected void GetTextFieldText()

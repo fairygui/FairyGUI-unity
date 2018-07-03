@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -13,6 +14,7 @@ namespace FairyGUI
 		protected string _text;
 		protected bool _ubbEnabled;
 		protected bool _updatingSize;
+		protected Dictionary<string, string> _templateVars;
 
 		public GTextField()
 			: base()
@@ -60,14 +62,100 @@ namespace FairyGUI
 
 		virtual protected void SetTextFieldText()
 		{
+			string str = _text;
+			if (_templateVars != null)
+				str = ParseTemplate(str);
+
 			if (_ubbEnabled)
-				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(_text));
+				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
 			else
-				_textField.text = _text;
+				_textField.text = str;
 		}
 
 		virtual protected void GetTextFieldText()
 		{
+		}
+
+		public Dictionary<string, string> templateVars
+		{
+			get { return _templateVars; }
+			set
+			{
+				if (_templateVars == null && value == null)
+					return;
+
+				_templateVars = value;
+
+				SetTextFieldText();
+				UpdateSize();
+				UpdateGear(6);
+			}
+		}
+
+		public GTextField SetVar(string name, string value)
+		{
+			if (_templateVars == null)
+				_templateVars = new Dictionary<string, string>();
+			_templateVars[name] = value;
+
+			return this;
+		}
+
+		public void FlushVars()
+		{
+			this.templateVars = _templateVars;
+		}
+
+		protected string ParseTemplate(string template)
+		{
+			int pos1 = 0, pos2 = 0;
+			int pos3;
+			string tag;
+			string value;
+			StringBuilder buffer = new StringBuilder();
+
+			while ((pos2 = template.IndexOf('{', pos1)) != -1)
+			{
+				if (pos2 > 0 && template[pos2 - 1] == '\\')
+				{
+					buffer.Append(template, pos1, pos2 - pos1 - 1);
+					buffer.Append('{');
+					pos1 = pos2 + 1;
+					continue;
+				}
+
+				buffer.Append(template, pos1, pos2 - pos1);
+				pos1 = pos2;
+				pos2 = template.IndexOf('}', pos1);
+				if (pos2 == -1)
+					break;
+
+				if (pos2 == pos1 + 1)
+				{
+					buffer.Append(template, pos1, 2);
+					pos1 = pos2 + 1;
+					continue;
+				}
+
+				tag = template.Substring(pos1 + 1, pos2 - pos1 - 1);
+				pos3 = tag.IndexOf('=');
+				if (pos3 != -1)
+				{
+					if (!_templateVars.TryGetValue(tag.Substring(0, pos3), out value))
+						value = tag.Substring(pos3 + 1);
+				}
+				else
+				{
+					if (!_templateVars.TryGetValue(tag, out value))
+						value = "";
+				}
+				buffer.Append(value);
+				pos1 = pos2 + 1;
+			}
+			if (pos1 < template.Length)
+				buffer.Append(template, pos1, template.Length - pos1);
+
+			return buffer.ToString();
 		}
 
 		/// <summary>
@@ -315,6 +403,9 @@ namespace FairyGUI
 				this.strokeColor = ToolSet.ConvertFromHtmlColor(str);
 				this.shadowOffset = xml.GetAttributeVector("shadowOffset");
 			}
+
+			if (xml.GetAttributeBool("vars"))
+				_templateVars = new Dictionary<string, string>();
 
 			_textField.textFormat = tf;
 		}
