@@ -983,9 +983,9 @@ namespace FairyGUI
 			if (_pageController == c)
 			{
 				if (_scrollType == ScrollType.Horizontal)
-					this.currentPageX = c.selectedIndex;
+					this.SetCurrentPageX(c.selectedIndex, true);
 				else
-					this.currentPageY = c.selectedIndex;
+					this.SetCurrentPageY(c.selectedIndex, true);
 			}
 		}
 
