@@ -57,8 +57,17 @@ namespace FairyGUI
 		bool _inertiaDisabled;
 		bool _maskDisabled;
 		float _decelerationRate;
+        float _tweenTimeGo = 0.5f; //调用SetPos(ani)时使用的缓动时间
+        float _tweenTimeDefault = 0.3f; //惯性滚动的最小缓动时间
+        float _pullRatio = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+        float _frameRate = 60f;
+        float _touchScreenThreshold = 1000f;
+        float _notTouchScreenThreshold = 500f;
+        float _resoulutionBase = 1136f;
+        float _distanceParam = 0.4f;
+        float _elapsedParam = 0.833f;
 
-		float _xPos;
+        float _xPos;
 		float _yPos;
 
 		Vector2 _viewSize;
@@ -98,11 +107,7 @@ namespace FairyGUI
 		GComponent _footer;
 		Controller _pageController;
 
-		static int _gestureFlag;
-
-		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
-		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
-		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+		static int _gestureFlag;        
         
         [LuaInterface.NoToLua]
         public static void ClearStatic()
@@ -144,8 +149,17 @@ namespace FairyGUI
 			_mouseWheelStep = _scrollStep * 2;
 			_softnessOnTopOrLeftSide = UIConfig.allowSoftnessOnTopOrLeftSide;
 			_decelerationRate = UIConfig.defaultScrollDecelerationRate;
+            _tweenTimeGo = UIConfig.scrollPaneTweenTimeGo;
+            _tweenTimeDefault = UIConfig.scrollPaneTweenTimeDefault;
+            _pullRatio = UIConfig.scrollPanePullRatio;
+            _frameRate = UIConfig.scrollPaneFrameRate;
+            _touchScreenThreshold = UIConfig.scrollPaneTouchScreenThreshold;
+            _notTouchScreenThreshold = UIConfig.scrollPaneNotTouchScreenThreshold;
+            _resoulutionBase = UIConfig.scrollPaneResoulutionBase;
+            _distanceParam = UIConfig.scrollPaneDistanceParam;
+            _elapsedParam = UIConfig.scrollPaneElapsedParam;
 
-			_displayOnLeft = (flags & 1) != 0;
+            _displayOnLeft = (flags & 1) != 0;
 			_snapToItem = (flags & 2) != 0;
 			_displayInDemand = (flags & 4) != 0;
 			_pageMode = (flags & 8) != 0;
@@ -944,7 +958,7 @@ namespace FairyGUI
 				_tweenStart = _container.xy;
 				_tweenChange = Vector2.zero;
 				_tweenChange[_refreshBarAxis] = _headerLockedSize - _tweenStart[_refreshBarAxis];
-				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+				_tweenDuration = new Vector2(_tweenTimeDefault, _tweenTimeDefault);
 				_tweenTime = Vector2.zero;
 				_tweening = 2;
 				Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -971,7 +985,7 @@ namespace FairyGUI
 				else
 					max += _footerLockedSize;
 				_tweenChange[_refreshBarAxis] = -max - _tweenStart[_refreshBarAxis];
-				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+				_tweenDuration = new Vector2(_tweenTimeDefault, _tweenTimeDefault);
 				_tweenTime = Vector2.zero;
 				_tweening = 2;
 				Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -1359,7 +1373,7 @@ namespace FairyGUI
 				{
 					_tweening = 1;
 					_tweenTime = Vector2.zero;
-					_tweenDuration = new Vector2(TWEEN_TIME_GO, TWEEN_TIME_GO);
+					_tweenDuration = new Vector2(_tweenTimeGo, _tweenTimeGo);
 					_tweenStart = _container.xy;
 					_tweenChange = pos - _tweenStart;
 					Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -1552,7 +1566,7 @@ namespace FairyGUI
 					else if (_header != null && _header.maxHeight != 0)
 						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _header.maxHeight);
 					else
-						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * PULL_RATIO);
+						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * _pullRatio);
 				}
 				else if (newPos.y < -_overlapSize.y)
 				{
@@ -1561,7 +1575,7 @@ namespace FairyGUI
 					else if (_footer != null && _footer.maxHeight > 0)
 						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_footer.maxHeight) - _overlapSize.y;
 					else
-						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * PULL_RATIO) - _overlapSize.y;
+						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * _pullRatio) - _overlapSize.y;
 				}
 				else
 					_container.y = newPos.y;
@@ -1576,7 +1590,7 @@ namespace FairyGUI
 					else if (_header != null && _header.maxWidth != 0)
 						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _header.maxWidth);
 					else
-						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * PULL_RATIO);
+						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * _pullRatio);
 				}
 				else if (newPos.x < 0 - _overlapSize.x)
 				{
@@ -1585,7 +1599,7 @@ namespace FairyGUI
 					else if (_footer != null && _footer.maxWidth > 0)
 						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_footer.maxWidth) - _overlapSize.x;
 					else
-						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * PULL_RATIO) - _overlapSize.x;
+						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * _pullRatio) - _overlapSize.x;
 				}
 				else
 					_container.x = newPos.x;
@@ -1593,9 +1607,9 @@ namespace FairyGUI
 
 			//更新速度
 			float deltaTime = Time.unscaledDeltaTime;
-			float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+			float elapsed = (Time.unscaledTime - _lastMoveTime) * _frameRate - 1;
 			if (elapsed > 1) //速度衰减
-				_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+				_velocity = _velocity * Mathf.Pow(_elapsedParam, elapsed);
 			Vector2 deltaPosition = pt - _lastTouchPos;
 			if (!sh)
 				deltaPosition.x = 0;
@@ -1683,9 +1697,9 @@ namespace FairyGUI
 			if (flag)
 			{
 				_tweenChange = endPos - _tweenStart;
-				if (_tweenChange.x < -UIConfig.touchDragSensitivity || _tweenChange.y < -UIConfig.touchDragSensitivity)
+				if (_tweenChange.x < -UIConfig.scrollPaneTouchDragSensitivity || _tweenChange.y < -UIConfig.scrollPaneTouchDragSensitivity)
 					onPullDownRelease.Call();
-				else if (_tweenChange.x > UIConfig.touchDragSensitivity || _tweenChange.y > UIConfig.touchDragSensitivity)
+				else if (_tweenChange.x > UIConfig.scrollPaneTouchDragSensitivity || _tweenChange.y > UIConfig.scrollPaneTouchDragSensitivity)
 					onPullUpRelease.Call();
 
 				if (_headerLockedSize > 0 && endPos[_refreshBarAxis] == 0)
@@ -1704,22 +1718,22 @@ namespace FairyGUI
 					_tweenChange = endPos - _tweenStart;
 				}
 
-				_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+				_tweenDuration.Set(_tweenTimeDefault, _tweenTimeDefault);
 			}
 			else
 			{
 				//更新速度
 				if (!_inertiaDisabled)
 				{
-					float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
+					float elapsed = (Time.unscaledTime - _lastMoveTime) * _frameRate - 1;
 					if (elapsed > 1)
-						_velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+						_velocity = _velocity * Mathf.Pow(_elapsedParam, elapsed);
 
 					//根据速度计算目标位置和需要时间
 					endPos = UpdateTargetAndDuration(_tweenStart);
 				}
 				else
-					_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+					_tweenDuration.Set(_tweenTimeDefault, _tweenTimeDefault);
 				Vector2 oldChange = endPos - _tweenStart;
 
 				//调整目标位置
@@ -2045,18 +2059,18 @@ namespace FairyGUI
 				float v2 = Mathf.Abs(v) * _velocityScale;
 				//在移动设备上，需要对不同分辨率做一个适配，我们的速度判断以1136分辨率为基准
 				if (Stage.touchScreen)
-					v2 *= 1136f / Mathf.Max(Screen.width, Screen.height);
+					v2 *= _resoulutionBase / Mathf.Max(Screen.width, Screen.height);
 				//这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
 				float ratio = 0;
 				if (_pageMode || !Stage.touchScreen)
 				{
-					if (v2 > 500)
-						ratio = Mathf.Pow((v2 - 500) / 500, 2);
+					if (v2 > _notTouchScreenThreshold)
+						ratio = Mathf.Pow((v2 - _notTouchScreenThreshold) / _notTouchScreenThreshold, 2);
 				}
 				else
 				{
-					if (v2 > 1000)
-						ratio = Mathf.Pow((v2 - 1000) / 1000, 2);
+					if (v2 > _touchScreenThreshold)
+						ratio = Mathf.Pow((v2 - _touchScreenThreshold) / _touchScreenThreshold, 2);
 				}
 
 				if (ratio != 0)
@@ -2069,18 +2083,18 @@ namespace FairyGUI
 					_velocity[axis] = v;
 
 					//算法：v*（_decelerationRate的n次幂）= 60，即在n帧后速度降为60（假设每秒60帧）。
-					duration = Mathf.Log(60 / v2, _decelerationRate) / 60;
+					duration = Mathf.Log(_frameRate / v2, _decelerationRate) / _frameRate;
 
 					//计算距离要使用本地速度
 					//理论公式貌似滚动的距离不够，改为经验公式
 					//float change = (int)((v/ 60 - 1) / (1 - _decelerationRate));
-					float change = (int)(v * duration * 0.4f);
+					float change = (int)(v * duration * _distanceParam);
 					pos += change;
 				}
 			}
 
-			if (duration < TWEEN_TIME_DEFAULT)
-				duration = TWEEN_TIME_DEFAULT;
+			if (duration < _tweenTimeDefault)
+				duration = _tweenTimeDefault;
 			_tweenDuration[axis] = duration;
 
 			return pos;
@@ -2095,8 +2109,8 @@ namespace FairyGUI
 				return;
 
 			float newDuration = Mathf.Abs(_tweenChange[axis] / oldChange) * _tweenDuration[axis];
-			if (newDuration < TWEEN_TIME_DEFAULT)
-				newDuration = TWEEN_TIME_DEFAULT;
+			if (newDuration < _tweenTimeDefault)
+				newDuration = _tweenTimeDefault;
 
 			_tweenDuration[axis] = newDuration;
 		}
@@ -2252,7 +2266,7 @@ namespace FairyGUI
 						|| newValue > threshold1 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+						_tweenDuration[axis] = _tweenTimeDefault;
 						_tweenChange[axis] = -newValue + threshold1;
 						_tweenStart[axis] = newValue;
 					}
@@ -2260,7 +2274,7 @@ namespace FairyGUI
 						|| newValue < threshold2 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
+						_tweenDuration[axis] = _tweenTimeDefault;
 						_tweenChange[axis] = threshold2 - newValue;
 						_tweenStart[axis] = newValue;
 					}
