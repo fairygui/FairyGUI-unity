@@ -495,9 +495,13 @@ namespace FairyGUI
 				if (_width == _contentWidth && _height == _contentHeight)
 				{
 					if (_content2 != null)
+					{
+						_content2.SetXY(0, 0);
 						_content2.SetScale(1, 1);
+					}
 					else
 					{
+						_content.SetXY(0, 0);
 						_content.SetScale(1, 1);
 						if (_content.texture != null)
 							_content.SetNativeSize();
@@ -534,8 +538,13 @@ namespace FairyGUI
 							sx = sy;
 					}
 
-					if (_shrinkOnly && sx >= 1 && sy >= 1)
-						sx = sy = 1;
+					if (_shrinkOnly)
+					{
+						if (sx > 1)
+							sx = 1;
+						if (sy > 1)
+							sy = 1;
+					}
 
 					_contentWidth = Mathf.FloorToInt(_contentSourceWidth * sx);
 					_contentHeight = Mathf.FloorToInt(_contentSourceHeight * sy);
