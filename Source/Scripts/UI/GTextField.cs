@@ -86,9 +86,7 @@ namespace FairyGUI
 
 				_templateVars = value;
 
-				SetTextFieldText();
-				UpdateSize();
-				UpdateGear(6);
+				FlushVars();
 			}
 		}
 
@@ -103,7 +101,8 @@ namespace FairyGUI
 
 		public void FlushVars()
 		{
-			this.templateVars = _templateVars;
+			SetTextFieldText();
+			UpdateSize();
 		}
 
 		protected string ParseTemplate(string template)

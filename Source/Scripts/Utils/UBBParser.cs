@@ -191,6 +191,10 @@ namespace FairyGUI.Utils
 					if (repl != null)
 						buffer.Append(repl);
 				}
+				else
+				{
+					buffer.Append(_text, pos1, pos2 - pos1 + 1);
+				}
 				pos1 = _readPos;
 			}
 
