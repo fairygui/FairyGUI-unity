@@ -171,10 +171,10 @@ namespace FairyGUI
 
 		public void Update()
 		{
-			time = Time.time;
+			time = Time.unscaledTime;
 			float elapsed = time - _lastTime;
-			if (Time.timeScale != 0)
-				elapsed /= Time.timeScale;
+// 			if (Time.timeScale != 0)
+// 				elapsed /= Time.timeScale;
 			_lastTime = time;
 
 			Dictionary<TimerCallback, Anymous_T>.Enumerator iter;
