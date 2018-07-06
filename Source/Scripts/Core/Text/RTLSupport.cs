@@ -119,9 +119,9 @@ namespace FairyGUI
 
             // 伊斯兰教真主安拉在阿拉伯文里写作الله， ّ (shadda) 上面有一个短线，这是小艾里夫（短剑艾里夫）的一个特殊形式。
             // 键盘输入时输入 ل (lam) + ل (lam) + ه (ha) 后会自动转换成带记号的符号。 [2018/3/13 20:03:45 --By aq_1000]
-            if (input.Contains("الله"))
+            if (input == "الله")
             {
-                input = input.Replace("الله", "ﷲ");
+                input = "ﷲ";
             }
 
             char[] chArray = input.ToCharArray();
