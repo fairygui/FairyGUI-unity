@@ -589,6 +589,7 @@ namespace FairyGUI
         private static bool _IsNeutrality(char uc)
         {
             return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' ||
+                uc == '!' || uc == '！' || uc == '.' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 	    
