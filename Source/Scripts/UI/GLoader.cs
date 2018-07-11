@@ -32,6 +32,8 @@ namespace FairyGUI
 		GObject _errorSign;
 		GComponent _content2;
 
+		EventCallback0 _content2SizeChangedDelegate;
+
 		static GObjectPool errorSignPool;
 
 		public GLoader()
@@ -40,6 +42,8 @@ namespace FairyGUI
 			_align = AlignType.Left;
 			_verticalAlign = VertAlignType.Top;
 			showErrorSign = true;
+
+			_content2SizeChangedDelegate = onContent2SizeChanged;
 		}
 
 		override protected void CreateDisplayObject()
@@ -388,6 +392,7 @@ namespace FairyGUI
 					{
 						_content2 = (GComponent)obj;
 						((Container)displayObject).AddChild(_content2.displayObject);
+						_content2.onSizeChanged.Add(_content2SizeChangedDelegate);
 						UpdateLayout();
 					}
 				}
@@ -401,6 +406,12 @@ namespace FairyGUI
 			}
 			else
 				SetErrorState();
+		}
+
+		private void onContent2SizeChanged()
+		{
+			if (!_updatingLayout)
+				UpdateLayout();
 		}
 
 		virtual protected void LoadExternal()
