@@ -2635,6 +2635,15 @@ namespace FairyGUI
 						if (foldInvisibleItems && !child.visible)
 							continue;
 
+						if (_lineCount != 0 && k >= _lineCount
+							|| _lineCount == 0 && curY + (_lineCount > 0 ? eachHeight : child.height) > viewHeight)
+						{
+							//new page
+							page++;
+							curY = 0;
+							k = 0;
+						}
+
 						lineSize += child.sourceWidth;
 						j++;
 						if (j == _columnCount || i == cnt - 1)
@@ -2670,15 +2679,6 @@ namespace FairyGUI
 							lineSize = 0;
 
 							k++;
-
-							if (_lineCount != 0 && k >= _lineCount
-								|| _lineCount == 0 && curY + child.height > viewHeight)
-							{
-								//new page
-								page++;
-								curY = 0;
-								k = 0;
-							}
 						}
 					}
 				}
