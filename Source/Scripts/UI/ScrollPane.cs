@@ -1275,7 +1275,7 @@ namespace FairyGUI
 					_footer.width = _viewSize.x;
 			}
 
-			SyncScrollBar();
+			SyncScrollBar(true);
 			CheckRefreshBar();
 			if (_pageMode)
 				UpdatePageController();
