@@ -338,7 +338,8 @@ namespace FairyGUI
 
 		void UpdateHitArea()
 		{
-			((BoxColliderHitTest)this.container.hitArea).SetArea(_ui.x, _ui.y, _ui.width, _ui.height);
+			if (this.container.hitArea != null)
+				((BoxColliderHitTest)this.container.hitArea).SetArea(_ui.xMin, _ui.yMin, _ui.width, _ui.height);
 		}
 
 		void CreateUI_EditMode()
@@ -412,6 +413,8 @@ namespace FairyGUI
 						this._ui.SetXY((int)((width - this._ui.sourceWidth) / 2), 0, true);
 						break;
 				}
+
+				UpdateHitArea();
 			}
 			else
 			{

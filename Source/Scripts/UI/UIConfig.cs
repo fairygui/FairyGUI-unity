@@ -74,8 +74,8 @@ namespace FairyGUI
 		/// 越接近1，减速越慢，意味着滑动的时间和距离更长。
 		/// 这个是全局设置，也可以通过ScrollPane.decelerationRate进行个性设置。
 		/// </summary>
-		public static float defaultScrollDecelerationRate = 0.967f;
-		[Obsolete("UIConfig.defaultTouchScrollSpeedRatio is deprecated. Use defaultScrollDecelerationRate instead.")]
+		public static float defaultScrollDecelerationRate = 0.9f;//0.967f;
+        [Obsolete("UIConfig.defaultTouchScrollSpeedRatio is deprecated. Use defaultScrollDecelerationRate instead.")]
 		public static float defaultTouchScrollSpeedRatio = 1;
 
 		/// <summary>
@@ -171,7 +171,7 @@ namespace FairyGUI
         /// <summary>
         /// 惯性滚动的最小缓动时间
         /// </summary>
-        public static float scrollPaneTweenTimeDefault = 0.3f;
+        public static float scrollPaneTweenTimeDefault = 0.15f;//0.3f;
 
         /// <summary>
         /// 下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
@@ -206,12 +206,12 @@ namespace FairyGUI
         /// <summary>
         /// Pixel offsets of finger to trigger dragging
         /// </summary>
-        public static int scrollPaneTouchDragSensitivity = 10;
+        public static int scrollPaneTouchDragSensitivity = 15;//10;
 
         /// <summary>
         /// Pixel offsets of finger to trigger dragging
         /// </summary>
-        public static float scrollPaneElapsedParam = 0.833f;
+        public static float scrollPaneElapsedParam = 0.9f;//0.833f;
 
         public enum ConfigKey
 		{

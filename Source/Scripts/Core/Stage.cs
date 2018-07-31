@@ -392,8 +392,17 @@ namespace FairyGUI
 		/// <param name="volumeScale"></param>
 		public void PlayOneShotSound(AudioClip clip, float volumeScale)
 		{
-			if (_audio != null && this.soundVolume > 0)
-				_audio.PlayOneShot(clip, volumeScale * this.soundVolume);
+            if (_audio != null && this.soundVolume > 0)
+            {
+                try
+                {
+                    _audio.PlayOneShot(clip, volumeScale * this.soundVolume);
+                }
+                catch (System.Exception)
+                {
+                	// Just Do Nothing
+                }
+            }
 		}
 
 		/// <summary>
@@ -403,7 +412,16 @@ namespace FairyGUI
 		public void PlayOneShotSound(AudioClip clip)
 		{
 			if (_audio != null && this.soundVolume > 0)
-				_audio.PlayOneShot(clip, this.soundVolume);
+            {
+                try
+                {
+                    _audio.PlayOneShot(clip, this.soundVolume);
+                }
+                catch (System.Exception)
+                {
+                    // Just Do Nothing
+                }
+            }
 		}
 
 		/// <summary>
@@ -639,7 +657,11 @@ namespace FairyGUI
 				TouchInfo touch = _touches[0];
 				touch.modifiers = evt.modifiers;
 			}
+#if UNITY_2017_1_OR_NEWER
+			else if (evt.type == EventType.ScrollWheel)
+#else
 			else if (evt.type == EventType.scrollWheel)
+#endif
 			{
 				if (_touchTarget != null)
 				{

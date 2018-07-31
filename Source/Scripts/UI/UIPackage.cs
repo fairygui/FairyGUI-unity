@@ -73,13 +73,17 @@ namespace FairyGUI
 		internal static int _constructing;
 		internal static string URL_PREFIX = "ui://";
 
+        [LuaInterface.NoToLua]
         static public void ClearStatic()
         {
             RemoveAllPackages(true);
             _packageInstById.Clear();
             _packageInstByName.Clear();
             _packageList.Clear();
-            _stringsSource.Clear();
+            if (null != _stringsSource)
+            {
+                _stringsSource.Clear();
+            }
             _constructing = 0;
             URL_PREFIX = "ui://";
         }

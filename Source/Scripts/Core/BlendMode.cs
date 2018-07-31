@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using NativeBlendMode = UnityEngine.Rendering.BlendMode;
 
 namespace FairyGUI
 {
 	/*关于BlendMode.Off, 这种模式相当于Blend Off指令的效果。当然，在着色器里使用Blend Off指令可以获得更高的效率，
 		但因为Image着色器本身就有多个关键字，复制一个这样的着色器代价太大，所有为了节省Shader数量便增加了这样一种模式，也是可以接受的。
 	*/
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -32,56 +31,47 @@ namespace FairyGUI
 	/// </summary>
 	public class BlendModeUtils
 	{
+		public class BlendFactor
+		{
+			public NativeBlendMode srcFactor;
+			public NativeBlendMode dstFactor;
+			public bool pma;
+
+			public BlendFactor(NativeBlendMode srcFactor, NativeBlendMode dstFactor, bool pma = false)
+			{
+				this.srcFactor = srcFactor;
+				this.dstFactor = dstFactor;
+				this.pma = pma;
+			}
+		}
+
 		//Source指的是被计算的颜色，Destination是已经在屏幕上的颜色。
 		//混合结果=Source * factor1 + Destination * factor2
-		static float[] Factors = new float[] {
+		public static BlendFactor[] Factors = new BlendFactor[] {
 			//Normal
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha,
-
+			new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.OneMinusSrcAlpha),
 			//None
-			(float)UnityEngine.Rendering.BlendMode.One,
-			(float)UnityEngine.Rendering.BlendMode.One,
-
+			new BlendFactor(NativeBlendMode.One, NativeBlendMode.One),
 			//Add
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-			(float)UnityEngine.Rendering.BlendMode.One,
-
+			new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.One),
 			//Multiply
-			(float)UnityEngine.Rendering.BlendMode.DstColor,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha,
-
+			new BlendFactor(NativeBlendMode.DstColor, NativeBlendMode.OneMinusSrcAlpha, true),
 			//Screen
-			(float)UnityEngine.Rendering.BlendMode.One,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcColor,
-
+			new BlendFactor(NativeBlendMode.One, NativeBlendMode.OneMinusSrcColor, true),
 			//Erase
-			(float)UnityEngine.Rendering.BlendMode.Zero,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha,
-
+			new BlendFactor(NativeBlendMode.Zero, NativeBlendMode.OneMinusSrcAlpha),
 			//Mask
-			(float)UnityEngine.Rendering.BlendMode.Zero,
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-
+			new BlendFactor(NativeBlendMode.Zero, NativeBlendMode.SrcAlpha),
 			//Below
-			(float)UnityEngine.Rendering.BlendMode.OneMinusDstAlpha,
-			(float)UnityEngine.Rendering.BlendMode.DstAlpha,
-
+			new BlendFactor(NativeBlendMode.OneMinusDstAlpha, NativeBlendMode.DstAlpha),
 			//Off
-			(float)UnityEngine.Rendering.BlendMode.One,
-			(float)UnityEngine.Rendering.BlendMode.Zero,
-
+			new BlendFactor(NativeBlendMode.One, NativeBlendMode.Zero),
 			//Custom1
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha,
-
+			new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.OneMinusSrcAlpha),
 			//Custom2
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha,
-
+			new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.OneMinusSrcAlpha),
 			//Custom3
-			(float)UnityEngine.Rendering.BlendMode.SrcAlpha,
-			(float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha
+			new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.OneMinusSrcAlpha)
 		};
 
 		/// <summary>
@@ -91,9 +81,12 @@ namespace FairyGUI
 		/// <param name="blendMode"></param>
 		public static void Apply(Material mat, BlendMode blendMode)
 		{
-			int index = (int)blendMode * 2;
-			mat.SetFloat("_BlendSrcFactor", Factors[index]);
-			mat.SetFloat("_BlendDstFactor", Factors[index + 1]);
+			BlendFactor bf = Factors[(int)blendMode];
+			mat.SetFloat("_BlendSrcFactor", (float)bf.srcFactor);
+			mat.SetFloat("_BlendDstFactor", (float)bf.dstFactor);
+
+			if (bf.pma)
+				mat.SetFloat("_ColorOption", 1);
 		}
 
 		/// <summary>
@@ -102,11 +95,11 @@ namespace FairyGUI
 		/// <param name="blendMode"></param>
 		/// <param name="srcFactor"></param>
 		/// <param name="dstFactor"></param>
-		public static void Override(BlendMode blendMode, UnityEngine.Rendering.BlendMode srcFactor, UnityEngine.Rendering.BlendMode dstFactor)
+		public static void Override(BlendMode blendMode, NativeBlendMode srcFactor, NativeBlendMode dstFactor)
 		{
-			int index = (int)blendMode * 2;
-			Factors[index] = (float)srcFactor;
-			Factors[index + 1] = (float)dstFactor;
+			BlendFactor bf = Factors[(int)blendMode];
+			bf.srcFactor = srcFactor;
+			bf.dstFactor = dstFactor;
 		}
 	}
 }

@@ -44,6 +44,15 @@ namespace FairyGUI
         private static Dictionary<int, char> middle;
         private static Dictionary<int, char> numbers;
 
+        private static List<char> listR = new List<char>();
+        private static List<string> listL = new List<string>();
+        private static StringBuilder sbL = new StringBuilder();
+        private static StringBuilder sbN = new StringBuilder();
+        private static StringBuilder sbRep = new StringBuilder();
+        private static StringBuilder sbSpace = new StringBuilder();
+        private static StringBuilder sbFinal = new StringBuilder();
+        private static StringBuilder sbReverse = new StringBuilder();
+
         public static bool IsArabicLetter(char ch)
         {
             if (ch >= 0x600 && ch <= 0x6ff)
@@ -125,98 +134,120 @@ namespace FairyGUI
             }
 
             char[] chArray = input.ToCharArray();
-            char[] chArray2 = new char[chArray.Length];
+//            char[] chArray2 = new char[chArray.Length];
+            char perChar = '\0';
             for (int i = 0; i < chArray.Length; i++)
             {
                 if (IsNumericChar(chArray[i]))
                 {
-                    chArray2[i] = ReplaceChar(chArray[i], CharState.number);
+                    perChar = chArray[i];
+                    chArray[i] = ReplaceChar(chArray[i], CharState.number);
                 }
                 else if ((i + 1) == chArray.Length)
                 {
                     if (chArray.Length == 1)
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
-                    else if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    else if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.final);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.final);
                     }
                 }
                 else if (i == 0)
                 {
                     if (!CheckSeparator(chArray[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.init);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
                 }
                 else if (CheckSeparator(chArray[i + 1]))
                 {
-                    if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.final);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.final);
                     }
                 }
-                else if (CheckSeparator(chArray[i - 1]))
+                else if (CheckSeparator(perChar))
                 {
                     if (CheckSeparator(chArray[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.init);
                     }
                 }
                 else if (CheckSpecific(chArray[i + 1]))
                 {
-                    if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.init);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.middle);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.middle);
                     }
                 }
-                else if (CheckSpecific(chArray[i - 1]))
+                else if (CheckSpecific(perChar))
                 {
                     if (CheckSeparator(chArray[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.isolated);
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = chArray[i];
+                        chArray[i] = ReplaceChar(chArray[i], CharState.init);
                     }
                 }
                 else
                 {
-                    chArray2[i] = ReplaceChar(chArray[i], CharState.middle);
+                    perChar = chArray[i];
+                    chArray[i] = ReplaceChar(chArray[i], CharState.middle);
                 }
             }
-            List<char> listR = new List<char>();
-            List<string> listL = new List<string>();
-            StringBuilder sbL = new StringBuilder();
-            StringBuilder sbN = new StringBuilder();
+
+            listR.Clear();
+            listL.Clear();
+            sbL.Length = 0;
+            sbN.Length = 0;
             int iReplace = 0;
             CharType ePre = CharType.UNKNOW;
-            for (int j = 0; j < chArray2.Length; j++)
+            char nextChar = '\0';
+            for (int j = 0; j < chArray.Length; j++)
             {
-                char item = chArray2[(chArray2.Length - j) - 1];
-                CharType eCType = _IsRTLChar(item, ePre);
+                if (j < chArray.Length - 1)
+                    nextChar = chArray[(chArray.Length - j) - 2];
+                else
+                    nextChar = '\0';
+                char item = chArray[(chArray.Length - j) - 1];
+                CharType eCType = _IsRTLChar(item, ePre, nextChar);
                 if (eCType == CharType.LTR)
                 {
                     if (sbL.Length == 0)
@@ -261,9 +292,9 @@ namespace FairyGUI
                 listL.Add(sbL.ToString());
             }
 
-            StringBuilder sbRep = new StringBuilder();
-            StringBuilder sbSpace = new StringBuilder();
-            StringBuilder sbFinal = new StringBuilder();
+            sbRep.Length = 0;
+            sbSpace.Length = 0;
+            sbFinal.Length = 0;
             sbFinal.Append(listR.ToArray());
             for (int m = 0; m < iReplace; m++)
             {
@@ -312,13 +343,12 @@ namespace FairyGUI
                     }
                 }
             }
-
-			return Reverse(sbFinal.ToString());
+            return Reverse(sbFinal.ToString());
         }
 
 		private static string Reverse(string source)
 		{
-			StringBuilder buffer = new StringBuilder();
+			sbReverse.Length = 0;
 			int len = source.Length;
 			int i = len - 1;
 			while (i >= 0)
@@ -332,16 +362,16 @@ namespace FairyGUI
 
 				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
 				{
-					buffer.Append(source[i - 1]);
-					buffer.Append(ch);
+					sbReverse.Append(source[i - 1]);
+					sbReverse.Append(ch);
 					i--;
 				}
 				else
-					buffer.Append(ch);
+					sbReverse.Append(ch);
 				i--;
 			}
 
-			return buffer.ToString();
+			return sbReverse.ToString();
 		}
 
         private static void InitChars()
@@ -589,17 +619,24 @@ namespace FairyGUI
         private static bool _IsNeutrality(char uc)
         {
             return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' ||
-                uc == '!' || uc == '！' || uc == '.' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
-	    
+
+        // 是否句末标点符号
+        private static bool _IsEndPunctuation(char uc, char nextChar)
+        {
+            if (uc == '.')
+                return _IsNeutrality(nextChar);
+            return (uc == '!' || uc == '！' || uc == '。');
+        }
+
         // 判断字符方向
-        private static CharType _IsRTLChar(char uc, CharType ePre)
+        private static CharType _IsRTLChar(char uc, CharType ePre, char nextChar)
         {
             CharType eCType = CharType.RTL;
             int uni = uc;
 
-            if (_IsBracket(uc))
+            if (_IsBracket(uc) || _IsEndPunctuation(uc, nextChar))
             {
                 eCType = CharType.RTL;
             }
