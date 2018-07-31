@@ -213,6 +213,11 @@ namespace FairyGUI
         /// </summary>
         public static float scrollPaneElapsedParam = 0.9f;//0.833f;
 
+        /// <summary>
+        /// 当前客户端是否是RTL语言
+        /// </summary>
+        public static bool rtlLanguage = true;
+
         public enum ConfigKey
 		{
 			DefaultFont,

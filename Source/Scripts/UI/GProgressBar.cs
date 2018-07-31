@@ -141,7 +141,12 @@ namespace FairyGUI
 				{
 					case ProgressTitleType.Percent:
 #if RTL_TEXT_SUPPORT
-                        _titleObject.text = "%" + Mathf.FloorToInt(percent * 100);
+                        if (UIConfig.rtlLanguage)
+                        {
+                            _titleObject.text = "%" + Mathf.FloorToInt(percent * 100);
+                        }
+                        else
+                            _titleObject.text = Mathf.FloorToInt(percent * 100) + "%";
 #else
                         _titleObject.text = Mathf.FloorToInt(percent * 100) + "%";
 #endif
@@ -149,7 +154,12 @@ namespace FairyGUI
 
 					case ProgressTitleType.ValueAndMax:
 #if RTL_TEXT_SUPPORT
-                        _titleObject.text = Math.Round(max) + "/" + Math.Round(newValue);
+                        if (UIConfig.rtlLanguage)
+                        {
+                            _titleObject.text = Math.Round(max) + "/" + Math.Round(newValue);
+                        }
+                        else
+                            _titleObject.text = Math.Round(newValue) + "/" + Math.Round(max);
 #else
                         _titleObject.text = Math.Round(newValue) + "/" + Math.Round(max);
 #endif
