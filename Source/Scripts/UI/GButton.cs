@@ -443,7 +443,7 @@ namespace FairyGUI
 				_downEffect = str == "dark" ? 1 : (str == "scale" ? 2 : 0);
 				_downEffectValue = xml.GetAttributeFloat("downEffectValue");
 				if (_downEffect == 2)
-					this.SetPivot(0.5f, 0.5f);
+					this.SetPivot(0.5f, 0.5f, this.pivotAsAnchor);
 			}
 
 			_buttonController = GetController("button");
