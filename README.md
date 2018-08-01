@@ -35,11 +35,9 @@ Get Started
 
 - Source
 
-  Here is the source code of FairyGUI. If it is used for a new project, The are the required files. In addition, you also need to place DOTween's DLL.
-The source code and shaders here are common to all versions of Unity.<br>
+  Here is the source code of FairyGUI. If it is used for a new project, The are the required files. The source code and shaders here are common to all versions of Unity.<br>
 
-  这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。另外，你还需要放置DOTween的DLL。  
-这里的源码和着色器都是Unity所有版本通用的。
+  这里是FairyGUI的源码，如果用于新的项目，这里都是必需的文件。这里的源码和着色器都是Unity所有版本通用的。
 
 - LuaSupport
  
@@ -54,11 +52,11 @@ Learn
 - 下载Examples工程，浏览一遍FairyGUI的例子。  
 - 解压Examples工程UIProject目录下的UIProject.zip，使用FairyGUI编辑器打开，结合例子浏览一遍UI工程。  
 - 观看视频教程：[强大的UI编辑器 - FairyGUI入门教程](http://www.sikiedu.com/course/139)  
-- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/guide)  
+- 阅读文字教程：[FairyGUI教程](http://www.fairygui.com/guide) 
 - FAQ：[问答社区](http://ask.fairygui.com)  
 - 进群与小伙伴一起交流：一群 434866637（已满） 二群 614444599  
 
 License
 ====
 MIT 你可以自由使用FairyGUI在你的商业和非商业项目。  
-如果觉得FairyGUI好用，请[赞助作者](http://fairygui.com/about/donate.html)
+如果觉得FairyGUI好用，请[赞助作者](http://www.fairygui.com/service)
