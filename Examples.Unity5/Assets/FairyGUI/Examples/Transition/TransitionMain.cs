@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using FairyGUI;
-using DG.Tweening;
 
 public class TransitionMain : MonoBehaviour
 {
@@ -28,6 +26,7 @@ public class TransitionMain : MonoBehaviour
 		_g1 = UIPackage.CreateObject("Transition", "BOSS").asCom;
 		_g2 = UIPackage.CreateObject("Transition", "BOSS_SKILL").asCom;
 		_g3 = UIPackage.CreateObject("Transition", "TRAP").asCom;
+
 		_g4 = UIPackage.CreateObject("Transition", "GoodHit").asCom;
 		_g5 = UIPackage.CreateObject("Transition", "PowerUp").asCom;
 		_g5.GetTransition("t0").SetHook("play_num_now", __playNum);
@@ -44,6 +43,7 @@ public class TransitionMain : MonoBehaviour
 		_btnGroup.visible = false;
 		GRoot.inst.AddChild(target);
 		Transition t = target.GetTransition("t0");
+
 		t.Play(() =>
 		{
 			_btnGroup.visible = true;
@@ -86,7 +86,9 @@ public class TransitionMain : MonoBehaviour
 
 	void __playNum()
 	{
-		DOTween.To(() => _startValue, x => { _g5.GetChild("value").text = "" + Mathf.Floor(x); }, _endValue, 0.3f).SetEase(Ease.Linear).SetUpdate(true);
+		GTween.To(_startValue, _endValue, 0.3f).SetEase(EaseType.Linear)
+			.OnUpdate((GTweener tweener) => { _g5.GetChild("value").text = "" + Mathf.Floor(tweener.value.x); });
+
 	}
 
 	void OnKeyDown(EventContext context)

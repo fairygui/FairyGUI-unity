@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FairyGUI;
 using UnityEngine;
-using DG.Tweening;
 
 public class Window3 : Window
 {

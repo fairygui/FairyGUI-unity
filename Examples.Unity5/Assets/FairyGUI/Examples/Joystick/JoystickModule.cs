@@ -1,8 +1,5 @@
 ﻿using FairyGUI;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
 public class JoystickModule : EventDispatcher
 {
@@ -17,7 +14,7 @@ public class JoystickModule : EventDispatcher
 	GObject _thumb;
 	GObject _center;
 	int touchId;
-	Tweener _tweener;
+	GTweener _tweener;
 
 	public EventListener onMove { get; private set; }
 	public EventListener onEnd { get; private set; }

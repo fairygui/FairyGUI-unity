@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FairyGUI;
-using DG.Tweening;
 
 public class TypingEffectMain : MonoBehaviour
 {

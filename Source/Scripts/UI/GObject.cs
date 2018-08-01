@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
-using DG.Tweening;
 
 namespace FairyGUI
 {
@@ -214,6 +213,7 @@ namespace FairyGUI
 		internal float _rawHeight;
 		internal bool _gearLocked;
 		internal float _sizePercentInGroup;
+		internal bool _disposed;
 
 		internal static uint _gInstanceCounter;
 
@@ -1541,6 +1541,8 @@ namespace FairyGUI
 
 		virtual public void Dispose()
 		{
+			_disposed = true;
+
 			RemoveFromParent();
 			RemoveEventListeners();
 			relations.Dispose();
@@ -1945,81 +1947,50 @@ namespace FairyGUI
 		}
 		#endregion
 
-		#region Tween Support
-		public Tweener TweenMove(Vector2 endValue, float duration)
+		#region Tween Helpers
+		public GTweener TweenMove(Vector2 endValue, float duration)
 		{
-			return DOTween.To(() => this.xy, x => this.xy = x, endValue, duration)
-				.SetOptions(_pixelSnapping)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(this.xy, endValue, duration).SetTarget(this, TweenPropType.XY);
 		}
 
-		public Tweener TweenMoveX(float endValue, float duration)
+		public GTweener TweenMoveX(float endValue, float duration)
 		{
-			return DOTween.To(() => this.x, x => this.x = x, endValue, duration)
-				.SetOptions(_pixelSnapping)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_x, endValue, duration).SetTarget(this, TweenPropType.X);
 		}
 
-		public Tweener TweenMoveY(float endValue, float duration)
+		public GTweener TweenMoveY(float endValue, float duration)
 		{
-			return DOTween.To(() => this.y, x => this.y = x, endValue, duration)
-				.SetOptions(_pixelSnapping)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_y, endValue, duration).SetTarget(this, TweenPropType.Y);
 		}
 
-		public Tweener TweenScale(Vector2 endValue, float duration)
+		public GTweener TweenScale(Vector2 endValue, float duration)
 		{
-			return DOTween.To(() => this.scale, x => this.scale = x, endValue, duration)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(this.scale, endValue, duration).SetTarget(this, TweenPropType.Scale);
 		}
 
-		public Tweener TweenScaleX(float endValue, float duration)
+		public GTweener TweenScaleX(float endValue, float duration)
 		{
-			return DOTween.To(() => this.scaleX, x => this.scaleX = x, endValue, duration)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_scaleX, endValue, duration).SetTarget(this, TweenPropType.ScaleX);
 		}
 
-		public Tweener TweenScaleY(float endValue, float duration)
+		public GTweener TweenScaleY(float endValue, float duration)
 		{
-			return DOTween.To(() => this.scaleY, x => this.scaleY = x, endValue, duration)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_scaleY, endValue, duration).SetTarget(this, TweenPropType.ScaleY);
 		}
 
-		public Tweener TweenResize(Vector2 endValue, float duration)
+		public GTweener TweenResize(Vector2 endValue, float duration)
 		{
-			return DOTween.To(() => this.size, x => this.size = x, endValue, duration)
-				.SetOptions(_pixelSnapping)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(this.size, endValue, duration).SetTarget(this, TweenPropType.Size);
 		}
 
-		public Tweener TweenFade(float endValue, float duration)
+		public GTweener TweenFade(float endValue, float duration)
 		{
-			return DOTween.To(() => this.alpha, x => this.alpha = x, endValue, duration)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_alpha, endValue, duration).SetTarget(this, TweenPropType.Alpha);
 		}
 
-		public Tweener TweenRotate(float endValue, float duration)
+		public GTweener TweenRotate(float endValue, float duration)
 		{
-			return DOTween.To(() => this.rotation, x => this.rotation = x, endValue, duration)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.SetTarget(this);
+			return GTween.To(_rotation, endValue, duration).SetTarget(this, TweenPropType.Rotation);
 		}
 		#endregion
 	}

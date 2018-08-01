@@ -33,6 +33,9 @@ Window = FairyGUI.Window
 GObjectPool = FairyGUI.GObjectPool
 Relations = FairyGUI.Relations
 RelationType = FairyGUI.RelationType
+GTween = FairyGUI.GTween
+GTweener = FairyGUI.GTweener
+EaseType = FairyGUI.EaseType
 
 --这里建立一个c# delegate到lua函数的映射，是为了支持self参数，和方便地进行remove操作
 local EventDelegates = {}

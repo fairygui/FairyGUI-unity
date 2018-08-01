@@ -32,8 +32,6 @@ namespace FairyGUI
 		GObject _errorSign;
 		GComponent _content2;
 
-		EventCallback0 _content2SizeChangedDelegate;
-
 		static GObjectPool errorSignPool;
 
 		public GLoader()
@@ -42,8 +40,6 @@ namespace FairyGUI
 			_align = AlignType.Left;
 			_verticalAlign = VertAlignType.Top;
 			showErrorSign = true;
-
-			_content2SizeChangedDelegate = onContent2SizeChanged;
 		}
 
 		override protected void CreateDisplayObject()
@@ -191,12 +187,39 @@ namespace FairyGUI
 		/// </summary>
 		public int frame
 		{
-			get { return _content.currentFrame; }
+			get { return _content.frame; }
 			set
 			{
-				_content.currentFrame = value;
+				_content.frame = value;
 				UpdateGear(5);
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public float timeScale
+		{
+			get { return _content.timeScale; }
+			set { _content.timeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ignoreEngineTimeScale
+		{
+			get { return _content.ignoreEngineTimeScale; }
+			set { _content.ignoreEngineTimeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="time"></param>
+		public void Advance(float time)
+		{
+			_content.Advance(time);
 		}
 
 		/// <summary>
@@ -392,7 +415,6 @@ namespace FairyGUI
 					{
 						_content2 = (GComponent)obj;
 						((Container)displayObject).AddChild(_content2.displayObject);
-						_content2.onSizeChanged.Add(_content2SizeChangedDelegate);
 						UpdateLayout();
 					}
 				}
@@ -406,12 +428,6 @@ namespace FairyGUI
 			}
 			else
 				SetErrorState();
-		}
-
-		private void onContent2SizeChanged()
-		{
-			if (!_updatingLayout)
-				UpdateLayout();
 		}
 
 		virtual protected void LoadExternal()
@@ -653,7 +669,7 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("frame");
 			if (str != null)
-				_content.currentFrame = int.Parse(str);
+				_content.frame = int.Parse(str);
 			_content.playing = xml.GetAttributeBool("playing", true);
 
 			str = xml.GetAttribute("color");

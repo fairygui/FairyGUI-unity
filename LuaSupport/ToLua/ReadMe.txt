@@ -1,6 +1,6 @@
 ﻿一、安装
 
-1、将LuaUIHelper.cs放入你的工程。TweenUtils.cs是DOTween的一个辅助工具类，如果你需要就放入，不需要就不放，不是必须的。
+1、将LuaUIHelper.cs放入你的工程。
 
 2、将以下语句添加到CustomSettings.cs适当的位置，然后重新生成绑定文件。
 
@@ -40,6 +40,10 @@ _GT(typeof(GObjectPool)),
 _GT(typeof(Relations)),
 _GT(typeof(RelationType)),
 _GT(typeof(Timers)),
+_GT(typeof(GTween)),
+_GT(typeof(GTweener)),
+_GT(typeof(EaseType)),
+_GT(typeof(TweenValue)),
 
 _GT(typeof(LuaUIHelper)),
 _GT(typeof(GLuaComponent)),
@@ -49,8 +53,6 @@ _GT(typeof(GLuaProgressBar)),
 _GT(typeof(GLuaSlider)),
 _GT(typeof(GLuaComboBox)),
 _GT(typeof(LuaWindow)),
-
-_GT(typeof(TweenUtils)),
 
 3、将FairyGUI.lua放入你的lua文件存放目录。
 

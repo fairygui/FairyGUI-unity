@@ -1475,11 +1475,7 @@ namespace FairyGUI
 		{
 			int cnt = _transitions.Count;
 			for (int i = 0; i < cnt; ++i)
-			{
-				Transition trans = _transitions[i];
-				if (trans.autoPlay)
-					trans.Play(trans.autoPlayRepeat, trans.autoPlayDelay, null);
-			}
+				_transitions[i].OnOwnerAddedToStage();
 		}
 
 		void __removedFromStage()

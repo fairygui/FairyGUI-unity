@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -26,13 +25,11 @@ namespace FairyGUI
 	/// <summary>
 	/// Gear is a connection between object and controller.
 	/// </summary>
-	public class GearColor : GearBase
+	public class GearColor : GearBase, ITweenListener
 	{
-		public Tweener tweener { get; private set; }
-
 		Dictionary<string, GearColorValue> _storage;
 		GearColorValue _default;
-		GearColorValue _tweenTarget;
+		GTweener _tweener;
 
 		public GearColor(GObject owner)
 			: base(owner)
@@ -91,12 +88,12 @@ namespace FairyGUI
 					_owner._gearLocked = false;
 				}
 
-				if (tweener != null)
+				if (_tweener != null)
 				{
-					if (_tweenTarget.color != gv.color)
+					if (_tweener.endValue.color != gv.color)
 					{
-						tweener.Kill(true);
-						tweener = null;
+						_tweener.Kill(true);
+						_tweener = null;
 					}
 					else
 						return;
@@ -106,35 +103,12 @@ namespace FairyGUI
 				{
 					if (_owner.CheckGearController(0, _controller))
 						_displayLockToken = _owner.AddDisplayLock();
-					_tweenTarget = gv;
 
-					tweener = DOTween.To(() => ((IColorGear)_owner).color, v =>
-					{
-						_owner._gearLocked = true;
-						((IColorGear)_owner).color = v;
-						_owner._gearLocked = false;
-					}, gv.color, tweenTime)
-					.SetEase(easeType)
-					.SetUpdate(true)
-					.SetRecyclable()
-					.OnUpdate(() =>
-					{
-						_owner.InvalidateBatchingState();
-					})
-					.OnComplete(() =>
-					{
-						tweener = null;
-						if (_displayLockToken != 0)
-						{
-							_owner.ReleaseDisplayLock(_displayLockToken);
-							_displayLockToken = 0;
-						}
-						_owner.InvalidateBatchingState();
-						_owner.OnGearStop.Call(this);
-					});
-
-					if (delay > 0)
-						tweener.SetDelay(delay);
+					_tweener = GTween.To(((IColorGear)_owner).color, gv.color, tweenTime)
+						.SetDelay(delay)
+						.SetEase(easeType)
+						.SetTarget(this)
+						.SetListener(this);
 				}
 			}
 			else
@@ -145,6 +119,30 @@ namespace FairyGUI
 					((ITextColorGear)_owner).strokeColor = gv.strokeColor;
 				_owner._gearLocked = false;
 			}
+		}
+
+		public void OnTweenStart(GTweener tweener)
+		{
+		}
+
+		public void OnTweenUpdate(GTweener tweener)
+		{
+			_owner._gearLocked = true;
+			((IColorGear)_owner).color = tweener.value.color;
+			_owner._gearLocked = false;
+
+			_owner.InvalidateBatchingState();
+		}
+
+		public void OnTweenComplete(GTweener tweener)
+		{
+			_tweener = null;
+			if (_displayLockToken != 0)
+			{
+				_owner.ReleaseDisplayLock(_displayLockToken);
+				_displayLockToken = 0;
+			}
+			_owner.OnGearStop.Call(this);
 		}
 
 		override public void UpdateState()

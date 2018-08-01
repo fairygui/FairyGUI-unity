@@ -26,7 +26,7 @@ namespace FairyGUI
 		{
 			_content = new MovieClip();
 			_content.gOwner = this;
-			_content.playState.ignoreTimeScale = true;
+			_content.ignoreEngineTimeScale = true;
 			displayObject = _content;
 		}
 
@@ -48,10 +48,10 @@ namespace FairyGUI
 		/// </summary>
 		public int frame
 		{
-			get { return _content.currentFrame; }
+			get { return _content.frame; }
 			set
 			{
-				_content.currentFrame = value;
+				_content.frame = value;
 				UpdateGear(5);
 			}
 		}
@@ -97,6 +97,50 @@ namespace FairyGUI
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		public float timeScale
+		{
+			get { return _content.timeScale; }
+			set { _content.timeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ignoreEngineTimeScale
+		{
+			get { return _content.ignoreEngineTimeScale; }
+			set { _content.ignoreEngineTimeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Rewind()
+		{
+			_content.Rewind();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="anotherMc"></param>
+		public void SyncStatus(GMovieClip anotherMc)
+		{
+			_content.SyncStatus(anotherMc._content);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="time"></param>
+		public void Advance(float time)
+		{
+			_content.Advance(time);
+		}
+
+		/// <summary>
 		/// Play from the start to end, repeat times, set to endAt on complete.
 		/// 从start帧开始，播放到end帧（-1表示结尾），重复times次（0表示无限循环），循环结束后，停止在endAt帧（-1表示参数end）
 		/// </summary>
@@ -132,7 +176,7 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("frame");
 			if (str != null)
-				_content.currentFrame = int.Parse(str);
+				_content.frame = int.Parse(str);
 			_content.playing = xml.GetAttributeBool("playing", true);
 
 			str = xml.GetAttribute("color");

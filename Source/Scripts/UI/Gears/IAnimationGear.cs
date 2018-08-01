@@ -15,5 +15,21 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		int frame { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		float timeScale { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		bool ignoreEngineTimeScale { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="time"></param>
+		void Advance(float time);
 	}
 }

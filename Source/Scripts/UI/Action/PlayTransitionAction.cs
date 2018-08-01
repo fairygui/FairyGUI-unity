@@ -5,7 +5,7 @@ namespace FairyGUI
 	public class PlayTransitionAction : ControllerAction
 	{
 		public string transitionName;
-		public int repeat;
+		public int playTimes;
 		public float delay;
 		public bool stopOnExit;
 
@@ -13,7 +13,7 @@ namespace FairyGUI
 
 		public PlayTransitionAction()
 		{
-			repeat = 1;
+			playTimes = 1;
 			delay = 0;
 		}
 
@@ -23,9 +23,9 @@ namespace FairyGUI
 			if (trans != null)
 			{
 				if (_currentTransition != null && _currentTransition.playing)
-					trans.ChangeRepeat(repeat);
+					trans.ChangePlayTimes(playTimes);
 				else
-					trans.Play(repeat, delay, null);
+					trans.Play(playTimes, delay, null);
 				_currentTransition = trans;
 			}
 		}
@@ -44,7 +44,7 @@ namespace FairyGUI
 			base.Setup(xml);
 
 			transitionName = xml.GetAttribute("transition");
-			repeat = xml.GetAttributeInt("repeat", 1);
+			playTimes = xml.GetAttributeInt("repeat", 1);
 			delay = xml.GetAttributeFloat("delay", 0);
 			stopOnExit = xml.GetAttributeBool("stopOnExit", false);
 		}

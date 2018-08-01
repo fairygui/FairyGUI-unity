@@ -12,7 +12,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public struct Frame
+		public class Frame
 		{
 			public Rect rect;
 			public float addDelay;
@@ -48,34 +48,50 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public PlayState playState { get; private set; }
+		public float timeScale;
+
+		/// <summary>
+		/// Whether to ignore Unity time scale.
+		/// </summary>
+		public bool ignoreEngineTimeScale;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		public EventListener onPlayEnd { get; private set; }
 
-		int _currentFrame;
+		int _frame;
 		bool _playing;
 		int _start;
 		int _end;
 		int _times;
 		int _endAt;
 		int _status; //0-none, 1-next loop, 2-ending, 3-ended
-		bool _forceDraw;
-		EventCallback0 _playEndDelegate;
+
+		float _frameElapsed; //当前帧延迟
+		bool _reversed;
+		int _repeatedCount;
+		int _displayFrame;
+		TimerCallback _timerDelegate;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		public MovieClip()
 		{
-			playState = new PlayState();
 			interval = 0.1f;
 			_playing = true;
+			_timerDelegate = OnTimer;
+			timeScale = 1;
+			ignoreEngineTimeScale = false;
 
 			onPlayEnd = new EventListener(this, "onPlayEnd");
-			_playEndDelegate = () => { onPlayEnd.Call(); };
+
+			if (Application.isPlaying)
+			{
+				onAddedToStage.Add(OnAddedToStage);
+				onRemovedFromStage.Add(OnRemoveFromStage);
+			}
 
 			SetPlaySettings();
 		}
@@ -96,12 +112,17 @@ namespace FairyGUI
 				_end = frameCount - 1;
 			if (_endAt == -1 || _endAt > frameCount - 1)
 				_endAt = frameCount - 1;
-			playState.Rewind();
 
 			graphics.texture = texture;
 			OnSizeChanged(true, true);
 			InvalidateBatchingState();
-			_forceDraw = true;
+
+			_displayFrame = -1;
+			_frameElapsed = 0;
+			_repeatedCount = 0;
+			_reversed = false;
+
+			CheckTimer();
 		}
 
 		/// <summary>
@@ -120,23 +141,119 @@ namespace FairyGUI
 		public bool playing
 		{
 			get { return _playing; }
-			set { _playing = value; }
+			set
+			{
+				if (_playing != value)
+				{
+					_playing = value;
+					CheckTimer();
+				}
+			}
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public int currentFrame
+		public int frame
 		{
-			get { return _currentFrame; }
+			get { return _frame; }
 			set
 			{
-				if (_currentFrame != value)
+				if (_frame != value)
 				{
-					_currentFrame = value;
-					playState.currrentFrame = value;
-					if (frameCount > 0)
-						_forceDraw = true;
+					if (frames != null && value >= frameCount)
+						value = frameCount - 1;
+
+					_frame = value;
+					_frameElapsed = 0;
+					_displayFrame = -1;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Rewind()
+		{
+			_frame = 0;
+			_frameElapsed = 0;
+			_reversed = false;
+			_repeatedCount = 0;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="anotherMc"></param>
+		public void SyncStatus(MovieClip anotherMc)
+		{
+			_frame = anotherMc._frame;
+			_frameElapsed = anotherMc._frameElapsed;
+			_reversed = anotherMc._reversed;
+			_repeatedCount = anotherMc._repeatedCount;
+			_displayFrame = -1;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="time"></param>
+		public void Advance(float time)
+		{
+			int beginFrame = _frame;
+			bool beginReversed = _reversed;
+			float backupTime = time;
+			while (true)
+			{
+				float tt = interval + frames[_frame].addDelay;
+				if (_frame == 0 && _repeatedCount > 0)
+					tt += repeatDelay;
+				if (time < tt)
+				{
+					_frameElapsed = 0;
+					break;
+				}
+
+				time -= tt;
+
+				if (swing)
+				{
+					if (_reversed)
+					{
+						_frame--;
+						if (_frame <= 0)
+						{
+							_frame = 0;
+							_repeatedCount++;
+							_reversed = !_reversed;
+						}
+					}
+					else
+					{
+						_frame++;
+						if (_frame > frameCount - 1)
+						{
+							_frame = Mathf.Max(0, frameCount - 2);
+							_repeatedCount++;
+							_reversed = !_reversed;
+						}
+					}
+				}
+				else
+				{
+					_frame++;
+					if (_frame > frameCount - 1)
+					{
+						_frame = 0;
+						_repeatedCount++;
+					}
+				}
+
+				if (_frame == beginFrame && _reversed == beginReversed) //走了一轮了
+				{
+					float roundTime = backupTime - time; //这就是一轮需要的时间
+					time -= Mathf.FloorToInt(time / roundTime) * roundTime; //跳过
 				}
 			}
 		}
@@ -166,8 +283,119 @@ namespace FairyGUI
 			_endAt = endAt;
 			if (_endAt == -1)
 				_endAt = _end;
-			this.currentFrame = start;
 			_status = 0;
+			this.frame = start;
+		}
+
+		void OnAddedToStage()
+		{
+			if (_playing && frameCount > 0)
+				Timers.inst.AddUpdate(_timerDelegate);
+		}
+
+		void OnRemoveFromStage()
+		{
+			Timers.inst.Remove(_timerDelegate);
+		}
+
+		void CheckTimer()
+		{
+			if (!Application.isPlaying)
+				return;
+
+			if (_playing && frameCount > 0 && this.stage != null)
+				Timers.inst.AddUpdate(_timerDelegate);
+			else
+				Timers.inst.Remove(_timerDelegate);
+		}
+
+		void OnTimer(object param)
+		{
+			if (!_playing || frameCount == 0 || _status == 3)
+				return;
+
+			float dt;
+			if (ignoreEngineTimeScale)
+				dt = Time.unscaledDeltaTime;
+			else
+				dt = Time.deltaTime;
+			if (timeScale != 1)
+				dt *= timeScale;
+
+			_frameElapsed += dt;
+			float tt = interval + frames[_frame].addDelay;
+			if (_frame == 0 && _repeatedCount > 0)
+				tt += repeatDelay;
+			if (_frameElapsed < tt)
+				return;
+
+			_frameElapsed -= tt;
+			if (_frameElapsed > interval)
+				_frameElapsed = interval;
+
+			if (swing)
+			{
+				if (_reversed)
+				{
+					_frame--;
+					if (_frame <= 0)
+					{
+						_frame = 0;
+						_repeatedCount++;
+						_reversed = !_reversed;
+					}
+				}
+				else
+				{
+					_frame++;
+					if (_frame > frameCount - 1)
+					{
+						_frame = Mathf.Max(0, frameCount - 2);
+						_repeatedCount++;
+						_reversed = !_reversed;
+					}
+				}
+			}
+			else
+			{
+				_frame++;
+				if (_frame > frameCount - 1)
+				{
+					_frame = 0;
+					_repeatedCount++;
+				}
+			}
+
+			if (_status == 1) //new loop
+			{
+				_frame = _start;
+				_frameElapsed = 0;
+				_status = 0;
+			}
+			else if (_status == 2) //ending
+			{
+				_frame = _endAt;
+				_frameElapsed = 0;
+				_status = 3; //ended
+
+				onPlayEnd.Call();
+			}
+			else
+			{
+				if (_frame == _end)
+				{
+					if (_times > 0)
+					{
+						_times--;
+						if (_times == 0)
+							_status = 2;  //ending
+						else
+							_status = 1; //new loop
+					}
+					else if (_start != 0)
+						_status = 1; //new loop
+				}
+			}
 		}
 
 		/// <summary>
@@ -176,46 +404,7 @@ namespace FairyGUI
 		/// <param name="context"></param>
 		public override void Update(UpdateContext context)
 		{
-			if (_playing && frameCount != 0 && _status != 3)
-			{
-				playState.Update(this, context);
-				if (_forceDraw || _currentFrame != playState.currrentFrame)
-				{
-					if (_status == 1)
-					{
-						_currentFrame = _start;
-						playState.currrentFrame = _currentFrame;
-						_status = 0;
-					}
-					else if (_status == 2)
-					{
-						_currentFrame = _endAt;
-						playState.currrentFrame = _currentFrame;
-						_status = 3;
-
-						UpdateContext.OnEnd += _playEndDelegate;
-					}
-					else
-					{
-						_currentFrame = playState.currrentFrame;
-						if (_currentFrame == _end)
-						{
-							if (_times > 0)
-							{
-								_times--;
-								if (_times == 0)
-									_status = 2;
-								else
-									_status = 1;
-							}
-							else if (_start != 0)
-								_status = 1;
-						}
-					}
-					DrawFrame();
-				}
-			}
-			else if (_forceDraw)
+			if (frameCount > 0 && _frame != _displayFrame)
 				DrawFrame();
 
 			base.Update(context);
@@ -223,13 +412,13 @@ namespace FairyGUI
 
 		void DrawFrame()
 		{
-			_forceDraw = false;
+			_displayFrame = _frame;
 
-			if (_currentFrame >= frames.Length)
+			if (_frame >= frames.Length)
 				graphics.ClearMesh();
 			else
 			{
-				Frame frame = frames[_currentFrame];
+				Frame frame = frames[_frame];
 
 				if (frame.rect.width == 0)
 					graphics.ClearMesh();

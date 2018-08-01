@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using DG.Tweening;
-using FairyGUI.Utils;
 using UnityEngine;
 
 namespace FairyGUI
@@ -20,13 +18,11 @@ namespace FairyGUI
 	/// <summary>
 	/// Gear is a connection between object and controller.
 	/// </summary>
-	public class GearXY : GearBase
+	public class GearXY : GearBase, ITweenListener
 	{
-		public Tweener tweener { get; private set; }
-
 		Dictionary<string, GearXYValue> _storage;
 		GearXYValue _default;
-		GearXYValue _tweenTarget;
+		GTweener _tweener;
 
 		public GearXY(GObject owner)
 			: base(owner)
@@ -62,12 +58,12 @@ namespace FairyGUI
 
 			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
 			{
-				if (tweener != null)
+				if (_tweener != null)
 				{
-					if (_tweenTarget.x != gv.x || _tweenTarget.y != gv.y)
+					if (_tweener.endValue.x != gv.x || _tweener.endValue.y != gv.y)
 					{
-						tweener.Kill(true);
-						tweener = null;
+						_tweener.Kill(true);
+						_tweener = null;
 					}
 					else
 						return;
@@ -77,35 +73,12 @@ namespace FairyGUI
 				{
 					if (_owner.CheckGearController(0, _controller))
 						_displayLockToken = _owner.AddDisplayLock();
-					_tweenTarget = gv;
 
-					tweener = DOTween.To(() => new Vector2(_owner.x, _owner.y), v =>
-					{
-						_owner._gearLocked = true;
-						_owner.SetXY(v.x, v.y);
-						_owner._gearLocked = false;
-					}, new Vector2(gv.x, gv.y), tweenTime)
-					.SetEase(easeType)
-					.SetUpdate(true)
-					.SetRecyclable()
-					.OnUpdate(() =>
-					{
-						_owner.InvalidateBatchingState();
-					})
-					.OnComplete(() =>
-					{
-						tweener = null;
-						if (_displayLockToken != 0)
-						{
-							_owner.ReleaseDisplayLock(_displayLockToken);
-							_displayLockToken = 0;
-						}
-						_owner.InvalidateBatchingState();
-						_owner.OnGearStop.Call(this);
-					});
-
-					if (delay > 0)
-						tweener.SetDelay(delay);
+					_tweener = GTween.To(_owner.xy, new Vector2(gv.x, gv.y), tweenTime)
+						.SetDelay(delay)
+						.SetEase(easeType)
+						.SetTarget(this)
+						.SetListener(this);
 				}
 			}
 			else
@@ -114,6 +87,30 @@ namespace FairyGUI
 				_owner.SetXY(gv.x, gv.y);
 				_owner._gearLocked = false;
 			}
+		}
+
+		public void OnTweenStart(GTweener tweener)
+		{//nothing
+		}
+
+		public void OnTweenUpdate(GTweener tweener)
+		{
+			_owner._gearLocked = true;
+			_owner.SetXY(tweener.value.x, tweener.value.y);
+			_owner._gearLocked = false;
+
+			_owner.InvalidateBatchingState();
+		}
+
+		public void OnTweenComplete(GTweener tweener)
+		{
+			_tweener = null;
+			if (_displayLockToken != 0)
+			{
+				_owner.ReleaseDisplayLock(_displayLockToken);
+				_displayLockToken = 0;
+			}
+			_owner.OnGearStop.Call(this);
 		}
 
 		override public void UpdateState()

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FairyGUI;
-using DG.Tweening;
-using UnityEngine;
+﻿using FairyGUI;
 
 public class Card : GButton
 {
@@ -27,8 +23,7 @@ public class Card : GButton
 
 		set
 		{
-			if (DOTween.IsTweening(this))
-				DOTween.Kill(this);
+			GTween.Kill(this);
 
 			_front.visible = value;
 			_back.visible = !value;
@@ -43,32 +38,36 @@ public class Card : GButton
 
 	public void Turn()
 	{
-		if (DOTween.IsTweening(this))
+		if (GTween.IsTweening(this))
 			return;
 
 		bool toOpen = !_front.visible;
-		DOTween.To(() => 0, x =>
+		GTween.To(0, 180, 0.8f).SetTarget(this).SetEase(EaseType.QuadOut).OnUpdate(TurnInTween).SetUserData(toOpen);
+	}
+
+	void TurnInTween(GTweener tweener)
+	{
+		bool toOpen = (bool)tweener.userData;
+		float v = tweener.value.x;
+		if (toOpen)
 		{
-			if (toOpen)
+			_back.rotationY = v;
+			_front.rotationY = -180 + v;
+			if (v > 90)
 			{
-				_back.rotationY = x;
-				_front.rotationY = -180 + x;
-				if (x > 90)
-				{
-					_front.visible = true;
-					_back.visible = false;
-				}
+				_front.visible = true;
+				_back.visible = false;
 			}
-			else
+		}
+		else
+		{
+			_back.rotationY = -180 + v;
+			_front.rotationY = v;
+			if (v > 90)
 			{
-				_back.rotationY = -180 + x;
-				_front.rotationY = x;
-				if (x > 90)
-				{
-					_front.visible = false;
-					_back.visible = true;
-				}
+				_front.visible = false;
+				_back.visible = true;
 			}
-		}, 180, 0.8f).SetTarget(this).SetEase(Ease.OutQuad);
+		}
 	}
 }

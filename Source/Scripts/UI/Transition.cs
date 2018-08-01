@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FairyGUI.Utils;
-using DG.Tweening;
-using DG.Tweening.Core;
 using UnityEngine;
 
 namespace FairyGUI
@@ -20,7 +18,7 @@ namespace FairyGUI
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Transition
+	public class Transition : ITweenListener
 	{
 		/// <summary>
 		/// 动效的名称。在编辑器里设定。
@@ -28,35 +26,31 @@ namespace FairyGUI
 		public string name { get; private set; }
 
 		/// <summary>
-		/// 自动播放的次数。
-		/// </summary>
-		public int autoPlayRepeat;
-
-		/// <summary>
-		/// 自动播放的延迟时间。
-		/// </summary>
-		public float autoPlayDelay;
-
-		/// <summary>
 		/// 当你启动了自动合批，动效里有涉及到XY、大小、旋转等的改变，如果你观察到元件的显示深度在播放过程中有错误，可以开启这个选项。
 		/// </summary>
 		public bool invalidateBatchingEveryFrame;
 
 		GComponent _owner;
-		List<TransitionItem> _items;
+		TransitionItem[] _items;
 		int _totalTimes;
 		int _totalTasks;
 		bool _playing;
+		bool _paused;
 		float _ownerBaseX;
 		float _ownerBaseY;
 		PlayCompleteCallback _onComplete;
 		int _options;
 		bool _reversed;
-		float _maxTime;
+		float _totalDuration;
 		bool _autoPlay;
+		int _autoPlayTimes;
+		float _autoPlayDelay;
 		float _timeScale;
-
-		const int FRAME_RATE = 24;
+		bool _ignoreEngineTimeScale;
+		float _startTime;
+		float _endTime;
+		GTweenCallback _delayedCallDelegate;
+		GTweenCallback1 _delayedCallDelegate2;
 
 		const int OPTION_IGNORE_DISPLAY_CONTROLLER = 1;
 		const int OPTION_AUTO_STOP_DISABLED = 2;
@@ -65,34 +59,11 @@ namespace FairyGUI
 		public Transition(GComponent owner)
 		{
 			_owner = owner;
-			_items = new List<TransitionItem>();
-			autoPlayRepeat = 1;
 			_timeScale = 1;
-		}
+			_ignoreEngineTimeScale = true;
 
-		/// <summary>
-		/// 动效是否自动播放。
-		/// </summary>
-		public bool autoPlay
-		{
-			get { return _autoPlay; }
-			set
-			{
-				if (_autoPlay != value)
-				{
-					_autoPlay = value;
-					if (_autoPlay)
-					{
-						if (_owner.onStage)
-							Play(autoPlayRepeat, autoPlayDelay, null);
-					}
-					else
-					{
-						if (!_owner.onStage)
-							Stop(false, true);
-					}
-				}
-			}
+			_delayedCallDelegate = OnDelayedPlay;
+			_delayedCallDelegate2 = OnDelayedPlayItem;
 		}
 
 		/// <summary>
@@ -100,7 +71,7 @@ namespace FairyGUI
 		/// </summary>
 		public void Play()
 		{
-			Play(1, 0, null);
+			_Play(1, 0, 0, -1, null, false);
 		}
 
 		/// <summary>
@@ -109,7 +80,7 @@ namespace FairyGUI
 		/// <param name="onComplete"></param>
 		public void Play(PlayCompleteCallback onComplete)
 		{
-			Play(1, 0, onComplete);
+			_Play(1, 0, 0, -1, onComplete, false);
 		}
 
 		/// <summary>
@@ -120,7 +91,20 @@ namespace FairyGUI
 		/// <param name="onComplete"></param>
 		public void Play(int times, float delay, PlayCompleteCallback onComplete)
 		{
-			_Play(times, delay, onComplete, false);
+			_Play(times, delay, 0, -1, onComplete, false);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="times"></param>
+		/// <param name="delay"></param>
+		/// <param name="startTime"></param>
+		/// <param name="endTime"></param>
+		/// <param name="onComplete"></param>
+		public void Play(int times, float delay, float startTime, float endTime, PlayCompleteCallback onComplete)
+		{
+			_Play(times, delay, startTime, endTime, onComplete, false);
 		}
 
 		/// <summary>
@@ -128,7 +112,7 @@ namespace FairyGUI
 		/// </summary>
 		public void PlayReverse()
 		{
-			PlayReverse(1, 0, null);
+			_Play(1, 0, 0, -1, null, true);
 		}
 
 		/// <summary>
@@ -137,7 +121,7 @@ namespace FairyGUI
 		/// <param name="onComplete"></param>
 		public void PlayReverse(PlayCompleteCallback onComplete)
 		{
-			PlayReverse(1, 0, onComplete);
+			_Play(1, 0, 0, -1, onComplete, true);
 		}
 
 		/// <summary>
@@ -148,40 +132,110 @@ namespace FairyGUI
 		/// <param name="onComplete"></param>
 		public void PlayReverse(int times, float delay, PlayCompleteCallback onComplete)
 		{
-			_Play(times, delay, onComplete, true);
+			_Play(times, delay, 0, -1, onComplete, true);
 		}
 
-		public void ChangeRepeat(int value)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		public void ChangePlayTimes(int value)
 		{
 			_totalTimes = value;
 		}
 
-		void _Play(int times, float delay, PlayCompleteCallback onComplete, bool reverse)
+		/// <summary>
+		/// 设置动效是否自动播放。
+		/// </summary>
+		/// <param name="autoPlay"></param>
+		/// <param name="times"></param>
+		/// <param name="delay"></param>
+		public void SetAutoPlay(bool autoPlay, int times, float delay)
+		{
+			if (_autoPlay != autoPlay)
+			{
+				_autoPlay = autoPlay;
+				_autoPlayTimes = times;
+				_autoPlayDelay = delay;
+				if (_autoPlay)
+				{
+					if (_owner.onStage)
+						Play(times, delay, null);
+				}
+				else
+				{
+					if (!_owner.onStage)
+						Stop(false, true);
+				}
+			}
+		}
+
+		void _Play(int times, float delay, float startTime, float endTime, PlayCompleteCallback onComplete, bool reverse)
 		{
 			Stop(true, true);
 
 			_totalTimes = times;
 			_reversed = reverse;
+			_startTime = startTime;
+			_endTime = endTime;
+			_playing = true;
+			_paused = false;
+			_onComplete = onComplete;
 
-			InternalPlay(delay);
-			_playing = _totalTasks > 0;
-			if (_playing)
+			int cnt = _items.Length;
+			for (int i = 0; i < cnt; i++)
 			{
-				_onComplete = onComplete;
-
-				if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0)
+				TransitionItem item = _items[i];
+				if (item.target == null)
 				{
-					int cnt = _items.Count;
-					for (int i = 0; i < cnt; i++)
+					if (item.targetId.Length > 0)
+						item.target = _owner.GetChildById(item.targetId);
+					else
+						item.target = _owner;
+				}
+				else if (item.target != _owner && item.target.parent != _owner) //maybe removed
+					item.target = null;
+
+				if (item.target != null && item.type == TransitionActionType.Transition)
+				{
+					TValue_Transition value = (TValue_Transition)item.value;
+					Transition trans = ((GComponent)item.target).GetTransition(value.transName);
+					if (trans == this)
+						trans = null;
+					if (trans != null)
 					{
-						TransitionItem item = _items[i];
-						if (item.target != null && item.target != _owner)
-							item.displayLockToken = item.target.AddDisplayLock();
+						if (value.playTimes == 0) //stop
+						{
+							int j;
+							for (j = i - 1; j >= 0; j--)
+							{
+								TransitionItem item2 = _items[j];
+								if (item2.type == TransitionActionType.Transition)
+								{
+									TValue_Transition value2 = (TValue_Transition)item2.value;
+									if (value2.trans == trans)
+									{
+										value2.stopTime = item.time - item2.time;
+										break;
+									}
+								}
+							}
+							if (j < 0)
+								value.stopTime = 0;
+							else
+								trans = null; //no need to handle stop anymore
+						}
+						else
+							value.stopTime = -1;
 					}
+					value.trans = trans;
 				}
 			}
-			else if (onComplete != null)
-				onComplete();
+
+			if (delay == 0)
+				OnDelayedPlay();
+			else
+				GTween.DelayedCall(delay).SetTarget(this).OnComplete(_delayedCallDelegate);
 		}
 
 		/// <summary>
@@ -199,40 +253,44 @@ namespace FairyGUI
 		/// <param name="processCallback"></param>
 		public void Stop(bool setToComplete, bool processCallback)
 		{
-			if (_playing)
+			if (!_playing)
+				return;
+
+			_playing = false;
+			_totalTasks = 0;
+			_totalTimes = 0;
+			PlayCompleteCallback func = _onComplete;
+			_onComplete = null;
+
+			GTween.Kill(this);//delay start
+
+			int cnt = _items.Length;
+			if (_reversed)
 			{
-				_playing = false;
-				_totalTasks = 0;
-				_totalTimes = 0;
-				PlayCompleteCallback func = _onComplete;
-				_onComplete = null;
-
-				int cnt = _items.Count;
-				if (_reversed)
+				for (int i = cnt - 1; i >= 0; i--)
 				{
-					for (int i = cnt - 1; i >= 0; i--)
-					{
-						TransitionItem item = _items[i];
-						if (item.target == null)
-							continue;
+					TransitionItem item = _items[i];
+					if (item.target == null)
+						continue;
 
-						StopItem(item, setToComplete);
-					}
+					StopItem(item, setToComplete);
 				}
-				else
-				{
-					for (int i = 0; i < cnt; i++)
-					{
-						TransitionItem item = _items[i];
-						if (item.target == null)
-							continue;
-
-						StopItem(item, setToComplete);
-					}
-				}
-				if (processCallback && func != null)
-					func();
 			}
+			else
+			{
+				for (int i = 0; i < cnt; i++)
+				{
+					TransitionItem item = _items[i];
+					if (item.target == null)
+						continue;
+
+					StopItem(item, setToComplete);
+				}
+			}
+
+			if (processCallback && func != null)
+				func();
+
 		}
 
 		void StopItem(TransitionItem item, bool setToComplete)
@@ -243,48 +301,77 @@ namespace FairyGUI
 				item.displayLockToken = 0;
 			}
 
-			if (item.type == TransitionActionType.ColorFilter)
-				((TransitionItem_ColorFilter)item).ClearFilter();
-
-			if (item.completed)
-				return;
-
 			if (item.tweener != null)
 			{
-				item.tweener.Kill();
+				item.tweener.Kill(setToComplete);
 				item.tweener = null;
+
+				if (item.type == TransitionActionType.Shake && !setToComplete) //震动必须归位，否则下次就越震越远了。
+				{
+					item.target._gearLocked = true;
+					item.target.SetXY(item.target.x - ((TValue_Shake)item.value).lastOffset.x, item.target.y - ((TValue_Shake)item.value).lastOffset.y);
+					item.target._gearLocked = false;
+
+					_owner.InvalidateBatchingState(true);
+				}
 			}
 
 			if (item.type == TransitionActionType.Transition)
 			{
-				Transition trans = ((GComponent)item.target).GetTransition(((TransitionItem_Transition)item).transName);
-				if (trans != null)
-					trans.Stop(setToComplete, false);
+				TValue_Transition value = (TValue_Transition)item.value;
+				if (value.trans != null)
+					value.trans.Stop(setToComplete, false);
 			}
-			else if (item.type == TransitionActionType.Shake)
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paused"></param>
+		public void SetPaused(bool paused)
+		{
+			if (!_playing || _paused == paused)
+				return;
+
+			_paused = paused;
+			GTweener tweener = GTween.GetTween(this);
+			if (tweener != null)
+				tweener.SetPaused(paused);
+
+			int cnt = _items.Length;
+			for (int i = 0; i < cnt; i++)
 			{
-				((TransitionItem_Shake)item).Stop(true);
-			}
-			else
-			{
-				if (setToComplete)
+				TransitionItem item = _items[i];
+				if (item.target == null)
+					continue;
+
+				if (item.type == TransitionActionType.Transition)
 				{
-					if (item.tween)
-					{
-						if (!item.yoyo || item.repeat % 2 == 0)
-							ApplyValue(item, _reversed ? item.startValue : item.endValue);
-						else
-							ApplyValue(item, _reversed ? item.endValue : item.startValue);
-					}
-					else if (item.type != TransitionActionType.Sound)
-						ApplyValue(item, item.value);
+					if (((TValue_Transition)item.value).trans != null)
+						((TValue_Transition)item.value).trans.SetPaused(paused);
 				}
+				else if (item.type == TransitionActionType.Animation)
+				{
+					if (paused)
+					{
+						((TValue_Animation)item.value).flag = ((IAnimationGear)item.target).playing;
+						((IAnimationGear)item.target).playing = false;
+					}
+					else
+						((IAnimationGear)item.target).playing = ((TValue_Animation)item.value).flag;
+				}
+
+				if (item.tweener != null)
+					item.tweener.SetPaused(paused);
 			}
 		}
 
 		public void Dispose()
 		{
-			int cnt = _items.Count;
+			if (_playing)
+				GTween.Kill(this);//delay start
+
+			int cnt = _items.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
@@ -293,17 +380,13 @@ namespace FairyGUI
 					item.tweener.Kill();
 					item.tweener = null;
 				}
-				else if (_playing && item.type == TransitionActionType.Shake)
-				{
-					((TransitionItem_Shake)item).Stop(false);
-				}
 
 				item.target = null;
 				item.hook = null;
-				item.hook2 = null;
+				if (item.tweenConfig != null)
+					item.tweenConfig.endHook = null;
 			}
 
-			_items.Clear();
 			_playing = false;
 			_onComplete = null;
 		}
@@ -323,21 +406,21 @@ namespace FairyGUI
 		/// <param name="aParams"></param>
 		public void SetValue(string label, params object[] aParams)
 		{
-			int cnt = _items.Count;
-			TransitionValue value;
+			int cnt = _items.Length;
+			object value;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
 				if (item.label == label)
 				{
-					if (item.tween)
-						value = item.startValue;
+					if (item.tweenConfig != null)
+						value = item.tweenConfig.startValue;
 					else
 						value = item.value;
 				}
-				else if (item.label2 == label)
+				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
 				{
-					value = item.endValue;
+					value = item.tweenConfig.endValue;
 				}
 				else
 					continue;
@@ -349,57 +432,74 @@ namespace FairyGUI
 					case TransitionActionType.Pivot:
 					case TransitionActionType.Scale:
 					case TransitionActionType.Skew:
-						value.b1 = true;
-						value.b2 = true;
-						value.f1 = Convert.ToSingle(aParams[0]);
-						value.f2 = Convert.ToSingle(aParams[1]);
+						{
+							TValue tvalue = (TValue)value;
+							tvalue.b1 = true;
+							tvalue.b2 = true;
+							tvalue.f1 = Convert.ToSingle(aParams[0]);
+							tvalue.f2 = Convert.ToSingle(aParams[1]);
+						}
 						break;
 
 					case TransitionActionType.Alpha:
-						value.f1 = Convert.ToSingle(aParams[0]);
+						((TValue)value).f1 = Convert.ToSingle(aParams[0]);
 						break;
 
 					case TransitionActionType.Rotation:
-						value.f1 = Convert.ToSingle(aParams[0]);
+						((TValue)value).f1 = Convert.ToSingle(aParams[0]);
 						break;
 
 					case TransitionActionType.Color:
-						value.AsColor = (Color)aParams[0];
+						((TValue)value).color = (Color)aParams[0];
 						break;
 
 					case TransitionActionType.Animation:
-						((TransitionItem_Animation)item).frame = Convert.ToInt32(aParams[0]);
-						if (aParams.Length > 1)
-							((TransitionItem_Animation)item).playing = Convert.ToBoolean(aParams[1]);
+						{
+							TValue_Animation tvalue = (TValue_Animation)value;
+							tvalue.frame = Convert.ToInt32(aParams[0]);
+							if (aParams.Length > 1)
+								tvalue.playing = Convert.ToBoolean(aParams[1]);
+						}
 						break;
 
 					case TransitionActionType.Visible:
-						((TransitionItem_Visible)item).visible = Convert.ToBoolean(aParams[0]);
+						((TValue_Visible)value).visible = Convert.ToBoolean(aParams[0]);
 						break;
 
 					case TransitionActionType.Sound:
-						((TransitionItem_Sound)item).sound = (string)aParams[0];
-						if (aParams.Length > 1)
-							((TransitionItem_Sound)item).volume = Convert.ToSingle(aParams[1]);
+						{
+							TValue_Sound tvalue = (TValue_Sound)value;
+							tvalue.sound = (string)aParams[0];
+							if (aParams.Length > 1)
+								tvalue.volume = Convert.ToSingle(aParams[1]);
+						}
 						break;
 
 					case TransitionActionType.Transition:
-						((TransitionItem_Transition)item).transName = (string)aParams[0];
-						if (aParams.Length > 1)
-							((TransitionItem_Transition)item).transRepeat = Convert.ToInt32(aParams[1]);
+						{
+							TValue_Transition tvalue = (TValue_Transition)value;
+							tvalue.transName = (string)aParams[0];
+							if (aParams.Length > 1)
+								tvalue.playTimes = Convert.ToInt32(aParams[1]);
+						}
 						break;
 
 					case TransitionActionType.Shake:
-						((TransitionItem_Shake)item).shakeAmplitude = Convert.ToSingle(aParams[0]);
-						if (aParams.Length > 1)
-							((TransitionItem_Shake)item).shakePeriod = Convert.ToSingle(aParams[1]);
+						{
+							((TValue_Shake)value).amplitude = Convert.ToSingle(aParams[0]);
+							if (aParams.Length > 1)
+								((TValue_Shake)value).duration = Convert.ToSingle(aParams[1]);
+						}
 						break;
 
 					case TransitionActionType.ColorFilter:
-						value.f1 = Convert.ToSingle(aParams[0]);
-						value.f2 = Convert.ToSingle(aParams[1]);
-						value.f3 = Convert.ToSingle(aParams[2]);
-						value.f4 = Convert.ToSingle(aParams[3]);
+						{
+							TValue tvalue = (TValue)value;
+							tvalue.f1 = Convert.ToSingle(aParams[0]);
+							tvalue.f2 = Convert.ToSingle(aParams[1]);
+							tvalue.f3 = Convert.ToSingle(aParams[2]);
+							tvalue.f4 = Convert.ToSingle(aParams[3]);
+						}
 						break;
 				}
 			}
@@ -412,7 +512,7 @@ namespace FairyGUI
 		/// <param name="callback"></param>
 		public void SetHook(string label, TransitionHook callback)
 		{
-			int cnt = _items.Count;
+			int cnt = _items.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
@@ -421,9 +521,9 @@ namespace FairyGUI
 					item.hook = callback;
 					break;
 				}
-				else if (item.label2 == label)
+				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
 				{
-					item.hook2 = callback;
+					item.tweenConfig.endHook = callback;
 					break;
 				}
 			}
@@ -434,12 +534,13 @@ namespace FairyGUI
 		/// </summary>
 		public void ClearHooks()
 		{
-			int cnt = _items.Count;
+			int cnt = _items.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
 				item.hook = null;
-				item.hook2 = null;
+				if (item.tweenConfig != null)
+					item.tweenConfig.endHook = null;
 			}
 		}
 
@@ -450,7 +551,7 @@ namespace FairyGUI
 		/// <param name="newTarget"></param>
 		public void SetTarget(string label, GObject newTarget)
 		{
-			int cnt = _items.Count;
+			int cnt = _items.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
@@ -466,13 +567,33 @@ namespace FairyGUI
 		/// <param name="value"></param>
 		public void SetDuration(string label, float value)
 		{
-			int cnt = _items.Count;
+			int cnt = _items.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
-				if (item.tween && item.label == label)
-					item.duration = value;
+				if (item.tweenConfig != null && item.label == label)
+					item.tweenConfig.duration = value;
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="label"></param>
+		/// <returns></returns>
+		public float GetLabelTime(string label)
+		{
+			int cnt = _items.Length;
+			for (int i = 0; i < cnt; i++)
+			{
+				TransitionItem item = _items[i];
+				if (item.label == label)
+					return item.time;
+				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
+					return item.time + item.tweenConfig.duration;
+			}
+
+			return float.NaN;
 		}
 
 		/// <summary>
@@ -483,16 +604,59 @@ namespace FairyGUI
 			get { return _timeScale; }
 			set
 			{
-				_timeScale = value;
-
-				if (_playing)
+				if (_timeScale != value)
 				{
-					int cnt = _items.Count;
+					_timeScale = value;
+
+					int cnt = _items.Length;
 					for (int i = 0; i < cnt; i++)
 					{
 						TransitionItem item = _items[i];
 						if (item.tweener != null)
-							item.tweener.timeScale = _timeScale;
+							item.tweener.SetTimeScale(value);
+						else if (item.type == TransitionActionType.Transition)
+						{
+							if (((TValue_Transition)item.value).trans != null)
+								((TValue_Transition)item.value).trans.timeScale = value;
+						}
+						else if (item.type == TransitionActionType.Animation)
+						{
+							if (item.target != null)
+								((IAnimationGear)item.target).timeScale = value;
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ignoreEngineTimeScale
+		{
+			get { return _ignoreEngineTimeScale; }
+			set
+			{
+				if (_ignoreEngineTimeScale != value)
+				{
+					_ignoreEngineTimeScale = value;
+
+					int cnt = _items.Length;
+					for (int i = 0; i < cnt; i++)
+					{
+						TransitionItem item = _items[i];
+						if (item.tweener != null)
+							item.tweener.SetIgnoreEngineTimeScale(value);
+						else if (item.type == TransitionActionType.Transition)
+						{
+							if (((TValue_Transition)item.value).trans != null)
+								((TValue_Transition)item.value).trans.ignoreEngineTimeScale = value;
+						}
+						else if (item.type == TransitionActionType.Animation)
+						{
+							if (item.target != null)
+								((IAnimationGear)item.target).ignoreEngineTimeScale = value;
+						}
 					}
 				}
 			}
@@ -500,7 +664,7 @@ namespace FairyGUI
 
 		internal void UpdateFromRelations(string targetId, float dx, float dy)
 		{
-			int cnt = _items.Count;
+			int cnt = _items.Length;
 			if (cnt == 0)
 				return;
 
@@ -509,20 +673,26 @@ namespace FairyGUI
 				TransitionItem item = _items[i];
 				if (item.type == TransitionActionType.XY && item.targetId == targetId)
 				{
-					if (item.tween)
+					if (item.tweenConfig != null)
 					{
-						item.startValue.f1 += dx;
-						item.startValue.f2 += dy;
-						item.endValue.f1 += dx;
-						item.endValue.f2 += dy;
+						item.tweenConfig.startValue.f1 += dx;
+						item.tweenConfig.startValue.f2 += dy;
+						item.tweenConfig.endValue.f1 += dx;
+						item.tweenConfig.endValue.f2 += dy;
 					}
 					else
 					{
-						item.value.f1 += dx;
-						item.value.f2 += dy;
+						((TValue)item.value).f1 += dx;
+						((TValue)item.value).f2 += dy;
 					}
 				}
 			}
+		}
+
+		internal void OnOwnerAddedToStage()
+		{
+			if (_autoPlay && !_playing)
+				Play(_autoPlayTimes, _autoPlayDelay, null);
 		}
 
 		internal void OnOwnerRemovedFromStage()
@@ -531,231 +701,393 @@ namespace FairyGUI
 				Stop((_options & OPTION_AUTO_STOP_AT_END) != 0 ? true : false, false);
 		}
 
-		void InternalPlay(float delay)
+		void OnDelayedPlay()
+		{
+			InternalPlay();
+
+			_playing = _totalTasks > 0;
+			if (_playing)
+			{
+				if ((_options & OPTION_IGNORE_DISPLAY_CONTROLLER) != 0)
+				{
+					int cnt = _items.Length;
+					for (int i = 0; i < cnt; i++)
+					{
+						TransitionItem item = _items[i];
+						if (item.target != null && item.target != _owner)
+							item.displayLockToken = item.target.AddDisplayLock();
+					}
+				}
+			}
+			else if (_onComplete != null)
+			{
+				PlayCompleteCallback func = _onComplete;
+				_onComplete = null;
+				func();
+			}
+		}
+
+		void InternalPlay()
 		{
 			_ownerBaseX = _owner.x;
 			_ownerBaseY = _owner.y;
 
 			_totalTasks = 0;
-			int cnt = _items.Count;
-			for (int i = 0; i < cnt; i++)
+
+			bool needSkipAnimations = false;
+			int cnt = _items.Length;
+			if (!_reversed)
 			{
-				TransitionItem item = _items[i];
-				if (item.targetId.Length > 0)
-					item.target = _owner.GetChildById(item.targetId);
-				else
-					item.target = _owner;
-				if (item.target == null)
-					continue;
-
-				if (item.tween)
+				for (int i = 0; i < cnt; i++)
 				{
-					float startTime = delay;
-					if (_reversed)
-						startTime += (_maxTime - item.time - item.duration);
-					else
-						startTime += item.time;
-					if (startTime > 0 && (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size))
-					{
-						_totalTasks++;
-						item.completed = false;
-						item.tweener = DOVirtual.DelayedCall(startTime, item.delayedCallDelegate, true);
-						item.tweener.SetRecyclable();
-						if (_timeScale != 1)
-							item.tweener.timeScale = _timeScale;
-					}
-					else
-						StartTween(item, startTime);
-				}
-				else
-				{
-					float startTime = delay;
-					if (_reversed)
-						startTime += (_maxTime - item.time);
-					else
-						startTime += item.time;
-					if (startTime == 0)
-					{
-						ApplyValue(item, item.value);
-						if (item.hook != null)
-							item.hook();
-					}
-					else
-					{
-						item.completed = false;
-						_totalTasks++;
-						item.tweener = DOVirtual.DelayedCall(startTime, item.delayedCallDelegate, true);
-						item.tweener.SetRecyclable();
-						if (_timeScale != 1)
-							item.tweener.timeScale = _timeScale;
-					}
-				}
-			}
-		}
+					TransitionItem item = _items[i];
+					if (item.target == null)
+						continue;
 
-		void StartTween(TransitionItem item, float delay)
-		{
-			TransitionValue startValue;
-			TransitionValue endValue;
-
-			if (_reversed)
-			{
-				startValue = item.endValue;
-				endValue = item.startValue;
+					if (item.type == TransitionActionType.Animation && _startTime != 0 && item.time <= _startTime)
+					{
+						needSkipAnimations = true;
+						((TValue_Animation)item.value).flag = false;
+					}
+					else
+						PlayItem(item);
+				}
 			}
 			else
 			{
-				startValue = item.startValue;
-				endValue = item.endValue;
+				for (int i = cnt = 1; i >= 0; i--)
+				{
+					TransitionItem item = _items[i];
+					if (item.target == null)
+						continue;
+
+					PlayItem(item);
+				}
 			}
 
+			if (needSkipAnimations)
+				SkipAnimations();
+		}
+
+		void PlayItem(TransitionItem item)
+		{
+			float time;
+			if (item.tweenConfig != null)
+			{
+				if (_reversed)
+					time = (_totalDuration - item.time - item.tweenConfig.duration);
+				else
+					time = item.time;
+
+				if (_endTime == -1 || time <= _endTime)
+				{
+					TValue startValue;
+					TValue endValue;
+
+					if (_reversed)
+					{
+						startValue = item.tweenConfig.endValue;
+						endValue = item.tweenConfig.startValue;
+					}
+					else
+					{
+						startValue = item.tweenConfig.startValue;
+						endValue = item.tweenConfig.endValue;
+					}
+
+					((TValue)item.value).b1 = startValue.b1 || endValue.b1;
+					((TValue)item.value).b2 = startValue.b2 || endValue.b2;
+
+					switch (item.type)
+					{
+						case TransitionActionType.XY:
+						case TransitionActionType.Size:
+						case TransitionActionType.Scale:
+						case TransitionActionType.Skew:
+							item.tweener = GTween.To(startValue.vec2, endValue.vec2, item.tweenConfig.duration);
+							break;
+
+						case TransitionActionType.Alpha:
+						case TransitionActionType.Rotation:
+							item.tweener = GTween.To(startValue.f1, endValue.f1, item.tweenConfig.duration);
+							break;
+
+						case TransitionActionType.Color:
+							item.tweener = GTween.To(startValue.color, endValue.color, item.tweenConfig.duration);
+							break;
+
+						case TransitionActionType.ColorFilter:
+							item.tweener = GTween.To(startValue.vec4, endValue.vec4, item.tweenConfig.duration);
+							break;
+					}
+
+					item.tweener.SetDelay(time)
+						.SetEase(item.tweenConfig.easeType)
+						.SetRepeat(item.tweenConfig.repeat, item.tweenConfig.yoyo)
+						.SetTimeScale(_timeScale)
+						.SetIgnoreEngineTimeScale(_ignoreEngineTimeScale)
+						.SetTarget(item)
+						.SetListener(this);
+
+					if (_endTime >= 0)
+						item.tweener.SetBreakpoint(_endTime - time);
+
+					_totalTasks++;
+				}
+			}
+			else if (item.type == TransitionActionType.Shake)
+			{
+				TValue_Shake value = (TValue_Shake)item.value;
+
+				if (_reversed)
+					time = (_totalDuration - item.time - value.duration);
+				else
+					time = item.time;
+
+				if (_endTime == -1 || time <= _endTime)
+				{
+					value.lastOffset.Set(0, 0);
+					value.offset.Set(0, 0);
+					item.tweener = GTween.Shake(Vector3.zero, value.amplitude, value.duration)
+						.SetDelay(time)
+						.SetTimeScale(_timeScale)
+						.SetIgnoreEngineTimeScale(_ignoreEngineTimeScale)
+						.SetTarget(item)
+						.SetListener(this);
+
+					if (_endTime >= 0)
+						item.tweener.SetBreakpoint(_endTime - item.time);
+
+					_totalTasks++;
+				}
+			}
+			else
+			{
+				if (_reversed)
+					time = (_totalDuration - item.time);
+				else
+					time = item.time;
+
+				if (time <= _startTime)
+				{
+					ApplyValue(item);
+					CallHook(item, false);
+				}
+				else if (_endTime == -1 || time <= _endTime)
+				{
+					_totalTasks++;
+					item.tweener = GTween.DelayedCall(time)
+						.SetTimeScale(_timeScale)
+						.SetIgnoreEngineTimeScale(_ignoreEngineTimeScale)
+						.SetTarget(item)
+						.OnComplete(_delayedCallDelegate2);
+				}
+			}
+
+			if (item.tweener != null)
+				item.tweener.Seek(_startTime);
+		}
+
+		void SkipAnimations()
+		{
+			int frame;
+			float playStartTime;
+			float playTotalTime;
+			TValue_Animation value;
+			IAnimationGear target;
+			TransitionItem item;
+
+			int cnt = _items.Length;
+			for (int i = 0; i < cnt; i++)
+			{
+				item = _items[i];
+				if (item.type != TransitionActionType.Animation || item.time > _startTime)
+					continue;
+
+				value = (TValue_Animation)item.value;
+				if (value.flag)
+					continue;
+
+				target = (IAnimationGear)item.target;
+				frame = target.frame;
+				playStartTime = target.playing ? 0 : -1;
+				playTotalTime = 0;
+
+				for (int j = i; j < cnt; j++)
+				{
+					item = _items[j];
+					if (item.type != TransitionActionType.Animation || item.target != target || item.time > _startTime)
+						continue;
+
+					value = (TValue_Animation)item.value;
+					value.flag = true;
+
+					if (value.frame != -1)
+					{
+						frame = value.frame;
+						if (value.playing)
+							playStartTime = item.time;
+						else
+							playStartTime = -1;
+						playTotalTime = 0;
+					}
+					else
+					{
+						if (value.playing)
+						{
+							if (playStartTime < 0)
+								playStartTime = item.time;
+						}
+						else
+						{
+							if (playStartTime >= 0)
+								playTotalTime += (item.time - playStartTime);
+							playStartTime = -1;
+						}
+					}
+
+					CallHook(item, false);
+				}
+
+				if (playStartTime >= 0)
+					playTotalTime += (_startTime - playStartTime);
+
+				target.playing = playStartTime >= 0;
+				target.frame = frame;
+				if (playTotalTime > 0)
+					target.Advance(playTotalTime);
+			}
+		}
+
+		void OnDelayedPlayItem(GTweener tweener)
+		{
+			TransitionItem item = (TransitionItem)tweener.target;
+			item.tweener = null;
+			_totalTasks--;
+
+			ApplyValue(item);
+			CallHook(item, false);
+
+			CheckAllComplete();
+		}
+
+		public void OnTweenStart(GTweener tweener)
+		{
+			TransitionItem item = (TransitionItem)tweener.target;
+
+			if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size) //位置和大小要到start才最终确认起始值
+			{
+				TValue startValue;
+				TValue endValue;
+
+				if (_reversed)
+				{
+					startValue = item.tweenConfig.endValue;
+					endValue = item.tweenConfig.startValue;
+				}
+				else
+				{
+					startValue = item.tweenConfig.startValue;
+					endValue = item.tweenConfig.endValue;
+				}
+
+				if (item.type == TransitionActionType.XY)
+				{
+					if (item.target != _owner)
+					{
+						if (!startValue.b1)
+							startValue.f1 = item.target.x;
+						if (!startValue.b2)
+							startValue.f2 = item.target.y;
+					}
+				}
+				else
+				{
+					if (!startValue.b1)
+						startValue.f1 = item.target.width;
+					if (!startValue.b2)
+						startValue.f2 = item.target.height;
+				}
+
+				if (!endValue.b1)
+					endValue.f1 = startValue.f1;
+				if (!endValue.b2)
+					endValue.f2 = startValue.f2;
+
+				tweener.startValue.vec2 = startValue.vec2;
+				tweener.endValue.vec2 = endValue.vec2;
+			}
+
+			CallHook(item, false);
+		}
+
+		public void OnTweenUpdate(GTweener tweener)
+		{
+			TransitionItem item = (TransitionItem)tweener.target;
 			switch (item.type)
 			{
 				case TransitionActionType.XY:
 				case TransitionActionType.Size:
-					{
-						if (item.type == TransitionActionType.XY)
-						{
-							if (item.target == _owner)
-							{
-								if (!startValue.b1)
-									startValue.f1 = 0;
-								if (!startValue.b2)
-									startValue.f2 = 0;
-							}
-							else
-							{
-								if (!startValue.b1)
-									startValue.f1 = item.target.x;
-								if (!startValue.b2)
-									startValue.f2 = item.target.y;
-							}
-						}
-						else
-						{
-							if (!startValue.b1)
-								startValue.f1 = item.target.width;
-							if (!startValue.b2)
-								startValue.f2 = item.target.height;
-						}
-
-						item.value.f1 = startValue.f1;
-						item.value.f2 = startValue.f2;
-
-						if (!endValue.b1)
-							endValue.f1 = item.value.f1;
-						if (!endValue.b2)
-							endValue.f2 = item.value.f2;
-
-						item.value.b1 = startValue.b1 || endValue.b1;
-						item.value.b2 = startValue.b2 || endValue.b2;
-
-						item.tweener = DOTween.To(((TransitionItem_Vector2)item).getter, ((TransitionItem_Vector2)item).setter,
-							endValue.AsVec2, item.duration);
-					}
-					break;
-
 				case TransitionActionType.Scale:
 				case TransitionActionType.Skew:
-					{
-						item.value.f1 = startValue.f1;
-						item.value.f2 = startValue.f2;
-						item.tweener = DOTween.To(((TransitionItem_Vector2)item).getter, ((TransitionItem_Vector2)item).setter,
-							endValue.AsVec2, item.duration);
-						break;
-					}
+					((TValue)item.value).vec2 = tweener.value.vec2;
+					break;
 
 				case TransitionActionType.Alpha:
 				case TransitionActionType.Rotation:
-					{
-						item.value.f1 = startValue.f1;
-						item.tweener = DOTween.To(((TransitionItem_Float)item).getter, ((TransitionItem_Float)item).setter,
-							endValue.f1, item.duration);
-						break;
-					}
+					((TValue)item.value).f1 = tweener.value.x;
+					break;
 
 				case TransitionActionType.Color:
-					{
-						item.value.Copy(startValue);
-						item.tweener = DOTween.To(((TransitionItem_Color)item).getter, ((TransitionItem_Color)item).setter,
-							endValue.AsColor, item.duration);
-						break;
-					}
+					((TValue)item.value).color = tweener.value.color;
+					break;
 
 				case TransitionActionType.ColorFilter:
-					{
-						item.value.Copy(startValue);
-						item.tweener = DOTween.To(((TransitionItem_ColorFilter)item).getter, ((TransitionItem_ColorFilter)item).setter,
-							endValue.AsVec4, item.duration);
-						break;
-					}
+					((TValue)item.value).vec4 = tweener.value.vec4;
+					break;
+
+				case TransitionActionType.Shake:
+					((TValue_Shake)item.value).offset = tweener.deltaValue.vec2;
+					break;
 			}
-
-			item.tweener.SetEase(item.easeType)
-				.SetUpdate(true)
-				.SetRecyclable()
-				.OnStart(item.tweenStartDelegate)
-				.OnUpdate(item.tweenUpdateDelegate)
-				.OnComplete(item.tweenCompleteDelegate);
-
-			if (delay > 0)
-				item.tweener.SetDelay(delay);
-			else
-				ApplyValue(item, item.value);
-			if (item.repeat != 0)
-				item.tweener.SetLoops(item.repeat == -1 ? int.MaxValue : (item.repeat + 1), item.yoyo ? LoopType.Yoyo : LoopType.Restart);
-			if (_timeScale != 1)
-				item.tweener.timeScale = _timeScale;
-
-			_totalTasks++;
-			item.completed = false;
+			ApplyValue(item);
 		}
 
-		internal void OnDelayedCall(TransitionItem item)
+		public void OnTweenComplete(GTweener tweener)
 		{
-			if (item.tween)
-			{
-				item.tweener = null;
-				_totalTasks--;
-
-				StartTween(item, 0);
-			}
-			else
-			{
-				item.tweener = null;
-				item.completed = true;
-				_totalTasks--;
-
-				ApplyValue(item, item.value);
-				if (item.hook != null)
-					item.hook();
-
-				CheckAllComplete();
-			}
-		}
-
-		internal void OnTweenComplete(TransitionItem item)
-		{
+			TransitionItem item = (TransitionItem)tweener.target;
 			item.tweener = null;
-			item.completed = true;
 			_totalTasks--;
-
-			if (item.hook2 != null)
-				item.hook2();
 
 			if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size
-				|| item.type == TransitionActionType.Scale)
+				|| item.type == TransitionActionType.Scale || item.type == TransitionActionType.Shake)
 				_owner.InvalidateBatchingState(true);
+
+			if (tweener.allCompleted) //当整体播放结束时间在这个tween的中间时不应该调用结尾钩子
+				CallHook(item, true);
 
 			CheckAllComplete();
 		}
 
-		internal void OnInnerActionComplete(TransitionItem item)
+		void OnPlayTransCompleted(TransitionItem item)
 		{
 			_totalTasks--;
-			item.completed = true;
 
 			CheckAllComplete();
+		}
+
+		void CallHook(TransitionItem item, bool tweenEnd)
+		{
+			if (tweenEnd)
+			{
+				if (item.tweenConfig != null && item.tweenConfig.endHook != null)
+					item.tweenConfig.endHook();
+			}
+			else
+			{
+				if (item.time >= _startTime && item.hook != null)
+					item.hook();
+			}
 		}
 
 		void CheckAllComplete()
@@ -764,31 +1096,25 @@ namespace FairyGUI
 			{
 				if (_totalTimes < 0)
 				{
-					InternalPlay(0);
+					InternalPlay();
 				}
 				else
 				{
 					_totalTimes--;
 					if (_totalTimes > 0)
-						InternalPlay(0);
+						InternalPlay();
 					else
 					{
 						_playing = false;
 
-						int cnt = _items.Count;
+						int cnt = _items.Length;
 						for (int i = 0; i < cnt; i++)
 						{
 							TransitionItem item = _items[i];
-							if (item.target != null)
+							if (item.target != null && item.displayLockToken != 0)
 							{
-								if (item.displayLockToken != 0)
-								{
-									item.target.ReleaseDisplayLock(item.displayLockToken);
-									item.displayLockToken = 0;
-								}
-
-								if (item.type == TransitionActionType.ColorFilter)
-									((TransitionItem_ColorFilter)item).ClearFilter();
+								item.target.ReleaseDisplayLock(item.displayLockToken);
+								item.displayLockToken = 0;
 							}
 						}
 
@@ -803,125 +1129,165 @@ namespace FairyGUI
 			}
 		}
 
-		internal void ApplyValue(TransitionItem item, TransitionValue value)
+		void ApplyValue(TransitionItem item)
 		{
 			item.target._gearLocked = true;
 
 			switch (item.type)
 			{
 				case TransitionActionType.XY:
-					if (item.target == _owner)
 					{
-						float f1, f2;
-						if (!value.b1)
-							f1 = item.target.x;
+						TValue value = (TValue)item.value;
+						if (item.target == _owner)
+						{
+							float f1, f2;
+							if (!value.b1)
+								f1 = item.target.x;
+							else
+								f1 = value.f1 + _ownerBaseX;
+							if (!value.b2)
+								f2 = item.target.y;
+							else
+								f2 = value.f2 + _ownerBaseY;
+							item.target.SetXY(f1, f2);
+						}
 						else
-							f1 = value.f1 + _ownerBaseX;
-						if (!value.b2)
-							f2 = item.target.y;
-						else
-							f2 = value.f2 + _ownerBaseY;
-						item.target.SetXY(f1, f2);
+						{
+							if (!value.b1)
+								value.f1 = item.target.x;
+							if (!value.b2)
+								value.f2 = item.target.y;
+							item.target.SetXY(value.f1, value.f2);
+						}
+						if (invalidateBatchingEveryFrame)
+							_owner.InvalidateBatchingState(true);
 					}
-					else
-					{
-						if (!value.b1)
-							value.f1 = item.target.x;
-						if (!value.b2)
-							value.f2 = item.target.y;
-						item.target.SetXY(value.f1, value.f2);
-					}
-					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Size:
-					if (!value.b1)
-						value.f1 = item.target.width;
-					if (!value.b2)
-						value.f2 = item.target.height;
-					item.target.SetSize(value.f1, value.f2);
-					if (invalidateBatchingEveryFrame)
-						_owner.InvalidateBatchingState(true);
+					{
+						TValue value = (TValue)item.value;
+						if (!value.b1)
+							value.f1 = item.target.width;
+						if (!value.b2)
+							value.f2 = item.target.height;
+						item.target.SetSize(value.f1, value.f2);
+						if (invalidateBatchingEveryFrame)
+							_owner.InvalidateBatchingState(true);
+					}
 					break;
 
 				case TransitionActionType.Pivot:
-					item.target.SetPivot(value.f1, value.f2);
+					item.target.SetPivot(((TValue)item.value).f1, ((TValue)item.value).f2, item.target.pivotAsAnchor);
 					if (invalidateBatchingEveryFrame)
 						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Alpha:
-					item.target.alpha = value.f1;
+					item.target.alpha = ((TValue)item.value).f1;
 					break;
 
 				case TransitionActionType.Rotation:
-					item.target.rotation = value.f1;
+					item.target.rotation = ((TValue)item.value).f1;
 					if (invalidateBatchingEveryFrame)
 						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Scale:
-					item.target.SetScale(value.f1, value.f2);
+					item.target.SetScale(((TValue)item.value).f1, ((TValue)item.value).f2);
 					if (invalidateBatchingEveryFrame)
 						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Skew:
-					item.target.skew = value.AsVec2;
+					item.target.skew = ((TValue)item.value).vec2;
 					if (invalidateBatchingEveryFrame)
 						_owner.InvalidateBatchingState(true);
 					break;
 
 				case TransitionActionType.Color:
-					((IColorGear)item.target).color = value.AsColor;
+					((IColorGear)item.target).color = ((TValue)item.value).color;
 					break;
 
 				case TransitionActionType.Animation:
-					if (((TransitionItem_Animation)item).frame >= 0)
-						((IAnimationGear)item.target).frame = ((TransitionItem_Animation)item).frame;
-					((IAnimationGear)item.target).playing = ((TransitionItem_Animation)item).playing;
+					{
+						TValue_Animation value = (TValue_Animation)item.value;
+						if (value.frame >= 0)
+							((IAnimationGear)item.target).frame = value.frame;
+						((IAnimationGear)item.target).playing = value.playing;
+						((IAnimationGear)item.target).timeScale = _timeScale;
+						((IAnimationGear)item.target).ignoreEngineTimeScale = _ignoreEngineTimeScale;
+					}
 					break;
 
 				case TransitionActionType.Visible:
-					item.target.visible = ((TransitionItem_Visible)item).visible;
+					item.target.visible = ((TValue_Visible)item.value).visible;
+					break;
+
+				case TransitionActionType.Shake:
+					{
+						TValue_Shake value = (TValue_Shake)item.value;
+						item.target.SetXY(item.target.x - value.lastOffset.x + value.offset.x, item.target.y - value.lastOffset.y + value.offset.y);
+						value.lastOffset = value.offset;
+
+						if (invalidateBatchingEveryFrame)
+							_owner.InvalidateBatchingState(true);
+					}
 					break;
 
 				case TransitionActionType.Transition:
-					Transition trans = ((GComponent)item.target).GetTransition(((TransitionItem_Transition)item).transName);
-					if (trans != null)
+					if (_playing)
 					{
-						int tranRepeat = ((TransitionItem_Transition)item).transRepeat;
-						if (tranRepeat == 0)
-							trans.Stop(false, true);
-						else if (trans.playing)
-							trans._totalTimes = tranRepeat;
-						else
+						TValue_Transition value = (TValue_Transition)item.value;
+						if (value.trans != null)
 						{
-							item.completed = false;
 							_totalTasks++;
-							if (_reversed)
-								trans.PlayReverse(tranRepeat, 0, ((TransitionItem_Transition)item).playCompleteDelegate);
-							else
-								trans.Play(tranRepeat, 0, ((TransitionItem_Transition)item).playCompleteDelegate);
-							if (_timeScale != 1)
-								trans.timeScale = _timeScale;
+
+							float startTime = _startTime > item.time ? (_startTime - item.time) : 0;
+							float endTime = _endTime >= 0 ? (_endTime - item.time) : -1;
+							if (value.stopTime >= 0 && (endTime < 0 || endTime > value.stopTime))
+								endTime = value.stopTime;
+							value.trans.timeScale = _timeScale;
+							value.trans.ignoreEngineTimeScale = _ignoreEngineTimeScale;
+							value.trans._Play(value.playTimes, 0, startTime, endTime, value.playCompleteDelegate, _reversed);
 						}
 					}
 					break;
 
 				case TransitionActionType.Sound:
-					((TransitionItem_Sound)item).Play();
-					break;
+					if (_playing && item.time >= _startTime)
+					{
+						TValue_Sound value = (TValue_Sound)item.value;
+						if (value.audioClip == null)
+						{
+							if (UIConfig.soundLoader == null || value.sound.StartsWith(UIPackage.URL_PREFIX))
+								value.audioClip = UIPackage.GetItemAssetByURL(value.sound) as AudioClip;
+							else
+								value.audioClip = UIConfig.soundLoader(value.sound);
+						}
 
-				case TransitionActionType.Shake:
-					((TransitionItem_Shake)item).Start();
-					_totalTasks++;
-					item.completed = false;
+						if (value.audioClip != null)
+							Stage.inst.PlayOneShotSound(value.audioClip, value.volume);
+					}
 					break;
 
 				case TransitionActionType.ColorFilter:
-					((TransitionItem_ColorFilter)item).SetFilter();
+					{
+						TValue value = (TValue)item.value;
+						ColorFilter cf = item.target.filter as ColorFilter;
+						if (cf == null)
+						{
+							cf = new ColorFilter();
+							item.target.filter = cf;
+						}
+						else
+							cf.Reset();
+
+						cf.AdjustBrightness(value.f1);
+						cf.AdjustContrast(value.f2);
+						cf.AdjustSaturation(value.f3);
+						cf.AdjustHue(value.f4);
+					}
 					break;
 			}
 
@@ -935,59 +1301,63 @@ namespace FairyGUI
 			_autoPlay = xml.GetAttributeBool("autoPlay");
 			if (_autoPlay)
 			{
-				this.autoPlayRepeat = xml.GetAttributeInt("autoPlayRepeat", 1);
-				this.autoPlayDelay = xml.GetAttributeFloat("autoPlayDelay");
+				_autoPlayTimes = xml.GetAttributeInt("autoPlayRepeat", 1);
+				_autoPlayDelay = xml.GetAttributeFloat("autoPlayDelay");
 			}
 
-			XMLList.Enumerator et = xml.GetEnumerator("item");
-			while (et.MoveNext())
+			float frameInterval = 1.0f / xml.GetAttributeInt("fps", 24);
+
+			XMLList xlist = xml.Elements();
+			int cnt = xlist.Count;
+			_items = new TransitionItem[cnt];
+			for (int i = 0; i < cnt; i++)
 			{
-				XML cxml = et.Current;
-				TransitionItem item = TransitionItem.createInstance(FieldTypes.ParseTransitionActionType(cxml.GetAttribute("type")));
-				_items.Add(item);
+				XML cxml = xlist[i];
+				TransitionItem item = new TransitionItem(FieldTypes.ParseTransitionActionType(cxml.GetAttribute("type")));
+				_items[i] = item;
 
-				item.time = (float)cxml.GetAttributeInt("time") / (float)FRAME_RATE;
+				item.time = (float)cxml.GetAttributeInt("time") * frameInterval;
 				item.targetId = cxml.GetAttribute("target", string.Empty);
-				item.tween = cxml.GetAttributeBool("tween");
+				if (cxml.GetAttributeBool("tween"))
+					item.tweenConfig = new TweenConfig();
 				item.label = cxml.GetAttribute("label");
-				item.Setup(this);
 
-				if (item.tween)
+				if (item.tweenConfig != null)
 				{
-					item.duration = (float)cxml.GetAttributeInt("duration") / FRAME_RATE;
-					if (item.time + item.duration > _maxTime)
-						_maxTime = item.time + item.duration;
+					item.tweenConfig.duration = (float)cxml.GetAttributeInt("duration") * frameInterval;
+					if (item.time + item.tweenConfig.duration > _totalDuration)
+						_totalDuration = item.time + item.tweenConfig.duration;
 
 					string ease = cxml.GetAttribute("ease");
 					if (ease != null)
-						item.easeType = FieldTypes.ParseEaseType(ease);
+						item.tweenConfig.easeType = EaseTypeUtils.ParseEaseType(ease);
 
-					item.repeat = cxml.GetAttributeInt("repeat");
-					item.yoyo = cxml.GetAttributeBool("yoyo");
-					item.label2 = cxml.GetAttribute("label2");
+					item.tweenConfig.repeat = cxml.GetAttributeInt("repeat");
+					item.tweenConfig.yoyo = cxml.GetAttributeBool("yoyo");
+					item.tweenConfig.endLabel = cxml.GetAttribute("label2");
 
 					string v = cxml.GetAttribute("endValue");
 					if (v != null)
 					{
-						DecodeValue(item, cxml.GetAttribute("startValue", string.Empty), item.startValue);
-						DecodeValue(item, v, item.endValue);
+						DecodeValue(item, cxml.GetAttribute("startValue", string.Empty), item.tweenConfig.startValue);
+						DecodeValue(item, v, item.tweenConfig.endValue);
 					}
 					else
 					{
-						item.tween = false;
+						item.tweenConfig = null;
 						DecodeValue(item, cxml.GetAttribute("startValue", string.Empty), item.value);
 					}
 				}
 				else
 				{
-					if (item.time > _maxTime)
-						_maxTime = item.time;
+					if (item.time > _totalDuration)
+						_totalDuration = item.time;
 					DecodeValue(item, cxml.GetAttribute("value", string.Empty), item.value);
 				}
 			}
 		}
 
-		void DecodeValue(TransitionItem item, string str, TransitionValue value)
+		void DecodeValue(TransitionItem item, string str, object value)
 		{
 			string[] arr;
 			switch (item.type)
@@ -996,134 +1366,134 @@ namespace FairyGUI
 				case TransitionActionType.Size:
 				case TransitionActionType.Pivot:
 				case TransitionActionType.Skew:
-					arr = str.Split(',');
-					if (arr[0] == "-")
 					{
-						value.b1 = false;
-					}
-					else
-					{
-						value.f1 = float.Parse(arr[0]);
-						value.b1 = true;
-					}
-					if (arr[1] == "-")
-					{
-						value.b2 = false;
-					}
-					else
-					{
-						value.f2 = float.Parse(arr[1]);
-						value.b2 = true;
+						TValue tvalue = (TValue)value;
+						arr = str.Split(',');
+						if (arr[0] == "-")
+						{
+							tvalue.b1 = false;
+						}
+						else
+						{
+							tvalue.f1 = float.Parse(arr[0]);
+							tvalue.b1 = true;
+						}
+						if (arr[1] == "-")
+						{
+							tvalue.b2 = false;
+						}
+						else
+						{
+							tvalue.f2 = float.Parse(arr[1]);
+							tvalue.b2 = true;
+						}
 					}
 					break;
 
 				case TransitionActionType.Alpha:
-					value.f1 = float.Parse(str);
+					((TValue)value).f1 = float.Parse(str);
 					break;
 
 				case TransitionActionType.Rotation:
-					value.f1 = float.Parse(str);
+					((TValue)value).f1 = float.Parse(str);
 					break;
 
 				case TransitionActionType.Scale:
 					arr = str.Split(',');
-					value.f1 = float.Parse(arr[0]);
-					value.f2 = float.Parse(arr[1]);
+					((TValue)value).f1 = float.Parse(arr[0]);
+					((TValue)value).f2 = float.Parse(arr[1]);
 					break;
 
 				case TransitionActionType.Color:
-					value.AsColor = ToolSet.ConvertFromHtmlColor(str);
+					((TValue)value).color = ToolSet.ConvertFromHtmlColor(str);
 					break;
 
 				case TransitionActionType.Animation:
-					arr = str.Split(',');
-					if (arr[0] == "-")
-						((TransitionItem_Animation)item).frame = -1;
-					else
-						((TransitionItem_Animation)item).frame = int.Parse(arr[0]);
-					((TransitionItem_Animation)item).playing = arr[1] == "p";
+					{
+						TValue_Animation tvalue = (TValue_Animation)value;
+						arr = str.Split(',');
+						if (arr[0] == "-")
+							tvalue.frame = -1;
+						else
+							tvalue.frame = int.Parse(arr[0]);
+						tvalue.playing = arr[1] == "p";
+					}
 					break;
 
 				case TransitionActionType.Visible:
-					((TransitionItem_Visible)item).visible = str == "true";
+					((TValue_Visible)value).visible = str == "true";
 					break;
 
 				case TransitionActionType.Sound:
-					arr = str.Split(',');
-					((TransitionItem_Sound)item).sound = arr[0];
-					if (arr.Length > 1)
 					{
-						int intv = int.Parse(arr[1]);
-						if (intv == 100 || intv == 0)
-							((TransitionItem_Sound)item).volume = 1;
+						TValue_Sound tvalue = (TValue_Sound)value;
+						arr = str.Split(',');
+						tvalue.sound = arr[0];
+						if (arr.Length > 1)
+						{
+							int intv = int.Parse(arr[1]);
+							if (intv == 100 || intv == 0)
+								tvalue.volume = 1;
+							else
+								tvalue.volume = (float)intv / 100f;
+						}
 						else
-							((TransitionItem_Sound)item).volume = (float)intv / 100f;
+							tvalue.volume = 1;
 					}
-					else
-						((TransitionItem_Sound)item).volume = 1;
 					break;
 
 				case TransitionActionType.Transition:
-					arr = str.Split(',');
-					((TransitionItem_Transition)item).transName = arr[0];
-					if (arr.Length > 1)
-						((TransitionItem_Transition)item).transRepeat = int.Parse(arr[1]);
-					else
-						((TransitionItem_Transition)item).transRepeat = 1;
+					{
+						TValue_Transition tvalue = (TValue_Transition)value;
+						arr = str.Split(',');
+						tvalue.transName = arr[0];
+						if (arr.Length > 1)
+							tvalue.playTimes = int.Parse(arr[1]);
+						else
+							tvalue.playTimes = 1;
+						tvalue.playCompleteDelegate = () => { OnPlayTransCompleted(item); };
+					}
 					break;
 
 				case TransitionActionType.Shake:
 					arr = str.Split(',');
-					((TransitionItem_Shake)item).shakeAmplitude = float.Parse(arr[0]);
-					((TransitionItem_Shake)item).shakePeriod = float.Parse(arr[1]);
+					((TValue_Shake)value).amplitude = float.Parse(arr[0]);
+					((TValue_Shake)value).duration = float.Parse(arr[1]);
 					break;
 
 				case TransitionActionType.ColorFilter:
-					arr = str.Split(',');
-					value.f1 = float.Parse(arr[0]);
-					value.f2 = float.Parse(arr[1]);
-					value.f3 = float.Parse(arr[2]);
-					value.f4 = float.Parse(arr[3]);
+					{
+						TValue tvalue = (TValue)value;
+						arr = str.Split(',');
+						tvalue.f1 = float.Parse(arr[0]);
+						tvalue.f2 = float.Parse(arr[1]);
+						tvalue.f3 = float.Parse(arr[2]);
+						tvalue.f4 = float.Parse(arr[3]);
+					}
 					break;
 			}
 		}
 	}
 
-	public class TransitionItem
+	class TransitionItem
 	{
 		public float time;
 		public string targetId;
 		public TransitionActionType type;
-		public float duration;
-		public TransitionValue value;
-		public TransitionValue startValue;
-		public TransitionValue endValue;
-		public Ease easeType;
-		public int repeat;
-		public bool yoyo;
-		public bool tween;
+		public TweenConfig tweenConfig;
 		public string label;
-		public string label2;
-
-		//hooks
+		public object value;
 		public TransitionHook hook;
-		public TransitionHook hook2;
 
 		//running properties
-		public Tween tweener;
-		public bool completed;
+		public GTweener tweener;
 		public GObject target;
 		public uint displayLockToken;
 
-		//cached delegates
-		public TweenCallback delayedCallDelegate;
-		public TweenCallback tweenStartDelegate;
-		public TweenCallback tweenUpdateDelegate;
-		public TweenCallback tweenCompleteDelegate;
-
-		public static TransitionItem createInstance(TransitionActionType type)
+		public TransitionItem(TransitionActionType type)
 		{
-			TransitionItem inst;
+			this.type = type;
+
 			switch (type)
 			{
 				case TransitionActionType.XY:
@@ -1131,305 +1501,94 @@ namespace FairyGUI
 				case TransitionActionType.Scale:
 				case TransitionActionType.Pivot:
 				case TransitionActionType.Skew:
-					inst = new TransitionItem_Vector2();
-					break;
-
 				case TransitionActionType.Alpha:
 				case TransitionActionType.Rotation:
-					inst = new TransitionItem_Float();
-					break;
-
 				case TransitionActionType.Color:
-					inst = new TransitionItem_Color();
-					break;
-
 				case TransitionActionType.ColorFilter:
-					inst = new TransitionItem_ColorFilter();
+					value = new TValue();
 					break;
 
 				case TransitionActionType.Animation:
-					inst = new TransitionItem_Animation();
+					value = new TValue_Animation();
 					break;
 
 				case TransitionActionType.Shake:
-					inst = new TransitionItem_Shake();
+					value = new TValue_Shake();
 					break;
 
 				case TransitionActionType.Sound:
-					inst = new TransitionItem_Sound();
+					value = new TValue_Sound();
 					break;
 
 				case TransitionActionType.Transition:
-					inst = new TransitionItem_Transition();
+					value = new TValue_Transition();
 					break;
 
 				case TransitionActionType.Visible:
-					inst = new TransitionItem_Visible();
-					break;
-
-				default:
-					inst = new TransitionItem();
+					value = new TValue_Visible();
 					break;
 			}
-
-			inst.type = type;
-			return inst;
-		}
-
-		public TransitionItem()
-		{
-		}
-
-		virtual public void Setup(Transition owner)
-		{
-			easeType = Ease.OutQuad;
-			delayedCallDelegate = () => { owner.OnDelayedCall(this); };
-
-			if (tween)
-			{
-				tweenStartDelegate = () => { if (hook != null) hook(); };
-				tweenUpdateDelegate = () => { owner.ApplyValue(this, value); };
-				tweenCompleteDelegate = () => { owner.OnTweenComplete(this); };
-			}
-		}
-
-		public void Copy(TransitionItem source)
-		{
-			this.time = source.time;
-			this.targetId = source.targetId;
-			this.type = source.type;
-			this.duration = source.duration;
-			if (this.value != null)
-				this.value.Copy(source.value);
-			if (this.startValue != null)
-				this.startValue.Copy(source.startValue);
-			if (this.endValue != null)
-				this.endValue.Copy(source.endValue);
-			this.easeType = source.easeType;
-			this.repeat = source.repeat;
-			this.yoyo = source.yoyo;
-			this.tween = source.tween;
-			this.label = source.label;
-			this.label2 = source.label2;
 		}
 	}
 
-	public class TransitionItem_Float : TransitionItem
+	class TweenConfig
 	{
-		public DOGetter<float> getter;
-		public DOSetter<float> setter;
+		public float duration;
+		public EaseType easeType;
+		public int repeat;
+		public bool yoyo;
 
-		public TransitionItem_Float()
+		public TValue startValue;
+		public TValue endValue;
+
+		public string endLabel;
+		public TransitionHook endHook;
+
+		public TweenConfig()
 		{
-			value = new TransitionValue();
-			startValue = new TransitionValue();
-			endValue = new TransitionValue();
-
-			getter = () => { return value.f1; };
-			setter = (x) => { value.f1 = x; };
+			easeType = EaseType.QuadOut;
+			startValue = new TValue();
+			endValue = new TValue();
 		}
 	}
 
-	public class TransitionItem_Vector2 : TransitionItem
-	{
-		public DOGetter<Vector2> getter;
-		public DOSetter<Vector2> setter;
-
-		public TransitionItem_Vector2()
-		{
-			value = new TransitionValue();
-			startValue = new TransitionValue();
-			endValue = new TransitionValue();
-
-			getter = () => { return value.AsVec2; };
-			setter = (x) => { value.AsVec2 = x; };
-		}
-	}
-
-	public class TransitionItem_Color : TransitionItem
-	{
-		public DOGetter<Color> getter;
-		public DOSetter<Color> setter;
-
-		public TransitionItem_Color()
-		{
-			value = new TransitionValue();
-			startValue = new TransitionValue();
-			endValue = new TransitionValue();
-
-			getter = () => { return value.AsColor; };
-			setter = (x) => { value.AsColor = x; };
-		}
-	}
-
-	public class TransitionItem_ColorFilter : TransitionItem
-	{
-		public DOGetter<Vector4> getter;
-		public DOSetter<Vector4> setter;
-
-		bool filterCreated;
-
-		public TransitionItem_ColorFilter()
-		{
-			value = new TransitionValue();
-			startValue = new TransitionValue();
-			endValue = new TransitionValue();
-
-			getter = () => { return value.AsVec4; };
-			setter = (x) => { value.AsVec4 = x; };
-		}
-
-		public void SetFilter()
-		{
-			ColorFilter cf = target.filter as ColorFilter;
-			if (cf == null)
-			{
-				cf = new ColorFilter();
-				target.filter = cf;
-				filterCreated = true;
-			}
-			else
-			{
-				cf.Reset();
-			}
-			cf.AdjustBrightness(value.f1);
-			cf.AdjustContrast(value.f2);
-			cf.AdjustSaturation(value.f3);
-			cf.AdjustHue(value.f4);
-		}
-
-		public void ClearFilter()
-		{
-			if (filterCreated)
-			{
-				target.filter = null;
-				filterCreated = false;
-			}
-		}
-	}
-
-	public class TransitionItem_Visible : TransitionItem
+	class TValue_Visible
 	{
 		public bool visible;
 	}
 
-	public class TransitionItem_Animation : TransitionItem
+	class TValue_Animation
 	{
 		public int frame;
 		public bool playing;
+		public bool flag;
 	}
 
-	public class TransitionItem_Sound : TransitionItem
+	class TValue_Sound
 	{
 		public string sound;
 		public float volume;
 		public AudioClip audioClip;
-
-		public override void Setup(Transition owner)
-		{
-			base.Setup(owner);
-		}
-
-		public void Play()
-		{
-			if (audioClip == null)
-			{
-				if (UIConfig.soundLoader == null || sound.StartsWith(UIPackage.URL_PREFIX))
-					audioClip = UIPackage.GetItemAssetByURL(sound) as AudioClip;
-				else
-					audioClip = UIConfig.soundLoader(sound);
-			}
-
-			if (audioClip != null)
-				Stage.inst.PlayOneShotSound(audioClip, volume);
-		}
 	}
 
-	public class TransitionItem_Transition : TransitionItem
+	class TValue_Transition
 	{
 		public string transName;
-		public int transRepeat;
-
+		public int playTimes;
+		public Transition trans;
 		public PlayCompleteCallback playCompleteDelegate;
-
-		override public void Setup(Transition owner)
-		{
-			base.Setup(owner);
-
-			playCompleteDelegate = () => { owner.OnInnerActionComplete(this); };
-		}
+		public float stopTime;
 	}
 
-	public class TransitionItem_Shake : TransitionItem
+	class TValue_Shake
 	{
-		public float shakeAmplitude;
-		public float shakePeriod;
-
-		float offsetX;
-		float offsetY;
-		float elapsed;
-
-		TimerCallback timerDelegate;
-		Transition owner;
-
-		override public void Setup(Transition owner)
-		{
-			base.Setup(owner);
-
-			timerDelegate = Run;
-			this.owner = owner;
-		}
-
-		public void Start()
-		{
-			offsetX = offsetY = 0;
-			elapsed = shakePeriod;
-			Timers.inst.AddUpdate(timerDelegate);
-		}
-
-		public void Stop(bool resetPosition)
-		{
-			if (Timers.inst.Exists(timerDelegate))
-			{
-				Timers.inst.Remove(timerDelegate);
-
-				if (resetPosition)
-				{
-					target._gearLocked = true;
-					target.SetXY(target.x - offsetX, target.y - offsetY);
-					target._gearLocked = false;
-				}
-			}
-		}
-
-		void Run(object param)
-		{
-			float r = Mathf.Ceil(shakeAmplitude * elapsed / shakePeriod);
-			Vector2 vr = UnityEngine.Random.insideUnitCircle * r;
-			vr.x = vr.x > 0 ? Mathf.Ceil(vr.x) : Mathf.Floor(vr.x);
-			vr.y = vr.y > 0 ? Mathf.Ceil(vr.y) : Mathf.Floor(vr.y);
-
-			target._gearLocked = true;
-			target.SetXY(target.x - offsetX + vr.x, target.y - offsetY + vr.y);
-			target._gearLocked = false;
-
-			offsetX = vr.x;
-			offsetY = vr.y;
-			elapsed -= Time.deltaTime;
-			if (elapsed <= 0)
-			{
-				target._gearLocked = true;
-				target.SetXY(target.x - offsetX, target.y - offsetY);
-				target._gearLocked = false;
-
-				Timers.inst.Remove(timerDelegate);
-
-				owner.OnInnerActionComplete(this);
-			}
-		}
+		public float amplitude;
+		public float duration;
+		public Vector2 lastOffset;
+		public Vector2 offset;
 	}
 
-	public class TransitionValue
+	class TValue
 	{
 		public float f1;
 		public float f2;
@@ -1438,13 +1597,13 @@ namespace FairyGUI
 		public bool b1;
 		public bool b2;
 
-		public TransitionValue()
+		public TValue()
 		{
 			b1 = true;
 			b2 = true;
 		}
 
-		public void Copy(TransitionValue source)
+		public void Copy(TValue source)
 		{
 			this.f1 = source.f1;
 			this.f2 = source.f2;
@@ -1454,7 +1613,7 @@ namespace FairyGUI
 			this.b2 = source.b2;
 		}
 
-		public Vector2 AsVec2
+		public Vector2 vec2
 		{
 			get { return new Vector2(f1, f2); }
 			set
@@ -1464,7 +1623,7 @@ namespace FairyGUI
 			}
 		}
 
-		public Vector4 AsVec4
+		public Vector4 vec4
 		{
 			get { return new Vector4(f1, f2, f3, f4); }
 			set
@@ -1476,7 +1635,7 @@ namespace FairyGUI
 			}
 		}
 
-		public Color AsColor
+		public Color color
 		{
 			get { return new Color(f1, f2, f3, f4); }
 			set

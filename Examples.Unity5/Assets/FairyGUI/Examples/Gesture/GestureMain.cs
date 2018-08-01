@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FairyGUI;
-using DG.Tweening;
 
 public class GestureMain : MonoBehaviour
 {
@@ -72,17 +71,26 @@ public class GestureMain : MonoBehaviour
 			if (Mathf.Abs(v.x) < 2)
 				return;
 		}
-		_ball.DORotate(v, 0.3f, RotateMode.WorldAxisAdd);
+
+		GTween.To(v, Vector3.zero, 0.3f).SetTarget(_ball).OnUpdate(
+			(GTweener tweener) =>
+			{
+				_ball.Rotate(tweener.deltaValue.vec3, Space.World);
+			});
 	}
 
 	void OnHold(EventContext context)
 	{
-		_ball.DOShakePosition(0.3f, new Vector3(0.1f, 0.1f, 0));
+		GTween.Shake(_ball.transform.localPosition, 0.05f, 0.5f).SetTarget(_ball).OnUpdate(
+			(GTweener tweener) =>
+			{
+				_ball.transform.localPosition = new Vector3(tweener.value.x, tweener.value.y, _ball.transform.localPosition.z);
+			});
 	}
 
 	void OnPinch(EventContext context)
 	{
-		DOTween.Kill(_ball);
+		GTween.Kill(_ball);
 
 		PinchGesture gesture = (PinchGesture)context.sender;
 		float newValue = Mathf.Clamp(_ball.localScale.x + gesture.delta, 0.3f, 2);
@@ -91,7 +99,7 @@ public class GestureMain : MonoBehaviour
 
 	void OnRotate(EventContext context)
 	{
-		DOTween.Kill(_ball);
+		GTween.Kill(_ball);
 
 		RotationGesture gesture = (RotationGesture)context.sender;
 		_ball.Rotate(Vector3.forward, -gesture.delta, Space.World);

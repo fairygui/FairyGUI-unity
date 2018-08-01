@@ -37,6 +37,10 @@ _GT(typeof(Window)),
 _GT(typeof(GObjectPool)),
 _GT(typeof(Relations)),
 _GT(typeof(RelationType)),
+_GT(typeof(GTween)),
+_GT(typeof(GTweener)),
+_GT(typeof(EaseType)),
+_GT(typeof(TweenValue)),
 
 2、拷贝FairyGUI.lua到你的lua文件存放目录。
 
@@ -74,6 +78,4 @@ function TestClass:OnClick() --也可以带上事件参数，TestClass:OnClick(c
 end
 
 TestClass.New()
-
-3、如果要使用Tween，你可以直接使用GObject.TweenXXXX系列函数，免除了Wrap DOTween的麻烦。
 

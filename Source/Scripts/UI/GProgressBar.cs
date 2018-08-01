@@ -1,7 +1,6 @@
 ﻿using System;
-using FairyGUI.Utils;
 using UnityEngine;
-using DG.Tweening;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -25,8 +24,7 @@ namespace FairyGUI
 		float _barMaxHeightDelta;
 		float _barStartX;
 		float _barStartY;
-
-		Tweener _tweener;
+		bool _tweening;
 
 		public GProgressBar()
 		{
@@ -84,10 +82,10 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (_tweener != null)
+				if (_tweening)
 				{
-					_tweener.Kill(true);
-					_tweener = null;
+					GTween.Kill(this, TweenPropType.Progress, true);
+					_tweening = false;
 				}
 
 				if (_value != value)
@@ -109,23 +107,18 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="duration"></param>
-		public Tweener TweenValue(double value, float duration)
+		public GTweener TweenValue(double value, float duration)
 		{
-			if (_value != value)
-			{
-				if (_tweener != null)
-					_tweener.Kill(false);
+			double oldValule = _value;
+			_value = value;
 
-				double oldValue = _value;
-				_value = value;
-				_tweener = DOTween.To(() => oldValue, v => { Update(v); }, value, duration)
-					.SetRecyclable()
-					.SetEase(Ease.Linear).OnComplete(() => { _tweener = null; });
-
-				return _tweener;
-			}
-			else
-				return null;
+			if (_tweening)
+				GTween.Kill(this, TweenPropType.Progress, false);
+			_tweening = true;
+			return GTween.To(oldValule, _value, duration)
+				.SetEase(EaseType.Linear)
+				.SetTarget(this, TweenPropType.Progress)
+				.OnComplete(() => { _tweening = false; });
 		}
 
 		/// <summary>
@@ -275,8 +268,8 @@ namespace FairyGUI
 
 		public override void Dispose()
 		{
-			if (_tweener != null)
-				_tweener.Kill(false);
+			if (_tweening)
+				GTween.Kill(this);
 			base.Dispose();
 		}
 	}

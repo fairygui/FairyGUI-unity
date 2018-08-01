@@ -76,6 +76,9 @@ namespace FairyGUI
 		{
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Dictionary<string, string> templateVars
 		{
 			get { return _templateVars; }
@@ -90,6 +93,12 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
 		public GTextField SetVar(string name, string value)
 		{
 			if (_templateVars == null)
@@ -99,6 +108,9 @@ namespace FairyGUI
 			return this;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void FlushVars()
 		{
 			SetTextFieldText();

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using FairyGUI;
-using DG.Tweening;
 
 public class BasicsMain : MonoBehaviour
 {

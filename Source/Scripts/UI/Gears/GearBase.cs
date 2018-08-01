@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using FairyGUI.Utils;
+﻿using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -18,7 +17,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Ease type.
 		/// </summary>
-		public Ease easeType;
+		public EaseType easeType;
 
 		/// <summary>
 		/// Tween duration in seconds.
@@ -37,7 +36,7 @@ namespace FairyGUI
 		public GearBase(GObject owner)
 		{
 			_owner = owner;
-			easeType = Ease.OutQuad;
+			easeType = EaseType.QuadOut;
 			tweenTime = 0.3f;
 			delay = 0;
 		}
@@ -79,7 +78,7 @@ namespace FairyGUI
 
 			str = xml.GetAttribute("ease");
 			if (str != null)
-				easeType = FieldTypes.ParseEaseType(str);
+				easeType = EaseTypeUtils.ParseEaseType(str);
 
 			str = xml.GetAttribute("duration");
 			if (str != null)

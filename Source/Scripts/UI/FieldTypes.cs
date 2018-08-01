@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using DG.Tweening;
-
-namespace FairyGUI
+﻿namespace FairyGUI
 {
 	public enum PackageItemType
 	{
@@ -408,49 +405,6 @@ namespace FairyGUI
 				default:
 					return FillMethod.None;
 			}
-		}
-
-		static Dictionary<string, Ease> EaseTypeMap = new Dictionary<string, Ease>
-			{
-				{ "Linear", Ease.Linear },
-				{ "Elastic.In", Ease.InElastic },
-				{ "Elastic.Out", Ease.InOutElastic },
-				{ "Elastic.InOut", Ease.InOutElastic },
-				{ "Quad.In", Ease.InQuad },
-				{ "Quad.Out", Ease.OutQuad },
-				{ "Quad.InOut", Ease.InOutQuad },
-				{ "Cube.In", Ease.InCubic },
-				{ "Cube.Out", Ease.OutCubic },
-				{ "Cube.InOut", Ease.InOutCubic },
-				{ "Quart.In", Ease.InQuart },
-				{ "Quart.Out", Ease.OutQuart },
-				{ "Quart.InOut", Ease.InOutQuart },
-				{ "Quint.In", Ease.InQuint },
-				{ "Quint.Out", Ease.OutQuint },
-				{ "Quint.InOut", Ease.InOutQuint },
-				{ "Sine.In", Ease.InSine },
-				{ "Sine.Out", Ease.OutSine },
-				{ "Sine.InOut", Ease.InOutSine },
-				{ "Bounce.In", Ease.InBounce },
-				{ "Bounce.Out", Ease.OutBounce },
-				{ "Bounce.InOut", Ease.InOutBounce },
-				{ "Circ.In", Ease.InCirc },
-				{ "Circ.Out", Ease.OutCirc },
-				{ "Circ.InOut", Ease.InOutCirc },
-				{ "Expo.In", Ease.InExpo },
-				{ "Expo.Out", Ease.OutExpo },
-				{ "Expo.InOut", Ease.InOutExpo },
-				{ "Back.In", Ease.InBack },
-				{ "Back.Out", Ease.OutBack },
-				{ "Back.InOut", Ease.InOutBack }
-			};
-		public static Ease ParseEaseType(string value)
-		{
-			Ease type;
-			if (!EaseTypeMap.TryGetValue(value, out type))
-				type = Ease.OutExpo;
-
-			return type;
 		}
 
 		public static TransitionActionType ParseTransitionActionType(string value)

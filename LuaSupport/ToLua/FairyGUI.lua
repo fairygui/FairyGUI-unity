@@ -37,6 +37,9 @@ RelationType = FairyGUI.RelationType
 UIPanel = FairyGUI.UIPanel
 UIPainter = FairyGUI.UIPainter
 TypingEffect = FairyGUI.TypingEffect
+GTween = FairyGUI.GTween
+GTweener = FairyGUI.GTweener
+EaseType = FairyGUI.EaseType
 
 fgui = {}
 

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FairyGUI;
-using DG.Tweening;
 
 public class EmitComponent : GComponent
 {
@@ -51,8 +50,8 @@ public class EmitComponent : GComponent
 		int toY = (int)rnd.y * 2;
 
 		EmitManager.inst.view.AddChild(this);
-		DOTween.To(() => Vector2.zero, val => { this.UpdatePosition(val); }, new Vector2(toX, toY), 1f)
-			.SetTarget(this).OnComplete(this.OnCompleted);
+		GTween.To(Vector2.zero, new Vector2(toX, toY), 1f).SetTarget(this)
+			.OnUpdate((GTweener tweener) => { this.UpdatePosition(tweener.value.vec2); }).OnComplete(this.OnCompleted);
 		this.TweenFade(0, 0.5f).SetDelay(0.5f);
 	}
 
@@ -87,7 +86,7 @@ public class EmitComponent : GComponent
 		_owner = null;
 		if (this.parent != null)
 		{
-			DOTween.Kill(this);
+			GTween.Kill(this);
 			EmitManager.inst.view.RemoveChild(this);
 		}
 		EmitManager.inst.ReturnComponent(this);
