@@ -374,7 +374,7 @@ namespace FairyGUI
 		{
 			if (_audio != null)
 			{
-				Object.DestroyObject(_audio);
+				Object.Destroy(_audio);
 				_audio = null;
 			}
 		}

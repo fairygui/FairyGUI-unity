@@ -316,7 +316,11 @@ namespace FairyGUI
 
 			float dt;
 			if (ignoreEngineTimeScale)
+			{
 				dt = Time.unscaledDeltaTime;
+				if (dt > 0.1f)
+					dt = 0.1f;
+			}
 			else
 				dt = Time.deltaTime;
 			if (timeScale != 1)

@@ -459,7 +459,7 @@ namespace FairyGUI
 					else if (_repeat >= 0)
 						_elapsedTime = _delay + _duration * (_repeat + 1);
 					else
-						_elapsedTime = _delay + _duration * 3;
+						_elapsedTime = _delay + _duration * 2;
 					Update();
 				}
 
@@ -567,7 +567,11 @@ namespace FairyGUI
 		{
 			float dt;
 			if (_ignoreEngineTimeScale)
+			{
 				dt = Time.unscaledDeltaTime;
+				if (dt > 0.1f)
+					dt = 0.1f;
+			}
 			else
 				dt = Time.deltaTime;
 			if (_timeScale != 1)
