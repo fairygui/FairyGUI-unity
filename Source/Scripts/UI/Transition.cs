@@ -755,7 +755,7 @@ namespace FairyGUI
 			}
 			else
 			{
-				for (int i = cnt = 1; i >= 0; i--)
+				for (int i = cnt - 1; i >= 0; i--)
 				{
 					TransitionItem item = _items[i];
 					if (item.target == null)
