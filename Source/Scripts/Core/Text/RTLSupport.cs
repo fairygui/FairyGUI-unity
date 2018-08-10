@@ -99,23 +99,34 @@ namespace FairyGUI
 
         private static bool CheckSeparator(char input)
         {
-            if ((input != ' ') && (input != '\t') && (input != '!') && 
-                (input != '.') && (input != '،') && (input != '?') && (input != '؟'))
-            {
-                return false;
-            }
-            return true;
+            return !IsArabicLetter(input);
+
+//             if ((input != ' ') && (input != '\t') && (input != '!') && 
+//                 (input != '.') && (input != '،') && (input != '?') && (input != '؟') && 
+//                 !_IsBracket(input) &&   // 括号也算 [2018/8/1/ 15:12:20 by aq_1000]
+//                 !_IsNeutrality(input))
+//             {
+//                 return false;
+//             }
+//             return true;
         }
 
         private static bool CheckSpecific(char input)
         {
             int num = input;
             if ((num != 0x622) && (num != 0x623) && (num != 0x627) && (num != 0x62f) && (num != 0x625) && 
-                (num != 0x630) && (num != 0x631) && (num != 0x632) && (num != 0x698) && (num != 0x648))
+                (num != 0x630) && (num != 0x631) && (num != 0x632) && (num != 0x698) && (num != 0x648) &&
+                !_CheckSoundmark(input))
             {
                 return false;
             }
             return true;
+        }
+
+        private static bool _CheckSoundmark(char ch)
+        {
+            int un = ch;
+            return (un >= 0x610 && un <= 0x61e) || (un >= 0x64b && un <= 0x65f);
         }
 
         public static string Convert(string input)
@@ -618,7 +629,7 @@ namespace FairyGUI
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' ||
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' || uc == '@' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 
@@ -627,7 +638,7 @@ namespace FairyGUI
         {
             if (uc == '.')
                 return _IsNeutrality(nextChar);
-            return (uc == '!' || uc == '！' || uc == '。');
+            return (uc == '!' || uc == '！' || uc == '。' || uc == '،' || uc == '?' || uc == '؟');
         }
 
         // 判断字符方向
