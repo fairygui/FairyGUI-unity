@@ -146,6 +146,11 @@ namespace FairyGUI
 				_totalActiveTweens = freePosStart;
 			}
 		}
+		
+		internal static void Clean()
+		{
+			_tweenerPool.Clear();
+		}
 
 		static void Init()
 		{

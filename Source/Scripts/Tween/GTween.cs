@@ -10,7 +10,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static bool safeMode = true;
+		public static bool catchCallbackExceptions = true;
 
 		/// <summary>
 		/// 
@@ -176,6 +176,14 @@ namespace FairyGUI
 		public static GTweener GetTween(object target, TweenPropType propType)
 		{
 			return TweenManager.GetTween(target, propType);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public static void Clean()
+		{
+			TweenManager.Clean();
 		}
 	}
 }

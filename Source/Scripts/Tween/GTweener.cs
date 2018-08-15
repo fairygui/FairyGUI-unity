@@ -565,26 +565,22 @@ namespace FairyGUI
 
 		internal void _Update()
 		{
-			float dt;
-			if (_ignoreEngineTimeScale)
-			{
-				dt = Time.unscaledDeltaTime;
-				if (dt > 0.1f)
-					dt = 0.1f;
-			}
-			else
-				dt = Time.deltaTime;
-			if (_timeScale != 1)
-				dt *= Time.timeScale;
-			if (dt == 0)
-				return;
-
 			if (_ended != 0) //Maybe completed by seek
 			{
 				CallCompleteCallback();
 				_killed = true;
 				return;
 			}
+
+			float dt;
+			if (_ignoreEngineTimeScale)
+				dt = Time.unscaledDeltaTime;
+			else
+				dt = Time.deltaTime;
+			if (_timeScale != 1)
+				dt *= _timeScale;
+			if (dt == 0)
+				return;
 
 			_elapsedTime += dt;
 			Update();
@@ -703,7 +699,7 @@ namespace FairyGUI
 
 		void CallStartCallback()
 		{
-			if (GTween.safeMode)
+			if (GTween.catchCallbackExceptions)
 			{
 				try
 				{
@@ -732,7 +728,7 @@ namespace FairyGUI
 
 		void CallUpdateCallback()
 		{
-			if (GTween.safeMode)
+			if (GTween.catchCallbackExceptions)
 			{
 				try
 				{
@@ -761,7 +757,7 @@ namespace FairyGUI
 
 		void CallCompleteCallback()
 		{
-			if (GTween.safeMode)
+			if (GTween.catchCallbackExceptions)
 			{
 				try
 				{

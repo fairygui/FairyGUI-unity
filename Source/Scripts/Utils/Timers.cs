@@ -14,7 +14,7 @@ namespace FairyGUI
 		public static int repeat;
 		public static float time;
 
-		public static bool safeMode = true;
+		public static bool catchCallbackExceptions = true;
 
 		Dictionary<TimerCallback, Anymous_T> _items;
 		Dictionary<TimerCallback, Anymous_T> _toAdd;
@@ -166,9 +166,6 @@ namespace FairyGUI
 		public void Update()
 		{
 			float dt = Time.unscaledDeltaTime;
-			if (dt > 0.1f)
-				dt = 0.1f;
-
 			Dictionary<TimerCallback, Anymous_T>.Enumerator iter;
 
 			if (_items.Count > 0)
@@ -203,7 +200,7 @@ namespace FairyGUI
 					repeat = i.repeat;
 					if (i.callback != null)
 					{
-						if (safeMode)
+						if (catchCallbackExceptions)
 						{
 							try
 							{
