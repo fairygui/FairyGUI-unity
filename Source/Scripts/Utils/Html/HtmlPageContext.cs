@@ -32,9 +32,9 @@ namespace FairyGUI.Utils
 
 		[LuaInterface.NoToLua]
 		public static void ClearStatic()
-		{
-			inst = new HtmlPageContext();
-			_poolManager = null;
+        {
+            _poolManager = null;
+            inst = new HtmlPageContext();
 		}
 
 		virtual public IHtmlObject CreateObject(RichTextField owner, HtmlElement element)

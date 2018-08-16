@@ -1173,7 +1173,14 @@ namespace FairyGUI
 
 			return t;
 		}
-	}
+
+        override public void Dispose()
+        {
+#if UNITY_5_4_OR_NEWER
+            SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
+#endif
+        }
+    }
 
 	class TouchInfo
 	{
