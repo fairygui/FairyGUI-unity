@@ -41,19 +41,19 @@ namespace FairyGUI
 		/// <returns></returns>
 		static public BaseFont GetFont(string name)
 		{
-			string url = UIPackage.NormalizeURL(name);
-			if (url != null)
-				name = url;
-
 			BaseFont ret;
+			if (name.StartsWith(UIPackage.URL_PREFIX))
+			{
+				ret = UIPackage.GetItemAssetByURL(name) as BaseFont;
+				if (ret != null)
+					return ret;
+			}
+
 			if (!sFontFactory.TryGetValue(name, out ret))
 			{
 				ret = new DynamicFont(name);
 				sFontFactory.Add(name, ret);
 			}
-
-			if (ret.packageItem != null && !ret.packageItem.decoded)
-				ret.packageItem.Load();
 
 			return ret;
 		}

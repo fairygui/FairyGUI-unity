@@ -781,7 +781,6 @@ namespace FairyGUI
 					case PackageItemType.Font:
 						{
 							pi.bitmapFont = new BitmapFont(pi);
-							FontManager.RegisterFont(pi.bitmapFont, null);
 							break;
 						}
 
@@ -865,8 +864,6 @@ namespace FairyGUI
 					}
 					pi.audioClip = null;
 				}
-				else if (pi.bitmapFont != null)
-					FontManager.UnregisterFont(pi.bitmapFont);
 			}
 			_items.Clear();
 
