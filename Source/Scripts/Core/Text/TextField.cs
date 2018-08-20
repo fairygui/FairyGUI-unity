@@ -1043,7 +1043,7 @@ namespace FairyGUI
 					else
 						xIndent = Mathf.Ceil(line.width) + GUTTER_X * 2;
 
-					if (_input && xIndent > rectWidth)
+					if (xIndent > rectWidth)
 						xIndent = rectWidth;
 
 					charX = xIndent - GUTTER_X;
@@ -1058,7 +1058,7 @@ namespace FairyGUI
 					else
 						xIndent = 0;
 
-					if (_input && xIndent < 0)
+					if (xIndent < 0)
 						xIndent = 0;
 
 					charX = GUTTER_X + xIndent;
