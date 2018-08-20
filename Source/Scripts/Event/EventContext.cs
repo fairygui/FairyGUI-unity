@@ -87,6 +87,10 @@ namespace FairyGUI
 
 		internal static void Return(EventContext value)
 		{
+			value.sender = null;
+			value.initiator = null;
+			value.data = null;
+			value.inputEvent = null;
 			pool.Push(value);
 		}
 	}
