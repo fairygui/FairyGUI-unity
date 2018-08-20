@@ -501,6 +501,9 @@ namespace FairyGUI
 					}
 				}
 			}
+
+			if ((_font is DynamicFont) && DynamicFont.textRebuildFlag)
+				graphics.texture = _font.mainTexture;
 		}
 
 		void BuildLines()
