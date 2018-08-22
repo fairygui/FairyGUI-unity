@@ -206,12 +206,9 @@ namespace FairyGUI
 					gBridge.CallInternal(context);
 				}
 
-				EventContext.Return(context);
-				context.initiator = null;
-				context.sender = null;
-				context.data = null;
-
-				return context._defaultPrevented;
+                var defaultPrevented = context._defaultPrevented;
+                EventContext.Return(context);
+                return defaultPrevented;                
 			}
 			else
 				return false;
@@ -313,12 +310,10 @@ namespace FairyGUI
 				}
 			}
 
-			EventContext.Return(context);
-			context.initiator = null;
-			context.sender = null;
-			context.data = null;
-			return context._defaultPrevented;
-		}
+            var defaultPrevented = context._defaultPrevented;
+            EventContext.Return(context);
+            return defaultPrevented;
+        }
 
 		/// <summary>
 		/// 
@@ -358,11 +353,9 @@ namespace FairyGUI
 			for (int i = 0; i < length; ++i)
 				bubbleChain[i].CallInternal(context);
 
-			EventContext.Return(context);
-			context.initiator = null;
-			context.sender = null;
-			context.data = null;
-			return context._defaultPrevented;
+            var defaultPrevented = context._defaultPrevented;
+            EventContext.Return(context);
+			return defaultPrevented;
 		}
 
 		static void GetChildEventBridges(string strType, Container container, List<EventBridge> bridges)
