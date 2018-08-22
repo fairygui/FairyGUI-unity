@@ -73,22 +73,37 @@ namespace FairyGUI
 		static Stack<EventContext> pool = new Stack<EventContext>();
 		internal static EventContext Get()
 		{
-			if (pool.Count > 0)
-			{
-				EventContext context = pool.Pop();
-				context._stopsPropagation = false;
-				context._defaultPrevented = false;
-				context._touchCapture = false;
-				return context;
-			}
-			else
-				return new EventContext();
-		}
+            if (pool.Count > 0)
+            {
+                EventContext context = pool.Pop();
+                return context;
+            }
+            else
+                return new EventContext();
+        }
 
 		internal static void Return(EventContext value)
 		{
-			pool.Push(value);
+            value.reset();
+            pool.Push(value);
 		}
-	}
+        internal static void Clear()
+        {
+            pool.Clear();
+        }
+
+        private void reset()
+        {
+            sender = null;
+            initiator = null;
+            inputEvent = null;
+            type = string.Empty;
+            data = null;
+            _stopsPropagation = false;
+            _defaultPrevented = false;
+            _touchCapture = false;
+            callChain.Clear();
+        }
+    }
 
 }
