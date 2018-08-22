@@ -99,10 +99,17 @@ namespace FairyGUI
 
         private static bool CheckSeparator(char input)
         {
-            return !IsArabicLetter(input);
+            if (!IsArabicLetter(input))
+            {
+                return true;   
+            }
+            else
+            {
+                return (input == '،') || (input == '?') || (input == '؟');
+            }
 
-//             if ((input != ' ') && (input != '\t') && (input != '!') && 
-//                 (input != '.') && (input != '،') && (input != '?') && (input != '؟') && 
+//             if ((input != ' ') && (input != '\t') && (input != '!') && (input != '.') && 
+//                 (input != '،') && (input != '?') && (input != '؟') && 
 //                 !_IsBracket(input) &&   // 括号也算 [2018/8/1/ 15:12:20 by aq_1000]
 //                 !_IsNeutrality(input))
 //             {
