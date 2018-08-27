@@ -1018,7 +1018,7 @@ namespace FairyGUI
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 					tex = _resBundle.LoadAsset<Texture>(fileName);
 #else
-					tex = (Texture2D)_resBundle.Load(filePath, typeof(Texture2D));
+					tex = (Texture2D)_resBundle.Load(fileName, typeof(Texture2D));
 #endif
 				}
 				else
@@ -1050,7 +1050,7 @@ namespace FairyGUI
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 						alphaTex = _resBundle.LoadAsset<Texture2D>(fileName);
 #else
-						alphaTex = (Texture2D)_resBundle.Load(filePath, typeof(Texture2D));
+						alphaTex = (Texture2D)_resBundle.Load(fileName, typeof(Texture2D));
 #endif
 					}
 				}

@@ -281,7 +281,7 @@ namespace FairyGUI
 			if (mainTexture != null)
 				mainTexture.Dispose();
 			mainTexture = new NTexture(_font.material.mainTexture);
-			mainTexture.location = 2;
+			mainTexture.destroyMethod = DestroyMethod.None;
 
 			textRebuildFlag = true;
 
