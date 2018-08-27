@@ -641,56 +641,33 @@ namespace FairyGUI
 				UpdateLayout();
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str;
-			str = xml.GetAttribute("url");
-			if (str != null)
-				_url = str;
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("align");
-			if (str != null)
-				_align = FieldTypes.ParseAlign(str);
+			_url = buffer.ReadS();
+			_align = (AlignType)buffer.ReadByte();
+			_verticalAlign = (VertAlignType)buffer.ReadByte();
+			_fill = (FillType)buffer.ReadByte();
+			_shrinkOnly = buffer.ReadBool();
+			_autoSize = buffer.ReadBool();
+			showErrorSign = buffer.ReadBool();
+			_content.playing = buffer.ReadBool();
+			_content.frame = buffer.ReadInt();
 
-			str = xml.GetAttribute("vAlign");
-			if (str != null)
-				_verticalAlign = FieldTypes.ParseVerticalAlign(str);
-
-			str = xml.GetAttribute("fill");
-			if (str != null)
-				_fill = FieldTypes.ParseFillType(str);
-
-			_shrinkOnly = xml.GetAttributeBool("shrinkOnly");
-
-			_autoSize = xml.GetAttributeBool("autoSize");
-
-			str = xml.GetAttribute("errorSign");
-			if (str != null)
-				showErrorSign = str == "true";
-
-			str = xml.GetAttribute("frame");
-			if (str != null)
-				_content.frame = int.Parse(str);
-			_content.playing = xml.GetAttributeBool("playing", true);
-
-			str = xml.GetAttribute("color");
-			if (str != null)
-				_content.color = ToolSet.ConvertFromHtmlColor(str);
-
-			str = xml.GetAttribute("fillMethod");
-			if (str != null)
-				_content.fillMethod = FieldTypes.ParseFillMethod(str);
-
+			if (buffer.ReadBool())
+				_content.color = buffer.ReadColor();
+			_content.fillMethod = (FillMethod)buffer.ReadByte();
 			if (_content.fillMethod != FillMethod.None)
 			{
-				_content.fillOrigin = xml.GetAttributeInt("fillOrigin");
-				_content.fillClockwise = xml.GetAttributeBool("fillClockwise", true);
-				_content.fillAmount = (float)xml.GetAttributeInt("fillAmount", 100) / 100;
+				_content.fillOrigin = buffer.ReadByte();
+				_content.fillClockwise = buffer.ReadBool();
+				_content.fillAmount = buffer.ReadFloat();
 			}
 
-			if (_url != null)
+			if (!string.IsNullOrEmpty(_url))
 				LoadContent();
 		}
 	}

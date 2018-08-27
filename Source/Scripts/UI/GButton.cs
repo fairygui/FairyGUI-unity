@@ -6,7 +6,7 @@ namespace FairyGUI
 	/// <summary>
 	/// GButton class.
 	/// </summary>
-	public class GButton : GComponent
+	public class GButton : GComponent, IColorGear
 	{
 		/// <summary>
 		/// The button will be in down status in these pages.
@@ -16,7 +16,7 @@ namespace FairyGUI
 		/// <summary>
 		/// Play sound when button is clicked.
 		/// </summary>
-		public AudioClip sound;
+		public NAudioClip sound;
 
 		/// <summary>
 		/// Volume of the click sound. (0-1)
@@ -167,51 +167,54 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_titleObject is GTextField)
-					return ((GTextField)_titleObject).color;
-				else if (_titleObject is GLabel)
-					return ((GLabel)_titleObject).titleColor;
-				else if (_titleObject is GButton)
-					return ((GButton)_titleObject).titleColor;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.color;
 				else
 					return Color.black;
 			}
 			set
 			{
-				if (_titleObject is GTextField)
-					((GTextField)_titleObject).color = value;
-				else if (_titleObject is GLabel)
-					((GLabel)_titleObject).titleColor = value;
-				else if (_titleObject is GButton)
-					((GButton)_titleObject).titleColor = value;
+				GTextField tf = GetTextField();
+				if (tf != null)
+				{
+					tf.color = value;
+					UpdateGear(4);
+				}
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public Color color
+		{
+			get { return this.titleColor; }
+			set { this.titleColor = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int titleFontSize
 		{
 			get
 			{
-				if (_titleObject is GTextField)
-					return ((GTextField)_titleObject).textFormat.size;
-				else if (_titleObject is GLabel)
-					return ((GLabel)_titleObject).titleFontSize;
-				else if (_titleObject is GButton)
-					return ((GButton)_titleObject).titleFontSize;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.textFormat.size;
 				else
 					return 0;
 			}
 			set
 			{
-				if (_titleObject is GTextField)
+				GTextField tf = GetTextField();
+				if (tf != null)
 				{
-					TextFormat tf = ((GTextField)_titleObject).textFormat;
-					tf.size = value;
-					((GTextField)_titleObject).textFormat = tf;
+					TextFormat format = ((GTextField)_titleObject).textFormat;
+					format.size = value;
+					tf.textFormat = format;
 				}
-				else if (_titleObject is GLabel)
-					((GLabel)_titleObject).titleFontSize = value;
-				else if (_titleObject is GButton)
-					((GButton)_titleObject).titleFontSize = value;
 			}
 		}
 
@@ -318,6 +321,22 @@ namespace FairyGUI
 			__click();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public GTextField GetTextField()
+		{
+			if (_titleObject is GTextField)
+				return (GTextField)_titleObject;
+			else if (_titleObject is GLabel)
+				return ((GLabel)_titleObject).GetTextField();
+			else if (_titleObject is GButton)
+				return ((GButton)_titleObject).GetTextField();
+			else
+				return null;
+		}
+
 		protected void SetState(string val)
 		{
 			if (_buttonController != null)
@@ -416,35 +435,19 @@ namespace FairyGUI
 				base.HandleGrayedChanged();
 		}
 
-		override public void ConstructFromXML(XML cxml)
+		override protected void ConstructExtension(ByteBuffer buffer)
 		{
-			base.ConstructFromXML(cxml);
+			buffer.Seek(0, 6);
 
-			XML xml = cxml.GetNode("Button");
-
-			string str;
-			str = xml.GetAttribute("mode");
+			_mode = (ButtonMode)buffer.ReadByte();
+			string str = buffer.ReadS();
 			if (str != null)
-				_mode = FieldTypes.ParseButtonMode(str);
-			else
-				_mode = ButtonMode.Common;
-
-			str = xml.GetAttribute("sound");
-			if (str != null)
-				sound = UIPackage.GetItemAssetByURL(str) as AudioClip;
-
-			str = xml.GetAttribute("volume");
-			if (str != null)
-				soundVolumeScale = float.Parse(str) / 100f;
-
-			str = xml.GetAttribute("downEffect");
-			if (str != null)
-			{
-				_downEffect = str == "dark" ? 1 : (str == "scale" ? 2 : 0);
-				_downEffectValue = xml.GetAttributeFloat("downEffectValue");
-				if (_downEffect == 2)
-					this.SetPivot(0.5f, 0.5f, this.pivotAsAnchor);
-			}
+				sound = UIPackage.GetItemAssetByURL(str) as NAudioClip;
+			soundVolumeScale = buffer.ReadFloat();
+			_downEffect = buffer.ReadByte();
+			_downEffectValue = buffer.ReadFloat();
+			if (_downEffect == 2)
+				SetPivot(0.5f, 0.5f, this.pivotAsAnchor);
 
 			_buttonController = GetController("button");
 			_titleObject = GetChild("title");
@@ -465,48 +468,47 @@ namespace FairyGUI
 			displayObject.onClick.Add(__click);
 		}
 
-		override public void Setup_AfterAdd(XML cxml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(cxml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			XML xml = cxml.GetNode("Button");
-			if (xml == null)
+			if (!buffer.Seek(beginPos, 6))
+				return;
+
+			if ((ObjectType)buffer.ReadByte() != packageItem.objectType)
 				return;
 
 			string str;
 
-			str = xml.GetAttribute("title");
+			str = buffer.ReadS();
 			if (str != null)
 				this.title = str;
-			str = xml.GetAttribute("icon");
-			if (str != null)
-				this.icon = str;
-			str = xml.GetAttribute("selectedTitle");
+			str = buffer.ReadS();
 			if (str != null)
 				this.selectedTitle = str;
-			str = xml.GetAttribute("selectedIcon");
+			str = buffer.ReadS();
+			if (str != null)
+				this.icon = str;
+			str = buffer.ReadS();
 			if (str != null)
 				this.selectedIcon = str;
+			if (buffer.ReadBool())
+				this.titleColor = buffer.ReadColor();
+			int iv = buffer.ReadInt();
+			if (iv != 0)
+				this.titleFontSize = iv;
+			iv = buffer.ReadShort();
+			if (iv >= 0)
+				_relatedController = parent.GetControllerAt(iv);
+			pageOption.id = buffer.ReadS();
 
-			str = xml.GetAttribute("titleColor");
+			str = buffer.ReadS();
 			if (str != null)
-				this.titleColor = ToolSet.ConvertFromHtmlColor(str);
-			str = xml.GetAttribute("titleFontSize");
-			if (str != null)
-				this.titleFontSize = int.Parse(str);
-			str = xml.GetAttribute("controller");
-			if (str != null)
-				_relatedController = parent.GetController(str);
-			pageOption.id = xml.GetAttribute("page");
-			this.selected = xml.GetAttributeBool("checked", false);
+				sound = UIPackage.GetItemAssetByURL(str) as NAudioClip;
+			if (buffer.ReadBool())
+				soundVolumeScale = buffer.ReadFloat();
 
-			str = xml.GetAttribute("sound");
-			if (str != null)
-				sound = UIPackage.GetItemAssetByURL(str) as AudioClip;
-
-			str = xml.GetAttribute("volume");
-			if (str != null)
-				soundVolumeScale = float.Parse(str) / 100f;
+			this.selected = buffer.ReadBool();
 		}
 
 		private void __rollover()
@@ -598,8 +600,8 @@ namespace FairyGUI
 
 		private void __click()
 		{
-			if (sound != null)
-				Stage.inst.PlayOneShotSound(sound, soundVolumeScale);
+			if (sound != null && sound.nativeClip != null)
+				Stage.inst.PlayOneShotSound(sound.nativeClip, soundVolumeScale);
 
 			if (_mode == ButtonMode.Check)
 			{

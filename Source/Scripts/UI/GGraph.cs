@@ -212,58 +212,38 @@ namespace FairyGUI
 			this.shape.DrawPolygon(points, fillColor);
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			string str;
-			string type = xml.GetAttribute("type");
-			if (type != null && type != "empty")
+			buffer.Seek(beginPos, 5);
+
+			int type = buffer.ReadByte();
+			int lineSize = 0;
+			Color lineColor = new Color();
+			Color fillColor = new Color();
+			float[] cornerRadius = null;
+
+			if (type != 0)
 			{
 				_shape = new Shape();
 				_shape.gOwner = this;
 				displayObject = _shape;
-			}
 
-			base.Setup_BeforeAdd(xml);
-
-			if (_shape != null)
-			{
-				int lineSize;
-				str = xml.GetAttribute("lineSize");
-				if (str != null)
-					lineSize = int.Parse(str);
-				else
-					lineSize = 1;
-
-				Color lineColor;
-				str = xml.GetAttribute("lineColor");
-				if (str != null)
-					lineColor = ToolSet.ConvertFromHtmlColor(str);
-				else
-					lineColor = Color.black;
-
-				Color fillColor;
-				str = xml.GetAttribute("fillColor");
-				if (str != null)
-					fillColor = ToolSet.ConvertFromHtmlColor(str);
-				else
-					fillColor = Color.white;
-
-				float[] cornerRadius = null;
-				string[] arr;
-				arr = xml.GetAttributeArray("corner");
-				if (arr != null && arr.Length > 0)
+				lineSize = buffer.ReadInt();
+				lineColor = buffer.ReadColor();
+				fillColor = buffer.ReadColor();
+				cornerRadius = null;
+				if (buffer.ReadBool())
 				{
 					cornerRadius = new float[4];
 					for (int i = 0; i < 4; i++)
-					{
-						if (i < arr.Length)
-							cornerRadius[i] = float.Parse(arr[i]);
-						else
-							cornerRadius[i] = cornerRadius[i - 1];
-					}
+						cornerRadius[i] = buffer.ReadFloat();
 				}
+			}
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-				if (type == "rect")
+			if (_shape != null)
+			{
+				if (type == 1)
 				{
 					if (cornerRadius != null)
 						DrawRoundRect(this.width, this.height, fillColor, cornerRadius);

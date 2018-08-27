@@ -249,8 +249,15 @@ namespace FairyGUI.Utils
 						{
 							PushTextFormat();
 							string align = XMLIterator.GetAttribute("align");
-							_format.align = FieldTypes.ParseAlign(align);
-
+							switch (align)
+							{
+								case "center":
+									_format.align = AlignType.Center;
+									break;
+								case "right":
+									_format.align = AlignType.Right;
+									break;
+							}
 							if (!IsNewLine())
 								AppendText("\n");
 						}

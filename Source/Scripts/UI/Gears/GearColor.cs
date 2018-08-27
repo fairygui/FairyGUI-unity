@@ -29,7 +29,6 @@ namespace FairyGUI
 	{
 		Dictionary<string, GearColorValue> _storage;
 		GearColorValue _default;
-		GTweener _tweener;
 
 		public GearColor(GObject owner)
 			: base(owner)
@@ -45,32 +44,19 @@ namespace FairyGUI
 			_storage = new Dictionary<string, GearColorValue>();
 		}
 
-		override protected void AddStatus(string pageId, string value)
+		override protected void AddStatus(string pageId, ByteBuffer buffer)
 		{
-			if (value == "-" || value.Length == 0)
-				return;
-
-			Color col1;
-			Color col2;
-			int pos = value.IndexOf(",");
-			if (pos == -1)
-			{
-				col1 = ToolSet.ConvertFromHtmlColor(value);
-				col2 = Color.clear;
-			}
-			else
-			{
-				col1 = ToolSet.ConvertFromHtmlColor(value.Substring(0, pos));
-				col2 = ToolSet.ConvertFromHtmlColor(value.Substring(pos + 1));
-			}
-
+			GearColorValue gv;
 			if (pageId == null)
-			{
-				_default.color = col1;
-				_default.strokeColor = col2;
-			}
+				gv = _default;
 			else
-				_storage[pageId] = new GearColorValue(col1, col2);
+			{
+				gv = new GearColorValue(Color.black, Color.black);
+				_storage[pageId] = gv;
+			}
+
+			gv.color = buffer.ReadColor();
+			gv.strokeColor = buffer.ReadColor();
 		}
 
 		override public void Apply()
@@ -79,7 +65,7 @@ namespace FairyGUI
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
 				gv = _default;
 
-			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
+			if (_tweenConfig != null && _tweenConfig.tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
 			{
 				if ((_owner is ITextColorGear) && gv.strokeColor.a > 0)
 				{
@@ -88,12 +74,12 @@ namespace FairyGUI
 					_owner._gearLocked = false;
 				}
 
-				if (_tweener != null)
+				if (_tweenConfig._tweener != null)
 				{
-					if (_tweener.endValue.color != gv.color)
+					if (_tweenConfig._tweener.endValue.color != gv.color)
 					{
-						_tweener.Kill(true);
-						_tweener = null;
+						_tweenConfig._tweener.Kill(true);
+						_tweenConfig._tweener = null;
 					}
 					else
 						return;
@@ -102,11 +88,11 @@ namespace FairyGUI
 				if (((IColorGear)_owner).color != gv.color)
 				{
 					if (_owner.CheckGearController(0, _controller))
-						_displayLockToken = _owner.AddDisplayLock();
+						_tweenConfig._displayLockToken = _owner.AddDisplayLock();
 
-					_tweener = GTween.To(((IColorGear)_owner).color, gv.color, tweenTime)
-						.SetDelay(delay)
-						.SetEase(easeType)
+					_tweenConfig._tweener = GTween.To(((IColorGear)_owner).color, gv.color, _tweenConfig.duration)
+						.SetDelay(_tweenConfig.delay)
+						.SetEase(_tweenConfig.easeType)
 						.SetTarget(this)
 						.SetListener(this);
 				}
@@ -136,11 +122,11 @@ namespace FairyGUI
 
 		public void OnTweenComplete(GTweener tweener)
 		{
-			_tweener = null;
-			if (_displayLockToken != 0)
+			_tweenConfig._tweener = null;
+			if (_tweenConfig._displayLockToken != 0)
 			{
-				_owner.ReleaseDisplayLock(_displayLockToken);
-				_displayLockToken = 0;
+				_owner.ReleaseDisplayLock(_tweenConfig._displayLockToken);
+				_tweenConfig._displayLockToken = 0;
 			}
 			_owner.OnGearStop.Call(this);
 		}

@@ -1264,13 +1264,13 @@ namespace FairyGUI
 						if (value.audioClip == null)
 						{
 							if (UIConfig.soundLoader == null || value.sound.StartsWith(UIPackage.URL_PREFIX))
-								value.audioClip = UIPackage.GetItemAssetByURL(value.sound) as AudioClip;
+								value.audioClip = UIPackage.GetItemAssetByURL(value.sound) as NAudioClip;
 							else
 								value.audioClip = UIConfig.soundLoader(value.sound);
 						}
 
-						if (value.audioClip != null)
-							Stage.inst.PlayOneShotSound(value.audioClip, value.volume);
+						if (value.audioClip != null && value.audioClip.nativeClip != null)
+							Stage.inst.PlayOneShotSound(value.audioClip.nativeClip, value.volume);
 					}
 					break;
 
@@ -1297,72 +1297,71 @@ namespace FairyGUI
 			item.target._gearLocked = false;
 		}
 
-		public void Setup(XML xml)
+		public void Setup(ByteBuffer buffer)
 		{
-			this.name = xml.GetAttribute("name");
-			_options = xml.GetAttributeInt("options");
-			_autoPlay = xml.GetAttributeBool("autoPlay");
-			if (_autoPlay)
-			{
-				_autoPlayTimes = xml.GetAttributeInt("autoPlayRepeat", 1);
-				_autoPlayDelay = xml.GetAttributeFloat("autoPlayDelay");
-			}
+			this.name = buffer.ReadS();
+			_options = buffer.ReadInt();
+			_autoPlay = buffer.ReadBool();
+			_autoPlayTimes = buffer.ReadInt();
+			_autoPlayDelay = buffer.ReadFloat();
 
-			float frameInterval = 1.0f / xml.GetAttributeInt("fps", 24);
-
-			XMLList xlist = xml.Elements();
-			int cnt = xlist.Count;
+			int cnt = buffer.ReadShort();
 			_items = new TransitionItem[cnt];
 			for (int i = 0; i < cnt; i++)
 			{
-				XML cxml = xlist[i];
-				TransitionItem item = new TransitionItem(FieldTypes.ParseTransitionActionType(cxml.GetAttribute("type")));
+				int dataLen = buffer.ReadShort();
+				int curPos = buffer.position;
+
+				buffer.Seek(curPos, 0);
+
+				TransitionItem item = new TransitionItem((TransitionActionType)buffer.ReadByte());
 				_items[i] = item;
 
-				item.time = (float)cxml.GetAttributeInt("time") * frameInterval;
-				item.targetId = cxml.GetAttribute("target", string.Empty);
-				if (cxml.GetAttributeBool("tween"))
-					item.tweenConfig = new TweenConfig();
-				item.label = cxml.GetAttribute("label");
+				item.time = buffer.ReadFloat();
+				int targetId = buffer.ReadShort();
+				if (targetId < 0)
+					item.targetId = string.Empty;
+				else
+					item.targetId = _owner.GetChildAt(targetId).id;
+				item.label = buffer.ReadS();
 
-				if (item.tweenConfig != null)
+				if (buffer.ReadBool())
 				{
-					item.tweenConfig.duration = (float)cxml.GetAttributeInt("duration") * frameInterval;
+					buffer.Seek(curPos, 1);
+
+					item.tweenConfig = new TweenConfig();
+					item.tweenConfig.duration = buffer.ReadFloat();
 					if (item.time + item.tweenConfig.duration > _totalDuration)
 						_totalDuration = item.time + item.tweenConfig.duration;
+					item.tweenConfig.easeType = (EaseType)buffer.ReadByte();
+					item.tweenConfig.repeat = buffer.ReadInt();
+					item.tweenConfig.yoyo = buffer.ReadBool();
+					item.tweenConfig.endLabel = buffer.ReadS();
 
-					string ease = cxml.GetAttribute("ease");
-					if (ease != null)
-						item.tweenConfig.easeType = EaseTypeUtils.ParseEaseType(ease);
+					buffer.Seek(curPos, 2);
 
-					item.tweenConfig.repeat = cxml.GetAttributeInt("repeat");
-					item.tweenConfig.yoyo = cxml.GetAttributeBool("yoyo");
-					item.tweenConfig.endLabel = cxml.GetAttribute("label2");
+					DecodeValue(item, buffer, item.tweenConfig.startValue);
 
-					string v = cxml.GetAttribute("endValue");
-					if (v != null)
-					{
-						DecodeValue(item, cxml.GetAttribute("startValue", string.Empty), item.tweenConfig.startValue);
-						DecodeValue(item, v, item.tweenConfig.endValue);
-					}
-					else
-					{
-						item.tweenConfig = null;
-						DecodeValue(item, cxml.GetAttribute("startValue", string.Empty), item.value);
-					}
+					buffer.Seek(curPos, 3);
+
+					DecodeValue(item, buffer, item.tweenConfig.endValue);
 				}
 				else
 				{
 					if (item.time > _totalDuration)
 						_totalDuration = item.time;
-					DecodeValue(item, cxml.GetAttribute("value", string.Empty), item.value);
+
+					buffer.Seek(curPos, 2);
+
+					DecodeValue(item, buffer, item.value);
 				}
+
+				buffer.position = curPos + dataLen;
 			}
 		}
 
-		void DecodeValue(TransitionItem item, string str, object value)
+		void DecodeValue(TransitionItem item, ByteBuffer buffer, object value)
 		{
-			string[] arr;
 			switch (item.type)
 			{
 				case TransitionActionType.XY:
@@ -1371,107 +1370,59 @@ namespace FairyGUI
 				case TransitionActionType.Skew:
 					{
 						TValue tvalue = (TValue)value;
-						arr = str.Split(',');
-						if (arr[0] == "-")
-						{
-							tvalue.b1 = false;
-						}
-						else
-						{
-							tvalue.f1 = float.Parse(arr[0]);
-							tvalue.b1 = true;
-						}
-						if (arr[1] == "-")
-						{
-							tvalue.b2 = false;
-						}
-						else
-						{
-							tvalue.f2 = float.Parse(arr[1]);
-							tvalue.b2 = true;
-						}
+						tvalue.b1 = buffer.ReadBool();
+						tvalue.b2 = buffer.ReadBool();
+						tvalue.f1 = buffer.ReadFloat();
+						tvalue.f2 = buffer.ReadFloat();
 					}
 					break;
 
 				case TransitionActionType.Alpha:
-					((TValue)value).f1 = float.Parse(str);
-					break;
-
 				case TransitionActionType.Rotation:
-					((TValue)value).f1 = float.Parse(str);
+					((TValue)value).f1 = buffer.ReadFloat();
 					break;
 
 				case TransitionActionType.Scale:
-					arr = str.Split(',');
-					((TValue)value).f1 = float.Parse(arr[0]);
-					((TValue)value).f2 = float.Parse(arr[1]);
+					((TValue)value).f1 = buffer.ReadFloat();
+					((TValue)value).f2 = buffer.ReadFloat();
 					break;
 
 				case TransitionActionType.Color:
-					((TValue)value).color = ToolSet.ConvertFromHtmlColor(str);
+					((TValue)value).color = buffer.ReadColor();
 					break;
 
 				case TransitionActionType.Animation:
-					{
-						TValue_Animation tvalue = (TValue_Animation)value;
-						arr = str.Split(',');
-						if (arr[0] == "-")
-							tvalue.frame = -1;
-						else
-							tvalue.frame = int.Parse(arr[0]);
-						tvalue.playing = arr[1] == "p";
-					}
+					((TValue_Animation)value).playing = buffer.ReadBool();
+					((TValue_Animation)value).frame = buffer.ReadInt();
 					break;
 
 				case TransitionActionType.Visible:
-					((TValue_Visible)value).visible = str == "true";
+					((TValue_Visible)value).visible = buffer.ReadBool();
 					break;
 
 				case TransitionActionType.Sound:
-					{
-						TValue_Sound tvalue = (TValue_Sound)value;
-						arr = str.Split(',');
-						tvalue.sound = arr[0];
-						if (arr.Length > 1)
-						{
-							int intv = int.Parse(arr[1]);
-							if (intv == 100 || intv == 0)
-								tvalue.volume = 1;
-							else
-								tvalue.volume = (float)intv / 100f;
-						}
-						else
-							tvalue.volume = 1;
-					}
+					((TValue_Sound)value).sound = buffer.ReadS();
+					((TValue_Sound)value).volume = buffer.ReadFloat();
 					break;
 
 				case TransitionActionType.Transition:
-					{
-						TValue_Transition tvalue = (TValue_Transition)value;
-						arr = str.Split(',');
-						tvalue.transName = arr[0];
-						if (arr.Length > 1)
-							tvalue.playTimes = int.Parse(arr[1]);
-						else
-							tvalue.playTimes = 1;
-						tvalue.playCompleteDelegate = () => { OnPlayTransCompleted(item); };
-					}
+					((TValue_Transition)value).transName = buffer.ReadS();
+					((TValue_Transition)value).playTimes = buffer.ReadInt();
+					((TValue_Transition)value).playCompleteDelegate = () => { OnPlayTransCompleted(item); };
 					break;
 
 				case TransitionActionType.Shake:
-					arr = str.Split(',');
-					((TValue_Shake)value).amplitude = float.Parse(arr[0]);
-					((TValue_Shake)value).duration = float.Parse(arr[1]);
+					((TValue_Shake)value).amplitude = buffer.ReadFloat();
+					((TValue_Shake)value).duration = buffer.ReadFloat();
 					break;
 
 				case TransitionActionType.ColorFilter:
 					{
 						TValue tvalue = (TValue)value;
-						arr = str.Split(',');
-						tvalue.f1 = float.Parse(arr[0]);
-						tvalue.f2 = float.Parse(arr[1]);
-						tvalue.f3 = float.Parse(arr[2]);
-						tvalue.f4 = float.Parse(arr[3]);
+						tvalue.f1 = buffer.ReadFloat();
+						tvalue.f2 = buffer.ReadFloat();
+						tvalue.f3 = buffer.ReadFloat();
+						tvalue.f4 = buffer.ReadFloat();
 					}
 					break;
 			}
@@ -1571,7 +1522,7 @@ namespace FairyGUI
 	{
 		public string sound;
 		public float volume;
-		public AudioClip audioClip;
+		public NAudioClip audioClip;
 	}
 
 	class TValue_Transition

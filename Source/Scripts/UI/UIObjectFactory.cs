@@ -67,7 +67,7 @@ namespace FairyGUI
 				pi.extensionCreator = null;
 		}
 
-		internal static void Clear()
+		public static void Clear()
 		{
 			packageItemExtensions.Clear();
 			loaderCreator = null;
@@ -80,54 +80,13 @@ namespace FairyGUI
 		/// <returns></returns>
 		public static GObject NewObject(PackageItem pi)
 		{
-			Stats.LatestObjectCreation++;
-
-			switch (pi.type)
+			if (pi.extensionCreator != null)
 			{
-				case PackageItemType.Image:
-					return new GImage();
-
-				case PackageItemType.MovieClip:
-					return new GMovieClip();
-
-				case PackageItemType.Component:
-					{
-						if (pi.extensionCreator != null)
-							return pi.extensionCreator();
-
-						XML xml = pi.componentData;
-						string extention = xml.GetAttribute("extention");
-						if (extention != null)
-						{
-							switch (extention)
-							{
-								case "Button":
-									return new GButton();
-
-								case "Label":
-									return new GLabel();
-
-								case "ProgressBar":
-									return new GProgressBar();
-
-								case "Slider":
-									return new GSlider();
-
-								case "ScrollBar":
-									return new GScrollBar();
-
-								case "ComboBox":
-									return new GComboBox();
-
-								default:
-									return new GComponent();
-							}
-						}
-						else
-							return new GComponent();
-					}
+				Stats.LatestObjectCreation++;
+				return pi.extensionCreator();
 			}
-			return null;
+			else
+				return NewObject(pi.objectType);
 		}
 
 		/// <summary>
@@ -135,46 +94,66 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static GObject NewObject(string type)
+		public static GObject NewObject(ObjectType type)
 		{
 			Stats.LatestObjectCreation++;
 
 			switch (type)
 			{
-				case "image":
+				case ObjectType.Image:
 					return new GImage();
 
-				case "movieclip":
+				case ObjectType.MovieClip:
 					return new GMovieClip();
 
-				case "component":
+				case ObjectType.Component:
 					return new GComponent();
 
-				case "text":
+				case ObjectType.Text:
 					return new GTextField();
 
-				case "richtext":
+				case ObjectType.RichText:
 					return new GRichTextField();
 
-				case "inputtext":
+				case ObjectType.InputText:
 					return new GTextInput();
 
-				case "group":
+				case ObjectType.Group:
 					return new GGroup();
 
-				case "list":
+				case ObjectType.List:
 					return new GList();
 
-				case "graph":
+				case ObjectType.Graph:
 					return new GGraph();
 
-				case "loader":
+				case ObjectType.Loader:
 					if (loaderCreator != null)
 						return loaderCreator();
 					else
 						return new GLoader();
+
+				case ObjectType.Button:
+					return new GButton();
+
+				case ObjectType.Label:
+					return new GLabel();
+
+				case ObjectType.ProgressBar:
+					return new GProgressBar();
+
+				case ObjectType.Slider:
+					return new GSlider();
+
+				case ObjectType.ScrollBar:
+					return new GScrollBar();
+
+				case ObjectType.ComboBox:
+					return new GComboBox();
+
+				default:
+					return null;
 			}
-			return null;
 		}
 	}
 }

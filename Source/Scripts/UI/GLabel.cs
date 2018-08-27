@@ -92,51 +92,45 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_titleObject is GTextField)
-					return ((GTextField)_titleObject).color;
-				else if (_titleObject is GLabel)
-					return ((GLabel)_titleObject).titleColor;
-				else if (_titleObject is GButton)
-					return ((GButton)_titleObject).titleColor;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.color;
 				else
 					return Color.black;
 			}
 			set
 			{
-				if (_titleObject is GTextField)
-					((GTextField)_titleObject).color = value;
-				else if (_titleObject is GLabel)
-					((GLabel)_titleObject).titleColor = value;
-				else if (_titleObject is GButton)
-					((GButton)_titleObject).titleColor = value;
+				GTextField tf = GetTextField();
+				if (tf != null)
+				{
+					tf.color = value;
+					UpdateGear(4);
+				}
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public int titleFontSize
 		{
 			get
 			{
-				if (_titleObject is GTextField)
-					return ((GTextField)_titleObject).textFormat.size;
-				else if (_titleObject is GLabel)
-					return ((GLabel)_titleObject).titleFontSize;
-				else if (_titleObject is GButton)
-					return ((GButton)_titleObject).titleFontSize;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.textFormat.size;
 				else
 					return 0;
 			}
 			set
 			{
-				if (_titleObject is GTextField)
+				GTextField tf = GetTextField();
+				if (tf != null)
 				{
-					TextFormat tf = ((GTextField)_titleObject).textFormat;
-					tf.size = value;
-					((GTextField)_titleObject).textFormat = tf;
+					TextFormat format = ((GTextField)_titleObject).textFormat;
+					format.size = value;
+					tf.textFormat = format;
 				}
-				else if (_titleObject is GLabel)
-					((GLabel)_titleObject).titleFontSize = value;
-				else if (_titleObject is GButton)
-					((GButton)_titleObject).titleFontSize = value;
 			}
 		}
 
@@ -146,57 +140,78 @@ namespace FairyGUI
 		public Color color
 		{
 			get { return this.titleColor; }
-			set
-			{
-				this.titleColor = value;
-				UpdateGear(4);
-			}
+			set { this.titleColor = value; }
 		}
 
-		override public void ConstructFromXML(XML cxml)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public GTextField GetTextField()
 		{
-			base.ConstructFromXML(cxml);
+			if (_titleObject is GTextField)
+				return (GTextField)_titleObject;
+			else if (_titleObject is GLabel)
+				return ((GLabel)_titleObject).GetTextField();
+			else if (_titleObject is GButton)
+				return ((GButton)_titleObject).GetTextField();
+			else
+				return null;
+		}
 
+		override protected void ConstructExtension(ByteBuffer buffer)
+		{
 			_titleObject = GetChild("title");
 			_iconObject = GetChild("icon");
 		}
 
-		override public void Setup_AfterAdd(XML cxml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(cxml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			XML xml = cxml.GetNode("Label");
-			if (xml == null)
+			if (!buffer.Seek(beginPos, 6))
+				return;
+
+			if ((ObjectType)buffer.ReadByte() != packageItem.objectType)
 				return;
 
 			string str;
-			str = xml.GetAttribute("title");
+			str = buffer.ReadS();
 			if (str != null)
 				this.title = str;
-			str = xml.GetAttribute("icon");
+			str = buffer.ReadS();
 			if (str != null)
 				this.icon = str;
-			str = xml.GetAttribute("titleColor");
-			if (str != null)
-				this.titleColor = ToolSet.ConvertFromHtmlColor(str);
-			str = xml.GetAttribute("titleFontSize");
-			if (str != null)
-				this.titleFontSize = int.Parse(str);
+			if (buffer.ReadBool())
+				this.titleColor = buffer.ReadColor();
+			int iv = buffer.ReadInt();
+			if (iv != 0)
+				this.titleFontSize = iv;
 
-			if (_titleObject is GTextInput)
+			if (buffer.ReadBool())
 			{
-				GTextInput input = ((GTextInput)_titleObject);
-				str = xml.GetAttribute("prompt");
-				if (str != null)
-					input.promptText = str;
+				GTextInput input = GetTextField() as GTextInput;
+				if (input != null)
+				{
+					str = buffer.ReadS();
+					if (str != null)
+						input.promptText = str;
 
-				str = xml.GetAttribute("restrict");
-				if (str != null)
-					input.restrict = str;
+					str = buffer.ReadS();
+					if (str != null)
+						input.restrict = str;
 
-				input.maxLength = xml.GetAttributeInt("maxLength", input.maxLength);
-				input.keyboardType = xml.GetAttributeInt("keyboardType", input.keyboardType);
-				input.displayAsPassword = xml.GetAttributeBool("password", input.displayAsPassword);
+					iv = buffer.ReadInt();
+					if (iv != 0)
+						input.maxLength = iv;
+					iv = buffer.ReadInt();
+					if (iv != 0)
+						input.keyboardType = iv;
+					if (buffer.ReadBool())
+						input.displayAsPassword = true;
+				}
+				else
+					buffer.Skip(13);
 			}
 		}
 	}

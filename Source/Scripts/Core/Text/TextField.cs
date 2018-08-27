@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using FairyGUI.Utils;
@@ -502,7 +501,7 @@ namespace FairyGUI
 				}
 			}
 
-			if ((_font is DynamicFont) && DynamicFont.textRebuildFlag)
+			if((_font is DynamicFont) && DynamicFont.textRebuildFlag)
 				graphics.texture = _font.mainTexture;
 		}
 

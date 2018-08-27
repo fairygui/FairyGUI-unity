@@ -5,17 +5,23 @@ namespace FairyGUI
 {
 	public class ControllerAction
 	{
+		public enum ActionType
+		{
+			PlayTransition,
+			ChangePage
+		}
+
 		public string[] fromPage;
 		public string[] toPage;
 
-		public static ControllerAction CreateAction(string type)
+		public static ControllerAction CreateAction(ActionType type)
 		{
 			switch (type)
 			{
-				case "play_transition":
+				case ActionType.PlayTransition:
 					return new PlayTransitionAction();
 
-				case "change_page":
+				case ActionType.ChangePage:
 					return new ChangePageAction();
 			}
 			return null;
@@ -44,10 +50,19 @@ namespace FairyGUI
 
 		}
 
-		virtual public void Setup(XML xml)
+		virtual public void Setup(ByteBuffer buffer)
 		{
-			fromPage = xml.GetAttributeArray("fromPage");
-			toPage = xml.GetAttributeArray("toPage");
+			int cnt;
+
+			cnt = buffer.ReadShort();
+			fromPage = new string[cnt];
+			for (int i = 0; i < cnt; i++)
+				fromPage[i] = buffer.ReadS();
+
+			cnt = buffer.ReadShort();
+			toPage = new string[cnt];
+			for (int i = 0; i < cnt; i++)
+				toPage[i] = buffer.ReadS();
 		}
 	}
 }

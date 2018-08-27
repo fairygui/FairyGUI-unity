@@ -39,14 +39,14 @@ namespace FairyGUI
 			}
 		}
 
-		override public void Setup(XML xml)
+		override public void Setup(ByteBuffer buffer)
 		{
-			base.Setup(xml);
+			base.Setup(buffer);
 
-			transitionName = xml.GetAttribute("transition");
-			playTimes = xml.GetAttributeInt("repeat", 1);
-			delay = xml.GetAttributeFloat("delay", 0);
-			stopOnExit = xml.GetAttributeBool("stopOnExit", false);
+			transitionName = buffer.ReadS();
+			playTimes = buffer.ReadInt();
+			delay = buffer.ReadFloat();
+			stopOnExit = buffer.ReadBool();
 		}
 	}
 }

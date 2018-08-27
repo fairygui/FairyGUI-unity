@@ -30,13 +30,13 @@ namespace FairyGUI
 			}
 		}
 
-		override public void Setup(XML xml)
+		override public void Setup(ByteBuffer buffer)
 		{
-			base.Setup(xml);
+			base.Setup(buffer);
 
-			objectId = xml.GetAttribute("objectId");
-			controllerName = xml.GetAttribute("controller");
-			targetPage = xml.GetAttribute("targetPage");
+			objectId = buffer.ReadS();
+			controllerName = buffer.ReadS();
+			targetPage = buffer.ReadS();
 		}
 	}
 }

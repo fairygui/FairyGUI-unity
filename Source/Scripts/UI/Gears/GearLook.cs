@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -26,7 +27,6 @@ namespace FairyGUI
 	{
 		Dictionary<string, GearLookValue> _storage;
 		GearLookValue _default;
-		GTweener _tweener;
 
 		public GearLook(GObject owner)
 			: base(owner)
@@ -39,23 +39,21 @@ namespace FairyGUI
 			_storage = new Dictionary<string, GearLookValue>();
 		}
 
-		override protected void AddStatus(string pageId, string value)
+		override protected void AddStatus(string pageId, ByteBuffer buffer)
 		{
-			if (value == "-" || value.Length == 0)
-				return;
-
-			string[] arr = value.Split(',');
+			GearLookValue gv;
 			if (pageId == null)
-			{
-				_default.alpha = float.Parse(arr[0]);
-				_default.rotation = float.Parse(arr[1]);
-				_default.grayed = int.Parse(arr[2]) == 1;
-				if (arr.Length > 3)
-					_default.touchable = int.Parse(arr[3]) == 1;
-			}
+				gv = _default;
 			else
-				_storage[pageId] = new GearLookValue(float.Parse(arr[0]), float.Parse(arr[1]), int.Parse(arr[2]) == 1,
-					arr.Length < 4 ? _owner.touchable : (int.Parse(arr[3]) == 1));
+			{
+				gv = new GearLookValue(0, 0, false, false);
+				_storage[pageId] = gv;
+			}
+
+			gv.alpha = buffer.ReadFloat();
+			gv.rotation = buffer.ReadFloat();
+			gv.grayed = buffer.ReadBool();
+			gv.touchable = buffer.ReadBool();
 		}
 
 		override public void Apply()
@@ -64,19 +62,19 @@ namespace FairyGUI
 			if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
 				gv = _default;
 
-			if (tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
+			if (_tweenConfig != null && _tweenConfig.tween && UIPackage._constructing == 0 && !disableAllTweenEffect)
 			{
 				_owner._gearLocked = true;
 				_owner.grayed = gv.grayed;
 				_owner.touchable = gv.touchable;
 				_owner._gearLocked = false;
 
-				if (_tweener != null)
+				if (_tweenConfig._tweener != null)
 				{
-					if (_tweener.endValue.x != gv.alpha || _tweener.endValue.y != gv.rotation)
+					if (_tweenConfig._tweener.endValue.x != gv.alpha || _tweenConfig._tweener.endValue.y != gv.rotation)
 					{
-						_tweener.Kill(true);
-						_tweener = null;
+						_tweenConfig._tweener.Kill(true);
+						_tweenConfig._tweener = null;
 					}
 					else
 						return;
@@ -87,11 +85,11 @@ namespace FairyGUI
 				if (a || b)
 				{
 					if (_owner.CheckGearController(0, _controller))
-						_displayLockToken = _owner.AddDisplayLock();
+						_tweenConfig._displayLockToken = _owner.AddDisplayLock();
 
-					_tweener = GTween.To(new Vector2(_owner.alpha, _owner.rotation), new Vector2(gv.alpha, gv.rotation), tweenTime)
-						.SetDelay(delay)
-						.SetEase(easeType)
+					_tweenConfig._tweener = GTween.To(new Vector2(_owner.alpha, _owner.rotation), new Vector2(gv.alpha, gv.rotation), _tweenConfig.duration)
+						.SetDelay(_tweenConfig.delay)
+						.SetEase(_tweenConfig.easeType)
 						.SetUserData((a ? 1 : 0) + (b ? 2 : 0))
 						.SetTarget(this)
 						.SetListener(this);
@@ -128,11 +126,11 @@ namespace FairyGUI
 
 		public void OnTweenComplete(GTweener tweener)
 		{
-			_tweener = null;
-			if (_displayLockToken != 0)
+			_tweenConfig._tweener = null;
+			if (_tweenConfig._displayLockToken != 0)
 			{
-				_owner.ReleaseDisplayLock(_displayLockToken);
-				_displayLockToken = 0;
+				_owner.ReleaseDisplayLock(_tweenConfig._displayLockToken);
+				_tweenConfig._displayLockToken = 0;
 			}
 			_owner.OnGearStop.Call(this);
 		}

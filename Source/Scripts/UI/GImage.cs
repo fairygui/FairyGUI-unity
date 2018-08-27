@@ -130,6 +130,8 @@ namespace FairyGUI
 
 		override public void ConstructFromResource()
 		{
+			packageItem.Load();
+
 			sourceWidth = packageItem.width;
 			sourceHeight = packageItem.height;
 			initWidth = sourceWidth;
@@ -143,28 +145,21 @@ namespace FairyGUI
 			SetSize(sourceWidth, sourceHeight);
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str;
-			str = xml.GetAttribute("color");
-			if (str != null)
-				_content.color = ToolSet.ConvertFromHtmlColor(str);
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("flip");
-			if (str != null)
-				_content.flip = FieldTypes.ParseFlipType(str);
-
-			str = xml.GetAttribute("fillMethod");
-			if (str != null)
-				_content.fillMethod = FieldTypes.ParseFillMethod(str);
-
+			if (buffer.ReadBool())
+				_content.color = buffer.ReadColor();
+			_content.flip = (FlipType)buffer.ReadByte();
+			_content.fillMethod = (FillMethod)buffer.ReadByte();
 			if (_content.fillMethod != FillMethod.None)
 			{
-				_content.fillOrigin = xml.GetAttributeInt("fillOrigin");
-				_content.fillClockwise = xml.GetAttributeBool("fillClockwise", true);
-				_content.fillAmount = (float)xml.GetAttributeInt("fillAmount", 100) / 100;
+				_content.fillOrigin = buffer.ReadByte();
+				_content.fillClockwise = buffer.ReadBool();
+				_content.fillAmount = buffer.ReadFloat();
 			}
 		}
 	}

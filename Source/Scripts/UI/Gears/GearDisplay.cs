@@ -1,4 +1,5 @@
 ﻿using System;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -13,6 +14,7 @@ namespace FairyGUI
 		public string[] pages { get; set; }
 
 		int _visible;
+		uint _displayLockToken;
 
 		public GearDisplay(GObject owner)
 			: base(owner)
@@ -20,7 +22,7 @@ namespace FairyGUI
 			_displayLockToken = 1;
 		}
 
-		override protected void AddStatus(string pageId, string value)
+		override protected void AddStatus(string pageId, ByteBuffer buffer)
 		{
 		}
 

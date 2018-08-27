@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -12,19 +11,22 @@ namespace FairyGUI
 		public UIPackage owner;
 
 		public PackageItemType type;
+		public ObjectType objectType;
+
 		public string id;
 		public string name;
 		public int width;
 		public int height;
 		public string file;
-		public bool decoded;
 		public bool exported;
+		public NTexture texture;
+		public ByteBuffer rawData;
 
 		//image
 		public Rect? scale9Grid;
 		public bool scaleByTile;
 		public int tileGridIndice;
-		public NTexture texture;
+		public PixelHitTestData pixelHitTestData;
 
 		//movieclip
 		public float interval;
@@ -33,39 +35,18 @@ namespace FairyGUI
 		public MovieClip.Frame[] frames;
 
 		//component
-		public XML componentData;
-		public DisplayListItem[] displayList;
+		public bool translated;
 		public UIObjectFactory.GComponentCreator extensionCreator;
 
 		//font
 		public BitmapFont bitmapFont;
 
 		//sound
-		public AudioClip audioClip;
-
-		//misc
-		public byte[] binary;
+		public NAudioClip audioClip;
 
 		public object Load()
 		{
 			return owner.GetItemAsset(this);
-		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	public class DisplayListItem
-	{
-		public PackageItem packageItem;
-		public string type;
-		public XML desc;
-		public int listItemCount;
-
-		public DisplayListItem(PackageItem pi, string type)
-		{
-			this.packageItem = pi;
-			this.type = type;
 		}
 	}
 }

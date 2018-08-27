@@ -8,83 +8,34 @@ namespace FairyGUI
 	/// </summary>
 	public class MaterialManager
 	{
-		/// <summary>
-		/// 
-		/// </summary>
-		public NTexture texture { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public string shaderName { get; private set; }
-
-		MaterialPool[] _pools;
+		NTexture _texture;
+		Shader _shader;
 		string[] _keywords;
+		List<NMaterial>[] _materials;
 
-		internal uint frameId;
-		internal uint clipId;
-		internal BlendMode blendMode;
+		internal string _managerKey;
 
-		static uint _gCounter;
-
-		static string[] GRAYED = new string[] { "GRAYED" };
-		static string[] CLIPPED = new string[] { "CLIPPED" };
-		static string[] CLIPPED_GRAYED = new string[] { "CLIPPED", "GRAYED" };
-		static string[] SOFT_CLIPPED = new string[] { "SOFT_CLIPPED" };
-		static string[] SOFT_CLIPPED_GRAYED = new string[] { "SOFT_CLIPPED", "GRAYED" };
-		static string[] ALPHA_MASK = new string[] { "ALPHA_MASK" };
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="texture"></param>
-		/// <param name="shaderName"></param>
-		/// <param name="keywords"></param>
-		/// <returns></returns>
-		public static MaterialManager GetInstance(NTexture texture, string shaderName, string[] keywords)
-		{
-			NTexture rootTexture = texture.root;
-			if (rootTexture == null)
-				return null;
-
-			if (rootTexture.materialManagers == null)
-				rootTexture.materialManagers = new Dictionary<string, MaterialManager>();
-
-			string key = shaderName;
-			if (keywords != null)
-			{
-				//对于带指定关键字的，目前的设计是不参加共享材质了，因为逻辑会变得更复杂
-				key = shaderName + "_" + _gCounter++;
-			}
-
-			MaterialManager mm;
-			if (!rootTexture.materialManagers.TryGetValue(key, out mm))
-			{
-				mm = new MaterialManager(rootTexture);
-				mm.shaderName = shaderName;
-				mm._keywords = keywords;
-				rootTexture.materialManagers.Add(key, mm);
-			}
-
-			return mm;
-		}
+		static string[][] internalKeywords = {
+			null,
+			new string[] { "GRAYED" },
+			new string[] { "CLIPPED" },
+			new string[] { "CLIPPED", "GRAYED" },
+			new string[] { "SOFT_CLIPPED" },
+			new string[] { "SOFT_CLIPPED", "GRAYED" },
+			new string[] { "ALPHA_MASK" }
+		};
+		const int internalKeywordCount = 7;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="texture"></param>
-		public MaterialManager(NTexture texture)
+		internal MaterialManager(NTexture texture, Shader shader, string[] keywords)
 		{
-			this.texture = texture;
-
-			_pools = new MaterialPool[7];
-			_pools[0] = new MaterialPool(this, null, false); //none
-			_pools[1] = new MaterialPool(this, GRAYED, false); //grayed
-			_pools[2] = new MaterialPool(this, CLIPPED, false); //clipped
-			_pools[3] = new MaterialPool(this, CLIPPED_GRAYED, false); //clipped+grayed
-			_pools[4] = new MaterialPool(this, SOFT_CLIPPED, false); //softClipped
-			_pools[5] = new MaterialPool(this, SOFT_CLIPPED_GRAYED, false); //softClipped+grayed
-			_pools[6] = new MaterialPool(this, ALPHA_MASK, true); //stencil mask
+			_texture = texture;
+			_shader = shader;
+			_keywords = keywords;
+			_materials = new List<NMaterial>[internalKeywordCount * 2];
 		}
 
 		/// <summary>
@@ -95,38 +46,39 @@ namespace FairyGUI
 		/// <returns></returns>
 		public NMaterial GetMaterial(NGraphics grahpics, UpdateContext context)
 		{
-			frameId = UpdateContext.frameId;
-			blendMode = grahpics.blendMode;
-			int pool;
+			uint frameId = UpdateContext.frameId;
+			BlendMode blendMode = grahpics.blendMode;
+			int collectionIndex;
+			uint clipId;
 
 			if (context.clipped && !grahpics.dontClip)
 			{
 				clipId = context.clipInfo.clipId;
 
 				if (grahpics.maskFrameId == UpdateContext.frameId)
-					pool = 6;
+					collectionIndex = 6;
 				else if (context.rectMaskDepth == 0)
 				{
 					if (grahpics.grayed)
-						pool = 1;
+						collectionIndex = 1;
 					else
-						pool = 0;
+						collectionIndex = 0;
 				}
 				else
 				{
 					if (context.clipInfo.soft)
 					{
 						if (grahpics.grayed)
-							pool = 5;
+							collectionIndex = 5;
 						else
-							pool = 4;
+							collectionIndex = 4;
 					}
 					else
 					{
 						if (grahpics.grayed)
-							pool = 3;
+							collectionIndex = 3;
 						else
-							pool = 2;
+							collectionIndex = 2;
 					}
 				}
 			}
@@ -134,31 +86,91 @@ namespace FairyGUI
 			{
 				clipId = 0;
 				if (grahpics.grayed)
-					pool = 1;
+					collectionIndex = 1;
 				else
-					pool = 0;
+					collectionIndex = 0;
 			}
-			return _pools[pool].Get();
+
+			List<NMaterial> items;
+
+			if (blendMode == BlendMode.Normal)
+			{
+				items = _materials[collectionIndex];
+				if (items == null)
+					items = new List<NMaterial>();
+				_materials[collectionIndex] = items;
+			}
+			else
+			{
+				items = _materials[internalKeywordCount + collectionIndex];
+				if (items == null)
+					items = new List<NMaterial>();
+				_materials[internalKeywordCount + collectionIndex] = items;
+			}
+
+			int cnt = items.Count;
+			NMaterial result = null;
+			for (int i = 0; i < cnt; i++)
+			{
+				NMaterial mat = items[i];
+				if (mat.frameId == frameId)
+				{
+					if (collectionIndex != 6 && mat.clipId == clipId && mat.blendMode == blendMode)
+						return mat;
+				}
+				else if (result == null)
+					result = mat;
+			}
+
+			if (result != null)
+			{
+				result.frameId = frameId;
+				result.clipId = clipId;
+				result.blendMode = blendMode;
+
+				if (result.combined)
+					result.material.SetTexture("_AlphaTex", _texture.alphaTexture);
+			}
+			else
+			{
+				result = CreateMaterial();
+				string[] keywords = internalKeywords[collectionIndex];
+				if (keywords != null)
+				{
+					cnt = keywords.Length;
+					for (int i = 0; i < cnt; i++)
+						result.material.EnableKeyword(keywords[i]);
+				}
+				result.frameId = frameId;
+				result.clipId = clipId;
+				result.blendMode = blendMode;
+				if (BlendModeUtils.Factors[(int)result.blendMode].pma)
+					result.material.EnableKeyword("COLOR_FILTER");
+				items.Add(result);
+			}
+
+			return result;
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public NMaterial CreateMaterial()
+		NMaterial CreateMaterial()
 		{
-			NMaterial nm = new NMaterial(ShaderConfig.GetShader(shaderName));
-			nm.material.mainTexture = texture.nativeTexture;
-			if (texture.alphaTexture != null)
+			NMaterial nm = new NMaterial(_shader);
+			nm.material.mainTexture = _texture.nativeTexture;
+			if (_texture.alphaTexture != null)
 			{
 				nm.combined = true;
 				nm.material.EnableKeyword("COMBINED");
-				nm.material.SetTexture("_AlphaTex", texture.alphaTexture.nativeTexture);
+				nm.material.SetTexture("_AlphaTex", _texture.alphaTexture);
 			}
 			if (_keywords != null)
 			{
-				foreach (string v in _keywords)
-					nm.material.EnableKeyword(v);
+				int cnt = _keywords.Length;
+				for (int i = 0; i < cnt; i++)
+					nm.material.EnableKeyword(_keywords[i]);
 			}
 			nm.material.hideFlags = DisplayOptions.hideFlags;
 
@@ -168,10 +180,57 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public void Dispose()
+		public void DestroyMaterials()
 		{
-			foreach (MaterialPool pool in _pools)
-				pool.Dispose();
+			int cnt = _materials.Length;
+			for (int i = 0; i < cnt; i++)
+			{
+				List<NMaterial> items = _materials[i];
+				if (items != null)
+				{
+					if (Application.isPlaying)
+					{
+						int cnt2 = items.Count;
+						for (int j = 0; j < cnt2; j++)
+							Object.Destroy(items[j].material);
+					}
+					else
+					{
+						int cnt2 = items.Count;
+						for (int j = 0; j < cnt2; j++)
+							Object.DestroyImmediate(items[j].material);
+					}
+					items.Clear();
+				}
+			}
+		}
+
+		public void RefreshMaterials()
+		{
+			int cnt = _materials.Length;
+			bool hasAlphaTexture = _texture.alphaTexture != null;
+			for (int i = 0; i < cnt; i++)
+			{
+				List<NMaterial> items = _materials[i];
+				if (items != null)
+				{
+					int cnt2 = items.Count;
+					for (int j = 0; j < cnt2; j++)
+					{
+						NMaterial nm = items[j];
+						nm.material.mainTexture = _texture.nativeTexture;
+						if (hasAlphaTexture)
+						{
+							if (!nm.combined)
+							{
+								nm.combined = true;
+								nm.material.EnableKeyword("COMBINED");
+							}
+							nm.material.SetTexture("_AlphaTex", _texture.alphaTexture);
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -180,7 +239,7 @@ namespace FairyGUI
 		public void Release()
 		{
 			if (_keywords != null)
-				Dispose();
+				_texture.DestroyMaterialManager(this);
 		}
 	}
 }

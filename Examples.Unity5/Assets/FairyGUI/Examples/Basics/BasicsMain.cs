@@ -28,7 +28,7 @@ public class BasicsMain : MonoBehaviour
 		UIConfig.verticalScrollBar = "ui://Basics/ScrollBar_VT";
 		UIConfig.horizontalScrollBar = "ui://Basics/ScrollBar_HZ";
 		UIConfig.popupMenu = "ui://Basics/PopupMenu";
-		UIConfig.buttonSound = (AudioClip)UIPackage.GetItemAsset("Basics", "click");
+		UIConfig.buttonSound = (NAudioClip)UIPackage.GetItemAsset("Basics", "click");
 	}
 
 	void Start()

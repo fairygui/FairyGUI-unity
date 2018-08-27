@@ -54,187 +54,6 @@ namespace FairyGUI
 			_items.Add(newItem);
 		}
 
-		void AddItems(GObject target, string sidePairs)
-		{
-			RelationItem newItem = new RelationItem(_owner);
-			newItem.target = target;
-
-			int start = 0;
-			int end = 0;
-			int ms;
-			int c1;
-			int c2;
-			bool usePercent;
-			RelationType tid;
-			//0 gc 解析版本
-			while (end < sidePairs.Length)
-			{
-				start = end;
-				end = sidePairs.IndexOf(",", start);
-				if (end == -1)
-					end = sidePairs.Length;
-				usePercent = sidePairs[end - 1] == '%';
-				ms = sidePairs.IndexOf('-', start, end - start);
-				end++;
-				if (ms != -1)
-				{
-					c1 = ((int)sidePairs[start]);
-					c2 = ((int)sidePairs[ms + 1]);
-				}
-				else
-				{
-					c1 = ((int)sidePairs[start]);
-					c2 = c1;
-				}
-
-				switch (c1)
-				{
-					case 119://width
-						tid = RelationType.Width;
-						break;
-
-					case 104://height
-						tid = RelationType.Height;
-						break;
-
-					case 109://middle
-						tid = RelationType.Middle_Middle;
-						break;
-
-					case 99://center
-						tid = RelationType.Center_Center;
-						break;
-
-					case 108: //left
-						if (ms - start > 4) //leftext
-						{
-							if (c2 == 108)
-								tid = RelationType.LeftExt_Left;
-							else
-								tid = RelationType.LeftExt_Right;
-						}
-						else
-						{
-							switch (c2)
-							{
-								case 108:
-									tid = RelationType.Left_Left;
-									break;
-
-								case 114:
-									tid = RelationType.Left_Right;
-									break;
-
-								case 99:
-									tid = RelationType.Left_Center;
-									break;
-
-								default:
-									throw new ArgumentException("invalid relation type: " + sidePairs);
-							}
-						}
-						break;
-
-					case 114: //right
-						if (ms - start > 5) //rightext
-						{
-							if (c2 == 108)
-								tid = RelationType.RightExt_Left;
-							else
-								tid = RelationType.RightExt_Right;
-						}
-						else
-						{
-							switch (c2)
-							{
-								case 108:
-									tid = RelationType.Right_Left;
-									break;
-
-								case 114:
-									tid = RelationType.Right_Right;
-									break;
-
-								case 99:
-									tid = RelationType.Right_Center;
-									break;
-
-								default:
-									throw new ArgumentException("invalid relation type: " + sidePairs);
-							}
-						}
-						break;
-
-					case 116://top
-						if (ms - start > 3) //topext
-						{
-							if (c2 == 116)
-								tid = RelationType.TopExt_Top;
-							else
-								tid = RelationType.TopExt_Bottom;
-						}
-						else
-						{
-							switch (c2)
-							{
-								case 116:
-									tid = RelationType.Top_Top;
-									break;
-
-								case 98:
-									tid = RelationType.Top_Bottom;
-									break;
-
-								case 109:
-									tid = RelationType.Top_Middle;
-									break;
-
-								default:
-									throw new ArgumentException("invalid relation type: " + sidePairs);
-							}
-						}
-						break;
-
-					case 98://bottom
-						if (ms - start > 6) //bottomext
-						{
-							if (c2 == 116)
-								tid = RelationType.BottomExt_Top;
-							else
-								tid = RelationType.BottomExt_Bottom;
-						}
-						else
-						{
-							switch (c2)
-							{
-								case 116:
-									tid = RelationType.Bottom_Top;
-									break;
-
-								case 98:
-									tid = RelationType.Bottom_Bottom;
-									break;
-
-								case 109:
-									tid = RelationType.Bottom_Middle;
-									break;
-
-								default:
-									throw new ArgumentException("invalid relation type: " + sidePairs);
-							}
-						}
-						break;
-
-					default:
-						throw new ArgumentException("invalid relation type: " + sidePairs);
-				}
-
-				newItem.InternalAdd(tid, usePercent);
-			}
-
-			_items.Add(newItem);
-		}
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -369,30 +188,31 @@ namespace FairyGUI
 			}
 		}
 
-		public void Setup(XML xml)
+		public void Setup(ByteBuffer buffer, bool parentToChild)
 		{
-			XMLList.Enumerator et = xml.GetEnumerator("relation");
-
-			string targetId;
+			int cnt = buffer.ReadByte();
 			GObject target;
-			while (et.MoveNext())
+			for (int i = 0; i < cnt; i++)
 			{
-				XML cxml = et.Current;
-				targetId = cxml.GetAttribute("target");
-				if (_owner.parent != null)
-				{
-					if (targetId != null && targetId != "")
-						target = _owner.parent.GetChildById(targetId);
-					else
-						target = _owner.parent;
-				}
+				int targetIndex = buffer.ReadShort();
+				if (targetIndex == -1)
+					target = _owner.parent;
+				else if (parentToChild)
+					target = ((GComponent)_owner).GetChildAt(targetIndex);
 				else
+					target = _owner.parent.GetChildAt(targetIndex);
+
+				RelationItem newItem = new RelationItem(_owner);
+				newItem.target = target;
+				_items.Add(newItem);
+
+				int cnt2 = buffer.ReadByte();
+				for (int j = 0; j < cnt2; j++)
 				{
-					//call from component construction
-					target = ((GComponent)_owner).GetChildById(targetId);
+					RelationType rt = (RelationType)buffer.ReadByte();
+					bool usePercent = buffer.ReadBool();
+					newItem.InternalAdd(rt, usePercent);
 				}
-				if (target != null)
-					AddItems(target, cxml.GetAttribute("sidePair"));
 			}
 		}
 	}

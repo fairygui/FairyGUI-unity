@@ -1702,117 +1702,110 @@ namespace FairyGUI
 		{
 		}
 
-		virtual public void Setup_BeforeAdd(XML xml)
+		virtual public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			string str;
-			string[] arr;
+			buffer.Seek(beginPos, 0);
+			buffer.Skip(5);
 
-			id = xml.GetAttribute("id");
-			name = xml.GetAttribute("name");
+			id = buffer.ReadS();
+			name = buffer.ReadS();
+			float f1 = buffer.ReadInt();
+			float f2 = buffer.ReadInt();
+			SetXY(f1, f2);
 
-			arr = xml.GetAttributeArray("xy");
-			if (arr != null)
-				this.SetXY(int.Parse(arr[0]), int.Parse(arr[1]));
-
-			arr = xml.GetAttributeArray("size");
-			if (arr != null)
+			if (buffer.ReadBool())
 			{
-				initWidth = int.Parse(arr[0]);
-				initHeight = int.Parse(arr[1]);
+				initWidth = buffer.ReadInt();
+				initHeight = buffer.ReadInt();
 				SetSize(initWidth, initHeight, true);
 			}
 
-			arr = xml.GetAttributeArray("restrictSize");
-			if (arr != null)
+			if (buffer.ReadBool())
 			{
-				minWidth = int.Parse(arr[0]);
-				maxWidth = int.Parse(arr[1]);
-				minHeight = int.Parse(arr[2]);
-				maxHeight = int.Parse(arr[3]);
+				minWidth = buffer.ReadInt();
+				maxWidth = buffer.ReadInt();
+				minHeight = buffer.ReadInt();
+				maxHeight = buffer.ReadInt();
 			}
 
-			arr = xml.GetAttributeArray("scale");
-			if (arr != null)
-				SetScale(float.Parse(arr[0]), float.Parse(arr[1]));
-
-			arr = xml.GetAttributeArray("skew");
-			if (arr != null)
-				this.skew = new Vector2(float.Parse(arr[0]), float.Parse(arr[1]));
-
-			str = xml.GetAttribute("rotation");
-			if (str != null)
-				this.rotation = float.Parse(str);
-
-			arr = xml.GetAttributeArray("pivot");
-			if (arr != null)
-				this.SetPivot(float.Parse(arr[0]), float.Parse(arr[1]), xml.GetAttributeBool("anchor"));
-
-			str = xml.GetAttribute("alpha");
-			if (str != null)
-				this.alpha = float.Parse(str);
-
-			this.touchable = xml.GetAttributeBool("touchable", true);
-			this.visible = xml.GetAttributeBool("visible", true);
-			this.grayed = xml.GetAttributeBool("grayed", false);
-
-			str = xml.GetAttribute("blend");
-			if (str != null)
-				this.blendMode = FieldTypes.ParseBlendMode(str);
-
-			str = xml.GetAttribute("filter");
-			if (str != null)
+			if (buffer.ReadBool())
 			{
-				switch (str)
-				{
-					case "color":
-						ColorFilter cf = new ColorFilter();
-						this.filter = cf;
-						arr = xml.GetAttributeArray("filterData");
-						cf.AdjustBrightness(float.Parse(arr[0]));
-						cf.AdjustContrast(float.Parse(arr[1]));
-						cf.AdjustSaturation(float.Parse(arr[2]));
-						cf.AdjustHue(float.Parse(arr[3]));
-						break;
-				}
+				f1 = buffer.ReadFloat();
+				f2 = buffer.ReadFloat();
+				SetScale(f1, f2);
 			}
 
-			str = xml.GetAttribute("tooltips");
-			if (str != null)
-				this.tooltips = str;
+			if (buffer.ReadBool())
+			{
+				f1 = buffer.ReadFloat();
+				f2 = buffer.ReadFloat();
+				this.skew = new Vector2(f1, f2);
+			}
 
-			str = xml.GetAttribute("customData");
+			if (buffer.ReadBool())
+			{
+				f1 = buffer.ReadFloat();
+				f2 = buffer.ReadFloat();
+				SetPivot(f1, f2, buffer.ReadBool());
+			}
+
+			f1 = buffer.ReadFloat();
+			if (f1 != 1)
+				this.alpha = f1;
+
+			f1 = buffer.ReadFloat();
+			if (f1 != 0)
+				this.rotation = f1;
+
+			if (!buffer.ReadBool())
+				this.visible = false;
+			if (!buffer.ReadBool())
+				this.touchable = false;
+			if (buffer.ReadBool())
+				this.grayed = true;
+			this.blendMode = (BlendMode)buffer.ReadByte();
+
+			int filter = buffer.ReadByte();
+			if (filter == 1)
+			{
+				ColorFilter cf = new ColorFilter();
+				this.filter = cf;
+
+				cf.AdjustBrightness(buffer.ReadFloat());
+				cf.AdjustContrast(buffer.ReadFloat());
+				cf.AdjustSaturation(buffer.ReadFloat());
+				cf.AdjustHue(buffer.ReadFloat());
+			}
+
+			string str = buffer.ReadS();
 			if (str != null)
 				this.data = str;
 		}
 
-		static Dictionary<string, int> GearXMLKeys = new Dictionary<string, int>()
+		virtual public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			{"gearDisplay",0},
-			{"gearXY",1},
-			{"gearSize",2},
-			{"gearLook",3},
-			{"gearColor",4},
-			{"gearAni",5},
-			{"gearText",6},
-			{"gearIcon",7}
-		};
+			buffer.Seek(beginPos, 1);
 
-		virtual public void Setup_AfterAdd(XML xml)
-		{
-			string str;
-
-			str = xml.GetAttribute("group");
+			string str = buffer.ReadS();
 			if (str != null)
-				group = parent.GetChildById(str) as GGroup;
+				this.tooltips = str;
 
-			XMLList.Enumerator et = xml.GetEnumerator();
-			XML cxml;
-			int index;
-			while (et.MoveNext())
+			int groupId = buffer.ReadShort();
+			if (groupId >= 0)
+				group = parent.GetChildAt(groupId) as GGroup;
+
+			buffer.Seek(beginPos, 2);
+
+			int cnt = buffer.ReadShort();
+			for (int i = 0; i < cnt; i++)
 			{
-				cxml = et.Current;
-				if (GearXMLKeys.TryGetValue(cxml.name, out index))
-					GetGear(index).Setup(cxml);
+				int nextPos = buffer.ReadShort();
+				nextPos += buffer.position;
+
+				GearBase gear = GetGear(buffer.ReadByte());
+				gear.Setup(buffer);
+
+				buffer.position = nextPos;
 			}
 		}
 

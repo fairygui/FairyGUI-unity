@@ -31,7 +31,7 @@ namespace FairyGUI
 		protected string[] _items;
 		protected string[] _icons;
 		protected string[] _values;
-		protected string _popupDirection;
+		protected PopupDirection _popupDirection;
 		protected Controller _selectionController;
 
 		bool _itemsUpdated;
@@ -48,7 +48,7 @@ namespace FairyGUI
 			_selectedIndex = -1;
 			_items = new string[0];
 			_values = new string[0];
-			_popupDirection = "auto";
+			_popupDirection = PopupDirection.Auto;
 
 			onChanged = new EventListener(this, "onChanged");
 		}
@@ -110,23 +110,42 @@ namespace FairyGUI
 		{
 			get
 			{
-				if (_titleObject is GTextField)
-					return ((GTextField)_titleObject).color;
-				else if (_titleObject is GLabel)
-					return ((GLabel)_titleObject).titleColor;
-				else if (_titleObject is GButton)
-					return ((GButton)_titleObject).titleColor;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.color;
 				else
 					return Color.black;
 			}
 			set
 			{
-				if (_titleObject is GTextField)
-					((GTextField)_titleObject).color = value;
-				else if (_titleObject is GLabel)
-					((GLabel)_titleObject).titleColor = value;
-				else if (_titleObject is GButton)
-					((GButton)_titleObject).titleColor = value;
+				GTextField tf = GetTextField();
+				if (tf != null)
+					tf.color = value;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public int titleFontSize
+		{
+			get
+			{
+				GTextField tf = GetTextField();
+				if (tf != null)
+					return tf.textFormat.size;
+				else
+					return 0;
+			}
+			set
+			{
+				GTextField tf = GetTextField();
+				if (tf != null)
+				{
+					TextFormat format = ((GTextField)_titleObject).textFormat;
+					format.size = value;
+					tf.textFormat = format;
+				}
 			}
 		}
 
@@ -257,10 +276,26 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public string popupDirection
+		public PopupDirection popupDirection
 		{
 			get { return _popupDirection; }
 			set { _popupDirection = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public GTextField GetTextField()
+		{
+			if (_titleObject is GTextField)
+				return (GTextField)_titleObject;
+			else if (_titleObject is GLabel)
+				return ((GLabel)_titleObject).GetTextField();
+			else if (_titleObject is GButton)
+				return ((GButton)_titleObject).GetTextField();
+			else
+				return null;
 		}
 
 		protected void SetState(string value)
@@ -324,20 +359,16 @@ namespace FairyGUI
 			base.Dispose();
 		}
 
-		override public void ConstructFromXML(XML cxml)
+		override protected void ConstructExtension(ByteBuffer buffer)
 		{
-			base.ConstructFromXML(cxml);
-
-			XML xml = cxml.GetNode("ComboBox");
-
-			string str;
+			buffer.Seek(0, 6);
 
 			_buttonController = GetController("button");
 			_titleObject = GetChild("title");
 			_iconObject = GetChild("icon");
 
-			str = xml.GetAttribute("dropdown");
-			if (str != null && str.Length > 0)
+			string str = buffer.ReadS();
+			if (str != null)
 			{
 				dropdown = UIPackage.CreateObjectFromURL(str) as GComponent;
 				if (dropdown == null)
@@ -369,41 +400,40 @@ namespace FairyGUI
 			displayObject.onTouchEnd.Add(__touchEnd);
 		}
 
-		override public void Setup_AfterAdd(XML cxml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(cxml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			XML xml = cxml.GetNode("ComboBox");
-			if (xml == null)
+			if (!buffer.Seek(beginPos, 6))
+				return;
+
+			if ((ObjectType)buffer.ReadByte() != packageItem.objectType)
 				return;
 
 			string str;
-			str = xml.GetAttribute("titleColor");
-			if (str != null)
-				this.titleColor = ToolSet.ConvertFromHtmlColor(str);
-			visibleItemCount = xml.GetAttributeInt("visibleItemCount", visibleItemCount);
-			_popupDirection = xml.GetAttribute("direction", _popupDirection);
-
-			XMLList col = xml.Elements("item");
-			_items = new string[col.Count];
-			_values = new string[col.Count];
-			int i = 0;
-			foreach (XML ix in col)
+			int itemCount = buffer.ReadShort();
+			_items = new string[itemCount];
+			_values = new string[itemCount];
+			for (int i = 0; i < itemCount; i++)
 			{
-				_items[i] = ix.GetAttribute("title");
-				_values[i] = ix.GetAttribute("value");
-				str = ix.GetAttribute("icon");
+				int nextPos = buffer.ReadShort();
+				nextPos += buffer.position;
+
+				_items[i] = buffer.ReadS();
+				_values[i] = buffer.ReadS();
+				str = buffer.ReadS();
 				if (str != null)
 				{
 					if (_icons == null)
-						_icons = new string[col.Count];
+						_icons = new string[itemCount];
 					_icons[i] = str;
 				}
-				i++;
+
+				buffer.position = nextPos;
 			}
 
-			str = xml.GetAttribute("title");
-			if (str != null && str.Length > 0)
+			str = buffer.ReadS();
+			if (str != null)
 			{
 				this.text = str;
 				_selectedIndex = Array.IndexOf(_items, str);
@@ -416,13 +446,20 @@ namespace FairyGUI
 			else
 				_selectedIndex = -1;
 
-			str = xml.GetAttribute("icon");
-			if (str != null && str.Length > 0)
+			str = buffer.ReadS();
+			if (str != null)
 				this.icon = str;
 
-			str = xml.GetAttribute("selectionController");
-			if (str != null)
-				_selectionController = parent.GetController(str);
+			if (buffer.ReadBool())
+				this.titleColor = buffer.ReadColor();
+			int iv = buffer.ReadInt();
+			if (iv > 0)
+				visibleItemCount = iv;
+			_popupDirection = (PopupDirection)buffer.ReadByte();
+
+			iv = buffer.ReadShort();
+			if (iv >= 0)
+				_selectionController = parent.GetControllerAt(iv);
 		}
 
 		public void UpdateDropdownList()
@@ -442,7 +479,13 @@ namespace FairyGUI
 				_list.selectedIndex = -1;
 			dropdown.width = this.width;
 
-			this.root.TogglePopup(dropdown, this, _popupDirection == "up" ? (object)false : (_popupDirection == "auto" ? null : (object)true));
+			object downward = null;
+			if (_popupDirection == PopupDirection.Down)
+				downward = true;
+			else if (_popupDirection == PopupDirection.Up)
+				downward = false;
+
+			this.root.TogglePopup(dropdown, this, downward);
 			if (dropdown.parent != null)
 			{
 				dropdown.displayObject.onRemovedFromStage.Add(__popupWinClosed);

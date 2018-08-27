@@ -155,6 +155,8 @@ namespace FairyGUI
 
 		override public void ConstructFromResource()
 		{
+			packageItem.Load();
+
 			sourceWidth = packageItem.width;
 			sourceHeight = packageItem.height;
 			initWidth = sourceWidth;
@@ -168,24 +170,17 @@ namespace FairyGUI
 			SetSize(sourceWidth, sourceHeight);
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str;
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("frame");
-			if (str != null)
-				_content.frame = int.Parse(str);
-			_content.playing = xml.GetAttributeBool("playing", true);
-
-			str = xml.GetAttribute("color");
-			if (str != null)
-				_content.color = ToolSet.ConvertFromHtmlColor(str);
-
-			str = xml.GetAttribute("flip");
-			if (str != null)
-				_content.flip = FieldTypes.ParseFlipType(str);
+			if (buffer.ReadBool())
+				_content.color = buffer.ReadColor();
+			_content.flip = (FlipType)buffer.ReadByte();
+			_content.frame = buffer.ReadInt();
+			_content.playing = buffer.ReadBool();
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Text;
 using FairyGUI.Utils;
 
 #if UNITY_5_3_OR_NEWER
@@ -196,6 +195,17 @@ namespace FairyGUI
 			StageCamera.CheckMainCamera();
 		}
 #endif
+
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			Timers.inst.Remove(RunTextureCollector);
+
+#if UNITY_5_4_OR_NEWER
+			SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
+#endif
+		}
 
 		/// <summary>
 		/// 
@@ -1070,7 +1080,7 @@ namespace FairyGUI
 				}
 				else if (curTime - texture.lastActive > 5)
 				{
-					texture.Dispose(true);
+					texture.Dispose();
 					_toCollectTextures.RemoveAt(i);
 					cnt--;
 				}

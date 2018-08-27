@@ -13,9 +13,8 @@ public class BuildAssetBundles
 			AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/Icons/i" + i + ".png").assetBundleName = "fairygui-examples/i" + i + ".ab";
 		}
 
-		AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage.bytes").assetBundleName = "fairygui-examples/bundleusage.ab";
-		AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage@sprites.bytes").assetBundleName = "fairygui-examples/bundleusage.ab";
-		AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage@atlas0.png").assetBundleName = "fairygui-examples/bundleusage.ab";
+		AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage.fui.bytes").assetBundleName = "fairygui-examples/bundleusage.ab";
+		AssetImporter.GetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage_atlas0.png").assetBundleName = "fairygui-examples/bundleusage.ab";
 
 		BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, BuildAssetBundleOptions.None, BuildTarget.Android);
 #else
@@ -26,10 +25,9 @@ public class BuildAssetBundles
 				BuildAssetBundleOptions.CollectDependencies, BuildTarget.Android);
 		}
 
-		Object mainAsset = AssetDatabase.LoadAssetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage.bytes", typeof(Object));
+		Object mainAsset = AssetDatabase.LoadAssetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage.fui.bytes", typeof(Object));
 		Object[] assets = new Object[] { 
-			AssetDatabase.LoadAssetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage@sprites.bytes", typeof(Object)),
-			AssetDatabase.LoadAssetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage@atlas0.png", typeof(Object))
+			AssetDatabase.LoadAssetAtPath("Assets/FairyGUI/Examples/Resources/UI/BundleUsage_atlas0.png", typeof(Object))
 		};
 
 		BuildPipeline.BuildAssetBundle(mainAsset, assets, Path.Combine(Application.streamingAssetsPath, "fairygui-examples/bundleusage.ab"), 
