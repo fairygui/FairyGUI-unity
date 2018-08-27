@@ -556,7 +556,10 @@ namespace FairyGUI
 			{
 				TransitionItem item = _items[i];
 				if (item.label == label)
+				{
 					item.targetId = newTarget.id;
+					item.target = null;
+				}
 			}
 		}
 
