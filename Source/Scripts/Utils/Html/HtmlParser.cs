@@ -21,8 +21,6 @@ namespace FairyGUI.Utils
 		protected int _textFormatStackTop;
 		protected TextFormat2 _format;
 		protected List<HtmlElement> _elements;
-		protected int _skipText;
-		protected bool _ignoreWhiteSpace;
 		protected HtmlParseOptions _defaultOptions;
 
 		static List<string> sHelperList1 = new List<string>();
@@ -42,22 +40,28 @@ namespace FairyGUI.Utils
 
 			_elements = elements;
 			_textFormatStackTop = 0;
-			_skipText = 0;
-			_ignoreWhiteSpace = parseOptions.ignoreWhiteSpace;
 			_format.CopyFrom(defaultFormat);
 			_format.colorChanged = false;
+			int skipText = 0;
+			bool ignoreWhiteSpace = parseOptions.ignoreWhiteSpace;
+			bool skipNextCR = false;
 			string text;
 
 			XMLIterator.Begin(aSource, true);
 			while (XMLIterator.NextTag())
 			{
-				if (_skipText == 0)
+				if (skipText == 0)
 				{
-					text = XMLIterator.GetText(_ignoreWhiteSpace);
+					text = XMLIterator.GetText(ignoreWhiteSpace);
 					if (text.Length > 0)
+					{
+						if (skipNextCR && text[0] == '\n')
+							text = text.Substring(1);
 						AppendText(text);
+					}
 				}
 
+				skipNextCR = false;
 				switch (XMLIterator.tagName)
 				{
 					case "b":
@@ -252,8 +256,8 @@ namespace FairyGUI.Utils
 						}
 						else if (XMLIterator.tagType == XMLTagType.End)
 						{
-							if (!IsNewLine())
-								AppendText("\n");
+							AppendText("\n");
+							skipNextCR = true;
 
 							PopTextFormat();
 						}
@@ -262,14 +266,22 @@ namespace FairyGUI.Utils
 					case "ui":
 					case "div":
 					case "li":
-						if (!IsNewLine())
+						if (XMLIterator.tagType == XMLTagType.Start)
+						{
+							if (!IsNewLine())
+								AppendText("\n");
+						}
+						else
+						{
 							AppendText("\n");
+							skipNextCR = true;
+						}
 						break;
 
 					case "html":
 					case "body":
 						//full html
-						_ignoreWhiteSpace = true;
+						ignoreWhiteSpace = true;
 						break;
 
 					case "head":
@@ -277,18 +289,22 @@ namespace FairyGUI.Utils
 					case "script":
 					case "form":
 						if (XMLIterator.tagType == XMLTagType.Start)
-							_skipText++;
+							skipText++;
 						else if (XMLIterator.tagType == XMLTagType.End)
-							_skipText--;
+							skipText--;
 						break;
 				}
 			}
 
-			if (_skipText == 0)
+			if (skipText == 0)
 			{
-				text = XMLIterator.GetText(_ignoreWhiteSpace);
+				text = XMLIterator.GetText(ignoreWhiteSpace);
 				if (text.Length > 0)
+				{
+					if (skipNextCR && text[0] == '\n')
+						text = text.Substring(1);
 					AppendText(text);
+				}
 			}
 
 			_elements = null;

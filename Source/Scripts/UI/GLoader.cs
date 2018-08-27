@@ -305,6 +305,9 @@ namespace FairyGUI
 			get { return _content; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public GComponent component
 		{
 			get { return _content2; }
