@@ -98,12 +98,12 @@ namespace FairyGUIEditor
 			NTexture.DisposeEmpty();
 			UIObjectFactory.Clear();
 
-			string[] ids = AssetDatabase.FindAssets(".fui t:textAsset");
+			string[] ids = AssetDatabase.FindAssets("_fui t:textAsset");
 			int cnt = ids.Length;
 			for (int i = 0; i < cnt; i++)
 			{
 				string assetPath = AssetDatabase.GUIDToAssetPath(ids[i]);
-				int pos = assetPath.LastIndexOf(".fui");
+				int pos = assetPath.LastIndexOf("_fui");
 				if (pos == -1)
 					continue;
 

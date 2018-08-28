@@ -130,7 +130,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="desc">A assetbunble contains description file.</param>
 		/// <param name="res">A assetbundle contains resources.</param>
-		/// <param name="mainAssetName">Main asset name. e.g. Basics@fui.bytes</param>
+		/// <param name="mainAssetName">Main asset name. e.g. Basics_fui.bytes</param>
 		/// <returns>UIPackage</returns>
 		public static UIPackage AddPackage(AssetBundle desc, AssetBundle res, string mainAssetName)
 		{
@@ -145,7 +145,7 @@ namespace FairyGUI
 			else
 			{
 				string[] names = desc.GetAllAssetNames();
-				string searchPattern = ".fui";
+				string searchPattern = "_fui";
 				foreach (string n in names)
 				{
 					if (n.IndexOf(searchPattern) != -1)
@@ -184,7 +184,7 @@ namespace FairyGUI
 			UIPackage pkg = new UIPackage();
 			pkg._resBundle = res;
 			pkg._fromBundle = true;
-			int pos = mainAssetName.IndexOf(".fui");
+			int pos = mainAssetName.IndexOf("_fui");
 			string assetNamePrefix;
 			if (pos != -1)
 				assetNamePrefix = mainAssetName.Substring(0, pos);
@@ -235,7 +235,7 @@ namespace FairyGUI
 			if (_packageInstById.ContainsKey(assetPath))
 				return _packageInstById[assetPath];
 
-			TextAsset asset = (TextAsset)loadFunc(assetPath + ".fui", ".bytes", typeof(TextAsset));
+			TextAsset asset = (TextAsset)loadFunc(assetPath + "_fui", ".bytes", typeof(TextAsset));
 			if (asset == null)
 			{
 				if (Application.isPlaying)

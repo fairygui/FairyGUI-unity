@@ -1497,15 +1497,17 @@ namespace FairyGUI
 
 			buffer.Seek(beginPos, 4);
 
-			string pageController = buffer.ReadS();
-			if (pageController != null && scrollPane != null && scrollPane.pageMode)
-				scrollPane.pageController = parent.GetController(pageController);
+			int pageController = buffer.ReadShort();
+			if (pageController != -1 && scrollPane != null && scrollPane.pageMode)
+				scrollPane.pageController = parent.GetControllerAt(pageController);
 
 			int cnt = buffer.ReadShort();
 			for (int i = 0; i < cnt; i++)
 			{
-				Controller cc = GetControllerAt(buffer.ReadShort());
-				cc.selectedPageId = buffer.ReadS();
+				Controller cc = GetController(buffer.ReadS());
+				string pageId = buffer.ReadS();
+				if (cc != null)
+					cc.selectedPageId = pageId;
 			}
 		}
 
