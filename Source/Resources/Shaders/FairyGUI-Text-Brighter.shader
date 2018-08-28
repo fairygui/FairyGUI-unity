@@ -91,7 +91,7 @@ Shader "FairyGUI/Text Brighter"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 500)
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 540)
 					o.color.rgb = GammaToLinearSpace(v.color.rgb);
 					o.color.a = v.color.a;
 					#else
@@ -138,13 +138,8 @@ Shader "FairyGUI/Text Brighter"
 					col.a *= tex2D(_MainTex, i.texcoord).a * i.flags.x;
 
 					#ifdef GRAYED
-					if(i.flags.y==1)
-					{
-						fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));
-						col.rgb = fixed3(grey, grey, grey);  
-					}
-					else
-						col.rgb = fixed3(0.8, 0.8, 0.8);
+					fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));
+					col.rgb = fixed3(grey, grey, grey);
 					#endif
 
 					#ifdef SOFT_CLIPPED

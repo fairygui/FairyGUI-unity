@@ -33,7 +33,7 @@ namespace FairyGUI.Utils
 		public ZipReader(byte[] data)
 		{
 			_stream = new ByteBuffer(data);
-			_stream.endian = ByteBuffer.Endian.LITTLE_ENDIAN;
+			_stream.littleEndian = true;
 
 			int pos = _stream.length - 22;
 			_stream.position = pos + 10;
@@ -107,7 +107,7 @@ namespace FairyGUI.Utils
 			if (entry.size > 0)
 			{
 				_stream.position = entry.offset;
-				_stream.ReadBytes(ref data, 0, entry.size);
+				_stream.ReadBytes(data, 0, entry.size);
 			}
 
 			return data;

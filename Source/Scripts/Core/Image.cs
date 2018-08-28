@@ -362,7 +362,7 @@ namespace FairyGUI
 			else if (_scaleByTile)
 			{
 				//如果纹理是repeat模式，而且单独占满一张纹理，那么可以用repeat的模式优化显示
-				if (_texture.nativeTexture.wrapMode == TextureWrapMode.Repeat
+				if (_texture.nativeTexture != null && _texture.nativeTexture.wrapMode == TextureWrapMode.Repeat
 					&& uvRect.x == 0 && uvRect.y == 0 && uvRect.width == 1 && uvRect.height == 1)
 				{
 					uvRect.width *= _contentRect.width / _texture.width;

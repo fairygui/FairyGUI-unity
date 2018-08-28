@@ -197,12 +197,39 @@ namespace FairyGUI
 		/// </summary>
 		public int frame
 		{
-			get { return _content.currentFrame; }
+			get { return _content.frame; }
 			set
 			{
-				_content.currentFrame = value;
+				_content.frame = value;
 				UpdateGear(5);
 			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public float timeScale
+		{
+			get { return _content.timeScale; }
+			set { _content.timeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ignoreEngineTimeScale
+		{
+			get { return _content.ignoreEngineTimeScale; }
+			set { _content.ignoreEngineTimeScale = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="time"></param>
+		public void Advance(float time)
+		{
+			_content.Advance(time);
 		}
 
 		/// <summary>
@@ -288,6 +315,14 @@ namespace FairyGUI
 			get { return _content; }
 		}
 
+		public GComponent component
+		{
+			get { return _content2; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public GComponent component
 		{
 			get { return _content2; }
@@ -621,8 +656,9 @@ namespace FairyGUI
 				UpdateLayout();
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
+<<<<<<< HEAD
 			base.Setup_BeforeAdd(xml);
 
 			string str;
@@ -654,23 +690,33 @@ namespace FairyGUI
 			if (str != null)
 				_content.currentFrame = int.Parse(str);
 			_content.playing = xml.GetAttributeBool("playing", true);
+=======
+			base.Setup_BeforeAdd(buffer, beginPos);
+>>>>>>> upstream/master
 
-			str = xml.GetAttribute("color");
-			if (str != null)
-				_content.color = ToolSet.ConvertFromHtmlColor(str);
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("fillMethod");
-			if (str != null)
-				_content.fillMethod = FieldTypes.ParseFillMethod(str);
+			_url = buffer.ReadS();
+			_align = (AlignType)buffer.ReadByte();
+			_verticalAlign = (VertAlignType)buffer.ReadByte();
+			_fill = (FillType)buffer.ReadByte();
+			_shrinkOnly = buffer.ReadBool();
+			_autoSize = buffer.ReadBool();
+			showErrorSign = buffer.ReadBool();
+			_content.playing = buffer.ReadBool();
+			_content.frame = buffer.ReadInt();
 
+			if (buffer.ReadBool())
+				_content.color = buffer.ReadColor();
+			_content.fillMethod = (FillMethod)buffer.ReadByte();
 			if (_content.fillMethod != FillMethod.None)
 			{
-				_content.fillOrigin = xml.GetAttributeInt("fillOrigin");
-				_content.fillClockwise = xml.GetAttributeBool("fillClockwise", true);
-				_content.fillAmount = (float)xml.GetAttributeInt("fillAmount", 100) / 100;
+				_content.fillOrigin = buffer.ReadByte();
+				_content.fillClockwise = buffer.ReadBool();
+				_content.fillAmount = buffer.ReadFloat();
 			}
 
-			if (_url != null)
+			if (!string.IsNullOrEmpty(_url))
 				LoadContent();
 		}
 	}

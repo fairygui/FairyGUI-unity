@@ -162,7 +162,7 @@ namespace FairyGUIEditor
 				if (pos != -1)
 					packagePath = selectedPkg.assetPath.Substring(pos + 10);
 				else
-					packagePath = null;
+					packagePath = selectedPkg.assetPath;
 				bool isPrefab = PrefabUtility.GetPrefabType(Selection.activeGameObject) == PrefabType.Prefab;
 
 				Selection.activeGameObject.SendMessage("OnUpdateSource",

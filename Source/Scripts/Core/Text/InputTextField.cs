@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using FairyGUI.Utils;
 
 namespace FairyGUI

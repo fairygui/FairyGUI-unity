@@ -6,23 +6,18 @@ namespace FairyGUI
 	/// <summary>
 	/// 
 	/// </summary>
+	public enum DestroyMethod
+	{
+		Destroy,
+		Unload,
+		None
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
 	public class NTexture
 	{
-		/// <summary>
-		/// 
-		/// </summary>
-		public Texture nativeTexture;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public NTexture alphaTexture;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public NTexture root;
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -36,17 +31,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public Dictionary<string, MaterialManager> materialManagers;
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public int refCount;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool disposed;
 
 		/// <summary>
 		/// 
@@ -56,13 +41,18 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool storedODisk;
+		public DestroyMethod destroyMethod;
 
-		Rect? _region;
+		Texture _nativeTexture;
+		Texture _alphaTexture;
+		Rect _region;
+		NTexture _root;
+		Dictionary<string, MaterialManager> _materialManagers;
 
-		static Texture2D CreateEmptyTexture()
+		internal static Texture2D CreateEmptyTexture()
 		{
 			Texture2D emptyTexture = new Texture2D(1, 1, TextureFormat.RGB24, false);
+			emptyTexture.name = "White Texture";
 			emptyTexture.hideFlags = DisplayOptions.hideFlags;
 			emptyTexture.SetPixel(0, 0, Color.white);
 			emptyTexture.Apply();
@@ -92,8 +82,9 @@ namespace FairyGUI
 		{
 			if (_empty != null)
 			{
-				_empty.Dispose(true);
+				NTexture tmp = _empty;
 				_empty = null;
+				tmp.Dispose();
 			}
 		}
 
@@ -103,9 +94,10 @@ namespace FairyGUI
 		/// <param name="texture"></param>
 		public NTexture(Texture texture)
 		{
-			root = this;
-			nativeTexture = texture;
+			_root = this;
+			_nativeTexture = texture;
 			uvRect = new Rect(0, 0, 1, 1);
+			_region = new Rect(0, 0, texture.width, texture.height);
 		}
 
 		/// <summary>
@@ -114,11 +106,13 @@ namespace FairyGUI
 		/// <param name="texture"></param>
 		/// <param name="xScale"></param>
 		/// <param name="yScale"></param>
-		public NTexture(Texture texture, float xScale, float yScale)
+		public NTexture(Texture texture, Texture alphaTexture, float xScale, float yScale)
 		{
-			root = this;
-			nativeTexture = texture;
+			_root = this;
+			_nativeTexture = texture;
+			_alphaTexture = alphaTexture;
 			uvRect = new Rect(0, 0, xScale, yScale);
+			_region = new Rect(0, 0, texture.width, texture.height);
 		}
 
 		/// <summary>
@@ -128,11 +122,11 @@ namespace FairyGUI
 		/// <param name="region"></param>
 		public NTexture(Texture texture, Rect region)
 		{
-			root = this;
-			nativeTexture = texture;
+			_root = this;
+			_nativeTexture = texture;
 			_region = region;
-			uvRect = new Rect(region.x / nativeTexture.width, 1 - region.yMax / nativeTexture.height,
-				region.width / nativeTexture.width, region.height / nativeTexture.height);
+			uvRect = new Rect(region.x / _nativeTexture.width, 1 - region.yMax / _nativeTexture.height,
+				region.width / _nativeTexture.width, region.height / _nativeTexture.height);
 		}
 
 		/// <summary>
@@ -142,16 +136,12 @@ namespace FairyGUI
 		/// <param name="region"></param>
 		public NTexture(NTexture root, Rect region, bool rotated)
 		{
-			this.root = root;
-			nativeTexture = root.nativeTexture;
+			_root = root;
 			this.rotated = rotated;
-			if (root._region != null)
-			{
-				region.x += ((Rect)root._region).x;
-				region.y += ((Rect)root._region).y;
-			}
-			uvRect = new Rect(region.x * root.uvRect.width / nativeTexture.width, 1 - region.yMax * root.uvRect.height / nativeTexture.height,
-				region.width * root.uvRect.width / nativeTexture.width, region.height * root.uvRect.height / nativeTexture.height);
+			region.x += root._region.x;
+			region.y += root._region.y;
+			uvRect = new Rect(region.x * root.uvRect.width / root.width, 1 - region.yMax * root.uvRect.height / root.height,
+				region.width * root.uvRect.width / root.width, region.height * root.uvRect.height / root.height);
 			if (rotated)
 			{
 				float tmp = region.width;
@@ -162,7 +152,6 @@ namespace FairyGUI
 				uvRect.width = uvRect.height;
 				uvRect.height = tmp;
 			}
-
 			_region = region;
 		}
 
@@ -171,13 +160,7 @@ namespace FairyGUI
 		/// </summary>
 		public int width
 		{
-			get
-			{
-				if (_region != null)
-					return (int)((Rect)_region).width;
-				else
-					return nativeTexture.width;
-			}
+			get { return (int)_region.width; }
 		}
 
 		/// <summary>
@@ -185,27 +168,161 @@ namespace FairyGUI
 		/// </summary>
 		public int height
 		{
-			get
+			get { return (int)_region.height; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public NTexture root
+		{
+			get { return _root; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool disposed
+		{
+			get { return _root == null; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Texture nativeTexture
+		{
+			get { return _root != null ? _root._nativeTexture : null; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Texture alphaTexture
+		{
+			get { return _root != null ? _root._alphaTexture : null; }
+		}
+
+		static uint _gCounter;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public MaterialManager GetMaterialManager(string shaderName, string[] keywords)
+		{
+			if (_root != this)
+				return _root.GetMaterialManager(shaderName, keywords);
+
+			if (_materialManagers == null)
+				_materialManagers = new Dictionary<string, MaterialManager>();
+
+			string key = shaderName;
+			if (keywords != null)
 			{
-				if (_region != null)
-					return (int)((Rect)_region).height;
+				//对于带指定关键字的，目前的设计是不参加共享材质了，因为逻辑会变得更复杂
+				key = shaderName + "_" + _gCounter++;
+			}
+
+			MaterialManager mm;
+			if (!_materialManagers.TryGetValue(key, out mm))
+			{
+				mm = new MaterialManager(this, ShaderConfig.GetShader(shaderName), keywords);
+				mm._managerKey = key;
+				_materialManagers.Add(key, mm);
+			}
+
+			return mm;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="manager"></param>
+		public void DestroyMaterialManager(MaterialManager manager)
+		{
+			_materialManagers.Remove(manager._managerKey);
+			manager.DestroyMaterials();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Unload()
+		{
+			Unload(false);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Unload(bool destroyMaterials)
+		{
+			if (this == _empty)
+				return;
+
+			if (_root != this)
+				throw new System.Exception("Unload is not allow to call on none root NTexture.");
+
+			if (_nativeTexture != null)
+			{
+				if (destroyMethod == DestroyMethod.Destroy)
+				{
+					Object.DestroyImmediate(_nativeTexture, true);
+					if (_alphaTexture != null)
+						Object.DestroyImmediate(_alphaTexture, true);
+				}
+				else if (destroyMethod == DestroyMethod.Unload)
+				{
+					Resources.UnloadAsset(_nativeTexture);
+					if (_alphaTexture != null)
+						Resources.UnloadAsset(_alphaTexture);
+				}
+
+				_nativeTexture = null;
+				_alphaTexture = null;
+
+				if (destroyMaterials)
+					DestroyMaterials();
 				else
-					return nativeTexture.height;
+					RefreshMaterials();
 			}
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public void DestroyMaterials()
+		/// <param name="nativeTexture"></param>
+		/// <param name="alphaTexture"></param>
+		public void Reload(Texture nativeTexture, Texture alphaTexture)
 		{
-			if (materialManagers != null && materialManagers.Count > 0)
+			if (_root != this)
+				throw new System.Exception("Reload is not allow to call on none root NTexture.");
+
+			_nativeTexture = nativeTexture;
+			_alphaTexture = alphaTexture;
+
+			RefreshMaterials();
+		}
+
+		void RefreshMaterials()
+		{
+			if (_materialManagers != null && _materialManagers.Count > 0)
 			{
-				foreach (KeyValuePair<string, MaterialManager> kv in materialManagers)
-				{
-					kv.Value.Dispose();
-				}
-				materialManagers.Clear();
+				Dictionary<string, MaterialManager>.Enumerator iter = _materialManagers.GetEnumerator();
+				while (iter.MoveNext())
+					iter.Current.Value.RefreshMaterials();
+				iter.Dispose();
+			}
+		}
+
+		void DestroyMaterials()
+		{
+			if (_materialManagers != null && _materialManagers.Count > 0)
+			{
+				Dictionary<string, MaterialManager>.Enumerator iter = _materialManagers.GetEnumerator();
+				while (iter.MoveNext())
+					iter.Current.Value.DestroyMaterials();
+				iter.Dispose();
 			}
 		}
 
@@ -214,30 +331,12 @@ namespace FairyGUI
 		/// </summary>
 		public void Dispose()
 		{
-			Dispose(false);
-		}
+			if (this == _empty)
+				return;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="allowDestroyingAssets"></param>
-		public void Dispose(bool allowDestroyingAssets)
-		{
-			if (!disposed)
-			{
-				disposed = true;
-
-				DestroyMaterials();
-				if (root == this && nativeTexture != null && allowDestroyingAssets)
-				{
-					if (storedODisk)
-						Resources.UnloadAsset(nativeTexture);
-					else
-						Texture.DestroyImmediate(nativeTexture, true);
-				}
-				nativeTexture = null;
-				root = null;
-			}
+			if (_root == this)
+				Unload(true);
+			_root = null;
 		}
 	}
 }

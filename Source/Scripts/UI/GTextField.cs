@@ -75,6 +75,7 @@ namespace FairyGUI
 				str = ParseTemplate(str);
 
 			if (_ubbEnabled)
+<<<<<<< HEAD
             {
                _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
             }
@@ -83,6 +84,11 @@ namespace FairyGUI
 			    string parseTxt = UBBParser.inst.GetRemoveParase(str);
 			    _textField.text = parseTxt;
 			}
+=======
+				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
+			else
+				_textField.text = str;
+>>>>>>> upstream/master
 		}
 
 		virtual protected void GetTextFieldText()
@@ -112,6 +118,99 @@ namespace FairyGUI
 			return this;
 		}
 
+		public void FlushVars()
+		{
+			SetTextFieldText();
+			UpdateSize();
+		}
+
+		protected string ParseTemplate(string template)
+		{
+			int pos1 = 0, pos2 = 0;
+			int pos3;
+			string tag;
+			string value;
+			StringBuilder buffer = new StringBuilder();
+
+			while ((pos2 = template.IndexOf('{', pos1)) != -1)
+			{
+				if (pos2 > 0 && template[pos2 - 1] == '\\')
+				{
+					buffer.Append(template, pos1, pos2 - pos1 - 1);
+					buffer.Append('{');
+					pos1 = pos2 + 1;
+					continue;
+				}
+
+				buffer.Append(template, pos1, pos2 - pos1);
+				pos1 = pos2;
+				pos2 = template.IndexOf('}', pos1);
+				if (pos2 == -1)
+					break;
+
+				if (pos2 == pos1 + 1)
+				{
+					buffer.Append(template, pos1, 2);
+					pos1 = pos2 + 1;
+					continue;
+				}
+
+				tag = template.Substring(pos1 + 1, pos2 - pos1 - 1);
+				pos3 = tag.IndexOf('=');
+				if (pos3 != -1)
+				{
+					if (!_templateVars.TryGetValue(tag.Substring(0, pos3), out value))
+						value = tag.Substring(pos3 + 1);
+				}
+				else
+				{
+					if (!_templateVars.TryGetValue(tag, out value))
+						value = "";
+				}
+				buffer.Append(value);
+				pos1 = pos2 + 1;
+			}
+			if (pos1 < template.Length)
+				buffer.Append(template, pos1, template.Length - pos1);
+
+			return buffer.ToString();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Dictionary<string, string> templateVars
+		{
+			get { return _templateVars; }
+			set
+			{
+				if (_templateVars == null && value == null)
+					return;
+
+				_templateVars = value;
+
+				FlushVars();
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public GTextField SetVar(string name, string value)
+		{
+			if (_templateVars == null)
+				_templateVars = new Dictionary<string, string>();
+			_templateVars[name] = value;
+
+			return this;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public void FlushVars()
 		{
 			SetTextFieldText();
@@ -362,77 +461,59 @@ namespace FairyGUI
 			}
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
+
+			buffer.Seek(beginPos, 5);
 
 			TextFormat tf = _textField.textFormat;
 
-			string str;
-			str = xml.GetAttribute("font");
-			if (str != null)
-				tf.font = str;
-
-			str = xml.GetAttribute("fontSize");
-			if (str != null)
-				tf.size = int.Parse(str);
-
-			str = xml.GetAttribute("color");
-			if (str != null)
-				tf.color = ToolSet.ConvertFromHtmlColor(str);
-
-			str = xml.GetAttribute("align");
-			if (str != null)
-				this.align = FieldTypes.ParseAlign(str);
-
-			str = xml.GetAttribute("vAlign");
-			if (str != null)
-				this.verticalAlign = FieldTypes.ParseVerticalAlign(str);
-
-			str = xml.GetAttribute("leading");
-			if (str != null)
-				tf.lineSpacing = int.Parse(str);
-
-			str = xml.GetAttribute("letterSpacing");
-			if (str != null)
-				tf.letterSpacing = int.Parse(str);
-
-			_ubbEnabled = xml.GetAttributeBool("ubb", false);
-
-			str = xml.GetAttribute("autoSize");
-			if (str != null)
-				this.autoSize = FieldTypes.ParseAutoSizeType(str);
-
-			tf.underline = xml.GetAttributeBool("underline", false);
-			tf.italic = xml.GetAttributeBool("italic", false);
-			tf.bold = xml.GetAttributeBool("bold", false);
-			this.singleLine = xml.GetAttributeBool("singleLine", false);
-			str = xml.GetAttribute("strokeColor");
-			if (str != null)
+			tf.font = buffer.ReadS();
+			tf.size = buffer.ReadShort();
+			tf.color = buffer.ReadColor();
+			this.align = (AlignType)buffer.ReadByte();
+			this.verticalAlign = (VertAlignType)buffer.ReadByte();
+			tf.lineSpacing = buffer.ReadShort();
+			tf.letterSpacing = buffer.ReadShort();
+			_ubbEnabled = buffer.ReadBool();
+			this.autoSize = (AutoSizeType)buffer.ReadByte();
+			tf.underline = buffer.ReadBool();
+			tf.italic = buffer.ReadBool();
+			tf.bold = buffer.ReadBool();
+			this.singleLine = buffer.ReadBool();
+			if (buffer.ReadBool())
 			{
-				this.strokeColor = ToolSet.ConvertFromHtmlColor(str);
-				this.stroke = xml.GetAttributeInt("strokeSize", 1);
+				this.strokeColor = buffer.ReadColor();
+				this.stroke = (int)buffer.ReadFloat();
 			}
 
-			str = xml.GetAttribute("shadowColor");
-			if (str != null)
+			if (buffer.ReadBool())
 			{
-				this.strokeColor = ToolSet.ConvertFromHtmlColor(str);
-				this.shadowOffset = xml.GetAttributeVector("shadowOffset");
+				this.strokeColor = buffer.ReadColor();
+				float f1 = buffer.ReadFloat();
+				float f2 = buffer.ReadFloat();
+				this.shadowOffset = new Vector2(f1, f2);
 			}
 
+<<<<<<< HEAD
 			if (xml.GetAttributeBool("vars"))
+=======
+			if (buffer.ReadBool())
+>>>>>>> upstream/master
 				_templateVars = new Dictionary<string, string>();
 
 			_textField.textFormat = tf;
 		}
 
-		override public void Setup_AfterAdd(XML xml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(xml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			string str = xml.GetAttribute("text");
-			if (str != null && str.Length > 0)
+			buffer.Seek(beginPos, 6);
+
+			string str = buffer.ReadS();
+			if (str != null)
 				this.text = str;
 		}
 	}

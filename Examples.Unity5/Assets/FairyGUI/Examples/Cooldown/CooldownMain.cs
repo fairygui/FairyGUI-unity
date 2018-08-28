@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FairyGUI;
-
 public class CooldownMain : MonoBehaviour
 {
 	GComponent _mainView;
@@ -30,6 +29,7 @@ public class CooldownMain : MonoBehaviour
 		_btn1.icon = "Cooldown/k1";
 		_time2 = 10;
 		_mask1 = _btn1.GetChild("mask").asImage;
+
 	}
 
 	void Update()

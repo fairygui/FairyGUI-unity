@@ -22,7 +22,7 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		public EventListener onChanged { get; private set; }
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -173,17 +173,28 @@ namespace FairyGUI
 			_textField = inputTextField.textField;
 		}
 
-		public override void Setup_BeforeAdd(Utils.XML xml)
+		public override void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str = xml.GetAttribute("prompt");
+			buffer.Seek(beginPos, 4);
+
+			string str = buffer.ReadS();
 			if (str != null)
 				inputTextField.promptText = str;
-			inputTextField.displayAsPassword = xml.GetAttributeBool("password", false);
-			inputTextField.restrict = xml.GetAttribute("restrict");
-			inputTextField.maxLength = xml.GetAttributeInt("maxLength", 0);
-			inputTextField.keyboardType = xml.GetAttributeInt("keyboardType");
+
+			str = buffer.ReadS();
+			if (str != null)
+				inputTextField.restrict = str;
+
+			int iv = buffer.ReadInt();
+			if (iv != 0)
+				inputTextField.maxLength = iv;
+			iv = buffer.ReadInt();
+			if (iv != 0)
+				inputTextField.keyboardType = iv;
+			if (buffer.ReadBool())
+				inputTextField.displayAsPassword = true;
 		}
 	}
 }

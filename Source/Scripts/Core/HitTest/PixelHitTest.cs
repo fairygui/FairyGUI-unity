@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FairyGUI.Utils;
+﻿using FairyGUI.Utils;
 using UnityEngine;
 
 namespace FairyGUI
@@ -13,16 +11,18 @@ namespace FairyGUI
 		public int pixelWidth;
 		public float scale;
 		public byte[] pixels;
+		public int pixelsLength;
+		public int pixelsOffset;
 
 		public void Load(ByteBuffer ba)
 		{
 			ba.ReadInt();
 			pixelWidth = ba.ReadInt();
 			scale = 1.0f / ba.ReadByte();
-			int len = ba.ReadInt();
-			pixels = new byte[len];
-			for (int i = 0; i < len; i++)
-				pixels[i] = ba.ReadByte();
+			pixels = ba.buffer;
+			pixelsLength = ba.ReadInt();
+			pixelsOffset = ba.position;
+			ba.Skip(pixelsLength);
 		}
 	}
 
@@ -71,8 +71,8 @@ namespace FairyGUI
 			int pos2 = pos / 8;
 			int pos3 = pos % 8;
 
-			if (pos2 >= 0 && pos2 < _data.pixels.Length)
-				return ((_data.pixels[pos2] >> pos3) & 0x1) > 0;
+			if (pos2 >= 0 && pos2 < _data.pixelsLength)
+				return ((_data.pixels[_data.pixelsOffset + pos2] >> pos3) & 0x1) > 0;
 			else
 				return false;
 		}

@@ -1,7 +1,6 @@
 ﻿using System;
-using FairyGUI.Utils;
 using UnityEngine;
-using DG.Tweening;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -25,8 +24,7 @@ namespace FairyGUI
 		float _barMaxHeightDelta;
 		float _barStartX;
 		float _barStartY;
-
-		Tweener _tweener;
+		bool _tweening;
 
 		public GProgressBar()
 		{
@@ -84,10 +82,10 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (_tweener != null)
+				if (_tweening)
 				{
-					_tweener.Kill(true);
-					_tweener = null;
+					GTween.Kill(this, TweenPropType.Progress, true);
+					_tweening = false;
 				}
 
 				if (_value != value)
@@ -109,23 +107,18 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="duration"></param>
-		public Tweener TweenValue(double value, float duration)
+		public GTweener TweenValue(double value, float duration)
 		{
-			if (_value != value)
-			{
-				if (_tweener != null)
-					_tweener.Kill(false);
+			double oldValule = _value;
+			_value = value;
 
-				double oldValue = _value;
-				_value = value;
-				_tweener = DOTween.To(() => oldValue, v => { Update(v); }, value, duration)
-					.SetRecyclable()
-					.SetEase(Ease.Linear).OnComplete(() => { _tweener = null; });
-
-				return _tweener;
-			}
-			else
-				return null;
+			if (_tweening)
+				GTween.Kill(this, TweenPropType.Progress, false);
+			_tweening = true;
+			return GTween.To(oldValule, _value, duration)
+				.SetEase(EaseType.Linear)
+				.SetTarget(this, TweenPropType.Progress)
+				.OnComplete(() => { _tweening = false; });
 		}
 
 		/// <summary>
@@ -231,19 +224,12 @@ namespace FairyGUI
 			InvalidateBatchingState(true);
 		}
 
-		override public void ConstructFromXML(XML cxml)
+		override protected void ConstructExtension(ByteBuffer buffer)
 		{
-			base.ConstructFromXML(cxml);
+			buffer.Seek(0, 6);
 
-			XML xml = cxml.GetNode("ProgressBar");
-
-			string str;
-			str = xml.GetAttribute("titleType");
-			if (str != null)
-				_titleType = FieldTypes.ParseProgressTitleType(str);
-			else
-				_titleType = ProgressTitleType.Percent;
-			_reverse = xml.GetAttributeBool("reverse", false);
+			_titleType = (ProgressTitleType)buffer.ReadByte();
+			_reverse = buffer.ReadBool();
 
 			_titleObject = GetChild("title") as GTextField;
 			_barObjectH = GetChild("bar");
@@ -264,16 +250,24 @@ namespace FairyGUI
 			}
 		}
 
-		override public void Setup_AfterAdd(XML cxml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(cxml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			XML xml = cxml.GetNode("ProgressBar");
-			if (xml != null)
+			if (!buffer.Seek(beginPos, 6))
 			{
-				_value = xml.GetAttributeInt("value");
-				_max = xml.GetAttributeInt("max");
+				Update(_value);
+				return;
 			}
+
+			if ((ObjectType)buffer.ReadByte() != packageItem.objectType)
+			{
+				Update(_value);
+				return;
+			}
+
+			_value = buffer.ReadInt();
+			_max = buffer.ReadInt();
 
 			Update(_value);
 		}
@@ -293,8 +287,8 @@ namespace FairyGUI
 
 		public override void Dispose()
 		{
-			if (_tweener != null)
-				_tweener.Kill(false);
+			if (_tweening)
+				GTween.Kill(this);
 			base.Dispose();
 		}
 	}

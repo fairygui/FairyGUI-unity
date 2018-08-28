@@ -14,6 +14,7 @@ namespace FairyGUIEditor
 	{
 		SerializedProperty packageName;
 		SerializedProperty componentName;
+		SerializedProperty packagePath;
 		SerializedProperty renderMode;
 		SerializedProperty renderCamera;
 		SerializedProperty sortingOrder;
@@ -33,6 +34,7 @@ namespace FairyGUIEditor
 		{
 			packageName = serializedObject.FindProperty("packageName");
 			componentName = serializedObject.FindProperty("componentName");
+			packagePath = serializedObject.FindProperty("packagePath");
 			renderMode = serializedObject.FindProperty("renderMode");
 			renderCamera = serializedObject.FindProperty("renderCamera");
 			sortingOrder = serializedObject.FindProperty("sortingOrder");
@@ -86,6 +88,11 @@ namespace FairyGUIEditor
 			EditorGUILayout.PrefixLabel("Component Name");
 			if (GUILayout.Button(componentName.stringValue, "ObjectField"))
 				EditorWindow.GetWindow<PackagesWindow>(true, "Select a UI Component").SetSelection(packageName.stringValue, componentName.stringValue);
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel("Package Path");
+			EditorGUILayout.LabelField(packagePath.stringValue, (GUIStyle)"helpbox");
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.PropertyField(renderMode);

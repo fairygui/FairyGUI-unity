@@ -43,7 +43,7 @@ namespace FairyGUI
 			beingQuit = true;
 
 			if (Application.isEditor)
-				UIPackage.RemoveAllPackages(true);
+				UIPackage.RemoveAllPackages();
 		}
 	}
 }

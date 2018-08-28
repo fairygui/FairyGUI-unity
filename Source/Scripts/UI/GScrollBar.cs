@@ -87,13 +87,11 @@ namespace FairyGUI
 			}
 		}
 
-		override public void ConstructFromXML(XML cxml)
+		override protected void ConstructExtension(ByteBuffer buffer)
 		{
-			base.ConstructFromXML(cxml);
+			buffer.Seek(0, 6);
 
-			XML xml = cxml.GetNode("ScrollBar");
-			if (xml != null)
-				_fixedGripSize = xml.GetAttributeBool("fixedGripSize");
+			_fixedGripSize = buffer.ReadBool();
 
 			_grip = GetChild("grip");
 			if (_grip == null)

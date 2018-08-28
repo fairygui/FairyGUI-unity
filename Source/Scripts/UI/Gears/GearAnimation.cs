@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -34,21 +34,19 @@ namespace FairyGUI
 			_storage = new Dictionary<string, GearAnimationValue>();
 		}
 
-		override protected void AddStatus(string pageId, string value)
+		override protected void AddStatus(string pageId, ByteBuffer buffer)
 		{
-			if (value == "-" || value.Length == 0)
-				return;
-
-			string[] arr = value.Split(',');
-			int frame = int.Parse(arr[0]);
-			bool playing = arr[1] == "p";
+			GearAnimationValue gv;
 			if (pageId == null)
-			{
-				_default.playing = playing;
-				_default.frame = frame;
-			}
+				gv = _default;
 			else
-				_storage[pageId] = new GearAnimationValue(playing, frame);
+			{
+				gv = new GearAnimationValue(false, 0);
+				_storage[pageId] = gv;
+			}
+
+			gv.playing = buffer.ReadBool();
+			gv.frame = buffer.ReadInt();
 		}
 
 		override public void Apply()

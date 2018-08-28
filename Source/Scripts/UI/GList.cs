@@ -2659,6 +2659,15 @@ namespace FairyGUI
 						if (foldInvisibleItems && !child.visible)
 							continue;
 
+						if (j == 0 && (_lineCount != 0 && k >= _lineCount
+							|| _lineCount == 0 && curY + (_lineCount > 0 ? eachHeight : child.height) > viewHeight))
+						{
+							//new page
+							page++;
+							curY = 0;
+							k = 0;
+						}
+
 						lineSize += child.sourceWidth;
 						j++;
 						if (j == _columnCount || i == cnt - 1)
@@ -2694,15 +2703,6 @@ namespace FairyGUI
 							lineSize = 0;
 
 							k++;
-
-							if (_lineCount != 0 && k >= _lineCount
-								|| _lineCount == 0 && curY + child.height > viewHeight)
-							{
-								//new page
-								page++;
-								curY = 0;
-								k = 0;
-							}
 						}
 					}
 				}
@@ -2756,151 +2756,87 @@ namespace FairyGUI
 			InvalidateBatchingState(true);
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str;
-			string[] arr;
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("layout");
-			if (str != null)
-				_layout = FieldTypes.ParseListLayoutType(str);
-			else
-				_layout = ListLayoutType.SingleColumn;
+			_layout = (ListLayoutType)buffer.ReadByte();
+			selectionMode = (ListSelectionMode)buffer.ReadByte();
+			_align = (AlignType)buffer.ReadByte();
+			_verticalAlign = (VertAlignType)buffer.ReadByte();
+			_lineGap = buffer.ReadShort();
+			_columnGap = buffer.ReadShort();
+			_lineCount = buffer.ReadShort();
+			_columnCount = buffer.ReadShort();
+			_autoResizeItem = buffer.ReadBool();
+			_childrenRenderOrder = (ChildrenRenderOrder)buffer.ReadByte();
+			_apexIndex = buffer.ReadShort();
 
-			str = xml.GetAttribute("selectionMode");
-			if (str != null)
-				selectionMode = FieldTypes.ParseListSelectionMode(str);
-			else
-				selectionMode = ListSelectionMode.Single;
+			if (buffer.ReadBool())
+			{
+				_margin.top = buffer.ReadInt();
+				_margin.bottom = buffer.ReadInt();
+				_margin.left = buffer.ReadInt();
+				_margin.right = buffer.ReadInt();
+			}
 
-			OverflowType overflow;
-			str = xml.GetAttribute("overflow");
-			if (str != null)
-				overflow = FieldTypes.ParseOverflowType(str);
-			else
-				overflow = OverflowType.Visible;
-
-			str = xml.GetAttribute("margin");
-			if (str != null)
-				_margin.Parse(str);
-
-			str = xml.GetAttribute("align");
-			if (str != null)
-				_align = FieldTypes.ParseAlign(str);
-
-			str = xml.GetAttribute("vAlign");
-			if (str != null)
-				_verticalAlign = FieldTypes.ParseVerticalAlign(str);
-
+			OverflowType overflow = (OverflowType)buffer.ReadByte();
 			if (overflow == OverflowType.Scroll)
 			{
-				ScrollType scroll;
-				str = xml.GetAttribute("scroll");
-				if (str != null)
-					scroll = FieldTypes.ParseScrollType(str);
-				else
-					scroll = ScrollType.Vertical;
-
-				ScrollBarDisplayType scrollBarDisplay;
-				str = xml.GetAttribute("scrollBar");
-				if (str != null)
-					scrollBarDisplay = FieldTypes.ParseScrollBarDisplayType(str);
-				else
-					scrollBarDisplay = ScrollBarDisplayType.Default;
-
-				int scrollBarFlags = xml.GetAttributeInt("scrollBarFlags");
-
-				Margin scrollBarMargin = new Margin();
-				str = xml.GetAttribute("scrollBarMargin");
-				if (str != null)
-					scrollBarMargin.Parse(str);
-
-				string vtScrollBarRes = null;
-				string hzScrollBarRes = null;
-				arr = xml.GetAttributeArray("scrollBarRes");
-				if (arr != null)
-				{
-					vtScrollBarRes = arr[0];
-					hzScrollBarRes = arr[1];
-				}
-
-				string headerRes = null;
-				string footerRes = null;
-				arr = xml.GetAttributeArray("ptrRes");
-				if (arr != null)
-				{
-					headerRes = arr[0];
-					footerRes = arr[1];
-				}
-
-				SetupScroll(scrollBarMargin, scroll, scrollBarDisplay, scrollBarFlags, vtScrollBarRes, hzScrollBarRes, headerRes, footerRes);
+				int savedPos = buffer.position;
+				buffer.Seek(beginPos, 7);
+				SetupScroll(buffer);
+				buffer.position = savedPos;
 			}
 			else
-			{
 				SetupOverflow(overflow);
+
+			if (buffer.ReadBool())
+			{
+				int i1 = buffer.ReadInt();
+				int i2 = buffer.ReadInt();
+				this.clipSoftness = new Vector2(i1, i2);
 			}
 
-			arr = xml.GetAttributeArray("clipSoftness");
-			if (arr != null)
-				this.clipSoftness = new Vector2(int.Parse(arr[0]), int.Parse(arr[1]));
+			buffer.Seek(beginPos, 8);
 
-			_lineGap = xml.GetAttributeInt("lineGap");
-			_columnGap = xml.GetAttributeInt("colGap");
-			int c = xml.GetAttributeInt("lineItemCount");
-			if (_layout == ListLayoutType.FlowHorizontal)
-				_columnCount = c;
-			else if (_layout == ListLayoutType.FlowVertical)
-				_lineCount = c;
-			else if (_layout == ListLayoutType.Pagination)
+			defaultItem = buffer.ReadS();
+			int itemCount = buffer.ReadShort();
+			for (int i = 0; i < itemCount; i++)
 			{
-				_columnCount = c;
-				_lineCount = xml.GetAttributeInt("lineItemCount2");
-			}
-			defaultItem = xml.GetAttribute("defaultItem");
+				int nextPos = buffer.ReadShort();
+				nextPos += buffer.position;
 
-			if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.SingleColumn)
-				_autoResizeItem = xml.GetAttributeBool("autoItemSize", true);
-			else
-				_autoResizeItem = xml.GetAttributeBool("autoItemSize", false);
-
-			str = xml.GetAttribute("renderOrder");
-			if (str != null)
-			{
-				_childrenRenderOrder = FieldTypes.ParseChildrenRenderOrder(str);
-				if (_childrenRenderOrder == ChildrenRenderOrder.Arch)
-					_apexIndex = xml.GetAttributeInt("apex", 0);
-			}
-
-			XMLList.Enumerator et = xml.GetEnumerator("item");
-			while (et.MoveNext())
-			{
-				XML ix = et.Current;
-				string url = ix.GetAttribute("url");
-				if (string.IsNullOrEmpty(url))
+				string str = buffer.ReadS();
+				if (str == null)
 				{
-					url = defaultItem;
-					if (string.IsNullOrEmpty(url))
+					str = defaultItem;
+					if (string.IsNullOrEmpty(str))
+					{
+						buffer.position = nextPos;
 						continue;
+					}
 				}
 
-				GObject obj = GetFromPool(url);
+				GObject obj = GetFromPool(str);
 				if (obj != null)
 				{
 					AddChild(obj);
-					str = ix.GetAttribute("title");
+					str = buffer.ReadS();
 					if (str != null)
 						obj.text = str;
-					str = ix.GetAttribute("icon");
+					str = buffer.ReadS();
+					if (str != null && (obj is GButton))
+						(obj as GButton).selectedTitle = str;
+					str = buffer.ReadS();
 					if (str != null)
 						obj.icon = str;
-					str = ix.GetAttribute("name");
-					if (str != null)
-						obj.name = str;
-					str = ix.GetAttribute("selectedIcon");
+					str = buffer.ReadS();
 					if (str != null && (obj is GButton))
 						(obj as GButton).selectedIcon = str;
+<<<<<<< HEAD
 					str = ix.GetAttribute("selectedTitle");
 					if (str != null && (obj is GButton))
 						(obj as GButton).selectedTitle = str;
@@ -2915,21 +2851,37 @@ namespace FairyGUI
 								if (cc != null)
 									cc.selectedPageId = arr[i + 1];
 							}
+=======
+					str = buffer.ReadS();
+					if (str != null)
+						obj.name = str;
+					if (obj is GComponent)
+					{
+						int cnt = buffer.ReadShort();
+						for (int j = 0; j < cnt; j++)
+						{
+							Controller cc = (obj as GComponent).GetController(buffer.ReadS());
+							str = buffer.ReadS();
+							if (cc != null)
+								cc.selectedPageId = str;
+>>>>>>> upstream/master
 						}
 					}
 				}
+
+				buffer.position = nextPos;
 			}
 		}
 
-		override public void Setup_AfterAdd(XML xml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(xml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
-			string str;
+			buffer.Seek(beginPos, 6);
 
-			str = xml.GetAttribute("selectionController");
-			if (str != null)
-				_selectionController = parent.GetController(str);
+			int i = buffer.ReadShort();
+			if (i != -1)
+				_selectionController = parent.GetControllerAt(i);
 		}
 	}
 }

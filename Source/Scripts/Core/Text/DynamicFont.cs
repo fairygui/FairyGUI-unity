@@ -106,7 +106,8 @@ namespace FairyGUI
 			_font.textureRebuildCallback += textureRebuildCallback;
 #endif
 
-			this.mainTexture = new NTexture(_font.material.mainTexture);
+			mainTexture = new NTexture(_font.material.mainTexture);
+			mainTexture.destroyMethod = DestroyMethod.None;
 		}
 
 		override public void SetFormat(TextFormat format, float fontSizeScale)
@@ -266,8 +267,9 @@ namespace FairyGUI
 				return;
 
 			if (mainTexture != null)
-				mainTexture.Dispose(false);
+				mainTexture.Dispose();
 			mainTexture = new NTexture(_font.material.mainTexture);
+			mainTexture.destroyMethod = DestroyMethod.None;
 
 			textRebuildFlag = true;
 
@@ -276,9 +278,10 @@ namespace FairyGUI
 #else
 		void textureRebuildCallback()
 		{
-            if (mainTexture != null)
-                mainTexture.Dispose(false);
+			if (mainTexture != null)
+				mainTexture.Dispose();
 			mainTexture = new NTexture(_font.material.mainTexture);
+			mainTexture.destroyMethod = DestroyMethod.None;
 
 			textRebuildFlag = true;
 

@@ -450,24 +450,20 @@ namespace FairyGUI
 			}
 		}
 
-		override public void Setup_BeforeAdd(XML xml)
+		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_BeforeAdd(xml);
+			base.Setup_BeforeAdd(buffer, beginPos);
 
-			string str;
+			buffer.Seek(beginPos, 5);
 
-			str = xml.GetAttribute("layout");
-			if (str != null)
-			{
-				_layout = FieldTypes.ParseGroupLayoutType(str);
-				_lineGap = xml.GetAttributeInt("lineGap");
-				_columnGap = xml.GetAttributeInt("colGap");
-			}
+			_layout = (GroupLayoutType)buffer.ReadByte();
+			_lineGap = buffer.ReadInt();
+			_columnGap = buffer.ReadInt();
 		}
 
-		override public void Setup_AfterAdd(XML xml)
+		override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
 		{
-			base.Setup_AfterAdd(xml);
+			base.Setup_AfterAdd(buffer, beginPos);
 
 			if (!this.visible)
 				HandleVisibleChanged();

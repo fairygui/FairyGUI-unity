@@ -13,15 +13,16 @@ namespace FairyGUI
 	{
 		public static int repeat;
 		public static float time;
-		public static GameObject gameObject;
+
+		public static bool catchCallbackExceptions = true;
 
 		Dictionary<TimerCallback, Anymous_T> _items;
 		Dictionary<TimerCallback, Anymous_T> _toAdd;
 		List<Anymous_T> _toRemove;
 		List<Anymous_T> _pool;
-		float _lastTime;
 
 		TimersEngine _engine;
+		GameObject gameObject;
 
 		private static Timers _inst;
 		public static Timers inst
@@ -43,7 +44,7 @@ namespace FairyGUI
         public Timers()
 		{
 			_inst = this;
-			gameObject = new GameObject("[Timers]");
+			gameObject = new GameObject("[FairyGUI.Timers]");
 			gameObject.hideFlags = HideFlags.HideInHierarchy;
 			gameObject.SetActive(true);
             gameObject.DontDestroyOnLoad();
@@ -54,7 +55,6 @@ namespace FairyGUI
 			_toAdd = new Dictionary<TimerCallback, Anymous_T>();
 			_toRemove = new List<Anymous_T>();
 			_pool = new List<Anymous_T>(100);
-			_lastTime = Time.time;
 		}
 
 		public void Add(float interval, int repeat, TimerCallback callback)
@@ -171,12 +171,16 @@ namespace FairyGUI
 
 		public void Update()
 		{
+<<<<<<< HEAD
 			time = Time.unscaledTime;
 			float elapsed = time - _lastTime;
 // 			if (Time.timeScale != 0)
 // 				elapsed /= Time.timeScale;
 			_lastTime = time;
 
+=======
+			float dt = Time.unscaledDeltaTime;
+>>>>>>> upstream/master
 			Dictionary<TimerCallback, Anymous_T>.Enumerator iter;
 
 			if (_items.Count > 0)
@@ -191,7 +195,7 @@ namespace FairyGUI
 						continue;
 					}
 
-					i.elapsed += elapsed;
+					i.elapsed += dt;
 					if (i.elapsed < i.interval)
 						continue;
 
@@ -211,16 +215,20 @@ namespace FairyGUI
 					repeat = i.repeat;
 					if (i.callback != null)
 					{
-						try
+						if (catchCallbackExceptions)
 						{
+							try
+							{
+								i.callback(i.param);
+							}
+							catch (System.Exception e)
+							{
+								i.deleted = true;
+								Debug.LogWarning("FairyGUI: timer(internal=" + i.interval + ", repeat=" + i.repeat + ") callback error > " + e.Message);
+							}
+						}
+						else
 							i.callback(i.param);
-						}
-						catch (System.Exception e)
-						{
-							i.deleted = true;
-							Debug.Log("timer callback failed, " + i.interval + "," + i.repeat);
-							Debug.LogException(e);
-						}
 					}
 				}
 				iter.Dispose();

@@ -23,7 +23,7 @@ namespace FairyGUI.Utils
 
 		public HtmlInput()
 		{
-			textInput = (GTextInput)UIObjectFactory.NewObject("inputtext");
+			textInput = (GTextInput)UIObjectFactory.NewObject(ObjectType.InputText);
 			textInput.gameObjectName = "HtmlInput";
 			textInput.verticalAlign = VertAlignType.Middle;
 

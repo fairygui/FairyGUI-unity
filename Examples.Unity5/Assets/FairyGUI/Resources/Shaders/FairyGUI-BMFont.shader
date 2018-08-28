@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
 Shader "FairyGUI/BMFont"
 {
 	Properties
@@ -94,8 +92,13 @@ Shader "FairyGUI/BMFont"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 540)
+					o.color.rgb = GammaToLinearSpace(v.color.rgb);
+					o.color.a = v.color.a;
+					#else
 					o.color = v.color;
-
+					#endif
+					
 					float2 texcoord = v.texcoord;
 					o.flags.x = floor(texcoord.x/10);
 					texcoord.x = texcoord.x - o.flags.x*10;
@@ -115,11 +118,11 @@ Shader "FairyGUI/BMFont"
 					o.texcoord = texcoord;
 
 					#ifdef CLIPPED
-					o.clipPos = mul(unity_ObjectToWorld, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
+					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
 					#endif
 
 					#ifdef SOFT_CLIPPED
-					o.clipPos = mul(unity_ObjectToWorld, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
+					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
 					#endif
 
 					return o;

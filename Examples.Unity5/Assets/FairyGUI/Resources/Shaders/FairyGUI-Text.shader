@@ -96,7 +96,12 @@ Shader "FairyGUI/Text"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 540)
+					o.color.rgb = GammaToLinearSpace(v.color.rgb);
+					o.color.a = v.color.a;
+					#else
 					o.color = v.color;
+					#endif
 					
 					#ifdef GRAYED
 					float2 texcoord = v.texcoord;
@@ -129,13 +134,8 @@ Shader "FairyGUI/Text"
 					col.a *= tex2D(_MainTex, i.texcoord).a;
 
 					#ifdef GRAYED
-					if(i.flag==1)
-					{
-						fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));  
-						col.rgb = fixed3(grey, grey, grey); 
-					}
-					else
-						col.rgb = fixed3(0.8, 0.8, 0.8);
+					fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));  
+					col.rgb = fixed3(grey, grey, grey); 
 					#endif
 
 					#ifdef SOFT_CLIPPED

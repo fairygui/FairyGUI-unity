@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using DG.Tweening;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -107,6 +107,7 @@ namespace FairyGUI
 		GComponent _footer;
 		Controller _pageController;
 
+<<<<<<< HEAD
 		static int _gestureFlag;        
         
         [LuaInterface.NoToLua]
@@ -124,15 +125,34 @@ namespace FairyGUI
 									string hzScrollBarRes,
 									string headerRes,
 									string footerRes)
+=======
+		static int _gestureFlag;
+
+		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
+		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
+		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+
+		public ScrollPane(GComponent owner)
+>>>>>>> upstream/master
 		{
 			onScroll = new EventListener(this, "onScroll");
 			onScrollEnd = new EventListener(this, "onScrollEnd");
 			onPullDownRelease = new EventListener(this, "onPullDownRelease");
 			onPullUpRelease = new EventListener(this, "onPullUpRelease");
 
+			_scrollStep = UIConfig.defaultScrollStep;
+			_mouseWheelStep = _scrollStep * 2;
+			_softnessOnTopOrLeftSide = UIConfig.allowSoftnessOnTopOrLeftSide;
+			_decelerationRate = UIConfig.defaultScrollDecelerationRate;
+			_touchEffect = UIConfig.defaultScrollTouchEffect;
+			_bouncebackEffect = UIConfig.defaultScrollBounceEffect;
+			_scrollBarVisible = true;
+			_mouseWheelEnabled = true;
+			_pageSize = Vector2.one;
+
 			_refreshDelegate = Refresh;
 			_tweenUpdateDelegate = TweenUpdate;
-			_showScrollBarDelegate = __showScrollBar;
+			_showScrollBarDelegate = onShowScrollBar;
 
 			_owner = owner;
 
@@ -143,6 +163,7 @@ namespace FairyGUI
 			_container.SetXY(0, 0);
 			_maskContainer.AddChild(_container);
 
+<<<<<<< HEAD
 			_scrollBarMargin = scrollBarMargin;
 			_scrollType = scrollType;
 			_scrollStep = UIConfig.defaultScrollStep;
@@ -160,6 +181,34 @@ namespace FairyGUI
             _elapsedParam = UIConfig.scrollPaneElapsedParam;
 
             _displayOnLeft = (flags & 1) != 0;
+=======
+			_owner.rootContainer.onMouseWheel.Add(__mouseWheel);
+			_owner.rootContainer.onTouchBegin.Add(__touchBegin);
+			_owner.rootContainer.onTouchMove.Add(__touchMove);
+			_owner.rootContainer.onTouchEnd.Add(__touchEnd);
+		}
+
+		public void Setup(ByteBuffer buffer)
+		{
+			_scrollType = (ScrollType)buffer.ReadByte();
+			ScrollBarDisplayType scrollBarDisplay = (ScrollBarDisplayType)buffer.ReadByte();
+			int flags = buffer.ReadInt();
+
+			if (buffer.ReadBool())
+			{
+				_scrollBarMargin.top = buffer.ReadInt();
+				_scrollBarMargin.bottom = buffer.ReadInt();
+				_scrollBarMargin.left = buffer.ReadInt();
+				_scrollBarMargin.right = buffer.ReadInt();
+			}
+
+			string vtScrollBarRes = buffer.ReadS();
+			string hzScrollBarRes = buffer.ReadS();
+			string headerRes = buffer.ReadS();
+			string footerRes = buffer.ReadS();
+
+			_displayOnLeft = (flags & 1) != 0;
+>>>>>>> upstream/master
 			_snapToItem = (flags & 2) != 0;
 			_displayInDemand = (flags & 4) != 0;
 			_pageMode = (flags & 8) != 0;
@@ -167,20 +216,12 @@ namespace FairyGUI
 				_touchEffect = true;
 			else if ((flags & 32) != 0)
 				_touchEffect = false;
-			else
-				_touchEffect = UIConfig.defaultScrollTouchEffect;
 			if ((flags & 64) != 0)
 				_bouncebackEffect = true;
 			else if ((flags & 128) != 0)
 				_bouncebackEffect = false;
-			else
-				_bouncebackEffect = UIConfig.defaultScrollBounceEffect;
 			_inertiaDisabled = (flags & 256) != 0;
 			_maskDisabled = (flags & 512) != 0;
-
-			_scrollBarVisible = true;
-			_mouseWheelEnabled = true;
-			_pageSize = Vector2.one;
 
 			if (scrollBarDisplay == ScrollBarDisplayType.Default)
 			{
@@ -194,7 +235,7 @@ namespace FairyGUI
 			{
 				if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical)
 				{
-					string res = string.IsNullOrEmpty(vtScrollBarRes) ? UIConfig.verticalScrollBar : vtScrollBarRes;
+					string res = vtScrollBarRes != null ? vtScrollBarRes : UIConfig.verticalScrollBar;
 					if (!string.IsNullOrEmpty(res))
 					{
 						_vtScrollBar = UIPackage.CreateObjectFromURL(res) as GScrollBar;
@@ -209,7 +250,7 @@ namespace FairyGUI
 				}
 				if (_scrollType == ScrollType.Both || _scrollType == ScrollType.Horizontal)
 				{
-					string res = string.IsNullOrEmpty(hzScrollBarRes) ? UIConfig.horizontalScrollBar : hzScrollBarRes;
+					string res = hzScrollBarRes != null ? hzScrollBarRes : UIConfig.horizontalScrollBar;
 					if (!string.IsNullOrEmpty(res))
 					{
 						_hzScrollBar = UIPackage.CreateObjectFromURL(res) as GScrollBar;
@@ -241,14 +282,14 @@ namespace FairyGUI
 
 			if (Application.isPlaying)
 			{
-				if (!string.IsNullOrEmpty(headerRes))
+				if (headerRes != null)
 				{
 					_header = (GComponent)UIPackage.CreateObjectFromURL(headerRes);
 					if (_header == null)
 						Debug.LogWarning("FairyGUI: cannot create scrollPane header from " + headerRes);
 				}
 
-				if (!string.IsNullOrEmpty(footerRes))
+				if (footerRes != null)
 				{
 					_footer = (GComponent)UIPackage.CreateObjectFromURL(footerRes);
 					if (_footer == null)
@@ -266,11 +307,6 @@ namespace FairyGUI
 			}
 
 			SetSize(owner.width, owner.height);
-
-			_owner.rootContainer.onMouseWheel.Add(__mouseWheel);
-			_owner.rootContainer.onTouchBegin.Add(__touchBegin);
-			_owner.rootContainer.onTouchMove.Add(__touchMove);
-			_owner.rootContainer.onTouchEnd.Add(__touchEnd);
 		}
 
 		/// <summary>
@@ -1295,7 +1331,7 @@ namespace FairyGUI
 					_footer.width = _viewSize.x;
 			}
 
-			SyncScrollBar();
+			SyncScrollBar(true);
 			CheckRefreshBar();
 			if (_pageMode)
 				UpdatePageController();
@@ -1799,17 +1835,17 @@ namespace FairyGUI
 		private void ShowScrollBar(bool val)
 		{
 			if (!Application.isPlaying)
-				__showScrollBar(val);
+				onShowScrollBar(val);
 			else if (val)
 			{
-				__showScrollBar(true);
+				onShowScrollBar(true);
 				Timers.inst.Remove(_showScrollBarDelegate);
 			}
 			else
 				Timers.inst.Add(0.5f, 1, _showScrollBarDelegate, val);
 		}
 
-		private void __showScrollBar(object obj)
+		private void onShowScrollBar(object obj)
 		{
 			if (_owner.displayObject == null || _owner.displayObject.isDisposed)
 				return;

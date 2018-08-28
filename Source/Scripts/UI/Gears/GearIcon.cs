@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -23,12 +22,12 @@ namespace FairyGUI
 			_storage = new Dictionary<string, string>();
 		}
 
-		override protected void AddStatus(string pageId, string value)
+		override protected void AddStatus(string pageId, ByteBuffer buffer)
 		{
 			if (pageId == null)
-				_default = value;
+				_default = buffer.ReadS();
 			else
-				_storage[pageId] = value;
+				_storage[pageId] = buffer.ReadS();
 		}
 
 		override public void Apply()

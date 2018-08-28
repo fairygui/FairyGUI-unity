@@ -352,64 +352,43 @@ namespace FairyGUI
 			}
 		}
 
-		public void Setup(XML xml)
+		public void Setup(ByteBuffer buffer)
 		{
-			string[] arr;
+			int beginPos = buffer.position;
+			buffer.Seek(beginPos, 0);
 
-			name = xml.GetAttribute("name");
-			autoRadioGroupDepth = xml.GetAttributeBool("autoRadioGroupDepth");
+			name = buffer.ReadS();
+			autoRadioGroupDepth = buffer.ReadBool();
 
-			arr = xml.GetAttributeArray("pages");
-			if (arr != null)
+			buffer.Seek(beginPos, 1);
+
+			int cnt = buffer.ReadShort();
+			_pageIds.Capacity = cnt;
+			_pageNames.Capacity = cnt;
+			for (int i = 0; i < cnt; i++)
 			{
-				int cnt = arr.Length;
-				for (int i = 0; i < cnt; i += 2)
-				{
-					_pageIds.Add(arr[i]);
-					_pageNames.Add(arr[i + 1]);
-				}
+				_pageIds.Add(buffer.ReadS());
+				_pageNames.Add(buffer.ReadS());
 			}
 
-			XMLList.Enumerator et = xml.GetEnumerator("action");
-			while (et.MoveNext())
+			buffer.Seek(beginPos, 2);
+
+			cnt = buffer.ReadShort();
+			if (cnt > 0)
 			{
 				if (_actions == null)
-					_actions = new List<ControllerAction>();
+					_actions = new List<ControllerAction>(cnt);
 
-				XML cxml = et.Current;
-				ControllerAction action = ControllerAction.CreateAction(cxml.GetAttribute("type"));
-				action.Setup(cxml);
-				_actions.Add(action);
-			}
-
-			arr = xml.GetAttributeArray("transitions");
-			if (arr != null)
-			{
-				if (_actions == null)
-					_actions = new List<ControllerAction>();
-
-				int cnt = arr.Length;
 				for (int i = 0; i < cnt; i++)
 				{
-					string str = arr[i];
+					int nextPos = buffer.ReadShort();
+					nextPos += buffer.position;
 
-					PlayTransitionAction taction = new PlayTransitionAction();
-					int k = str.IndexOf("=");
-					taction.transitionName = str.Substring(k + 1);
-					str = str.Substring(0, k);
-					k = str.IndexOf("-");
-					int ii = int.Parse(str.Substring(k + 1));
-					if (ii < _pageIds.Count)
-						taction.toPage = new string[] { _pageIds[ii] };
-					str = str.Substring(0, k);
-					if (str != "*")
-					{
-						ii = int.Parse(str);
-						if (ii < _pageIds.Count)
-							taction.fromPage = new string[] { _pageIds[ii] };
-					}
-					taction.stopOnExit = true;
-					_actions.Add(taction);
+					ControllerAction action = ControllerAction.CreateAction((ControllerAction.ActionType)buffer.ReadByte());
+					action.Setup(buffer);
+					_actions.Add(action);
+
+					buffer.position = nextPos;
 				}
 			}
 
