@@ -36,7 +36,7 @@ namespace FairyGUI
 		/// <param name="extension"></param>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public delegate object LoadResource(string name, string extension, System.Type type);
+		public delegate object LoadResource(string name, string extension, System.Type type, out DestroyMethod destroyMethod);
 
 		/// <summary>
 		/// 
@@ -210,16 +210,20 @@ namespace FairyGUI
 			if (descFilePath.StartsWith("Assets/"))
 			{
 #if UNITY_EDITOR
-				return AddPackage(descFilePath, (string name, string extension, System.Type type) =>
+				return AddPackage(descFilePath, (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
 				{
+					destroyMethod = DestroyMethod.Unload;
 					return AssetDatabase.LoadAssetAtPath(name + extension, type);
 				});
 #else
+				
+				Debug.LogWarning("FairyGUI: failed to load package in '" + descFilePath + "'");
 				return null;
 #endif
 			}
-			return AddPackage(descFilePath, (string name, string extension, System.Type type) =>
+			return AddPackage(descFilePath, (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
 			{
+				destroyMethod = DestroyMethod.Unload;
 				return Resources.Load(name, type);
 			});
 		}
@@ -235,7 +239,8 @@ namespace FairyGUI
 			if (_packageInstById.ContainsKey(assetPath))
 				return _packageInstById[assetPath];
 
-			TextAsset asset = (TextAsset)loadFunc(assetPath + "_fui", ".bytes", typeof(TextAsset));
+			DestroyMethod dm;
+			TextAsset asset = (TextAsset)loadFunc(assetPath + "_fui", ".bytes", typeof(TextAsset), out dm);
 			if (asset == null)
 			{
 				if (Application.isPlaying)
@@ -1011,6 +1016,8 @@ namespace FairyGUI
 
 			Texture tex = null;
 			Texture alphaTex = null;
+			DestroyMethod dm;
+
 			if (_fromBundle)
 			{
 				if (_resBundle != null)
@@ -1023,9 +1030,11 @@ namespace FairyGUI
 				}
 				else
 					Debug.LogWarning("FairyGUI: bundle already unloaded.");
+
+				dm = DestroyMethod.None;
 			}
 			else
-				tex = (Texture)_loadFunc(fileName, ext, typeof(Texture));
+				tex = (Texture)_loadFunc(fileName, ext, typeof(Texture), out dm);
 
 			if (tex == null)
 				Debug.LogWarning("FairyGUI: texture '" + item.file + "' not found in " + this.name);
@@ -1055,10 +1064,10 @@ namespace FairyGUI
 					}
 				}
 				else
-					alphaTex = (Texture2D)_loadFunc(fileName, ext, typeof(Texture2D));
+					alphaTex = (Texture2D)_loadFunc(fileName, ext, typeof(Texture2D), out dm);
 			}
 
-			DestroyMethod dm = _fromBundle ? DestroyMethod.None : DestroyMethod.Unload;
+
 			if (tex == null)
 			{
 				tex = NTexture.CreateEmptyTexture();
@@ -1093,6 +1102,7 @@ namespace FairyGUI
 
 			AudioClip audioClip = null;
 			DestroyMethod dm;
+
 			if (_resBundle != null)
 			{
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
@@ -1104,8 +1114,7 @@ namespace FairyGUI
 			}
 			else
 			{
-				audioClip = (AudioClip)_loadFunc(fileName, ext, typeof(AudioClip));
-				dm = DestroyMethod.Unload;
+				audioClip = (AudioClip)_loadFunc(fileName, ext, typeof(AudioClip), out dm);
 			}
 
 			if (item.audioClip == null)
@@ -1135,7 +1144,8 @@ namespace FairyGUI
 			}
 			else
 			{
-				object ret = _loadFunc(fileName, ext, typeof(TextAsset));
+				DestroyMethod dm;
+				object ret = _loadFunc(fileName, ext, typeof(TextAsset), out dm);
 				if (ret == null)
 					return null;
 				if (ret is byte[])

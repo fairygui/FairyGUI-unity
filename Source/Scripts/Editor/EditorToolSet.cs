@@ -110,8 +110,9 @@ namespace FairyGUIEditor
 				assetPath = assetPath.Substring(0, pos);
 				if (AssetDatabase.AssetPathToGUID(assetPath) != null)
 					UIPackage.AddPackage(assetPath,
-						(string name, string extension, System.Type type) =>
+						(string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
 						{
+							destroyMethod = DestroyMethod.Unload;
 							return AssetDatabase.LoadAssetAtPath(name + extension, type);
 						}
 					);
