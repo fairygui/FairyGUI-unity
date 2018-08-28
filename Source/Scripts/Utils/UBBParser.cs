@@ -138,12 +138,6 @@ namespace FairyGUI.Utils
 
 			if (remove)
 				_readPos = pos2;
-<<<<<<< HEAD
-=======
-
-			return buffer.ToString();
-		}
->>>>>>> upstream/master
 
 			return buffer.ToString();
 		}

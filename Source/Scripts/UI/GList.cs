@@ -2836,22 +2836,7 @@ namespace FairyGUI
 					str = buffer.ReadS();
 					if (str != null && (obj is GButton))
 						(obj as GButton).selectedIcon = str;
-<<<<<<< HEAD
-					str = ix.GetAttribute("selectedTitle");
-					if (str != null && (obj is GButton))
-						(obj as GButton).selectedTitle = str;
-					if (obj is GComponent)
-					{
-						arr = ix.GetAttributeArray("controllers");
-						if (arr != null)
-						{
-							for (int i = 0; i < arr.Length; i += 2)
-							{
-								Controller cc = (obj as GComponent).GetController(arr[i]);
-								if (cc != null)
-									cc.selectedPageId = arr[i + 1];
-							}
-=======
+
 					str = buffer.ReadS();
 					if (str != null)
 						obj.name = str;
@@ -2864,7 +2849,7 @@ namespace FairyGUI
 							str = buffer.ReadS();
 							if (cc != null)
 								cc.selectedPageId = str;
->>>>>>> upstream/master
+
 						}
 					}
 				}

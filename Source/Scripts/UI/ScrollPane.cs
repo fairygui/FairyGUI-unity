@@ -107,25 +107,6 @@ namespace FairyGUI
 		GComponent _footer;
 		Controller _pageController;
 
-<<<<<<< HEAD
-		static int _gestureFlag;        
-        
-        [LuaInterface.NoToLua]
-        public static void ClearStatic()
-        {
-            draggingPane = null;
-            _gestureFlag = 0;
-        }
-		public ScrollPane(GComponent owner,
-									ScrollType scrollType,
-									Margin scrollBarMargin,
-									ScrollBarDisplayType scrollBarDisplay,
-									int flags,
-									string vtScrollBarRes,
-									string hzScrollBarRes,
-									string headerRes,
-									string footerRes)
-=======
 		static int _gestureFlag;
 
 		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
@@ -133,7 +114,6 @@ namespace FairyGUI
 		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
 
 		public ScrollPane(GComponent owner)
->>>>>>> upstream/master
 		{
 			onScroll = new EventListener(this, "onScroll");
 			onScrollEnd = new EventListener(this, "onScrollEnd");
@@ -163,25 +143,6 @@ namespace FairyGUI
 			_container.SetXY(0, 0);
 			_maskContainer.AddChild(_container);
 
-<<<<<<< HEAD
-			_scrollBarMargin = scrollBarMargin;
-			_scrollType = scrollType;
-			_scrollStep = UIConfig.defaultScrollStep;
-			_mouseWheelStep = _scrollStep * 2;
-			_softnessOnTopOrLeftSide = UIConfig.allowSoftnessOnTopOrLeftSide;
-			_decelerationRate = UIConfig.defaultScrollDecelerationRate;
-            _tweenTimeGo = UIConfig.scrollPaneTweenTimeGo;
-            _tweenTimeDefault = UIConfig.scrollPaneTweenTimeDefault;
-            _pullRatio = UIConfig.scrollPanePullRatio;
-            _frameRate = UIConfig.scrollPaneFrameRate;
-            _touchScreenThreshold = UIConfig.scrollPaneTouchScreenThreshold;
-            _notTouchScreenThreshold = UIConfig.scrollPaneNotTouchScreenThreshold;
-            _resoulutionBase = UIConfig.scrollPaneResoulutionBase;
-            _distanceParam = UIConfig.scrollPaneDistanceParam;
-            _elapsedParam = UIConfig.scrollPaneElapsedParam;
-
-            _displayOnLeft = (flags & 1) != 0;
-=======
 			_owner.rootContainer.onMouseWheel.Add(__mouseWheel);
 			_owner.rootContainer.onTouchBegin.Add(__touchBegin);
 			_owner.rootContainer.onTouchMove.Add(__touchMove);
@@ -208,7 +169,6 @@ namespace FairyGUI
 			string footerRes = buffer.ReadS();
 
 			_displayOnLeft = (flags & 1) != 0;
->>>>>>> upstream/master
 			_snapToItem = (flags & 2) != 0;
 			_displayInDemand = (flags & 4) != 0;
 			_pageMode = (flags & 8) != 0;

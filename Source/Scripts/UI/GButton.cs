@@ -321,8 +321,6 @@ namespace FairyGUI
 			__click();
 		}
 
-<<<<<<< HEAD
-=======
 		/// <summary>
 		/// 
 		/// </summary>
@@ -339,7 +337,6 @@ namespace FairyGUI
 				return null;
 		}
 
->>>>>>> upstream/master
 		protected void SetState(string val)
 		{
 			if (_buttonController != null)

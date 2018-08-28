@@ -71,16 +71,11 @@ namespace FairyGUI
         [LuaInterface.NoToLua]
         static public void ClearStatic()
         {
-            RemoveAllPackages(true);
+            RemoveAllPackages();
             _packageInstById.Clear();
             _packageInstByName.Clear();
             _packageList.Clear();
-            if (null != _stringsSource)
-            {
-                _stringsSource.Clear();
-            }
             _constructing = 0;
-            URL_PREFIX = "ui://";
         }
 
 		public UIPackage()

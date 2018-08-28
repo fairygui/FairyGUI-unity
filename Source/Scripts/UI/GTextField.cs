@@ -75,105 +75,14 @@ namespace FairyGUI
 				str = ParseTemplate(str);
 
 			if (_ubbEnabled)
-<<<<<<< HEAD
-            {
-               _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
-            }
-			else
-			{
-			    string parseTxt = UBBParser.inst.GetRemoveParase(str);
-			    _textField.text = parseTxt;
-			}
-=======
 				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
 			else
 				_textField.text = str;
->>>>>>> upstream/master
+
 		}
 
 		virtual protected void GetTextFieldText()
 		{
-		}
-
-		public Dictionary<string, string> templateVars
-		{
-			get { return _templateVars; }
-			set
-			{
-				if (_templateVars == null && value == null)
-					return;
-
-				_templateVars = value;
-
-				FlushVars();
-			}
-		}
-
-		public GTextField SetVar(string name, string value)
-		{
-			if (_templateVars == null)
-				_templateVars = new Dictionary<string, string>();
-			_templateVars[name] = value;
-
-			return this;
-		}
-
-		public void FlushVars()
-		{
-			SetTextFieldText();
-			UpdateSize();
-		}
-
-		protected string ParseTemplate(string template)
-		{
-			int pos1 = 0, pos2 = 0;
-			int pos3;
-			string tag;
-			string value;
-			StringBuilder buffer = new StringBuilder();
-
-			while ((pos2 = template.IndexOf('{', pos1)) != -1)
-			{
-				if (pos2 > 0 && template[pos2 - 1] == '\\')
-				{
-					buffer.Append(template, pos1, pos2 - pos1 - 1);
-					buffer.Append('{');
-					pos1 = pos2 + 1;
-					continue;
-				}
-
-				buffer.Append(template, pos1, pos2 - pos1);
-				pos1 = pos2;
-				pos2 = template.IndexOf('}', pos1);
-				if (pos2 == -1)
-					break;
-
-				if (pos2 == pos1 + 1)
-				{
-					buffer.Append(template, pos1, 2);
-					pos1 = pos2 + 1;
-					continue;
-				}
-
-				tag = template.Substring(pos1 + 1, pos2 - pos1 - 1);
-				pos3 = tag.IndexOf('=');
-				if (pos3 != -1)
-				{
-					if (!_templateVars.TryGetValue(tag.Substring(0, pos3), out value))
-						value = tag.Substring(pos3 + 1);
-				}
-				else
-				{
-					if (!_templateVars.TryGetValue(tag, out value))
-						value = "";
-				}
-				buffer.Append(value);
-				pos1 = pos2 + 1;
-			}
-			if (pos1 < template.Length)
-				buffer.Append(template, pos1, template.Length - pos1);
-
-			return buffer.ToString();
 		}
 
 		/// <summary>
@@ -496,11 +405,7 @@ namespace FairyGUI
 				this.shadowOffset = new Vector2(f1, f2);
 			}
 
-<<<<<<< HEAD
-			if (xml.GetAttributeBool("vars"))
-=======
 			if (buffer.ReadBool())
->>>>>>> upstream/master
 				_templateVars = new Dictionary<string, string>();
 
 			_textField.textFormat = tf;

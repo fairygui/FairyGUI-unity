@@ -446,11 +446,7 @@ namespace FairyGUI
 						break;
 
 					case TransitionActionType.Rotation:
-<<<<<<< HEAD
-						value.f1 = Convert.ToSingle(aParams[0]);
-=======
 						((TValue)value).f1 = Convert.ToSingle(aParams[0]);
->>>>>>> upstream/master
 						break;
 
 					case TransitionActionType.Color:
@@ -792,20 +788,9 @@ namespace FairyGUI
 					TValue endValue;
 
 					if (_reversed)
-<<<<<<< HEAD
-						startTime += (_maxTime - item.time);
-					else
-						startTime += item.time;
-					if (startTime == 0)
-					{
-						ApplyValue(item, item.value);
-						if (item.hook != null)
-							item.hook();
-=======
 					{
 						startValue = item.tweenConfig.endValue;
 						endValue = item.tweenConfig.startValue;
->>>>>>> upstream/master
 					}
 					else
 					{
@@ -1329,21 +1314,8 @@ namespace FairyGUI
 
 				buffer.Seek(curPos, 0);
 
-<<<<<<< HEAD
-				item.time = (float)cxml.GetAttributeInt("time") / (float)FRAME_RATE;
-				item.targetId = cxml.GetAttribute("target", string.Empty);
-                if (//item.targetId == "n10_d6z7" || item.targetId == "n12_rx9h" || item.targetId == "n11_d6z7" ||
-                    item.targetId == "n1_gd1o" || item.targetId == "n33_r965")
-                {
-                    continue;
-                }
-				item.tween = cxml.GetAttributeBool("tween");
-				item.label = cxml.GetAttribute("label");
-				item.Setup(this);
-=======
 				TransitionItem item = new TransitionItem((TransitionActionType)buffer.ReadByte());
 				_items[i] = item;
->>>>>>> upstream/master
 
 				item.time = buffer.ReadFloat();
 				int targetId = buffer.ReadShort();
@@ -1407,11 +1379,7 @@ namespace FairyGUI
 
 				case TransitionActionType.Alpha:
 				case TransitionActionType.Rotation:
-<<<<<<< HEAD
-					value.f1 = float.Parse(str);
-=======
 					((TValue)value).f1 = buffer.ReadFloat();
->>>>>>> upstream/master
 					break;
 
 				case TransitionActionType.Scale:

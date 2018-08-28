@@ -202,17 +202,6 @@ namespace FairyGUI
 		}
 #endif
 
-		public override void Dispose()
-		{
-			base.Dispose();
-
-			Timers.inst.Remove(RunTextureCollector);
-
-#if UNITY_5_4_OR_NEWER
-			SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
-#endif
-		}
-
 		/// <summary>
 		/// 
 		/// </summary>

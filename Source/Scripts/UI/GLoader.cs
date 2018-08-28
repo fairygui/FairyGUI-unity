@@ -315,11 +315,6 @@ namespace FairyGUI
 			get { return _content; }
 		}
 
-		public GComponent component
-		{
-			get { return _content2; }
-		}
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -658,41 +653,8 @@ namespace FairyGUI
 
 		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
-<<<<<<< HEAD
-			base.Setup_BeforeAdd(xml);
-
-			string str;
-			str = xml.GetAttribute("url");
-			if (str != null)
-				_url = str;
-
-			str = xml.GetAttribute("align");
-			if (str != null)
-				_align = FieldTypes.ParseAlign(str);
-
-			str = xml.GetAttribute("vAlign");
-			if (str != null)
-				_verticalAlign = FieldTypes.ParseVerticalAlign(str);
-
-			str = xml.GetAttribute("fill");
-			if (str != null)
-				_fill = FieldTypes.ParseFillType(str);
-
-			_shrinkOnly = xml.GetAttributeBool("shrinkOnly");
-
-			_autoSize = xml.GetAttributeBool("autoSize");
-
-			str = xml.GetAttribute("errorSign");
-			if (str != null)
-				showErrorSign = str == "true";
-
-			str = xml.GetAttribute("frame");
-			if (str != null)
-				_content.currentFrame = int.Parse(str);
-			_content.playing = xml.GetAttributeBool("playing", true);
-=======
 			base.Setup_BeforeAdd(buffer, beginPos);
->>>>>>> upstream/master
+
 
 			buffer.Seek(beginPos, 5);
 

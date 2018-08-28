@@ -171,16 +171,7 @@ namespace FairyGUI
 
 		public void Update()
 		{
-<<<<<<< HEAD
-			time = Time.unscaledTime;
-			float elapsed = time - _lastTime;
-// 			if (Time.timeScale != 0)
-// 				elapsed /= Time.timeScale;
-			_lastTime = time;
-
-=======
 			float dt = Time.unscaledDeltaTime;
->>>>>>> upstream/master
 			Dictionary<TimerCallback, Anymous_T>.Enumerator iter;
 
 			if (_items.Count > 0)
