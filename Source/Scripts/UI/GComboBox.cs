@@ -377,7 +377,11 @@ namespace FairyGUI
 					return;
 				}
 
-				_list = dropdown.GetChild("list") as GList;
+                if (string.IsNullOrEmpty(dropdown.name))
+                {
+                    dropdown.name = string.Format("{0}_{1}", dropdown.packageItem.owner.name, dropdown.packageItem.name);
+                }
+                _list = dropdown.GetChild("list") as GList;
 				if (_list == null)
 				{
 					Debug.LogWarning("FairyGUI: " + this.resourceURL + ": should container a list component named list.");
