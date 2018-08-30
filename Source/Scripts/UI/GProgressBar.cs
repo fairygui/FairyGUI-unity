@@ -115,7 +115,7 @@ namespace FairyGUI
 			if (_tweening)
 				GTween.Kill(this, TweenPropType.Progress, false);
 			_tweening = true;
-			return GTween.To(oldValule, _value, duration)
+			return GTween.ToDouble(oldValule, _value, duration)
 				.SetEase(EaseType.Linear)
 				.SetTarget(this, TweenPropType.Progress)
 				.OnComplete(() => { _tweening = false; });

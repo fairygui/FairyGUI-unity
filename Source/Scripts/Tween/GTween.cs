@@ -79,7 +79,7 @@ namespace FairyGUI
 		/// <param name="endValue"></param>
 		/// <param name="duration"></param>
 		/// <returns></returns>
-		public static GTweener To(double startValue, double endValue, float duration)
+		public static GTweener ToDouble(double startValue, double endValue, float duration)
 		{
 			return TweenManager.CreateTween()._To(startValue, endValue, duration);
 		}
