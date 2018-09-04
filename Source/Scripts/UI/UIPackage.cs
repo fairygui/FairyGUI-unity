@@ -434,7 +434,28 @@ namespace FairyGUI
 				return null;
 		}
 
-		public static void CreateObjectAsync(string pkgName, string resName, CreateObjectCallback callback)
+        public static void CreateObjectAsyncLTR(string pkgName, string resName, CreateObjectCallback callback)
+        {
+            UIPackage pkg = GetByName(pkgName);
+            if (pkg != null)
+            {
+                UniteSettingsProxy sSetting = AppFacade.Instance.GetModelProxy(typeof(UniteSettingsProxy)) as UniteSettingsProxy;
+                if (sSetting.IsNeedLTR())
+                {
+                    string resTLRName = resName + "_LTR";
+                    PackageItem pi;
+                    if (pkg._itemsByName.TryGetValue(resTLRName, out pi))
+                    {
+                        resName = resTLRName;
+                    }
+                }
+                pkg.CreateObjectAsync(resName, callback);
+            }
+            else
+                Debug.LogError("FairyGUI: package not found - " + pkgName);
+        }
+
+        public static void CreateObjectAsync(string pkgName, string resName, CreateObjectCallback callback)
 		{
 			UIPackage pkg = GetByName(pkgName);
 			if (pkg != null)
