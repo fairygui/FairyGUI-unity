@@ -1509,7 +1509,7 @@ namespace FairyGUI
 		public Vector2 WorldToLocal(Vector3 pt, Camera camera)
 		{
 			Vector3 v = camera.WorldToScreenPoint(pt);
-			v.y = Screen.height - v.y;
+			v.y = UIScreen.height - v.y;
 			v.z = 0;
 			return GlobalToLocal(v);
 		}

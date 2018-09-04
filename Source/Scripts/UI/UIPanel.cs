@@ -392,8 +392,8 @@ namespace FairyGUI
 					this.container.scale = new Vector2(StageCamera.UnitsPerPixel * UIContentScaler.scaleFactor, StageCamera.UnitsPerPixel * UIContentScaler.scaleFactor);
 			}
 
-			int width = Mathf.CeilToInt(Screen.width / UIContentScaler.scaleFactor);
-			int height = Mathf.CeilToInt(Screen.height / UIContentScaler.scaleFactor);
+			int width = Mathf.CeilToInt(UIScreen.width / UIContentScaler.scaleFactor);
+			int height = Mathf.CeilToInt(UIScreen.height / UIContentScaler.scaleFactor);
 			if (this._ui != null)
 			{
 				switch (fitScreen)

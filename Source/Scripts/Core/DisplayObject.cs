@@ -1163,7 +1163,7 @@ namespace FairyGUI
 				Vector3 direction;
 				Vector3 screenPoint = new Vector3();
 				screenPoint.x = point.x;
-				screenPoint.y = Screen.height - point.y;
+				screenPoint.y = UIScreen.height - point.y;
 
 				if (wsc.hitArea is MeshColliderHitTest)
 				{

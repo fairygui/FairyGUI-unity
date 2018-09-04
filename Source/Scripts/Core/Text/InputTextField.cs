@@ -568,7 +568,7 @@ namespace FairyGUI
 				_caret.SetPosition(pos.x, pos.y, 0);
 
 				Vector2 cursorPos = _caret.LocalToGlobal(new Vector2(0, _caret.height));
-				Input.compositionCursorPos = cursorPos;
+				Input.compositionCursorPos = UIScreen.UIScreenPosToScreenPos(cursorPos);
 
 				_nextBlink = Time.time + 0.5f;
 				_caret.graphics.enabled = true;

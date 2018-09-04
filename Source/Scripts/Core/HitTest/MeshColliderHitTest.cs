@@ -45,7 +45,7 @@ namespace FairyGUI
 
 			localPoint = new Vector2(hit.textureCoord.x * this.width, (1 - hit.textureCoord.y) * this.height);
 			HitTestContext.direction = Vector3.back;
-			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(new Vector2(localPoint.x, Screen.height - localPoint.y));
+			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(new Vector2(localPoint.x, UIScreen.height - localPoint.y));
 
 			return true;
 		}

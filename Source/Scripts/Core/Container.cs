@@ -495,8 +495,8 @@ namespace FairyGUI
 					return null;
 			}
 
-			HitTestContext.screenPoint = new Vector2(stagePoint.x, Screen.height - stagePoint.y);
-			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(HitTestContext.screenPoint);
+			HitTestContext.screenPoint = new Vector2(stagePoint.x, UIScreen.height - stagePoint.y);
+			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(UIScreen.UIScreenPosToScreenPos(HitTestContext.screenPoint));
 			HitTestContext.direction = Vector3.back;
 			HitTestContext.forTouch = forTouch;
 

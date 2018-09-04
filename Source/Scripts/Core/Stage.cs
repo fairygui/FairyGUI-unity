@@ -151,8 +151,8 @@ namespace FairyGUI
 			soundVolume = 1;
 
 			_updateContext = new UpdateContext();
-			stageWidth = Screen.width;
-			stageHeight = Screen.height;
+			stageWidth = UIScreen.width;
+			stageHeight = UIScreen.height;
 			_frameGotHitTarget = -1;
 
 			_touches = new TouchInfo[5];
@@ -570,7 +570,7 @@ namespace FairyGUI
 				{
 					Touch uTouch = Input.GetTouch(i);
 
-					Vector2 pos = uTouch.position;
+					Vector2 pos = UIScreen.ScreenPosToUIScreenPos(uTouch.position);
 					pos.y = stageHeight - pos.y;
 
 					TouchInfo touch = null;
@@ -606,7 +606,7 @@ namespace FairyGUI
 			}
 			else
 			{
-				Vector2 pos = Input.mousePosition;
+				Vector2 pos = UIScreen.ScreenPosToUIScreenPos(Input.mousePosition);
 				pos.y = stageHeight - pos.y;
 
 				TouchInfo touch = _touches[0];
@@ -622,8 +622,8 @@ namespace FairyGUI
 
 		internal void HandleScreenSizeChanged()
 		{
-			stageWidth = Screen.width;
-			stageHeight = Screen.height;
+			stageWidth = UIScreen.width;
+			stageHeight = UIScreen.height;
 
 			this.cachedTransform.localScale = new Vector3(StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel, StageCamera.UnitsPerPixel);
 
@@ -748,13 +748,13 @@ namespace FairyGUI
 					for (int i = 0; i < Input.touchCount; ++i)
 					{
 						Touch uTouch = Input.GetTouch(i);
-						_touchPosition = uTouch.position;
+						_touchPosition = UIScreen.ScreenPosToUIScreenPos(uTouch.position);
 						_touchPosition.y = stageHeight - _touchPosition.y;
 					}
 				}
 				else
 				{
-					Vector2 pos = Input.mousePosition;
+					Vector2 pos = UIScreen.ScreenPosToUIScreenPos(Input.mousePosition);
 					if (pos.x >= 0 && pos.y >= 0) //编辑器环境下坐标有时是负
 					{
 						pos.y = stageHeight - pos.y;
@@ -895,7 +895,7 @@ namespace FairyGUI
 				if (uTouch.phase == TouchPhase.Stationary)
 					continue;
 
-				Vector2 pos = uTouch.position;
+				Vector2 pos = UIScreen.ScreenPosToUIScreenPos(uTouch.position);
 				pos.y = stageHeight - pos.y;
 
 				TouchInfo touch = null;

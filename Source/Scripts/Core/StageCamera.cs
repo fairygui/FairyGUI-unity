@@ -58,14 +58,14 @@ namespace FairyGUI
 
 		void Update()
 		{
-			if (screenWidth != Screen.width || screenHeight != Screen.height)
+			if (screenWidth != UIScreen.width || screenHeight != UIScreen.height)
 				OnScreenSizeChanged();
 		}
 
 		void OnScreenSizeChanged()
 		{
-			screenWidth = Screen.width;
-			screenHeight = Screen.height;
+			screenWidth = UIScreen.width;
+			screenHeight = UIScreen.height;
 			if (screenWidth == 0 || screenHeight == 0)
 				return;
 

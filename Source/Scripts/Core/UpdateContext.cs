@@ -147,8 +147,8 @@ namespace FairyGUI
 				if (clipInfo.soft)
 				{
 					clipInfo.softness = (Vector4)softness;
-					float vx = clipInfo.rect.width * Screen.height * 0.25f;
-					float vy = clipInfo.rect.height * Screen.height * 0.25f;
+					float vx = clipInfo.rect.width * UIScreen.height * 0.25f;
+					float vy = clipInfo.rect.height * UIScreen.height * 0.25f;
 
 					if (clipInfo.softness.x > 0)
 						clipInfo.softness.x = vx / clipInfo.softness.x;

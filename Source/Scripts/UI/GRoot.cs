@@ -85,7 +85,7 @@ namespace FairyGUI
 		/// </summary>
 		public void ApplyContentScaleFactor()
 		{
-			this.SetSize(Mathf.CeilToInt(Screen.width / UIContentScaler.scaleFactor), Mathf.CeilToInt(Screen.height / UIContentScaler.scaleFactor));
+			this.SetSize(Mathf.CeilToInt(UIScreen.width / UIContentScaler.scaleFactor), Mathf.CeilToInt(UIScreen.height / UIContentScaler.scaleFactor));
 			this.SetScale(UIContentScaler.scaleFactor, UIContentScaler.scaleFactor);
 		}
 

@@ -124,7 +124,7 @@ namespace FairyGUI
 				scaleFactor = 1;
 		}
 
-		//For UIContentScalerEditor Only, as the Screen.width/height is not correct in OnInspectorGUI
+		//For UIContentScalerEditor Only, as the UIScreen.width/height is not correct in OnInspectorGUI
 		/// <summary>
 		/// 
 		/// </summary>
@@ -145,7 +145,7 @@ namespace FairyGUI
 
 				int dx = designResolutionX;
 				int dy = designResolutionY;
-				if (!ignoreOrientation && (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy))
+				if (!ignoreOrientation && (UIScreen.width > UIScreen.height && dx < dy || UIScreen.width < UIScreen.height && dx > dy))
 				{
 					//scale should not change when orientation change
 					int tmp = dx;
@@ -155,18 +155,18 @@ namespace FairyGUI
 
 				if (screenMatchMode == ScreenMatchMode.MatchWidthOrHeight)
 				{
-					float s1 = (float)Screen.width / dx;
-					float s2 = (float)Screen.height / dy;
+					float s1 = (float)UIScreen.width / dx;
+					float s2 = (float)UIScreen.height / dy;
 					scaleFactor = Mathf.Min(s1, s2);
 				}
 				else if (screenMatchMode == ScreenMatchMode.MatchWidth)
-					scaleFactor = (float)Screen.width / dx;
+					scaleFactor = (float)UIScreen.width / dx;
 				else
-					scaleFactor = (float)Screen.height / dy;
+					scaleFactor = (float)UIScreen.height / dy;
 			}
 			else if (scaleMode == ScaleMode.ConstantPhysicalSize)
 			{
-				float dpi = Screen.dpi;
+				float dpi = UIScreen.dpi;
 				if (dpi == 0)
 					dpi = fallbackScreenDPI;
 				if (dpi == 0)

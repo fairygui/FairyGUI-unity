@@ -2055,7 +2055,7 @@ namespace FairyGUI
 				float v2 = Mathf.Abs(v) * _velocityScale;
 				//在移动设备上，需要对不同分辨率做一个适配，我们的速度判断以1136分辨率为基准
 				if (Stage.touchScreen)
-					v2 *= _resoulutionBase / Mathf.Max(Screen.width, Screen.height);
+					v2 *= _resoulutionBase / Mathf.Max(UIScreen.width, UIScreen.height);
 				//这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
 				float ratio = 0;
 				if (_pageMode || !Stage.touchScreen)
