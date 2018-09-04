@@ -75,10 +75,14 @@ namespace FairyGUI
 				str = ParseTemplate(str);
 
 			if (_ubbEnabled)
-				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
+            {
+               _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
+            }
 			else
-				_textField.text = str;
-
+			{
+			    string parseTxt = UBBParser.inst.GetRemoveParase(str);
+			    _textField.text = parseTxt;
+			}
 		}
 
 		virtual protected void GetTextFieldText()
