@@ -29,6 +29,8 @@ namespace FairyGUI.Utils
 		int _length;
 		byte[] _data;
 
+		static byte[] temp = new byte[8];
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -171,21 +173,14 @@ namespace FairyGUI.Utils
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public unsafe short ReadShort()
+		public short ReadShort()
 		{
 			int startIndex = _offset + _pointer;
 			_pointer += 2;
-			fixed (byte* pbyte = &_data[startIndex])
-			{
-				if (littleEndian)
-				{
-					return (short)((*pbyte) | (*(pbyte + 1) << 8));
-				}
-				else
-				{
-					return (short)((*pbyte << 8) | (*(pbyte + 1)));
-				}
-			}
+			if (littleEndian)
+				return (short)(_data[startIndex] | (_data[startIndex + 1] << 8));
+			else
+				return (short)((_data[startIndex] << 8) | _data[startIndex + 1]);
 		}
 
 		/// <summary>
@@ -201,21 +196,14 @@ namespace FairyGUI.Utils
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public unsafe int ReadInt()
+		public int ReadInt()
 		{
 			int startIndex = _offset + _pointer;
 			_pointer += 4;
-			fixed (byte* pbyte = &_data[startIndex])
-			{
-				if (littleEndian)
-				{
-					return (*pbyte) | (*(pbyte + 1) << 8) | (*(pbyte + 2) << 16) | (*(pbyte + 3) << 24);
-				}
-				else
-				{
-					return (*pbyte << 24) | (*(pbyte + 1) << 16) | (*(pbyte + 2) << 8) | (*(pbyte + 3));
-				}
-			}
+			if (littleEndian)
+				return (_data[startIndex]) | (_data[startIndex + 1] << 8) | (_data[startIndex + 2] << 16) | (_data[startIndex + 3] << 24);
+			else
+				return (_data[startIndex] << 24) | (_data[startIndex + 1] << 16) | (_data[startIndex + 2] << 8) | (_data[startIndex + 3]);
 		}
 
 		/// <summary>
@@ -231,34 +219,19 @@ namespace FairyGUI.Utils
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public unsafe float ReadFloat()
-		{
-			int val = ReadInt();
-			return *(float*)&val;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		public unsafe long ReadLong()
+		public float ReadFloat()
 		{
 			int startIndex = _offset + _pointer;
-			_pointer += 8;
-			fixed (byte* pbyte = &_data[startIndex])
+			_pointer += 4;
+			if (littleEndian == BitConverter.IsLittleEndian)
+				return BitConverter.ToSingle(_data, startIndex);
+			else
 			{
-				if (littleEndian)
-				{
-					int i1 = (*pbyte) | (*(pbyte + 1) << 8) | (*(pbyte + 2) << 16) | (*(pbyte + 3) << 24);
-					int i2 = (*(pbyte + 4)) | (*(pbyte + 5) << 8) | (*(pbyte + 6) << 16) | (*(pbyte + 7) << 24);
-					return (uint)i1 | ((long)i2 << 32);
-				}
-				else
-				{
-					int i1 = (*pbyte << 24) | (*(pbyte + 1) << 16) | (*(pbyte + 2) << 8) | (*(pbyte + 3));
-					int i2 = (*(pbyte + 4) << 24) | (*(pbyte + 5) << 16) | (*(pbyte + 6) << 8) | (*(pbyte + 7));
-					return (uint)i2 | ((long)i1 << 32);
-				}
+				temp[3] = _data[startIndex];
+				temp[2] = _data[startIndex + 1];
+				temp[1] = _data[startIndex + 2];
+				temp[0] = _data[startIndex + 3];
+				return BitConverter.ToSingle(temp, 0);
 			}
 		}
 
@@ -266,10 +239,46 @@ namespace FairyGUI.Utils
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public unsafe double ReadDouble()
+		public long ReadLong()
 		{
-			long val = ReadLong();
-			return *(double*)&val;
+			int startIndex = _offset + _pointer;
+			_pointer += 8;
+			if (littleEndian)
+			{
+				int i1 = (_data[startIndex]) | (_data[startIndex + 1] << 8) | (_data[startIndex + 2] << 16) | (_data[startIndex + 3] << 24);
+				int i2 = (_data[startIndex + 4]) | (_data[startIndex + 5] << 8) | (_data[startIndex + 6] << 16) | (_data[startIndex + 7] << 24);
+				return (uint)i1 | ((long)i2 << 32);
+			}
+			else
+			{
+				int i1 = (_data[startIndex] << 24) | (_data[startIndex + 1] << 16) | (_data[startIndex + 2] << 8) | (_data[startIndex + 3]);
+				int i2 = (_data[startIndex + 4] << 24) | (_data[startIndex + 5] << 16) | (_data[startIndex + 6] << 8) | (_data[startIndex + 7]);
+				return (uint)i2 | ((long)i1 << 32);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public double ReadDouble()
+		{
+			int startIndex = _offset + _pointer;
+			_pointer += 8;
+			if (littleEndian == BitConverter.IsLittleEndian)
+				return BitConverter.ToDouble(_data, startIndex);
+			else
+			{
+				temp[7] = _data[startIndex];
+				temp[6] = _data[startIndex + 1];
+				temp[5] = _data[startIndex + 2];
+				temp[4] = _data[startIndex + 3];
+				temp[3] = _data[startIndex + 4];
+				temp[2] = _data[startIndex + 5];
+				temp[1] = _data[startIndex + 6];
+				temp[0] = _data[startIndex + 7];
+				return BitConverter.ToSingle(temp, 0);
+			}
 		}
 
 		/// <summary>
