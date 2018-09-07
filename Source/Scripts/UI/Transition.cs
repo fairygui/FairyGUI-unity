@@ -1008,6 +1008,13 @@ namespace FairyGUI
 						if (!startValue.b2)
 							startValue.f2 = item.target.y;
 					}
+					else
+					{
+						if (!startValue.b1)
+							startValue.f1 = item.target.x - _ownerBaseX;
+						if (!startValue.b2)
+							startValue.f2 = item.target.y - _ownerBaseY;
+					}
 				}
 				else
 				{
