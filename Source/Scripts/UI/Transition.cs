@@ -501,6 +501,11 @@ namespace FairyGUI
 							tvalue.f4 = Convert.ToSingle(aParams[3]);
 						}
 						break;
+
+					case TransitionActionType.Text:
+					case TransitionActionType.Icon:
+						((TValue_Text)value).text = (string)aParams[0];
+						break;
 				}
 			}
 		}
@@ -1292,6 +1297,14 @@ namespace FairyGUI
 						cf.AdjustHue(value.f4);
 					}
 					break;
+
+				case TransitionActionType.Text:
+					item.target.text = ((TValue_Text)item.value).text;
+					break;
+
+				case TransitionActionType.Icon:
+					item.target.icon = ((TValue_Text)item.value).text;
+					break;
 			}
 
 			item.target._gearLocked = false;
@@ -1425,6 +1438,11 @@ namespace FairyGUI
 						tvalue.f4 = buffer.ReadFloat();
 					}
 					break;
+
+				case TransitionActionType.Text:
+				case TransitionActionType.Icon:
+					((TValue_Text)value).text = buffer.ReadS();
+					break;
 			}
 		}
 	}
@@ -1480,6 +1498,11 @@ namespace FairyGUI
 
 				case TransitionActionType.Visible:
 					value = new TValue_Visible();
+					break;
+
+				case TransitionActionType.Text:
+				case TransitionActionType.Icon:
+					value = new TValue_Text();
 					break;
 			}
 		}
@@ -1540,6 +1563,11 @@ namespace FairyGUI
 		public float duration;
 		public Vector2 lastOffset;
 		public Vector2 offset;
+	}
+
+	class TValue_Text
+	{
+		public string text;
 	}
 
 	class TValue

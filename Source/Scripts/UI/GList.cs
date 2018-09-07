@@ -1163,7 +1163,7 @@ namespace FairyGUI
 					throw new Exception("Invalid child index: " + index + ">" + _virtualItems.Count);
 
 				if (_loop)
-					index = Mathf.FloorToInt(_firstIndex / _numItems) * _numItems + index;
+					index = Mathf.FloorToInt((float)_firstIndex / _numItems) * _numItems + index;
 
 				Rect rect;
 				ItemInfo ii = _virtualItems[index];

@@ -1457,11 +1457,10 @@ namespace FairyGUI
 				//fast
 				pt.x /= GRoot.contentScaleFactor;
 				pt.y /= GRoot.contentScaleFactor;
+				return pt;
 			}
 			else
 				return r.GlobalToLocal(pt);
-
-			return pt;
 		}
 
 		/// <summary>
