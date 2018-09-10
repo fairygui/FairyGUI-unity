@@ -5,11 +5,10 @@ namespace FairyGUI
 {
 	public class TranslationHelper
 	{
-		public static Dictionary<string, Dictionary<string, string>> strings;
+		public static Dictionary<string, Dictionary<string, string>> strings = new Dictionary<string, Dictionary<string, string>>();
 
 		public static void LoadFromXML(XML source)
 		{
-			strings = new Dictionary<string, Dictionary<string, string>>();
 			XMLList.Enumerator et = source.GetEnumerator("string");
 			while (et.MoveNext())
 			{
