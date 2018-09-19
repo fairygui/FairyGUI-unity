@@ -18,6 +18,11 @@ public class EmojiUBBParser : UBBParser
     {
   
     }
+    public string UrlPackageName
+    {
+        get; set;
+    }
+
     public void SetEmojiHandlersr(string ss)
     {
         this.handlers[ss] = OnTag_Emoji;
@@ -28,7 +33,7 @@ public class EmojiUBBParser : UBBParser
         //var tarName = tagName.Substring(1).ToLower();
         var tarName = tagName;
 
-        var url = UIPackage.GetItemURLLTR("ChatUIEmoji", tarName);
+        var url = UIPackage.GetItemURLLTR(UrlPackageName, tarName);
         return "<img src='" + url + "'/>";
     }
     public new string Parse(string text)
