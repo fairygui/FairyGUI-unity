@@ -829,7 +829,7 @@ namespace FairyGUI
 				{
 					if (pi.texture != null)
 					{
-						pi.texture.Unload();
+						pi.texture.Dispose();
 						pi.texture = null;
 					}
 				}
