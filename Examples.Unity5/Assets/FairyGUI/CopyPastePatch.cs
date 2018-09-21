@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FairyGUI
 {
@@ -44,6 +42,7 @@ namespace FairyGUI
 		public static void OnPaste(InputTextField textField)
 		{
 			TextEditor te = new TextEditor();
+			te.multiline = true;
 			te.Paste();
 #if UNITY_5_3_OR_NEWER
 			string value = te.text;
@@ -51,7 +50,11 @@ namespace FairyGUI
 			string value = te.content.text;
 #endif
 			if (!string.IsNullOrEmpty(value))
+			{
+				if (textField.textField.singleLine)
+					value = value.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
 				textField.ReplaceSelection(value);
+			}
 		}
 	}
 #endif
