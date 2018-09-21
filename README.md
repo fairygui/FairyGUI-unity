@@ -28,8 +28,8 @@ Get Started
 ====
 
 - Examples.Unity5
-- 
-  If you are exploring FairyGUI for the first time, it is highly recommended that you start with the Examples project. This is an example project for the Unity 5.x version. This project was created on Unity 5.5.0. If you are using another version of Unity, you can read it from [here] (https://github.com/fairygui/FairyGUI -unity/releases) Download FairyGUI-Unity-Plugin.zip, then replace the DLL in the Assets/Plugins directory inside the project with the DLL that corresponds to your Unity version.<br>
+
+  If you are exploring FairyGUI for the first time, it is highly recommended that you start with the Examples project. This is an example project for the Unity 5.x version. This project was created on Unity 5.5.0. If you are using another version of Unity, you can read it from [here] (https://github.com/fairygui/FairyGUI-unity/releases) Download FairyGUI-Unity-Plugin.zip, then replace the DLL in the Assets/Plugins directory inside the project with the DLL that corresponds to your Unity version.<br>
 
   如果你第一次探索FairyGUI，强烈建议你从Examples工程开始。这是适用于Unity5.x版本的例子工程，这个工程是在Unity5.5.0上制作的，如果你使用的是其他版本的Unity，可以从[这里](https://github.com/fairygui/FairyGUI-unity/releases)下载FairyGUI-Unity-Plugin.zip，然后用里面对应你Unity版本的DLL替换工程内Assets/Plugins目录下的DLL即可。
 
