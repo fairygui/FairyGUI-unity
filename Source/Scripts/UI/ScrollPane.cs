@@ -127,6 +127,16 @@ namespace FairyGUI
 			_touchEffect = UIConfig.defaultScrollTouchEffect;
 			_bouncebackEffect = UIConfig.defaultScrollBounceEffect;
 			_scrollBarVisible = true;
+            _tweenTimeGo = UIConfig.scrollPaneTweenTimeGo;
+            _tweenTimeDefault = UIConfig.scrollPaneTweenTimeDefault;
+            _pullRatio = UIConfig.scrollPanePullRatio;
+            _frameRate = UIConfig.scrollPaneFrameRate;
+            _touchScreenThreshold = UIConfig.scrollPaneTouchScreenThreshold;
+            _notTouchScreenThreshold = UIConfig.scrollPaneNotTouchScreenThreshold;
+            _resoulutionBase = UIConfig.scrollPaneResoulutionBase;
+            _distanceParam = UIConfig.scrollPaneDistanceParam;
+            _elapsedParam = UIConfig.scrollPaneElapsedParam;
+            _scrollBarVisible = true;
 			_mouseWheelEnabled = true;
 			_pageSize = Vector2.one;
 
