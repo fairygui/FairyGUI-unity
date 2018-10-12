@@ -88,7 +88,6 @@ namespace FairyGUIEditor
 							InitDefaultValue(selectedKey, value);
 						}
 					}
-					modified = true;
 				}
 				EditorGUILayout.EndHorizontal();
 
@@ -100,7 +99,6 @@ namespace FairyGUIEditor
 
 					EditorGUILayout.BeginHorizontal();
 					EditorGUILayout.PrefixLabel(((UIConfig.ConfigKey)i).ToString());
-					EditorGUI.BeginChangeCheck();
 					switch ((UIConfig.ConfigKey)i)
 					{
 						case UIConfig.ConfigKey.ClickDragSensitivity:
@@ -129,8 +127,15 @@ namespace FairyGUIEditor
 						case UIConfig.ConfigKey.DefaultScrollTouchEffect:
 						case UIConfig.ConfigKey.RenderingTextBrighterOnDesktop:
 						case UIConfig.ConfigKey.AllowSoftnessOnTopOrLeftSide:
-						case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
+						case UIConfig.ConfigKey.DepthSupportForPaintingMode:
 							value.b = EditorGUILayout.Toggle(value.b);
+							break;
+
+						case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
+							EditorGUI.BeginChangeCheck();
+							value.b = EditorGUILayout.Toggle(value.b);
+							if (EditorGUI.EndChangeCheck())
+								modified = true;
 							break;
 
 						case UIConfig.ConfigKey.ButtonSoundVolumeScale:
@@ -142,14 +147,13 @@ namespace FairyGUIEditor
 							value.c = EditorGUILayout.ColorField(value.c);
 							break;
 					}
-					if (EditorGUI.EndChangeCheck())
-						modified = true;
 
 					if (GUILayout.Button(new GUIContent("X", "Delete Item"), EditorStyles.miniButtonRight, GUILayout.Width(30)))
 					{
 						config.Items[i].Reset();
 						InitDefaultValue((UIConfig.ConfigKey)i, config.Items[i]);
-						modified = true;
+						if (i == (int)UIConfig.ConfigKey.EnhancedTextOutlineEffect || i == (int)UIConfig.ConfigKey.DepthSupportForPaintingMode)
+							modified = true;
 					}
 					EditorGUILayout.EndHorizontal();
 				}
@@ -279,6 +283,10 @@ namespace FairyGUIEditor
 					break;
 
 				case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
+					value.b = true;
+					break;
+
+				case UIConfig.ConfigKey.DepthSupportForPaintingMode:
 					value.b = false;
 					break;
 			}
