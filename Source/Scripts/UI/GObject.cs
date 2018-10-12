@@ -1545,6 +1545,7 @@ namespace FairyGUI
 			RemoveFromParent();
 			RemoveEventListeners();
 			relations.Dispose();
+			relations = null;
 			if (displayObject != null)
 			{
 				displayObject.gOwner = null;
