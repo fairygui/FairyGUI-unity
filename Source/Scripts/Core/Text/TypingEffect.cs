@@ -18,6 +18,7 @@ namespace FairyGUI
 		protected int _printIndex;
 		protected int _mainLayerStart;
 		protected int _strokeLayerStart;
+		protected int _strokeDrawDirs;
 		protected int _vertIndex;
 		protected int _mainLayerVertCount;
 
@@ -60,6 +61,7 @@ namespace FairyGUI
 			_backupVerts.Clear();
 			_stroke = false;
 			_shadow = false;
+			_strokeDrawDirs = 4;
 			_mainLayerStart = 0;
 			_mainLayerVertCount = 0;
 			_printIndex = 0;
@@ -96,26 +98,12 @@ namespace FairyGUI
 
 			if (_mainLayerVertCount < vertCount) //说明有描边或者阴影
 			{
-				if (vertCount == _mainLayerVertCount * 6)
-				{
-					_stroke = true;
-					_shadow = true;
-					_mainLayerStart = vertCount * 5 / 6;
-					_strokeLayerStart = vertCount / 6;
-				}
-				else if (vertCount == _mainLayerVertCount * 5)
-				{
-					_stroke = true;
-					_shadow = false;
-					_mainLayerStart = vertCount * 4 / 5;
-					_strokeLayerStart = 0;
-				}
-				else if (vertCount == _mainLayerVertCount * 2)
-				{
-					_stroke = false;
-					_shadow = true;
-					_mainLayerStart = vertCount / 2;
-				}
+				int repeat = vertCount / _mainLayerVertCount;
+				_stroke = repeat > 2;
+				_shadow = repeat % 2 == 0;
+				_mainLayerStart = vertCount - vertCount / repeat;
+				_strokeLayerStart = _shadow ? (vertCount / repeat) : 0;
+				_strokeDrawDirs = repeat > 8 ? 8 : 4;
 			}
 		}
 
@@ -173,7 +161,7 @@ namespace FairyGUI
 				end = start + vertCount;
 				for (int i = start; i < end; i++)
 				{
-					for (int j = 0; j < 4; j++)
+					for (int j = 0; j < _strokeDrawDirs; j++)
 					{
 						int k = i + _mainLayerVertCount * j;
 						vertices[k] = _backupVerts[k];

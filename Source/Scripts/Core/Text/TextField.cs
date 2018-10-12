@@ -44,8 +44,10 @@ namespace FairyGUI
 		const int GUTTER_Y = 2;
 		static float[] STROKE_OFFSET = new float[]
 		{
-			 -1f, 0f, 1f, 0f,
-			0f, -1f, 0f, 1f
+			 -1, 0, 1, 0,
+			0, -1, 0, 1,
+			-1, -1, 1, -1,
+			-1, 1, 1, 1
 		};
 		static float[] BOLD_OFFSET = new float[]
 		{
@@ -501,7 +503,7 @@ namespace FairyGUI
 				}
 			}
 
-			if((_font is DynamicFont) && DynamicFont.textRebuildFlag)
+			if ((_font is DynamicFont) && DynamicFont.textRebuildFlag)
 				graphics.texture = _font.mainTexture;
 		}
 
@@ -1371,8 +1373,9 @@ namespace FairyGUI
 			{
 				int count = vertList.Count;
 				int allocCount = count;
+				int drawDirs = UIConfig.enhancedTextOutlineEffect ? 8 : 4;
 				if (_stroke != 0)
-					allocCount += count * 4;
+					allocCount += count * drawDirs;
 				if (hasShadow)
 					allocCount += count;
 				graphics.Alloc(allocCount);
@@ -1398,8 +1401,8 @@ namespace FairyGUI
 				Color32 strokeColor = _strokeColor;
 				if (_stroke != 0)
 				{
-					start = allocCount - count * 5;
-					for (int j = 0; j < 4; j++)
+					start = allocCount - count * (drawDirs + 1);
+					for (int j = 0; j < drawDirs; j++)
 					{
 						for (int i = 0; i < count; i++)
 						{

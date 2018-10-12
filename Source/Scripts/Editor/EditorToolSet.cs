@@ -127,11 +127,6 @@ namespace FairyGUIEditor
 				packagesPopupContents[i] = new GUIContent(pkgs[i].name);
 			packagesPopupContents[cnt] = new GUIContent("Please Select");
 
-			UIConfig.ClearResourceRefs();
-			UIConfig[] configs = GameObject.FindObjectsOfType<UIConfig>();
-			foreach (UIConfig config in configs)
-				config.Load();
-
 			EMRenderSupport.Reload();
 		}
 

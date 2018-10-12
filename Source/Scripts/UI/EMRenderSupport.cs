@@ -106,6 +106,11 @@ namespace FairyGUI
 			if (Application.isPlaying)
 				return;
 
+			UIConfig.ClearResourceRefs();
+			UIConfig[] configs = GameObject.FindObjectsOfType<UIConfig>();
+			foreach (UIConfig config in configs)
+				config.Load();
+
 			packageListReady = true;
 
 			int cnt = _targets.Count;

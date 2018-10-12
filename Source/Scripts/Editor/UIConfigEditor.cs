@@ -46,6 +46,8 @@ namespace FairyGUIEditor
 				EditorPrefs.SetBool("itemsFoldOut", itemsFoldout);
 			EditorGUILayout.EndHorizontal();
 
+			bool modified = false;
+
 			if (itemsFoldout)
 			{
 				Undo.RecordObject(config, "Items");
@@ -86,6 +88,7 @@ namespace FairyGUIEditor
 							InitDefaultValue(selectedKey, value);
 						}
 					}
+					modified = true;
 				}
 				EditorGUILayout.EndHorizontal();
 
@@ -97,6 +100,7 @@ namespace FairyGUIEditor
 
 					EditorGUILayout.BeginHorizontal();
 					EditorGUILayout.PrefixLabel(((UIConfig.ConfigKey)i).ToString());
+					EditorGUI.BeginChangeCheck();
 					switch ((UIConfig.ConfigKey)i)
 					{
 						case UIConfig.ConfigKey.ClickDragSensitivity:
@@ -125,7 +129,7 @@ namespace FairyGUIEditor
 						case UIConfig.ConfigKey.DefaultScrollTouchEffect:
 						case UIConfig.ConfigKey.RenderingTextBrighterOnDesktop:
 						case UIConfig.ConfigKey.AllowSoftnessOnTopOrLeftSide:
-						case UIConfig.ConfigKey.RightToLeftText:
+						case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
 							value.b = EditorGUILayout.Toggle(value.b);
 							break;
 
@@ -138,8 +142,15 @@ namespace FairyGUIEditor
 							value.c = EditorGUILayout.ColorField(value.c);
 							break;
 					}
+					if (EditorGUI.EndChangeCheck())
+						modified = true;
+
 					if (GUILayout.Button(new GUIContent("X", "Delete Item"), EditorStyles.miniButtonRight, GUILayout.Width(30)))
+					{
 						config.Items[i].Reset();
+						InitDefaultValue((UIConfig.ConfigKey)i, config.Items[i]);
+						modified = true;
+					}
 					EditorGUILayout.EndHorizontal();
 				}
 			}
@@ -210,13 +221,13 @@ namespace FairyGUIEditor
 			else
 				errorState = 0;
 
-			if (serializedObject.ApplyModifiedProperties())
+			if (serializedObject.ApplyModifiedProperties() || modified)
 				(target as UIConfig).ApplyModifiedProperties();
 		}
 
 		void InitDefaultValue(UIConfig.ConfigKey key, UIConfig.ConfigValue value)
 		{
-			switch ((UIConfig.ConfigKey)key)
+			switch (key)
 			{
 				case UIConfig.ConfigKey.ButtonSoundVolumeScale:
 					value.f = 1;
@@ -267,7 +278,7 @@ namespace FairyGUIEditor
 					value.c = new Color32(255, 223, 141, 128);
 					break;
 
-				case UIConfig.ConfigKey.RightToLeftText:
+				case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
 					value.b = false;
 					break;
 			}
