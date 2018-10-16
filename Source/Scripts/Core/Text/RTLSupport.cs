@@ -260,8 +260,8 @@ namespace FairyGUI
             char nextChar = '\0';
             for (int j = 0; j < chArray.Length; j++)
             {
-                if (j < chArray.Length - 1)
-                    nextChar = chArray[(chArray.Length - j) - 2];
+                if (j > 0)
+                    nextChar = chArray[chArray.Length - j];
                 else
                     nextChar = '\0';
                 char item = chArray[(chArray.Length - j) - 1];
@@ -657,6 +657,10 @@ namespace FairyGUI
             if (_IsBracket(uc) || _IsEndPunctuation(uc, nextChar))
             {
                 eCType = CharType.RTL;
+            }
+            else if ((uni >= 0x660) && (uni <= 0x669))
+            {
+                eCType = CharType.LTR;
             }
             else if (IsArabicLetter(uc) || uc == '-' || uc == '%')
             {
