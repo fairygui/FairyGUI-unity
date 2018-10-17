@@ -24,6 +24,7 @@ namespace FairyGUI
 
 		static float[] IDENTITY = new float[] { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 };
 		static string[] FILTER_KEY = new string[] { "COLOR_FILTER" };
+		static float[] tmp = new float[20];
 
 		public ColorFilter()
 		{
@@ -59,13 +60,16 @@ namespace FairyGUI
 
 		public void Dispose()
 		{
-			if ((_target is Image) || (_target is MovieClip))
-				_target.graphics.materialKeywords = null;
-			else if (!_target.isDisposed)
+			if (!_target.isDisposed)
 			{
-				//恢复原来的材质
-				_target.paintingGraphics.material = _savedMaterial;
-				_target.LeavePaintingMode(1);
+				if ((_target is Image) || (_target is MovieClip))
+					_target.graphics.materialKeywords = null;
+				else
+				{
+					//恢复原来的材质
+					_target.paintingGraphics.material = _savedMaterial;
+					_target.LeavePaintingMode(1);
+				}
 			}
 
 			if (_material != null)
@@ -92,10 +96,10 @@ namespace FairyGUI
 
 		public void Invert()
 		{
-			ConcatValues(-1, 0, 0, 0, 1,
-						  0, -1, 0, 0, 1,
-						  0, 0, -1, 0, 1,
-						  0, 0, 0, 1, 0);
+			_ConcatValues(0, -1, 0, 0, 0, 1);
+			_ConcatValues(1, 0, -1, 0, 0, 1);
+			_ConcatValues(2, 0, 0, -1, 0, 1);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -113,10 +117,10 @@ namespace FairyGUI
 			float invLumG = invSat * LUMA_G;
 			float invLumB = invSat * LUMA_B;
 
-			ConcatValues((invLumR + sat), invLumG, invLumB, 0, 0,
-						  invLumR, (invLumG + sat), invLumB, 0, 0,
-						  invLumR, invLumG, (invLumB + sat), 0, 0,
-						  0, 0, 0, 1, 0);
+			_ConcatValues(0, (invLumR + sat), invLumG, invLumB, 0, 0);
+			_ConcatValues(1, invLumR, (invLumG + sat), invLumB, 0, 0);
+			_ConcatValues(2, invLumR, invLumG, (invLumB + sat), 0, 0);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -129,10 +133,10 @@ namespace FairyGUI
 			float s = value + 1;
 			float o = 128f / 255 * (1 - s);
 
-			ConcatValues(s, 0, 0, 0, o,
-						 0, s, 0, 0, o,
-						 0, 0, s, 0, o,
-						 0, 0, 0, 1, 0);
+			_ConcatValues(0, s, 0, 0, 0, o);
+			_ConcatValues(1, 0, s, 0, 0, o);
+			_ConcatValues(2, 0, 0, s, 0, o);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -142,10 +146,10 @@ namespace FairyGUI
 		/// <param name="value"></param>
 		public void AdjustBrightness(float value)
 		{
-			ConcatValues(1, 0, 0, 0, value,
-						 0, 1, 0, 0, value,
-						 0, 0, 1, 0, value,
-						 0, 0, 0, 1, 0);
+			_ConcatValues(0, 1, 0, 0, 0, value);
+			_ConcatValues(1, 0, 1, 0, 0, value);
+			_ConcatValues(2, 0, 0, 1, 0, value);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -159,11 +163,10 @@ namespace FairyGUI
 			float cos = Mathf.Cos(value);
 			float sin = Mathf.Sin(value);
 
-			ConcatValues(
-				((LUMA_R + (cos * (1 - LUMA_R))) + (sin * -(LUMA_R))), ((LUMA_G + (cos * -(LUMA_G))) + (sin * -(LUMA_G))), ((LUMA_B + (cos * -(LUMA_B))) + (sin * (1 - LUMA_B))), 0, 0,
-				((LUMA_R + (cos * -(LUMA_R))) + (sin * 0.143f)), ((LUMA_G + (cos * (1 - LUMA_G))) + (sin * 0.14f)), ((LUMA_B + (cos * -(LUMA_B))) + (sin * -0.283f)), 0, 0,
-				((LUMA_R + (cos * -(LUMA_R))) + (sin * -((1 - LUMA_R)))), ((LUMA_G + (cos * -(LUMA_G))) + (sin * LUMA_G)), ((LUMA_B + (cos * (1 - LUMA_B))) + (sin * LUMA_B)), 0, 0,
-				0, 0, 0, 1, 0);
+			_ConcatValues(0, ((LUMA_R + (cos * (1 - LUMA_R))) + (sin * -(LUMA_R))), ((LUMA_G + (cos * -(LUMA_G))) + (sin * -(LUMA_G))), ((LUMA_B + (cos * -(LUMA_B))) + (sin * (1 - LUMA_B))), 0, 0);
+			_ConcatValues(1, ((LUMA_R + (cos * -(LUMA_R))) + (sin * 0.143f)), ((LUMA_G + (cos * (1 - LUMA_G))) + (sin * 0.14f)), ((LUMA_B + (cos * -(LUMA_B))) + (sin * -0.283f)), 0, 0);
+			_ConcatValues(2, ((LUMA_R + (cos * -(LUMA_R))) + (sin * -((1 - LUMA_R)))), ((LUMA_G + (cos * -(LUMA_G))) + (sin * LUMA_G)), ((LUMA_B + (cos * (1 - LUMA_B))) + (sin * LUMA_B)), 0, 0);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -179,11 +182,10 @@ namespace FairyGUI
 			float gA = amount * color.g;
 			float bA = amount * color.b;
 
-			ConcatValues(
-				q + rA * LUMA_R, rA * LUMA_G, rA * LUMA_B, 0, 0,
-				gA * LUMA_R, q + gA * LUMA_G, gA * LUMA_B, 0, 0,
-				bA * LUMA_R, bA * LUMA_G, q + bA * LUMA_B, 0, 0,
-				0, 0, 0, 1, 0);
+			_ConcatValues(0, q + rA * LUMA_R, rA * LUMA_G, rA * LUMA_B, 0, 0);
+			_ConcatValues(1, gA * LUMA_R, q + gA * LUMA_G, gA * LUMA_B, 0, 0);
+			_ConcatValues(2, bA * LUMA_R, bA * LUMA_G, q + bA * LUMA_B, 0, 0);
+			_ConcatValues(3, 0, 0, 0, 1, 0);
 		}
 
 		/// <summary>
@@ -196,7 +198,21 @@ namespace FairyGUI
 			UpdateMatrix();
 		}
 
-		static float[] tmp = new float[20];
+		void _ConcatValues(int index, float f0, float f1, float f2, float f3, float f4)
+		{
+			int i = index * 5;
+			for (int x = 0; x < 5; ++x)
+			{
+				tmp[i + x] = f0 * _matrix[x] + f1 * _matrix[x + 5] + f2 * _matrix[x + 10] + f3 * _matrix[x + 15] + (x == 4 ? f4 : 0);
+			}
+
+			if (index == 3)
+			{
+				Array.Copy(tmp, _matrix, tmp.Length);
+
+				UpdateMatrix();
+			}
+		}
 
 		/// <summary>
 		/// 
