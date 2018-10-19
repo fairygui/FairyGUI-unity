@@ -636,7 +636,7 @@ namespace FairyGUI
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\t' || uc == '@' ||
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\r' || uc == '\t' || uc == '@' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
 
