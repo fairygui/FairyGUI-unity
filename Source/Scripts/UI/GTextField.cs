@@ -117,6 +117,14 @@ namespace FairyGUI
 			UpdateSize();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool HasCharacter(char ch)
+		{
+			return _textField.HasCharacter(ch);
+		}
+
 		protected string ParseTemplate(string template)
 		{
 			int pos1 = 0, pos2 = 0;

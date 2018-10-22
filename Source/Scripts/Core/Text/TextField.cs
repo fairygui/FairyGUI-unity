@@ -389,6 +389,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public bool HasCharacter(char ch)
+		{
+			return _font.HasCharacter(ch);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		/// <param name="startLine"></param>
 		/// <param name="startCharX"></param>
 		/// <param name="endLine"></param>
