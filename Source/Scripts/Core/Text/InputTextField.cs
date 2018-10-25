@@ -245,7 +245,7 @@ namespace FairyGUI
 				Stage.inst.focus = this;
 
 			_selectionStart = start;
-			_caretPosition = start + (length < 0 ? int.MaxValue : length);
+			_caretPosition = length < 0 ? int.MaxValue : (start + length);
 			if (!textField.Redraw())
 			{
 				int cnt = textField.charPositions.Count;
@@ -330,10 +330,15 @@ namespace FairyGUI
 			if (value == _text)
 				return;
 
+			if (value == null)
+				value = string.Empty;
+
 			value = ValidateInput(value);
 
 			if (maxLength > 0)
 				value = TruncateText(value, maxLength);
+
+			_caretPosition = value.Length;
 
 			this.text = value;
 			onChanged.Call();
@@ -896,8 +901,12 @@ namespace FairyGUI
 			if (Stage.keyboardInput)
 			{
 				if (keyboardInput)
+				{
 					Stage.inst.OpenKeyboard(_text, false, _displayAsPassword ? false : !textField.singleLine,
 						_displayAsPassword, false, null, keyboardType, hideInput);
+
+					SetSelection(0, -1);
+				}
 			}
 			else
 			{
