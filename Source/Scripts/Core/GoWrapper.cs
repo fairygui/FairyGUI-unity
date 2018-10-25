@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using FairyGUI.Utils;
 
@@ -46,17 +47,23 @@ namespace FairyGUI
 		/// <param name="go">包装对象。</param>
 		public GoWrapper(GameObject go) : this()
 		{
-			setWrapTarget(go, false);
+			SetWrapTarget(go, false);
 		}
 
 		/// <summary>
 		/// 设置包装对象。注意如果原来有包装对象，设置新的包装对象后，原来的包装对象只会被删除引用，但不会被销毁。
-		/// 对象包含的所有材质不会被复制，如果材质已经是公用的，这可能影响到其他对象。如果希望自动复制，改为使用setWrapTarget(target, true)设置。
+		/// 对象包含的所有材质不会被复制，如果材质已经是公用的，这可能影响到其他对象。如果希望自动复制，改为使用SetWrapTarget(target, true)设置。
 		/// </summary>
 		public GameObject wrapTarget
 		{
 			get { return _wrapTarget; }
-			set { setWrapTarget(value, false); }
+			set { SetWrapTarget(value, false); }
+		}
+
+		[Obsolete("setWrapTarget is deprecated. Use SetWrapTarget instead.")]
+		public void setWrapTarget(GameObject target, bool cloneMaterial)
+		{
+			SetWrapTarget(target, cloneMaterial);
 		}
 
 		/// <summary>
@@ -64,7 +71,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="target"></param>
 		/// <param name="cloneMaterial">如果true，则复制材质，否则直接使用sharedMaterial。</param>
-		public void setWrapTarget(GameObject target, bool cloneMaterial)
+		public void SetWrapTarget(GameObject target, bool cloneMaterial)
 		{
 			RecoverMaterials();
 

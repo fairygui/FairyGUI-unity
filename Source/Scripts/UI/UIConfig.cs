@@ -65,8 +65,6 @@ namespace FairyGUI
 		/// 鼠标滚轮触发一次滚动的距离设定为defaultScrollStep*2
 		/// </summary>
 		public static float defaultScrollStep = 25;
-		[Obsolete("UIConfig.defaultScrollSpeed is deprecated. Use defaultScrollStep instead.")]
-		public static float defaultScrollSpeed = 25;
 
 		/// <summary>
 		/// Deceleration ratio of scrollpane when its in touch dragging.
@@ -75,8 +73,6 @@ namespace FairyGUI
 		/// 这个是全局设置，也可以通过ScrollPane.decelerationRate进行个性设置。
 		/// </summary>
 		public static float defaultScrollDecelerationRate = 0.967f;
-		[Obsolete("UIConfig.defaultTouchScrollSpeedRatio is deprecated. Use defaultScrollDecelerationRate instead.")]
-		public static float defaultTouchScrollSpeedRatio = 1;
 
 		/// <summary>
 		/// Scrollbar display mode. Recommended 'Auto' for mobile and 'Visible' for web.
