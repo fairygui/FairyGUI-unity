@@ -89,8 +89,8 @@ namespace FairyGUI
 				mat = _material;
 			if ((object)mat != null)
 			{
-				mat.SetMatrix("_ColorMatrix", _shaderMatrix);
-				mat.SetVector("_ColorOffset", _offset);
+				mat.SetMatrix(ShaderConfig._properyIDs._ColorMatrix, _shaderMatrix);
+				mat.SetVector(ShaderConfig._properyIDs._ColorOffset, _offset);
 			}
 		}
 
