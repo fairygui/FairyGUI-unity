@@ -1,4 +1,5 @@
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 Shader "FairyGUI/Text"
 {
@@ -95,8 +96,8 @@ Shader "FairyGUI/Text"
 				v2f vert (appdata_t v)
 				{
 					v2f o;
-					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 540)
+					o.vertex = UnityObjectToClipPos(v.vertex);
+					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 550)
 					o.color.rgb = GammaToLinearSpace(v.color.rgb);
 					o.color.a = v.color.a;
 					#else
@@ -135,7 +136,7 @@ Shader "FairyGUI/Text"
 
 					#ifdef GRAYED
 					fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));  
-					col.rgb = fixed3(grey, grey, grey); 
+					col.rgb = fixed3(grey, grey, grey);
 					#endif
 
 					#ifdef SOFT_CLIPPED
