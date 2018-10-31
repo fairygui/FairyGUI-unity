@@ -156,6 +156,8 @@ namespace FairyGUI
 				for (int j = 0; j < mcnt; j++)
 				{
 					Material mat = mats[j];
+					if (mat == null)
+						continue;
 
 					//确保相同的材质不会复制两次
 					int k = _materialsBackup.IndexOf(mat);
