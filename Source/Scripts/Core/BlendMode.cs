@@ -82,11 +82,11 @@ namespace FairyGUI
 		public static void Apply(Material mat, BlendMode blendMode)
 		{
 			BlendFactor bf = Factors[(int)blendMode];
-			mat.SetFloat("_BlendSrcFactor", (float)bf.srcFactor);
-			mat.SetFloat("_BlendDstFactor", (float)bf.dstFactor);
+			mat.SetFloat(ShaderConfig._properyIDs._BlendSrcFactor, (float)bf.srcFactor);
+			mat.SetFloat(ShaderConfig._properyIDs._BlendDstFactor, (float)bf.dstFactor);
 
 			if (bf.pma)
-				mat.SetFloat("_ColorOption", 1);
+				mat.SetFloat(ShaderConfig._properyIDs._ColorOption, 1);
 		}
 
 		/// <summary>

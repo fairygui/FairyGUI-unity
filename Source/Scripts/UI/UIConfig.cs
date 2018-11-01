@@ -65,8 +65,6 @@ namespace FairyGUI
 		/// 鼠标滚轮触发一次滚动的距离设定为defaultScrollStep*2
 		/// </summary>
 		public static float defaultScrollStep = 25;
-		[Obsolete("UIConfig.defaultScrollSpeed is deprecated. Use defaultScrollStep instead.")]
-		public static float defaultScrollSpeed = 25;
 
 		/// <summary>
 		/// Deceleration ratio of scrollpane when its in touch dragging.
@@ -219,6 +217,13 @@ namespace FairyGUI
         public static bool rtlLanguage = true;
 
         public enum ConfigKey
+		/// <summary>
+		/// Indicates whether to draw extra 4 or 8 times to achieve stroke effect for textfield.
+		/// If it is true, that is the 8 times, otherwise it is the 4 times.
+		/// </summary>
+		public static bool enhancedTextOutlineEffect = true;
+
+		public enum ConfigKey
 		{
 			DefaultFont,
 			ButtonSound,
@@ -244,7 +249,8 @@ namespace FairyGUI
 			AllowSoftnessOnTopOrLeftSide,
 			InputCaretSize,
 			InputHighlightColor,
-			RightToLeftText,
+			EnhancedTextOutlineEffect,
+			DepthSupportForPaintingMode,
 
 			PleaseSelect = 100
 		}
@@ -393,6 +399,14 @@ namespace FairyGUI
 					case ConfigKey.InputHighlightColor:
 						UIConfig.inputHighlightColor = value.c;
 						break;
+
+					case ConfigKey.DepthSupportForPaintingMode:
+						UIConfig.depthSupportForPaintingMode = value.b;
+						break;
+
+					case ConfigKey.EnhancedTextOutlineEffect:
+						UIConfig.enhancedTextOutlineEffect = value.b;
+						break;
 				}
 			}
 		}
@@ -413,7 +427,7 @@ namespace FairyGUI
 
 		public void ApplyModifiedProperties()
 		{
-			//nothing yet
+			EMRenderSupport.Reload();
 		}
 
 		public delegate NAudioClip SoundLoader(string url);

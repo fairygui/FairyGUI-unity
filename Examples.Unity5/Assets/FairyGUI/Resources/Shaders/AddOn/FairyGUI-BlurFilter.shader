@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "FairyGUI/BlurFilter" {
 	Properties {
 	_MainTex ("Base (RGB)", 2D) = "white" {}
@@ -32,7 +34,7 @@ SubShader {
 		v2f vert (appdata_t v)
 		{
 			v2f o;
-			o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+			o.vertex = UnityObjectToClipPos(v.vertex);
 			o.texcoord = v.texcoord - _BlurOffsets.xy * _MainTex_TexelSize.xy;
 			o.taps[0] = o.texcoord + _MainTex_TexelSize * _BlurOffsets.xy;
 			o.taps[1] = o.texcoord - _MainTex_TexelSize * _BlurOffsets.xy;

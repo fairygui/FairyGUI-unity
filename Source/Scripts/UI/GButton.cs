@@ -211,7 +211,7 @@ namespace FairyGUI
 				GTextField tf = GetTextField();
 				if (tf != null)
 				{
-					TextFormat format = ((GTextField)_titleObject).textFormat;
+					TextFormat format = tf.textFormat;
 					format.size = value;
 					tf.textFormat = format;
 				}

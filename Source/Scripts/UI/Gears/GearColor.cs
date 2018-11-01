@@ -11,8 +11,6 @@ namespace FairyGUI
 
 		public GearColorValue()
 		{
-			//兼容旧版本。如果a值为0，则表示不设置
-			strokeColor = Color.clear;
 		}
 
 		public GearColorValue(Color color, Color strokeColor)

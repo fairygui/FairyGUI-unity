@@ -1040,8 +1040,8 @@ namespace FairyGUI
 			if (_displayOnLeft && _vtScrollBar != null)
 				mx = Mathf.FloorToInt(_owner.margin.left + _vtScrollBar.width);
 			else
-				mx = Mathf.FloorToInt(_owner.margin.left);
-			my = Mathf.FloorToInt(_owner.margin.top);
+				mx = _owner.margin.left;
+			my = _owner.margin.top;
 			mx += _owner._alignOffset.x;
 			my += _owner._alignOffset.y;
 
@@ -1356,7 +1356,7 @@ namespace FairyGUI
 		{
 			if (_aniFlag == 1 && !_isMouseMoved)
 			{
-				Vector2 pos;
+				Vector2 pos = new Vector2();
 
 				if (_overlapSize.x > 0)
 					pos.x = -(int)_xPos;

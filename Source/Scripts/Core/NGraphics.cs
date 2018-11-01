@@ -329,11 +329,12 @@ namespace FairyGUI
 			Stats.GraphicsCount++;
 
 			NMaterial nm = null;
+			bool firstInstance = true;
 			if (!_customMatarial)
 			{
 				if (_manager != null)
 				{
-					nm = _manager.GetMaterial(this, context);
+					nm = _manager.GetMaterial(this, context, out firstInstance);
 					_material = nm.material;
 					if ((object)_material != (object)meshRenderer.sharedMaterial)
 						meshRenderer.sharedMaterial = _material;
@@ -353,7 +354,7 @@ namespace FairyGUI
 					_stencilEraser.enabled = false;
 			}
 
-			if (_material != null)
+			if (firstInstance && (object)_material != null)
 			{
 				if (blendMode != BlendMode.Normal) //GetMateria已经保证了不同的blendMode会返回不同的共享材质，所以这里可以放心设置
 					BlendModeUtils.Apply(_material, blendMode);
@@ -363,9 +364,9 @@ namespace FairyGUI
 				{
 					if (maskFrameId != UpdateContext.frameId && context.rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
 					{
-						_material.SetVector("_ClipBox", context.clipInfo.clipBox);
+						_material.SetVector(ShaderConfig._properyIDs._ClipBox, context.clipInfo.clipBox);
 						if (context.clipInfo.soft)
-							_material.SetVector("_ClipSoftness", context.clipInfo.softness);
+							_material.SetVector(ShaderConfig._properyIDs._ClipSoftness, context.clipInfo.softness);
 					}
 
 					if (context.stencilReferenceValue > 0)
@@ -374,19 +375,19 @@ namespace FairyGUI
 						{
 							if (context.stencilReferenceValue == 1)
 							{
-								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Always);
-								_material.SetInt("_Stencil", 1);
-								_material.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Replace);
-								_material.SetInt("_StencilReadMask", 255);
-								_material.SetInt("_ColorMask", 0);
+								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
+								_material.SetInt(ShaderConfig._properyIDs._Stencil, 1);
+								_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+								_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, 255);
+								_material.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 							}
 							else
 							{
-								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
-								_material.SetInt("_Stencil", context.stencilReferenceValue | (context.stencilReferenceValue - 1));
-								_material.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Replace);
-								_material.SetInt("_StencilReadMask", context.stencilReferenceValue - 1);
-								_material.SetInt("_ColorMask", 0);
+								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+								_material.SetInt(ShaderConfig._properyIDs._Stencil, context.stencilReferenceValue | (context.stencilReferenceValue - 1));
+								_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+								_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue - 1);
+								_material.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 							}
 
 							//设置擦除stencil的drawcall
@@ -400,31 +401,31 @@ namespace FairyGUI
 
 							if (nm != null)
 							{
-								NMaterial eraserNm = _manager.GetMaterial(this, context);
+								NMaterial eraserNm = _manager.GetMaterial(this, context, out firstInstance);
 								eraserNm.stencilSet = true;
 								Material eraserMat = eraserNm.material;
 								if ((object)eraserMat != (object)_stencilEraser.meshRenderer.sharedMaterial)
 									_stencilEraser.meshRenderer.sharedMaterial = eraserMat;
 
 								int refValue = context.stencilReferenceValue - 1;
-								eraserMat.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
-								eraserMat.SetInt("_Stencil", refValue);
-								eraserMat.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Replace);
-								eraserMat.SetInt("_StencilReadMask", refValue);
-								eraserMat.SetInt("_ColorMask", 0);
+								eraserMat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+								eraserMat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+								eraserMat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+								eraserMat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+								eraserMat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 							}
 						}
 						else
 						{
 							int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
 							if (context.clipInfo.reversedMask)
-								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.NotEqual);
+								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.NotEqual);
 							else
-								_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Equal);
-							_material.SetInt("_Stencil", refValue);
-							_material.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Keep);
-							_material.SetInt("_StencilReadMask", refValue);
-							_material.SetInt("_ColorMask", 15);
+								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+							_material.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+							_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
+							_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+							_material.SetInt(ShaderConfig._properyIDs._ColorMask, 15);
 						}
 						if (nm != null)
 							nm.stencilSet = true;
@@ -437,11 +438,11 @@ namespace FairyGUI
 
 				if (clearStencil)
 				{
-					_material.SetInt("_StencilComp", (int)UnityEngine.Rendering.CompareFunction.Always);
-					_material.SetInt("_Stencil", 0);
-					_material.SetInt("_StencilOp", (int)UnityEngine.Rendering.StencilOp.Keep);
-					_material.SetInt("_StencilReadMask", 255);
-					_material.SetInt("_ColorMask", 15);
+					_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
+					_material.SetInt(ShaderConfig._properyIDs._Stencil, 0);
+					_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
+					_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, 255);
+					_material.SetInt(ShaderConfig._properyIDs._ColorMask, 15);
 				}
 			}
 		}

@@ -159,6 +159,7 @@ namespace FairyGUI
 		public void Dispose()
 		{
 			ClearAll();
+			handling = null;
 		}
 
 		/// <summary>

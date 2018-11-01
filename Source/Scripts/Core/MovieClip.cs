@@ -451,6 +451,8 @@ namespace FairyGUI
 				_requireUpdateMesh = false;
 				DrawFrame();
 			}
+			else
+				graphics.ClearMesh();
 		}
 	}
 }
