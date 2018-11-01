@@ -79,7 +79,6 @@ namespace FairyGUI
 		Vector2 _lastTouchPos;
 		Vector2 _lastTouchGlobalPos;
 		Vector2 _velocity;
-        System.Collections.Generic.List<Vector2> _velocityList = new System.Collections.Generic.List<Vector2>();
         float _velocityScale;
 		float _lastMoveTime;
 		bool _isMouseMoved;
@@ -1480,7 +1479,6 @@ namespace FairyGUI
 			_lastTouchGlobalPos = evt.position;
 			_isHoldAreaDone = false;
 			_velocity = Vector2.zero;
-            _velocityList.Clear();
             _velocityScale = 1;
 			_lastMoveTime = Time.unscaledTime;
 		}
@@ -1626,7 +1624,6 @@ namespace FairyGUI
 			if (!sv)
 				deltaPosition.y = 0;
 			_velocity = Vector2.Lerp(_velocity, deltaPosition / deltaTime, deltaTime * 10);
-            _velocityList.Add(_velocity);
 			/*速度计算使用的是本地位移，但在后续的惯性滚动判断中需要用到屏幕位移，所以这里要记录一个位移的比例。
 			 *后续的处理要使用这个比例但不使用坐标转换的方法的原因是，在曲面UI等异形UI中，还无法简单地进行屏幕坐标和本地坐标的转换。
 			 */
@@ -1739,7 +1736,6 @@ namespace FairyGUI
                     if (elapsed > 1)
                     {
                         _velocity = _velocity * Mathf.Pow(_elapsedParam, elapsed);
-                        _velocityList.Add(_velocity);
                       
                     }
                     //根据速度计算目标位置和需要时间
@@ -1772,11 +1768,6 @@ namespace FairyGUI
 
 			_tweening = 2;
 			_tweenTime = Vector2.zero;
-            foreach (var velocity in _velocityList)
-            {
-                LuaFramework.Util.Log("x "+velocity.x + " y " + velocity.y);
-            }
-            _velocityList.Clear();
             Timers.inst.AddUpdate(_tweenUpdateDelegate);
 		}
 
