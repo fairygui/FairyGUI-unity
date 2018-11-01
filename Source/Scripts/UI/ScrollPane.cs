@@ -59,6 +59,7 @@ namespace FairyGUI
 		float _decelerationRate;
         float _tweenTimeGo = 0.5f; //调用SetPos(ani)时使用的缓动时间
         float _tweenTimeDefault = 0.3f; //惯性滚动的最小缓动时间
+        float _tweenTimePull = 0.15f; //惯性滚动的最小缓动时间(回弹使用)
         float _pullRatio = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
         float _frameRate = 60f;
         float _touchScreenThreshold = 1000f;
@@ -78,7 +79,8 @@ namespace FairyGUI
 		Vector2 _lastTouchPos;
 		Vector2 _lastTouchGlobalPos;
 		Vector2 _velocity;
-		float _velocityScale;
+        System.Collections.Generic.List<Vector2> _velocityList = new System.Collections.Generic.List<Vector2>();
+        float _velocityScale;
 		float _lastMoveTime;
 		bool _isMouseMoved;
 		bool _isHoldAreaDone;
@@ -136,6 +138,7 @@ namespace FairyGUI
             _resoulutionBase = UIConfig.scrollPaneResoulutionBase;
             _distanceParam = UIConfig.scrollPaneDistanceParam;
             _elapsedParam = UIConfig.scrollPaneElapsedParam;
+            _tweenTimePull = UIConfig.scrollPaneTweenTimePull;
             _scrollBarVisible = true;
 			_mouseWheelEnabled = true;
 			_pageSize = Vector2.one;
@@ -1040,8 +1043,8 @@ namespace FairyGUI
 			if (_displayOnLeft && _vtScrollBar != null)
 				mx = Mathf.FloorToInt(_owner.margin.left + _vtScrollBar.width);
 			else
-				mx = _owner.margin.left;
-			my = _owner.margin.top;
+				mx = Mathf.FloorToInt(_owner.margin.left);
+			my = Mathf.FloorToInt(_owner.margin.top);
 			mx += _owner._alignOffset.x;
 			my += _owner._alignOffset.y;
 
@@ -1356,7 +1359,7 @@ namespace FairyGUI
 		{
 			if (_aniFlag == 1 && !_isMouseMoved)
 			{
-				Vector2 pos = new Vector2();
+				Vector2 pos;
 
 				if (_overlapSize.x > 0)
 					pos.x = -(int)_xPos;
@@ -1477,7 +1480,8 @@ namespace FairyGUI
 			_lastTouchGlobalPos = evt.position;
 			_isHoldAreaDone = false;
 			_velocity = Vector2.zero;
-			_velocityScale = 1;
+            _velocityList.Clear();
+            _velocityScale = 1;
 			_lastMoveTime = Time.unscaledTime;
 		}
 
@@ -1622,7 +1626,7 @@ namespace FairyGUI
 			if (!sv)
 				deltaPosition.y = 0;
 			_velocity = Vector2.Lerp(_velocity, deltaPosition / deltaTime, deltaTime * 10);
-
+            _velocityList.Add(_velocity);
 			/*速度计算使用的是本地位移，但在后续的惯性滚动判断中需要用到屏幕位移，所以这里要记录一个位移的比例。
 			 *后续的处理要使用这个比例但不使用坐标转换的方法的原因是，在曲面UI等异形UI中，还无法简单地进行屏幕坐标和本地坐标的转换。
 			 */
@@ -1732,11 +1736,14 @@ namespace FairyGUI
 				if (!_inertiaDisabled)
 				{
 					float elapsed = (Time.unscaledTime - _lastMoveTime) * _frameRate - 1;
-					if (elapsed > 1)
-						_velocity = _velocity * Mathf.Pow(_elapsedParam, elapsed);
-
-					//根据速度计算目标位置和需要时间
-					endPos = UpdateTargetAndDuration(_tweenStart);
+                    if (elapsed > 1)
+                    {
+                        _velocity = _velocity * Mathf.Pow(_elapsedParam, elapsed);
+                        _velocityList.Add(_velocity);
+                      
+                    }
+                    //根据速度计算目标位置和需要时间
+                    endPos = UpdateTargetAndDuration(_tweenStart);
 				}
 				else
 					_tweenDuration.Set(_tweenTimeDefault, _tweenTimeDefault);
@@ -1765,7 +1772,12 @@ namespace FairyGUI
 
 			_tweening = 2;
 			_tweenTime = Vector2.zero;
-			Timers.inst.AddUpdate(_tweenUpdateDelegate);
+            foreach (var velocity in _velocityList)
+            {
+                LuaFramework.Util.Log("x "+velocity.x + " y " + velocity.y);
+            }
+            _velocityList.Clear();
+            Timers.inst.AddUpdate(_tweenUpdateDelegate);
 		}
 
 		private void __mouseWheel(EventContext context)
@@ -2272,7 +2284,7 @@ namespace FairyGUI
 						|| newValue > threshold1 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = _tweenTimeDefault;
+						_tweenDuration[axis] = _tweenTimePull;
 						_tweenChange[axis] = -newValue + threshold1;
 						_tweenStart[axis] = newValue;
 					}
@@ -2280,7 +2292,7 @@ namespace FairyGUI
 						|| newValue < threshold2 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = _tweenTimeDefault;
+						_tweenDuration[axis] = _tweenTimePull;
 						_tweenChange[axis] = threshold2 - newValue;
 						_tweenStart[axis] = newValue;
 					}

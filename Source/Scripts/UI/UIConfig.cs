@@ -169,7 +169,9 @@ namespace FairyGUI
         /// <summary>
         /// 惯性滚动的最小缓动时间
         /// </summary>
-        public static float scrollPaneTweenTimeDefault = 0.15f;//0.3f;
+        public static float scrollPaneTweenTimeDefault = 0.5f;//0.3f;
+
+        public static float scrollPaneTweenTimePull = 0.15f;//0.3f;
 
         /// <summary>
         /// 下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
@@ -184,7 +186,7 @@ namespace FairyGUI
         /// <summary>
         /// 这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
         /// </summary>
-        public static int scrollPaneTouchScreenThreshold = 1000;
+        public static int scrollPaneTouchScreenThreshold = 250;
 
         /// <summary>
         /// 这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
@@ -194,7 +196,7 @@ namespace FairyGUI
         /// <summary>
         /// 在移动设备上，需要对不同分辨率做一个适配，我们的速度判断以1136分辨率为基准
         /// </summary>
-        public static float scrollPaneResoulutionBase = 1136f;
+        public static float scrollPaneResoulutionBase = 1280;
 
         /// <summary>
         /// 计算距离参数
@@ -216,7 +218,6 @@ namespace FairyGUI
         /// </summary>
         public static bool rtlLanguage = true;
 
-        public enum ConfigKey
 		/// <summary>
 		/// Indicates whether to draw extra 4 or 8 times to achieve stroke effect for textfield.
 		/// If it is true, that is the 8 times, otherwise it is the 4 times.
