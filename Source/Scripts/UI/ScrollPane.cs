@@ -57,10 +57,6 @@ namespace FairyGUI
 		bool _inertiaDisabled;
 		bool _maskDisabled;
 		float _decelerationRate;
-        float _tweenTimeGo = 0.5f; //调用SetPos(ani)时使用的缓动时间
-        float _tweenTimeDefault = 0.3f; //惯性滚动的最小缓动时间
-        float _tweenTimePull = 0.15f; //惯性滚动的最小缓动时间(回弹使用)
-        float _pullRatio = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
         float _frameRate = 60f;
         float _touchScreenThreshold = 1000f;
         float _notTouchScreenThreshold = 500f;
@@ -112,7 +108,7 @@ namespace FairyGUI
 
 		const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
 		const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
-		const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+		const float PULL_RATIO = 0.15f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
 
 		public ScrollPane(GComponent owner)
 		{
@@ -127,17 +123,12 @@ namespace FairyGUI
 			_decelerationRate = UIConfig.defaultScrollDecelerationRate;
 			_touchEffect = UIConfig.defaultScrollTouchEffect;
 			_bouncebackEffect = UIConfig.defaultScrollBounceEffect;
-			_scrollBarVisible = true;
-            _tweenTimeGo = UIConfig.scrollPaneTweenTimeGo;
-            _tweenTimeDefault = UIConfig.scrollPaneTweenTimeDefault;
-            _pullRatio = UIConfig.scrollPanePullRatio;
             _frameRate = UIConfig.scrollPaneFrameRate;
             _touchScreenThreshold = UIConfig.scrollPaneTouchScreenThreshold;
             _notTouchScreenThreshold = UIConfig.scrollPaneNotTouchScreenThreshold;
             _resoulutionBase = UIConfig.scrollPaneResoulutionBase;
             _distanceParam = UIConfig.scrollPaneDistanceParam;
             _elapsedParam = UIConfig.scrollPaneElapsedParam;
-            _tweenTimePull = UIConfig.scrollPaneTweenTimePull;
             _scrollBarVisible = true;
 			_mouseWheelEnabled = true;
 			_pageSize = Vector2.one;
@@ -966,7 +957,7 @@ namespace FairyGUI
 				_tweenStart = _container.xy;
 				_tweenChange = Vector2.zero;
 				_tweenChange[_refreshBarAxis] = _headerLockedSize - _tweenStart[_refreshBarAxis];
-				_tweenDuration = new Vector2(_tweenTimeDefault, _tweenTimeDefault);
+				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
 				_tweenTime = Vector2.zero;
 				_tweening = 2;
 				Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -993,7 +984,7 @@ namespace FairyGUI
 				else
 					max += _footerLockedSize;
 				_tweenChange[_refreshBarAxis] = -max - _tweenStart[_refreshBarAxis];
-				_tweenDuration = new Vector2(_tweenTimeDefault, _tweenTimeDefault);
+				_tweenDuration = new Vector2(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
 				_tweenTime = Vector2.zero;
 				_tweening = 2;
 				Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -1358,7 +1349,7 @@ namespace FairyGUI
 		{
 			if (_aniFlag == 1 && !_isMouseMoved)
 			{
-				Vector2 pos;
+				Vector2 pos = new Vector2();
 
 				if (_overlapSize.x > 0)
 					pos.x = -(int)_xPos;
@@ -1381,7 +1372,7 @@ namespace FairyGUI
 				{
 					_tweening = 1;
 					_tweenTime = Vector2.zero;
-					_tweenDuration = new Vector2(_tweenTimeGo, _tweenTimeGo);
+					_tweenDuration = new Vector2(TWEEN_TIME_GO, TWEEN_TIME_GO);
 					_tweenStart = _container.xy;
 					_tweenChange = pos - _tweenStart;
 					Timers.inst.AddUpdate(_tweenUpdateDelegate);
@@ -1479,7 +1470,7 @@ namespace FairyGUI
 			_lastTouchGlobalPos = evt.position;
 			_isHoldAreaDone = false;
 			_velocity = Vector2.zero;
-            _velocityScale = 1;
+			_velocityScale = 1;
 			_lastMoveTime = Time.unscaledTime;
 		}
 
@@ -1574,7 +1565,7 @@ namespace FairyGUI
 					else if (_header != null && _header.maxHeight != 0)
 						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _header.maxHeight);
 					else
-						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * _pullRatio);
+						_container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * PULL_RATIO);
 				}
 				else if (newPos.y < -_overlapSize.y)
 				{
@@ -1583,7 +1574,7 @@ namespace FairyGUI
 					else if (_footer != null && _footer.maxHeight > 0)
 						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_footer.maxHeight) - _overlapSize.y;
 					else
-						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * _pullRatio) - _overlapSize.y;
+						_container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * PULL_RATIO) - _overlapSize.y;
 				}
 				else
 					_container.y = newPos.y;
@@ -1598,7 +1589,7 @@ namespace FairyGUI
 					else if (_header != null && _header.maxWidth != 0)
 						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _header.maxWidth);
 					else
-						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * _pullRatio);
+						_container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * PULL_RATIO);
 				}
 				else if (newPos.x < 0 - _overlapSize.x)
 				{
@@ -1607,7 +1598,7 @@ namespace FairyGUI
 					else if (_footer != null && _footer.maxWidth > 0)
 						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_footer.maxWidth) - _overlapSize.x;
 					else
-						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * _pullRatio) - _overlapSize.x;
+						_container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * PULL_RATIO) - _overlapSize.x;
 				}
 				else
 					_container.x = newPos.x;
@@ -1725,7 +1716,7 @@ namespace FairyGUI
 					_tweenChange = endPos - _tweenStart;
 				}
 
-				_tweenDuration.Set(_tweenTimeDefault, _tweenTimeDefault);
+				_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
 			}
 			else
 			{
@@ -1742,7 +1733,7 @@ namespace FairyGUI
                     endPos = UpdateTargetAndDuration(_tweenStart);
 				}
 				else
-					_tweenDuration.Set(_tweenTimeDefault, _tweenTimeDefault);
+					_tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
 				Vector2 oldChange = endPos - _tweenStart;
 
 				//调整目标位置
@@ -1768,7 +1759,7 @@ namespace FairyGUI
 
 			_tweening = 2;
 			_tweenTime = Vector2.zero;
-            Timers.inst.AddUpdate(_tweenUpdateDelegate);
+			Timers.inst.AddUpdate(_tweenUpdateDelegate);
 		}
 
 		private void __mouseWheel(EventContext context)
@@ -2102,8 +2093,8 @@ namespace FairyGUI
 				}
 			}
 
-			if (duration < _tweenTimeDefault)
-				duration = _tweenTimeDefault;
+			if (duration < TWEEN_TIME_DEFAULT)
+				duration = TWEEN_TIME_DEFAULT;
 			_tweenDuration[axis] = duration;
 
 			return pos;
@@ -2118,8 +2109,8 @@ namespace FairyGUI
 				return;
 
 			float newDuration = Mathf.Abs(_tweenChange[axis] / oldChange) * _tweenDuration[axis];
-			if (newDuration < _tweenTimeDefault)
-				newDuration = _tweenTimeDefault;
+			if (newDuration < TWEEN_TIME_DEFAULT)
+				newDuration = TWEEN_TIME_DEFAULT;
 
 			_tweenDuration[axis] = newDuration;
 		}
@@ -2275,7 +2266,7 @@ namespace FairyGUI
 						|| newValue > threshold1 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = _tweenTimePull;
+						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
 						_tweenChange[axis] = -newValue + threshold1;
 						_tweenStart[axis] = newValue;
 					}
@@ -2283,7 +2274,7 @@ namespace FairyGUI
 						|| newValue < threshold2 && _tweenChange[axis] == 0)//开始回弹
 					{
 						_tweenTime[axis] = 0;
-						_tweenDuration[axis] = _tweenTimePull;
+						_tweenDuration[axis] = TWEEN_TIME_DEFAULT;
 						_tweenChange[axis] = threshold2 - newValue;
 						_tweenStart[axis] = newValue;
 					}
