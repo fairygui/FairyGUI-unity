@@ -90,6 +90,7 @@ namespace FairyGUI
 		Vector2 _itemSize;
 		int _virtualListChanged; //1-content changed, 2-size changed
 		bool _eventLocked;
+        bool _touchableTemp;
 
 		class ItemInfo
 		{
@@ -122,7 +123,38 @@ namespace FairyGUI
 			onRightClickItem = new EventListener(this, "onRightClickItem");
 		}
 
-		public override void Dispose()
+
+        override public void ConstructFromResource()
+        {
+            base.ConstructFromResource();
+
+            scrollPane.onPullDownRelease.Add(() =>
+            {
+                if (touchable)
+                {
+                    _touchableTemp = touchable;
+                    touchable = false;
+                }
+            });
+            scrollPane.onPullUpRelease.Add(() =>
+            {
+                if (touchable)
+                {
+                    _touchableTemp = touchable;
+                    touchable = false;
+                }
+            });
+            scrollPane.onScrollEnd.Add(() =>
+            {
+                if (_touchableTemp)
+                {
+                    touchable = _touchableTemp;
+                    _touchableTemp = false;
+                }
+            });
+        }
+
+        public override void Dispose()
 		{
 			_pool.Clear();
 			if (_virtualListChanged != 0)
@@ -2789,7 +2821,31 @@ namespace FairyGUI
 				buffer.Seek(beginPos, 7);
 				SetupScroll(buffer);
 				buffer.position = savedPos;
-			}
+                scrollPane.onPullDownRelease.Add(() =>
+                {
+                    if (touchable)
+                    {
+                        _touchableTemp = touchable;
+                        touchable = false;
+                    }
+                });
+                scrollPane.onPullUpRelease.Add(() =>
+                {
+                    if (touchable)
+                    {
+                        _touchableTemp = touchable;
+                        touchable = false;
+                    }
+                });
+                scrollPane.onScrollEnd.Add(() =>
+                {
+                    if (_touchableTemp)
+                    {
+                        touchable = _touchableTemp;
+                        _touchableTemp = false;
+                    }
+                });
+            }
 			else
 				SetupOverflow(overflow);
 
