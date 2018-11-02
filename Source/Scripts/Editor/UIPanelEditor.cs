@@ -104,7 +104,9 @@ namespace FairyGUIEditor
 			EditorGUILayout.PropertyField(hitTestMode);
 			EditorGUILayout.PropertyField(touchDisabled);
 			EditorGUILayout.PropertyField(setNativeChildrenOrder);
+			EditorGUILayout.Separator();
 			EditorGUILayout.LabelField("UI Transform", (GUIStyle)"OL Title");
+			EditorGUILayout.Separator();
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(position);
 			EditorGUILayout.PropertyField(rotation);
