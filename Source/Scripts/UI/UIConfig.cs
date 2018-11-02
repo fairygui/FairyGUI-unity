@@ -162,6 +162,23 @@ namespace FairyGUI
 		public static bool depthSupportForPaintingMode = false;
 
         /// <summary>
+        /// 调用SetPos(ani)时使用的缓动时间
+        /// </summary>
+        public static float scrollPaneTweenTimeGo = 0.5f;
+
+        /// <summary>
+        /// 惯性滚动的最小缓动时间
+        /// </summary>
+        public static float scrollPaneTweenTimeDefault = 0.5f;//0.3f;
+
+        public static float scrollPaneTweenTimePull = 0.15f;//0.3f;
+
+        /// <summary>
+        /// 下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+        /// </summary>
+        public static float scrollPanePullRatio = 0.5f;
+
+        /// <summary>
         /// 滚动到目标对应的帧率 （60）
         /// </summary>
         public static int scrollPaneFrameRate = 60;
