@@ -1170,14 +1170,14 @@ namespace FairyGUI
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 				{
 					float pos = 0;
-					for (int i = 0; i < index; i += _curLineItemCount)
+					for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
 						pos += _virtualItems[i].size.y + _lineGap;
 					rect = new Rect(0, pos, _itemSize.x, ii.size.y);
 				}
 				else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
 				{
 					float pos = 0;
-					for (int i = 0; i < index; i += _curLineItemCount)
+					for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
 						pos += _virtualItems[i].size.x + _columnGap;
 					rect = new Rect(pos, 0, ii.size.x, _itemSize.y);
 				}
