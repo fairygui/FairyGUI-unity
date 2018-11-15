@@ -1936,8 +1936,8 @@ namespace FairyGUI
 			childCount = _children.Count;
 			for (int i = 0; i < childCount; i++)
 			{
-				GObject obj = _children[i];
-				if (obj != _virtualItems[newFirstIndex + i].obj)
+				GObject obj = _virtualItems[newFirstIndex + i].obj;
+				if (_children[i] != obj)
 					SetChildIndex(obj, i);
 			}
 
@@ -2110,8 +2110,8 @@ namespace FairyGUI
 			childCount = _children.Count;
 			for (int i = 0; i < childCount; i++)
 			{
-				GObject obj = _children[i];
-				if (obj != _virtualItems[newFirstIndex + i].obj)
+				GObject obj = _virtualItems[newFirstIndex + i].obj;
+				if (_children[i] != obj)
 					SetChildIndex(obj, i);
 			}
 
