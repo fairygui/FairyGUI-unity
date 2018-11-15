@@ -17,7 +17,8 @@ namespace FairyGUI
 		/// <param name="luaClass"></param>
 		public static void SetExtension(string url, System.Type baseType, LuaFunction extendFunction)
 		{
-			UIObjectFactory.SetPackageItemExtension(url, () => {
+			UIObjectFactory.SetPackageItemExtension(url, () =>
+			{
 				GComponent gcom = (GComponent)Activator.CreateInstance(baseType);
 				gcom.data = extendFunction;
 				return gcom;
@@ -27,20 +28,20 @@ namespace FairyGUI
 		[NoToLuaAttribute]
 		public static LuaTable ConnectLua(GComponent gcom)
 		{
-			LuaTable _peerTable = null;
+			LuaTable peerTable = null;
 			LuaFunction extendFunction = gcom.data as LuaFunction;
-			if (extendFunction!=null)
+			if (extendFunction != null)
 			{
 				gcom.data = null;
 
 				extendFunction.BeginPCall();
 				extendFunction.Push(gcom);
 				extendFunction.PCall();
-				_peerTable = extendFunction.CheckLuaTable();
+				peerTable = extendFunction.CheckLuaTable();
 				extendFunction.EndPCall();
 			}
 
-			return _peerTable;
+			return peerTable;
 		}
 	}
 
@@ -61,7 +62,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -82,7 +86,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -103,7 +110,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -124,7 +134,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -145,7 +158,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -166,7 +182,10 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 		}
 	}
 
@@ -194,17 +213,35 @@ namespace FairyGUI
 			base.Dispose();
 
 			if (_peerTable != null)
+			{
 				_peerTable.Dispose();
+				_peerTable = null;
+			}
 			if (_OnInit != null)
+			{
 				_OnInit.Dispose();
+				_OnInit = null;
+			}
 			if (_DoHideAnimation != null)
+			{
 				_DoHideAnimation.Dispose();
+				_DoHideAnimation = null;
+			}
 			if (_DoShowAnimation != null)
+			{
 				_DoShowAnimation.Dispose();
+				_DoShowAnimation = null;
+			}
 			if (_OnShown != null)
+			{
 				_OnShown.Dispose();
+				_OnShown = null;
+			}
 			if (_OnHide != null)
+			{
 				_OnHide.Dispose();
+				_OnHide = null;
+			}
 		}
 
 		protected override void OnInit()
