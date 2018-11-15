@@ -1795,8 +1795,8 @@ namespace FairyGUI
 			_firstIndex = newFirstIndex;
 			int curIndex = newFirstIndex;
 			bool forward = oldFirstIndex > newFirstIndex;
-			int oldCount = this.numChildren;
-			int lastIndex = oldFirstIndex + oldCount - 1;
+			int childCount = this.numChildren;
+			int lastIndex = oldFirstIndex + childCount - 1;
 			int reuseIndex = forward ? lastIndex : oldFirstIndex;
 			float curX = 0, curY = pos;
 			bool needRender;
@@ -1867,17 +1867,10 @@ namespace FairyGUI
 						}
 					}
 
-					if (ii.obj != null)
-					{
-						SetChildIndex(ii.obj, forward ? curIndex - newFirstIndex : numChildren);
-					}
-					else
+					if (ii.obj == null)
 					{
 						ii.obj = _pool.GetObject(url);
-						if (forward)
-							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
-						else
-							this.AddChild(ii.obj);
+						this.AddChild(ii.obj);
 					}
 					if (ii.obj is GButton)
 						((GButton)ii.obj).selected = ii.selected;
@@ -1921,7 +1914,7 @@ namespace FairyGUI
 				curIndex++;
 			}
 
-			for (int i = 0; i < oldCount; i++)
+			for (int i = 0; i < childCount; i++)
 			{
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
@@ -1931,6 +1924,12 @@ namespace FairyGUI
 					RemoveChildToPool(ii.obj);
 					ii.obj = null;
 				}
+			}
+
+			childCount = _children.Count;
+			for (int i = 0; i < childCount; i++)
+			{
+				_children[i] = _virtualItems[newFirstIndex + i].obj;
 			}
 
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
@@ -1962,8 +1961,8 @@ namespace FairyGUI
 			_firstIndex = newFirstIndex;
 			int curIndex = newFirstIndex;
 			bool forward = oldFirstIndex > newFirstIndex;
-			int oldCount = this.numChildren;
-			int lastIndex = oldFirstIndex + oldCount - 1;
+			int childCount = this.numChildren;
+			int lastIndex = oldFirstIndex + childCount - 1;
 			int reuseIndex = forward ? lastIndex : oldFirstIndex;
 			float curX = pos, curY = 0;
 			bool needRender;
@@ -2033,17 +2032,10 @@ namespace FairyGUI
 						}
 					}
 
-					if (ii.obj != null)
-					{
-						SetChildIndex(ii.obj, forward ? curIndex - newFirstIndex : numChildren);
-					}
-					else
+					if (ii.obj == null)
 					{
 						ii.obj = _pool.GetObject(url);
-						if (forward)
-							this.AddChildAt(ii.obj, curIndex - newFirstIndex);
-						else
-							this.AddChild(ii.obj);
+						this.AddChild(ii.obj);
 					}
 					if (ii.obj is GButton)
 						((GButton)ii.obj).selected = ii.selected;
@@ -2087,7 +2079,7 @@ namespace FairyGUI
 				curIndex++;
 			}
 
-			for (int i = 0; i < oldCount; i++)
+			for (int i = 0; i < childCount; i++)
 			{
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
@@ -2097,6 +2089,12 @@ namespace FairyGUI
 					RemoveChildToPool(ii.obj);
 					ii.obj = null;
 				}
+			}
+
+			childCount = _children.Count;
+			for (int i = 0; i < childCount; i++)
+			{
+				_children[i] = _virtualItems[newFirstIndex + i].obj;
 			}
 
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
