@@ -423,7 +423,7 @@ namespace FairyGUI
 		{
 			base.HandleAlphaChanged();
 
-			if (this.underConstruct)
+			if (this.underConstruct || parent == null)
 				return;
 
 			int cnt = parent.numChildren;
