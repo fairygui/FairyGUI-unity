@@ -123,6 +123,8 @@ namespace FairyGUI
 				else
 					_size = Mathf.FloorToInt((float)format.size * fontSizeScale);
 			}
+			if (_size == 0)
+				_size = 1;
 
 			if (format.bold && !customBold)
 			{
