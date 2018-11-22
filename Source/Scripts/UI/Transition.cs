@@ -1074,10 +1074,6 @@ namespace FairyGUI
 			item.tweener = null;
 			_totalTasks--;
 
-			if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size
-				|| item.type == TransitionActionType.Scale || item.type == TransitionActionType.Shake)
-				_owner.InvalidateBatchingState(true);
-
 			if (tweener.allCompleted) //当整体播放结束时间在这个tween的中间时不应该调用结尾钩子
 				CallHook(item, true);
 
