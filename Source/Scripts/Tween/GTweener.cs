@@ -79,6 +79,7 @@ namespace FairyGUI
 		int _ended;
 		float _elapsedTime;
 		float _normalizedTime;
+		int _smoothStart;
 
 		public GTweener()
 		{
@@ -417,6 +418,8 @@ namespace FairyGUI
 		public GTweener SetPaused(bool paused)
 		{
 			_paused = paused;
+			if (_paused)
+				_smoothStart = 0;
 			return this;
 		}
 
@@ -552,6 +555,7 @@ namespace FairyGUI
 			_elapsedTime = 0;
 			_normalizedTime = 0;
 			_ended = 0;
+			_smoothStart = Time.frameCount == 1 ? 3 : 1;//刚启动时会有多帧的超时
 		}
 
 		internal void _Reset()
@@ -573,7 +577,14 @@ namespace FairyGUI
 			}
 
 			float dt;
-			if (_ignoreEngineTimeScale)
+			if (_smoothStart > 0)
+			{
+				_smoothStart--;
+				dt = Mathf.Clamp(Time.unscaledDeltaTime, 0, Application.targetFrameRate > 0 ? (1.0f / Application.targetFrameRate) : 0.016f);
+				if (!_ignoreEngineTimeScale)
+					dt *= Time.timeScale;
+			}
+			else if (_ignoreEngineTimeScale)
 				dt = Time.unscaledDeltaTime;
 			else
 				dt = Time.deltaTime;
