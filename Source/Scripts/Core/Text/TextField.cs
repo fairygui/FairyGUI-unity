@@ -1078,6 +1078,7 @@ namespace FairyGUI
 
 #if RTL_TEXT_SUPPORT
                 string strLine = "";
+                int charCount = line.charCount;
                 if (_textDirection != RTLSupport.DirectionType.UNKNOW)
                 {
                     strLine = _parsedText.Substring(line.charIndex, line.charCount);
@@ -1085,8 +1086,9 @@ namespace FairyGUI
                         strLine = RTLSupport.ConvertLineR(strLine);
                     else
                         strLine = RTLSupport.ConvertLineL(strLine);
+                    charCount = strLine.Length;
                 }
-                for (int j = 0; j < line.charCount; j++)
+                for (int j = 0; j < charCount; j++)
                 {
                     int charIndex = line.charIndex + j;
                     char ch = _textDirection != RTLSupport.DirectionType.UNKNOW ? strLine[j] : _parsedText[charIndex];
