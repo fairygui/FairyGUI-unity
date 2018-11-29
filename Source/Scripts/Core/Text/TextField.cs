@@ -18,9 +18,11 @@ namespace FairyGUI
 		bool _wordWrap;
 		bool _singleLine;
 		bool _html;
-		bool _rtl;
+#if RTL_TEXT_SUPPORT
+        RTLSupport.DirectionType _textDirection = RTLSupport.DirectionType.UNKNOW;
+#endif
 
-		int _stroke;
+        int _stroke;
 		Color _strokeColor;
 		Vector2 _shadowOffset;
 
@@ -631,7 +633,7 @@ namespace FairyGUI
 					}
 					else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '.'
 #if RTL_TEXT_SUPPORT
-						|| (_rtl && RTLSupport.IsArabicLetter(ch))
+						|| (_textDirection != RTLSupport.DirectionType.UNKNOW && RTLSupport.IsArabicLetter(ch))
 #endif
 					))
 					{
@@ -787,7 +789,7 @@ namespace FairyGUI
 		void ParseText()
 		{
 #if RTL_TEXT_SUPPORT
-			_rtl = RTLSupport.ContainsArabicLetters(_text);
+			_textDirection = RTLSupport.DetectTextDirection(_text);
 #endif
 			if (_html)
 			{
@@ -803,8 +805,8 @@ namespace FairyGUI
 			if (elementCount == 0)
 			{
 #if RTL_TEXT_SUPPORT
-				if (_rtl)
-					_parsedText = RTLSupport.Convert(_parsedText);
+				if (_textDirection != RTLSupport.DirectionType.UNKNOW)
+					_parsedText = RTLSupport.DoMapping(_parsedText);
 #endif
 
 				bool flag = _input || _richTextField != null && _richTextField.emojies != null;
@@ -842,8 +844,8 @@ namespace FairyGUI
 					if (element.type == HtmlElementType.Text)
 					{
 #if RTL_TEXT_SUPPORT
-						if (_rtl)
-							element.text = RTLSupport.Convert(element.text);
+						if (_textDirection != RTLSupport.DirectionType.UNKNOW)
+							element.text = RTLSupport.DoMapping(element.text);
 #endif
 						i = ParseText(buffer, element.text, i);
 						elementCount = _elements.Count;
@@ -989,7 +991,7 @@ namespace FairyGUI
 			Color32[] gradientColor = format.gradientColor;
 			bool boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
 #if RTL_TEXT_SUPPORT
-            if (!_rtl && _input)
+            if (_textDirection == RTLSupport.DirectionType.UNKNOW && _input)
                 letterSpacing++;
 #else
             if (_input)
@@ -1044,7 +1046,7 @@ namespace FairyGUI
 				else
 					lineAlign = format.align;
 #if RTL_TEXT_SUPPORT
-				if (_rtl)
+				if (_textDirection == RTLSupport.DirectionType.RTL)
 				{
 					if (lineAlign == AlignType.Center)
 						xIndent = (int)((rectWidth + line.width) / 2);
@@ -1074,12 +1076,27 @@ namespace FairyGUI
 					charX = GUTTER_X + xIndent;
 				}
 
-				for (int j = 0; j < line.charCount; j++)
+#if RTL_TEXT_SUPPORT
+                string strLine = "";
+                if (_textDirection != RTLSupport.DirectionType.UNKNOW)
+                {
+                    strLine = _parsedText.Substring(line.charIndex, line.charCount);
+                    if (_textDirection == RTLSupport.DirectionType.RTL)
+                        strLine = RTLSupport.ConvertLineR(strLine);
+                    else
+                        strLine = RTLSupport.ConvertLineL(strLine);
+                }
+                for (int j = 0; j < line.charCount; j++)
+                {
+                    int charIndex = line.charIndex + j;
+                    char ch = _textDirection != RTLSupport.DirectionType.UNKNOW ? strLine[j] : _parsedText[charIndex];
+#else
+                for (int j = 0; j < line.charCount; j++)
 				{
 					int charIndex = line.charIndex + j;
 					char ch = _parsedText[charIndex];
-
-					while (element != null && charIndex == element.charIndex)
+#endif
+                    while (element != null && charIndex == element.charIndex)
 					{
 						if (element.type == HtmlElementType.Text)
 						{
@@ -1113,8 +1130,10 @@ namespace FairyGUI
 							IHtmlObject htmlObj = element.htmlObject;
 							if (htmlObj != null)
 							{
-								if (_rtl)
-									charX -= htmlObj.width - 2;
+                                if (_textDirection == RTLSupport.DirectionType.RTL)
+                                {
+                                    charX -= htmlObj.width - 2;
+                                }
 
 								if (_charPositions != null)
 								{
@@ -1132,10 +1151,12 @@ namespace FairyGUI
 								else
 									element.status &= 254;
 
-								if (_rtl)
-									charX -= letterSpacing;
-								else
-									charX += htmlObj.width + letterSpacing + 2;
+                                if (_textDirection == RTLSupport.DirectionType.RTL)
+                                {
+                                    charX -= letterSpacing;
+                                }
+                                else
+                                    charX += htmlObj.width + letterSpacing + 2;
 							}
 						}
 
@@ -1155,8 +1176,8 @@ namespace FairyGUI
 					if (_font.GetGlyph(ch, glyph))
 					{
 #if RTL_TEXT_SUPPORT
-						if (_rtl)
-						{
+                        if (_textDirection == RTLSupport.DirectionType.RTL)
+                        {
 							if (lineClipped || clipped && charX != (xIndent - GUTTER_X) && charX < GUTTER_X - 0.5f) //超出区域，剪裁
 							{
 								charX -= (letterSpacing + glyph.width);
@@ -1328,8 +1349,8 @@ namespace FairyGUI
 							_charPositions.Add(cp);
 						}
 #if RTL_TEXT_SUPPORT
-						if (_rtl)
-						{
+                        if (_textDirection == RTLSupport.DirectionType.RTL)
+                        {
 							charX -= letterSpacing;
 						}
 						else
@@ -1352,14 +1373,14 @@ namespace FairyGUI
 						}
 
 #if RTL_TEXT_SUPPORT
-						if (_rtl)
-						{
+                        if (_textDirection == RTLSupport.DirectionType.RTL)
+                        {
 							charX -= letterSpacing;
 						}
-#endif
 						else
-						{
-							charX += letterSpacing;
+#endif
+                        {
+                            charX += letterSpacing;
 						}
 					}
 				}//text loop
@@ -1481,8 +1502,10 @@ namespace FairyGUI
 			_textWidth = 0;
 			_textHeight = 0;
 			_parsedText = string.Empty;
-			_rtl = false;
-			if (_charPositions != null)
+#if RTL_TEXT_SUPPORT
+            _textDirection = RTLSupport.DirectionType.UNKNOW;
+#endif
+            if (_charPositions != null)
 				_charPositions.Clear();
 		}
 
