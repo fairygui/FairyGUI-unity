@@ -90,6 +90,7 @@ namespace FairyGUI
 		Vector2 _itemSize;
 		int _virtualListChanged; //1-content changed, 2-size changed
 		bool _eventLocked;
+		bool _touchableTemp;
 		uint itemInfoVer; //用来标志item是否在本次处理中已经被重用了
 
 		class ItemInfo
