@@ -1526,7 +1526,7 @@ namespace FairyGUI
 				pt.x += _width * _pivotX;
 				pt.y += _height * _pivotY;
 			}
-			return this.displayObject.TransformPoint(pt, targetSpace.displayObject);
+			return this.displayObject.TransformPoint(pt, targetSpace != null ? targetSpace.displayObject : Stage.inst);
 		}
 
 		/// <summary>
@@ -1542,7 +1542,7 @@ namespace FairyGUI
 				rect.x += _width * _pivotX;
 				rect.y += _height * _pivotY;
 			}
-			return this.displayObject.TransformRect(rect, targetSpace.displayObject);
+			return this.displayObject.TransformRect(rect, targetSpace != null ? targetSpace.displayObject : Stage.inst);
 		}
 
 		/// <summary>

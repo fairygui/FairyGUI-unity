@@ -450,9 +450,9 @@ namespace FairyGUI
 			if (child.sortingOrder != 0) //no effect
 				return;
 
-			int cnt = _children.Count;
 			if (_sortingChildCount > 0)
 			{
+				int cnt = _children.Count;
 				if (index > (cnt - _sortingChildCount - 1))
 					index = cnt - _sortingChildCount - 1;
 			}

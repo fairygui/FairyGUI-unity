@@ -211,6 +211,12 @@ namespace FairyGUI
                 GameObject.DontDestroyOnLoad(gameObject);
 			gameObject.hideFlags = DisplayOptions.hideFlags;
 			gameObject.SetActive(false);
+
+#if FAIRYGUI_TEST
+			DisplayObjectInfo info = gameObject.AddComponent<DisplayObjectInfo>();
+			info.displayObject = this;
+#endif
+
 			_ownsGameObject = true;
 		}
 
@@ -1515,5 +1521,17 @@ namespace FairyGUI
 			DestroyGameObject();
             home = null;
 		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public class DisplayObjectInfo : MonoBehaviour
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		[System.NonSerialized]
+		public DisplayObject displayObject;
 	}
 }

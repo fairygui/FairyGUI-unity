@@ -87,6 +87,8 @@ namespace FairyGUI
 
 			if (bf.pma)
 				mat.SetFloat(ShaderConfig._properyIDs._ColorOption, 1);
+			else
+				mat.SetFloat(ShaderConfig._properyIDs._ColorOption, 0);
 		}
 
 		/// <summary>

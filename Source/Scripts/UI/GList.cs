@@ -90,7 +90,7 @@ namespace FairyGUI
 		Vector2 _itemSize;
 		int _virtualListChanged; //1-content changed, 2-size changed
 		bool _eventLocked;
-        bool _touchableTemp;
+		uint itemInfoVer; //用来标志item是否在本次处理中已经被重用了
 
 		class ItemInfo
 		{
@@ -1207,14 +1207,14 @@ namespace FairyGUI
 				if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 				{
 					float pos = 0;
-					for (int i = 0; i < index; i += _curLineItemCount)
+					for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
 						pos += _virtualItems[i].size.y + _lineGap;
 					rect = new Rect(0, pos, _itemSize.x, ii.size.y);
 				}
 				else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
 				{
 					float pos = 0;
-					for (int i = 0; i < index; i += _curLineItemCount)
+					for (int i = _curLineItemCount - 1; i < index; i += _curLineItemCount)
 						pos += _virtualItems[i].size.x + _columnGap;
 					rect = new Rect(pos, 0, ii.size.x, _itemSize.y);
 				}
@@ -1793,12 +1793,35 @@ namespace FairyGUI
 
 			if (_layout == ListLayoutType.SingleColumn || _layout == ListLayoutType.FlowHorizontal)
 			{
-				HandleScroll1(forceUpdate);
+				int enterCounter = 0;
+				while (HandleScroll1(forceUpdate))
+				{
+					//可能会因为ITEM资源改变导致ITEM大小发生改变，所有出现最后一页填不满的情况，这时要反复尝试填满。
+					enterCounter++;
+					forceUpdate = false;
+					if (enterCounter > 20)
+					{
+						Debug.Log("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
+						break;
+					}
+				}
+
 				HandleArchOrder1();
 			}
 			else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
 			{
-				HandleScroll2(forceUpdate);
+				int enterCounter = 0;
+				while (HandleScroll2(forceUpdate))
+				{
+					enterCounter++;
+					forceUpdate = false;
+					if (enterCounter > 20)
+					{
+						Debug.Log("FairyGUI: list will never be filled as the item renderer function always returns a different size.");
+						break;
+					}
+				}
+
 				HandleArchOrder2();
 			}
 			else
@@ -1809,25 +1832,8 @@ namespace FairyGUI
 			_boundsChanged = false;
 		}
 
-		static uint itemInfoVer = 0; //用来标志item是否在本次处理中已经被重用了
-		static uint enterCounter = 0; //因为HandleScroll是会重入的，这个用来避免极端情况下的死锁
-
-        [LuaInterface.NoToLua]
-        public static void ClearGLlistStatic()
-        {
-            itemInfoVer = 0;
-            enterCounter = 0;
-        }
-
-        void HandleScroll1(bool forceUpdate)
+		bool HandleScroll1(bool forceUpdate)
 		{
-			enterCounter++;
-			if (enterCounter > 3)
-			{
-				enterCounter--;
-				return;
-			}
-
 			float pos = scrollPane.scrollingPosY;
 			float max = pos + scrollPane.viewHeight;
 			bool end = max == scrollPane.contentHeight;//这个标志表示当前需要滚动到最末，无论内容变化大小
@@ -1835,17 +1841,14 @@ namespace FairyGUI
 			//寻找当前位置的第一条项目
 			int newFirstIndex = GetIndexOnPos1(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
-			{
-				enterCounter--;
-				return;
-			}
+				return false;
 
 			int oldFirstIndex = _firstIndex;
 			_firstIndex = newFirstIndex;
 			int curIndex = newFirstIndex;
 			bool forward = oldFirstIndex > newFirstIndex;
-			int oldCount = this.numChildren;
-			int lastIndex = oldFirstIndex + oldCount - 1;
+			int childCount = this.numChildren;
+			int lastIndex = oldFirstIndex + childCount - 1;
 			int reuseIndex = forward ? lastIndex : oldFirstIndex;
 			float curX = 0, curY = pos;
 			bool needRender;
@@ -1971,7 +1974,7 @@ namespace FairyGUI
 				curIndex++;
 			}
 
-			for (int i = 0; i < oldCount; i++)
+			for (int i = 0; i < childCount; i++)
 			{
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
@@ -1983,21 +1986,25 @@ namespace FairyGUI
 				}
 			}
 
+			childCount = _children.Count;
+			for (int i = 0; i < childCount; i++)
+			{
+				GObject obj = _virtualItems[newFirstIndex + i].obj;
+				if (_children[i] != obj)
+					SetChildIndex(obj, i);
+			}
+
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
 				this.scrollPane.ChangeContentSizeOnScrolling(0, deltaSize, 0, firstItemDeltaSize);
 
 			if (curIndex > 0 && this.numChildren > 0 && this.container.y < 0 && GetChildAt(0).y > -this.container.y)//最后一页没填满！
-				HandleScroll1(false);
-
-			enterCounter--;
+				return true;
+			else
+				return false;
 		}
 
-		void HandleScroll2(bool forceUpdate)
+		bool HandleScroll2(bool forceUpdate)
 		{
-			enterCounter++;
-			if (enterCounter > 3)
-				return;
-
 			float pos = scrollPane.scrollingPosX;
 			float max = pos + scrollPane.viewWidth;
 			bool end = pos == scrollPane.contentWidth;//这个标志表示当前需要滚动到最末，无论内容变化大小
@@ -2005,17 +2012,14 @@ namespace FairyGUI
 			//寻找当前位置的第一条项目
 			int newFirstIndex = GetIndexOnPos2(ref pos, forceUpdate);
 			if (newFirstIndex == _firstIndex && !forceUpdate)
-			{
-				enterCounter--;
-				return;
-			}
+				return false;
 
 			int oldFirstIndex = _firstIndex;
 			_firstIndex = newFirstIndex;
 			int curIndex = newFirstIndex;
 			bool forward = oldFirstIndex > newFirstIndex;
-			int oldCount = this.numChildren;
-			int lastIndex = oldFirstIndex + oldCount - 1;
+			int childCount = this.numChildren;
+			int lastIndex = oldFirstIndex + childCount - 1;
 			int reuseIndex = forward ? lastIndex : oldFirstIndex;
 			float curX = pos, curY = 0;
 			bool needRender;
@@ -2140,7 +2144,7 @@ namespace FairyGUI
 				curIndex++;
 			}
 
-			for (int i = 0; i < oldCount; i++)
+			for (int i = 0; i < childCount; i++)
 			{
 				ItemInfo ii = _virtualItems[oldFirstIndex + i];
 				if (ii.updateFlag != itemInfoVer && ii.obj != null)
@@ -2152,13 +2156,21 @@ namespace FairyGUI
 				}
 			}
 
+			childCount = _children.Count;
+			for (int i = 0; i < childCount; i++)
+			{
+				GObject obj = _virtualItems[newFirstIndex + i].obj;
+				if (_children[i] != obj)
+					SetChildIndex(obj, i);
+			}
+
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
 				this.scrollPane.ChangeContentSizeOnScrolling(deltaSize, 0, firstItemDeltaSize, 0);
 
 			if (curIndex > 0 && this.numChildren > 0 && this.container.x < 0 && GetChildAt(0).x > -this.container.x)//最后一页没填满！
-				HandleScroll2(false);
-
-			enterCounter--;
+				return true;
+			else
+				return false;
 		}
 
 		void HandleScroll3(bool forceUpdate)
