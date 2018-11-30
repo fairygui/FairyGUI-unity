@@ -7,7 +7,7 @@ namespace FairyGUI
 	/// <summary>
 	/// GProgressBar class.
 	/// </summary>
-	public class GProgressBar : GComponent
+	public class GProgressBar : GComponent 
 	{
 		double _max;
 		double _value;
