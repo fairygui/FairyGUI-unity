@@ -1,4 +1,4 @@
-/********************************************************************
+﻿/********************************************************************
 				Copyright (c) 2018, Tadpole Studio
 					All rights reserved
  
@@ -17,23 +17,35 @@ using System.Text;
 
 namespace FairyGUI
 {
-    internal enum CharState
-    {
-        init,
-        middle,
-        final,
-        isolated,
-        number
-    }
-
     public class RTLSupport
     {
-        private static Dictionary<int, char> final;
-        private static Dictionary<int, char> init;
+        internal enum CharState
+        {
+            isolated,
+            final,
+            lead,
+            middle,
+        }
+
+        // Bidirectional Character Types
+        public enum DirectionType
+        {
+            UNKNOW = 0,
+            LTR,
+            RTL,
+            NEUTRAL,
+        }
+
+        public static DirectionType BaseDirection = DirectionType.RTL;    // 主体语言是否是RTL的语言
         private static bool isCharsInitialized = false;
-        private static Dictionary<int, char> isolate;
-        private static Dictionary<int, char> middle;
-        private static Dictionary<int, char> numbers;
+        private static Dictionary<int, char[]> mapping = new Dictionary<int, char[]>();
+
+        private static List<char> listFinal = new List<char>();
+        private static List<string> listRep = new List<string>();
+        private static StringBuilder sbRep = new StringBuilder();
+        private static StringBuilder sbN = new StringBuilder();
+        private static StringBuilder sbFinal = new StringBuilder();
+        private static StringBuilder sbReverse = new StringBuilder();
 
         public static bool IsArabicLetter(char ch)
         {
@@ -49,16 +61,12 @@ namespace FairyGUI
             if (ch >= 0xfe70 && ch <= 0xfefc)
                 return true;
 
-            // ﷲ 添加真主字符 [2018/3/13 19:03:35 --By aq_1000]
-//             if (ch == 0xfdf2)
-//                 return true;
-
             return false;
         }
 
         public static bool ContainsArabicLetters(string text)
         {
-            foreach (char character in text.ToCharArray())
+            foreach (char character in text)
             {
                 if (character >= 0x600 && character <= 0x6ff)
                     return true;
@@ -71,35 +79,77 @@ namespace FairyGUI
 
                 if (character >= 0xfe70 && character <= 0xfefc)
                     return true;
-
-                // ﷲ 添加真主字符 [2018/3/13 19:03:35 --By aq_1000]
-//                 if (character == 0xfdf2)
-//                     return true;
             }
             return false;
         }
 
+        // 检测文本主方向
+        public static DirectionType DetectTextDirection(string text)
+        {
+            bool isContainRTL = false;
+            bool isContainLTR = false;
+            foreach (char ch in text)
+            {
+                if (IsArabicLetter(ch))
+                {
+                    isContainRTL = true;
+                    if (isContainLTR)
+                        break;
+                }
+                else if (char.IsLetter(ch))
+                {
+                    isContainLTR = true;
+                    if (isContainRTL)
+                        break;
+                }
+            }
+            if (!isContainRTL)
+                return DirectionType.UNKNOW;    // 这边unknow暂时代表文本一个RTL字符都没有，无需进行RTL转换
+            else if (!isContainLTR)
+                return DirectionType.RTL;
+            return BaseDirection;
+        }
+
         private static bool CheckSeparator(char input)
         {
-            if ((((input != ' ') && (input != '!')) && ((input != '.') && (input != '،'))) && ((input != '?') && (input != '؟')))
+            if (!IsArabicLetter(input))
             {
-                return false;
+                return true;   
             }
-            return true;
+            else
+            {
+                return (input == '،') || (input == '?') || (input == '؟');
+            }
+
+//             if ((input != ' ') && (input != '\t') && (input != '!') && (input != '.') && 
+//                 (input != '،') && (input != '?') && (input != '؟') && 
+//                 !_IsBracket(input) &&   // 括号也算 [2018/8/1/ 15:12:20 by aq_1000]
+//                 !_IsNeutrality(input))
+//             {
+//                 return false;
+//             }
+//             return true;
         }
 
         private static bool CheckSpecific(char input)
         {
             int num = input;
-            if ((((num != 0x622) && (num != 0x623)) && ((num != 0x627) && (num != 0x62f)) && (num != 0x625)) && 
-                (((num != 0x630) && (num != 0x631)) && (((num != 0x632) && (num != 0x698)) && (num != 0x648))))
+            if ((num != 0x622) && (num != 0x623) && (num != 0x627) && (num != 0x62f) && (num != 0x625) && 
+                (num != 0x630) && (num != 0x631) && (num != 0x632) && (num != 0x698) && (num != 0x648) &&
+                !_CheckSoundmark(input))
             {
                 return false;
             }
             return true;
         }
 
-        public static string Convert(string input)
+        private static bool _CheckSoundmark(char ch)
+        {
+            int un = ch;
+            return (un >= 0x610 && un <= 0x61e) || (un >= 0x64b && un <= 0x65f);
+        }
+
+        public static string DoMapping(string input)
         {
             if (!isCharsInitialized)
             {
@@ -107,169 +157,320 @@ namespace FairyGUI
                 InitChars();
             }
 
-            // 伊斯兰教真主安拉在阿拉伯文里写作الله， ّ (shadda) 上面有一个短线，这是小艾里夫（短剑艾里夫）的一个特殊形式。
+            // 伊斯兰教真主安拉在阿拉伯文里写作الله
             // 键盘输入时输入 ل (lam) + ل (lam) + ه (ha) 后会自动转换成带记号的符号。 [2018/3/13 20:03:45 --By aq_1000]
-            if (input.Contains("الله"))
+            if (input == "الله")
             {
-                input = input.Replace("الله", "ﷲ");
+                input = "ﷲ";
             }
 
-            char[] chArray = input.ToCharArray();
-            char[] chArray2 = new char[chArray.Length];
-            for (int i = 0; i < chArray.Length; i++)
+            sbFinal.Length = 0;
+            sbFinal.Append(input);
+            char perChar = '\0';
+            for (int i = 0; i < sbFinal.Length; i++)
             {
-                if (IsNumericChar(chArray[i]))
+                if (!mapping.ContainsKey(sbFinal[i]))
                 {
-                    chArray2[i] = ReplaceChar(chArray[i], CharState.number);
+                    perChar = sbFinal[i];
+                    continue;
                 }
-                else if ((i + 1) == chArray.Length)
+
+                if ((i + 1) == sbFinal.Length)
                 {
-                    if (chArray.Length == 1)
+                    if (sbFinal.Length == 1)
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
-                    else if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    else if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.final);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.final];
                     }
                 }
                 else if (i == 0)
                 {
-                    if (!CheckSeparator(chArray[i + 1]))
+                    if (!CheckSeparator(sbFinal[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.lead];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
                 }
-                else if (CheckSeparator(chArray[i + 1]))
+                else if (CheckSeparator(sbFinal[i + 1]))
                 {
-                    if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.final);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.final];
                     }
                 }
-                else if (CheckSeparator(chArray[i - 1]))
+                else if (CheckSeparator(perChar))
                 {
-                    if (CheckSeparator(chArray[i + 1]))
+                    if (CheckSeparator(sbFinal[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.lead];
                     }
                 }
-                else if (CheckSpecific(chArray[i + 1]))
+                else if (CheckSpecific(sbFinal[i + 1]))
                 {
-                    if (CheckSeparator(chArray[i - 1]) || CheckSpecific(chArray[i - 1]))
+                    if (CheckSeparator(perChar) || CheckSpecific(perChar))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.lead];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.middle);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.middle];
                     }
                 }
-                else if (CheckSpecific(chArray[i - 1]))
+                else if (CheckSpecific(perChar))
                 {
-                    if (CheckSeparator(chArray[i + 1]))
+                    if (CheckSeparator(sbFinal[i + 1]))
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.isolated);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.isolated];
                     }
                     else
                     {
-                        chArray2[i] = ReplaceChar(chArray[i], CharState.init);
+                        perChar = sbFinal[i];
+                        sbFinal[i] = mapping[sbFinal[i]][(int)CharState.lead];
                     }
                 }
                 else
                 {
-                    chArray2[i] = ReplaceChar(chArray[i], CharState.middle);
+                    perChar = sbFinal[i];
+                    sbFinal[i] = mapping[sbFinal[i]][(int)CharState.middle];
                 }
             }
-            List<char> listR = new List<char>();
-            List<string> listL = new List<string>();
-            string str = "";
+            return sbFinal.ToString();
+        }
+
+        // 主体语言是LTR
+        public static string ConvertLineL(string source)
+        {
+            listFinal.Clear();
+            listRep.Clear();
+            sbRep.Length = 0;
+            sbN.Length = 0;
             int iReplace = 0;
-            bool bPre = true;   // Pre is RTL
-            for (int j = 0; j < chArray2.Length; j++)
+            DirectionType ePre = DirectionType.UNKNOW;
+            char nextChar = '\0';
+            for (int j = 0; j < source.Length; j++)
             {
-                char item = chArray2[(chArray2.Length - j) - 1];
-                bool bIsRTLChar = _IsRTLChar(item, bPre);
-                bPre = bIsRTLChar;
-                if (!bIsRTLChar)
+                if (j < source.Length - 1)
+                    nextChar = source[j + 1];
+                else
+                    nextChar = '\0';
+                char item = source[j];
+                DirectionType eCType = _GetDirection(item, ePre, nextChar);
+                if (eCType == DirectionType.RTL)
                 {
-                    if (string.IsNullOrEmpty(str))
+                    if (sbRep.Length == 0)
                     {
-                        listR.Add('\x00bf');
+                        listFinal.Add('\x00bf');
                         iReplace++;
                     }
-                    str = str + item.ToString();
+
+                    if (sbN.Length > 0)
+                        sbRep.Append(sbN.ToString());
+                    sbN.Length = 0;
+                    sbRep.Append(item);
+                }
+                else if (eCType == DirectionType.LTR)
+                {
+                    if (sbRep.Length > 0)
+                    {
+                        listRep.Add(sbRep.ToString());
+                    }
+                    sbRep.Length = 0;
+
+                    if (sbN.Length > 0)
+                    {
+                        for (int n = 0; n < sbN.Length; ++n)
+                        {
+                            listFinal.Add(sbN[n]);
+                        }
+                    }
+                    sbN.Length = 0;
+
+                    item = _ProcessBracket(item);
+                    listFinal.Add(item);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(str))
-                    {
-                        listL.Add(str);
-                    }
-                    str = "";
-		            item = _ProcessBracket(item);
-                    listR.Add(item);
+                    sbN.Append(item);
                 }
+                ePre = eCType;
             }
-            if (!string.IsNullOrEmpty(str))
+            if (sbRep.Length > 0)
             {
-                listL.Add(str);
+                listRep.Add(sbRep.ToString());
             }
 
-            string strFinal = new string(listR.ToArray());
+            sbRep.Length = 0;
+            sbN.Length = 0;
+            sbFinal.Length = 0;
+            sbFinal.Append(listFinal.ToArray());
             for (int m = 0; m < iReplace; m++)
             {
-                for (int n = 0; n < strFinal.Length; n++)
+                for (int n = 0; n < sbFinal.Length; n++)
                 {
-                    if (strFinal[n] == '\x00bf')
+                    if (sbFinal[n] == '\x00bf')
                     {
-                        char[] array4 = listL[0].ToCharArray();
-                        Array.Reverse(array4);
-                        string str4 = new string(array4);
-                        listL.RemoveAt(0);
+                        sbRep.Length = 0;
+                        sbRep.Append(_Reverse(listRep[0]));
+                        listRep.RemoveAt(0);
 
                         // 字符串反向的时候造成末尾空格跑到词首 [2018/4/11 20:04:35 --By aq_1000]
-                        string strSpace = "";
-                        for (int num4 = 0; num4 < str4.Length; num4++)
+                        sbN.Length = 0;
+                        for (int num4 = 0; num4 < sbRep.Length; num4++)
                         {
-                            if (!_IsNeutrality(str4[num4])) 
+                            if (!_IsNeutrality(sbRep[num4]))
                                 break;
-                            strSpace += str4[num4];
+                            sbN.Append(sbRep[num4]);
                         }
-                        if (strSpace.Length > 0)    // 词首空格重新放到词尾
+                        if (sbN.Length > 0)    // 词首空格重新放到词尾
                         {
-                            str4 = str4.Remove(0, strSpace.Length);
-                            str4 += strSpace;
+                            sbRep.Remove(0, sbN.Length);
+                            for (int iSpace = sbN.Length - 1; iSpace >= 0; --iSpace)   // 空格也要取反
+                            {
+                                sbRep.Append(sbN[iSpace]);
+                            }
                         }
 
-                        strFinal = strFinal.Remove(n, 1).Insert(n, str4);
+                        sbFinal.Replace(sbFinal[n].ToString(), sbRep.ToString(), n, 1);
                         break;
                     }
                 }
             }
-
-			return Reverse(strFinal);
+            return sbFinal.ToString();
         }
 
-		private static string Reverse(string source)
+        // 主体语言是RTL，整个文本就从右往左读，LTR语言就作为嵌入语段处理
+        public static string ConvertLineR(string source)
+        {
+            listFinal.Clear();
+            listRep.Clear();
+            sbRep.Length = 0;
+            sbN.Length = 0;
+            int iReplace = 0;
+            DirectionType ePre = DirectionType.UNKNOW;
+            char nextChar = '\0';
+            for (int j = 0; j < source.Length; j++)
+            {
+                if (j < source.Length - 1)
+                    nextChar = source[j + 1];
+                else
+                    nextChar = '\0';
+                char item = source[j];
+                DirectionType eCType = _GetDirection(item, ePre, nextChar);
+                if (eCType == DirectionType.LTR)
+                {
+                    if (sbRep.Length == 0)
+                    {
+                        listFinal.Add('\x00bf');
+                        iReplace++;
+                    }
+
+                    if (sbN.Length > 0)
+                        sbRep.Append(sbN.ToString());
+                    sbN.Length = 0;
+                    sbRep.Append(item);
+                }
+                else if (eCType == DirectionType.RTL)
+                {
+                    if (sbRep.Length > 0)
+                    {
+                        listRep.Add(sbRep.ToString());
+                    }
+                    sbRep.Length = 0;
+
+                    if (sbN.Length > 0)
+                    {
+                        for (int n = 0; n < sbN.Length; ++n)
+                        {
+                            listFinal.Add(sbN[n]);
+                        }
+                    }
+                    sbN.Length = 0;
+
+                    item = _ProcessBracket(item);
+                    listFinal.Add(item);
+                }
+                else
+                {
+                    sbN.Append(item);
+                }
+                ePre = eCType;
+            }
+            if (sbRep.Length > 0)
+            {
+                listRep.Add(sbRep.ToString());
+            }
+
+            sbFinal.Length = 0;
+            sbFinal.Append(listFinal.ToArray());
+            for (int m = 0; m < iReplace; m++)
+            {
+                for (int n = 0; n < sbFinal.Length; n++)
+                {
+                    if (sbFinal[n] == '\x00bf')
+                    {
+                        sbRep.Length = 0;
+                        sbRep.Append(_Reverse(listRep[0]));
+                        listRep.RemoveAt(0);
+
+                        // 字符串反向的时候造成末尾空格跑到词首 [2018/4/11 20:04:35 --By aq_1000]
+                        sbN.Length = 0;
+                        for (int num4 = 0; num4 < sbRep.Length; num4++)
+                        {
+                            if (!_IsNeutrality(sbRep[num4]))
+                                break;
+                            sbN.Append(sbRep[num4]);
+                        }
+                        if (sbN.Length > 0)    // 词首空格重新放到词尾
+                        {
+                            sbRep.Remove(0, sbN.Length);
+                            for (int iSpace = sbN.Length - 1; iSpace >= 0; --iSpace)   // 空格也要取反
+                            {
+                                sbRep.Append(sbN[iSpace]);
+                            }
+                        }
+
+                        sbFinal.Replace(sbFinal[n].ToString(), sbRep.ToString(), n, 1);
+                        break;
+                    }
+                }
+            }
+            return sbFinal.ToString();
+        }
+
+
+        private static string _Reverse(string source)
 		{
-			StringBuilder buffer = new StringBuilder();
+			sbReverse.Length = 0;
 			int len = source.Length;
 			int i = len - 1;
 			while (i >= 0)
@@ -283,292 +484,113 @@ namespace FairyGUI
 
 				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
 				{
-					buffer.Append(source[i - 1]);
-					buffer.Append(ch);
+					sbReverse.Append(source[i - 1]);
+					sbReverse.Append(ch);
 					i--;
 				}
 				else
-					buffer.Append(ch);
+					sbReverse.Append(ch);
 				i--;
 			}
 
-			return buffer.ToString();
+			return sbReverse.ToString();
 		}
 
         private static void InitChars()
         {
-            numbers = new Dictionary<int, char>();
-            init = new Dictionary<int, char>();
-            final = new Dictionary<int, char>();
-            middle = new Dictionary<int, char>();
-            isolate = new Dictionary<int, char>();
-            numbers.Add(0x660, '٠');
-            numbers.Add(0x661, '١');
-            numbers.Add(0x662, '٢');
-            numbers.Add(0x663, '٣');
-            numbers.Add(0x664, '٤');
-            numbers.Add(0x665, '٥');
-            numbers.Add(0x666, '٦');
-            numbers.Add(0x667, '٧');
-            numbers.Add(0x668, '٨');
-            numbers.Add(0x669, '٩');
-//             numbers.Add(0x30, '٠');
-//             numbers.Add(0x31, '١');
-//             numbers.Add(50, '٢');
-//             numbers.Add(0x33, '٣');
-//             numbers.Add(0x34, '٤');
-//             numbers.Add(0x35, '٥');
-//             numbers.Add(0x36, '٦');
-//             numbers.Add(0x37, '٧');
-//             numbers.Add(0x38, '٨');
-//             numbers.Add(0x39, '٩');
-            init.Add(0x622, (char)0xfe81);
-            init.Add(0x627, (char)0xfe8d);
-            init.Add(0x628, (char)0xfe91);
-            init.Add(0x67e, (char)0xfb58);
-            init.Add(0x62a, (char)0xfe97);
-            init.Add(0x62b, (char)0xfe9b);
-            init.Add(0x62c, (char)0xfe9f);
-            init.Add(0x686, (char)0xfb7c);
-            init.Add(0x62d, (char)0xfea3);
-            init.Add(0x62e, (char)0xfea7);
-            init.Add(0x62f, (char)0xfea9);
-            init.Add(0x630, (char)0xfeab);
-            init.Add(0x631, (char)0xfead);
-            init.Add(0x632, (char)0xfeaf);
-            init.Add(0x698, (char)0xfb8a);
-            init.Add(0x633, (char)0xfeb3);
-            init.Add(0x634, (char)0xfeb7);
-            init.Add(0x635, (char)0xfebb);
-            init.Add(0x636, (char)0xfebf);
-            init.Add(0x637, (char)0xfec3);
-            init.Add(0x638, (char)0xfec7);
-            init.Add(0x639, (char)0xfecb);
-            init.Add(0x63a, (char)0xfecf);
-            init.Add(0x641, (char)0xfed3);
-            init.Add(0x642, (char)0xfed7);
-            init.Add(0x6a9, (char)0xfedb);
-            init.Add(0x643, (char)0xfedb);
-            init.Add(0x6af, (char)0xfb94);
-            init.Add(0x644, (char)0xfedf);
-            init.Add(0x645, (char)0xfee3);
-            init.Add(0x646, (char)0xfee7);
-            init.Add(0x647, (char)0xfeeb);
-            init.Add(0x648, (char)0xfeed);
-            init.Add(0x649, (char)0xfef3);
-            init.Add(0x6be, (char)0xfeeb);
-            init.Add(0x6cc, (char)0xfef3);
-            init.Add(0x64a, (char)0xfef3);
-            init.Add(0x623, (char)0xfe83);
-            init.Add(0x621, (char)0xfe8b);
-            init.Add(0x626, (char)0xfe8b);
-            middle.Add(0x622, (char)0xfe81);
-            middle.Add(0x627, (char)0xfe8e);
-            middle.Add(0x628, (char)0xfe92);
-            middle.Add(0x67e, (char)0xfb59);
-            middle.Add(0x62a, (char)0xfe98);
-            middle.Add(0x62b, (char)0xfe9c);
-            middle.Add(0x62c, (char)0xfea0);
-            middle.Add(0x686, (char)0xfb7d);
-            middle.Add(0x62d, (char)0xfea4);
-            middle.Add(0x62e, (char)0xfea8);
-            middle.Add(0x62f, (char)0xfeaa);
-            middle.Add(0x630, (char)0xfeac);
-            middle.Add(0x631, (char)0xfeae);
-            middle.Add(0x632, (char)0xfeb0);
-            middle.Add(0x698, (char)0xfb8b);
-            middle.Add(0x633, (char)0xfeb4);
-            middle.Add(0x634, (char)0xfeb8);
-            middle.Add(0x635, (char)0xfebc);
-            middle.Add(0x636, (char)0xfec0);
-            middle.Add(0x637, (char)0xfec4);
-            middle.Add(0x638, (char)0xfec8);
-            middle.Add(0x639, (char)0xfecc);
-            middle.Add(0x63a, (char)0xfed0);
-            middle.Add(0x641, (char)0xfed4);
-            middle.Add(0x642, (char)0xfed8);
-            middle.Add(0x6a9, (char)0xfedc);
-            middle.Add(0x643, (char)0xfedc);
-            middle.Add(0x6af, (char)0xfb95);
-            middle.Add(0x644, (char)0xfee0);
-            middle.Add(0x645, (char)0xfee4);
-            middle.Add(0x646, (char)0xfee8);
-            middle.Add(0x647, (char)0xfeec);
-            middle.Add(0x648, (char)0xfeee);
-            middle.Add(0x649, (char)0xfef4);
-            middle.Add(0x6be, (char)0xfeec);
-            middle.Add(0x6cc, (char)0xfef4);
-            middle.Add(0x64a, (char)0xfef4);
-            middle.Add(0x623, (char)0xfe84);
-            middle.Add(0x621, (char)0xfe8c);
-            middle.Add(0x626, (char)0xfe8c);
-            final.Add(0x622, (char)0xfe81);
-            final.Add(0x627, (char)0xfe8e);
-            final.Add(0x628, (char)0xfe90);
-            final.Add(0x629, (char)0xfe94);     // 该字符只会出现在末尾 [2018/4/10 16:04:18 --By aq_1000]
-            final.Add(0x67e, (char)0xfb57);
-            final.Add(0x62a, (char)0xfe96);
-            final.Add(0x62b, (char)0xfe9a);
-            final.Add(0x62c, (char)0xfe9e);
-            final.Add(0x686, (char)0xfb7b);
-            final.Add(0x62d, (char)0xfea2);
-            final.Add(0x62e, (char)0xfea6);
-            final.Add(0x62f, (char)0xfeaa);
-            final.Add(0x630, (char)0xfeac);
-            final.Add(0x631, (char)0xfeae);
-            final.Add(0x632, (char)0xfeb0);
-            final.Add(0x698, (char)0xfb8b);
-            final.Add(0x633, (char)0xfeb2);
-            final.Add(0x634, (char)0xfeb6);
-            final.Add(0x635, (char)0xfeba);
-            final.Add(0x636, (char)0xfebe);
-            final.Add(0x637, (char)0xfec2);
-            final.Add(0x638, (char)0xfec6);
-            final.Add(0x639, (char)0xfeca);
-            final.Add(0x63a, (char)0xfece);
-            final.Add(0x641, (char)0xfed2);
-            final.Add(0x642, (char)0xfed6);
-            final.Add(0x6a9, (char)0xfb8f);
-            final.Add(0x643, (char)0xfeda);
-            final.Add(0x6af, (char)0xfb93);
-            final.Add(0x644, (char)0xfede);
-            final.Add(0x645, (char)0xfee2);
-            final.Add(0x646, (char)0xfee6);
-            final.Add(0x647, (char)0xfeea);
-            final.Add(0x648, (char)0xfeee);
-            final.Add(0x649, (char)0xfef0);
-            final.Add(0x6be, (char)0xfeea);
-            final.Add(0x6cc, (char)0xfef0);
-            final.Add(0x64a, (char)0xfef2);
-            final.Add(0x623, (char)0xfe84);
-            final.Add(0x621, (char)0xfe8a);
-            final.Add(0x626, (char)0xfe8a);
-            isolate.Add(0x621, (char)0xfe80);
-            isolate.Add(0x622, (char)0xfe81);
-            isolate.Add(0x626, (char)0xfe89);
-            isolate.Add(0x627, (char)0xfe8d);
-            isolate.Add(0x628, (char)0xfe8f);
-            isolate.Add(0x67e, (char)0xfb56);
-            isolate.Add(0x62a, (char)0xfe95);
-            isolate.Add(0x62b, (char)0xfe99);
-            isolate.Add(0x62c, (char)0xfe9d);
-            isolate.Add(0x686, (char)0xfb7a);
-            isolate.Add(0x62d, (char)0xfea1);
-            isolate.Add(0x62e, (char)0xfea5);
-            isolate.Add(0x62f, (char)0xfea9);
-            isolate.Add(0x630, (char)0xfeab);
-            isolate.Add(0x631, (char)0xfead);
-            isolate.Add(0x632, (char)0xfeaf);
-            isolate.Add(0x698, (char)0xfb8a);
-            isolate.Add(0x633, (char)0xfeb1);
-            isolate.Add(0x634, (char)0xfeb5);
-            isolate.Add(0x635, (char)0xfeb9);
-            isolate.Add(0x636, (char)0xfebd);
-            isolate.Add(0x637, (char)0xfec1);
-            isolate.Add(0x638, (char)0xfec5);
-            isolate.Add(0x639, (char)0xfec9);
-            isolate.Add(0x63a, (char)0xfecd);
-            isolate.Add(0x641, (char)0xfed1);
-            isolate.Add(0x642, (char)0xfed5);
-            isolate.Add(0x6a9, (char)0xfb8e);
-            isolate.Add(0x643, (char)0xfed9);
-            isolate.Add(0x6af, (char)0xfb92);
-            isolate.Add(0x644, (char)0xfedd);
-            isolate.Add(0x645, (char)0xfee1);
-            isolate.Add(0x646, (char)0xfee5);
-            isolate.Add(0x647, (char)0xfee9);
-            isolate.Add(0x648, (char)0xfeed);
-            isolate.Add(0x649, (char)0xfeef);
-            isolate.Add(0x6be, (char)0xfee9);
-            isolate.Add(0x6cc, (char)0xfeef);
-            isolate.Add(0x64a, (char)0xfef1);
-            isolate.Add(0x623, (char)0xfe83); 
-        }
+            // {isolated,final,lead,middle} [2018/11/27 16:04:18 --By aq_1000]
+            mapping.Add(0x621, new char[4] { (char)0xFE80, (char)0xFE8A, (char)0xFE8B, (char)0xFE8C });    // Hamza      
+            mapping.Add(0x627, new char[4] { (char)0xFE8D, (char)0xFE8E, (char)0xFE8D, (char)0xFE8E });    // Alef       
+            mapping.Add(0x623, new char[4] { (char)0xFE83, (char)0xFE84, (char)0xFE83, (char)0xFE84 });    // AlefHamza
+            mapping.Add(0x624, new char[4] { (char)0xFE85, (char)0xFE85, (char)0xFE85, (char)0xFE85 });    // WawHamza
+            mapping.Add(0x625, new char[4] { (char)0xFE87, (char)0xFE87, (char)0xFE87, (char)0xFE87 });    // AlefMaksoor
+            mapping.Add(0x649, new char[4] { (char)0xFBFC, (char)0xFBFD, (char)0xFBFE, (char)0xFBFF });    // AlefMagsora
+            mapping.Add(0x626, new char[4] { (char)0xFE89, (char)0xFE8A, (char)0xFE8B, (char)0xFE8C });    // HamzaNabera
+            mapping.Add(0x628, new char[4] { (char)0xFE8F, (char)0xFE90, (char)0xFE91, (char)0xFE92 });    // Ba
+            mapping.Add(0x62A, new char[4] { (char)0xFE95, (char)0xFE96, (char)0xFE97, (char)0xFE98 });    // Ta
+            mapping.Add(0x62B, new char[4] { (char)0xFE99, (char)0xFE9A, (char)0xFE9B, (char)0xFE9C });    // Tha2
+            mapping.Add(0x62C, new char[4] { (char)0xFE9D, (char)0xFE9E, (char)0xFE9F, (char)0xFEA0 });    // Jeem
+            mapping.Add(0x62D, new char[4] { (char)0xFEA1, (char)0xFEA2, (char)0xFEA3, (char)0xFEA4 });    // H7aa
+            mapping.Add(0x62E, new char[4] { (char)0xFEA5, (char)0xFEA6, (char)0xFEA7, (char)0xFEA8 });    // Khaa2
+            mapping.Add(0x62F, new char[4] { (char)0xFEA9, (char)0xFEAA, (char)0xFEA9, (char)0xFEAA });    // Dal
+            mapping.Add(0x630, new char[4] { (char)0xFEAB, (char)0xFEAC, (char)0xFEAB, (char)0xFEAC });    // Thal
+            mapping.Add(0x631, new char[4] { (char)0xFEAD, (char)0xFEAE, (char)0xFEAD, (char)0xFEAD });    // Ra2
+            mapping.Add(0x632, new char[4] { (char)0xFEAF, (char)0xFEB0, (char)0xFEAF, (char)0xFEB0 });    // Zeen
+            mapping.Add(0x633, new char[4] { (char)0xFEB1, (char)0xFEB2, (char)0xFEB3, (char)0xFEB4 });    // Seen
+            mapping.Add(0x634, new char[4] { (char)0xFEB5, (char)0xFEB6, (char)0xFEB7, (char)0xFEB8 });    // Sheen
+            mapping.Add(0x635, new char[4] { (char)0xFEB9, (char)0xFEBA, (char)0xFEBB, (char)0xFEBC });    // S9a
+            mapping.Add(0x636, new char[4] { (char)0xFEBD, (char)0xFEBE, (char)0xFEBF, (char)0xFEC0 });    // Dha
+            mapping.Add(0x637, new char[4] { (char)0xFEC1, (char)0xFEC2, (char)0xFEC3, (char)0xFEC4 });    // T6a
+            mapping.Add(0x638, new char[4] { (char)0xFEC5, (char)0xFEC6, (char)0xFEC7, (char)0xFEC8 });    // T6ha
+            mapping.Add(0x639, new char[4] { (char)0xFEC9, (char)0xFECA, (char)0xFECB, (char)0xFECC });    // Ain
+            mapping.Add(0x63A, new char[4] { (char)0xFECD, (char)0xFECE, (char)0xFECF, (char)0xFED0 });    // Gain
+            mapping.Add(0x641, new char[4] { (char)0xFED1, (char)0xFED2, (char)0xFED3, (char)0xFED4 });    // Fa
+            mapping.Add(0x642, new char[4] { (char)0xFED5, (char)0xFED6, (char)0xFED7, (char)0xFED8 });    // Gaf
+            mapping.Add(0x643, new char[4] { (char)0xFED9, (char)0xFEDA, (char)0xFEDB, (char)0xFEDC });    // Kaf
+            mapping.Add(0x644, new char[4] { (char)0xFEDD, (char)0xFEDE, (char)0xFEDF, (char)0xFEE0 });    // Lam
+            mapping.Add(0x645, new char[4] { (char)0xFEE1, (char)0xFEE2, (char)0xFEE3, (char)0xFEE4 });    // Meem
+            mapping.Add(0x646, new char[4] { (char)0xFEE5, (char)0xFEE6, (char)0xFEE7, (char)0xFEE8 });    // Noon
+            mapping.Add(0x647, new char[4] { (char)0xFEE9, (char)0xFEEA, (char)0xFEEB, (char)0xFEEC });    // Ha
+            mapping.Add(0x648, new char[4] { (char)0xFEED, (char)0xFEEE, (char)0xFEED, (char)0xFEEE });    // Waw
+            mapping.Add(0x64A, new char[4] { (char)0xFEF1, (char)0xFEF2, (char)0xFEF3, (char)0xFEF4 });    // Ya
+            mapping.Add(0x622, new char[4] { (char)0xFE81, (char)0xFE81, (char)0xFE81, (char)0xFE81 });    // AlefMad
+            mapping.Add(0x629, new char[4] { (char)0xFE93, (char)0xFE94, (char)0xFE94, (char)0xFE94 });    // TaMarboota // 该字符只会出现在末尾 [2018/4/10 16:04:18 --By aq_1000]
+            mapping.Add(0x67E, new char[4] { (char)0xFB56, (char)0xFB57, (char)0xFB58, (char)0xFB59 });    // PersianPe
+            mapping.Add(0x686, new char[4] { (char)0xFB7A, (char)0xFB7B, (char)0xFB7C, (char)0xFB7D });    // PersianChe
+            mapping.Add(0x698, new char[4] { (char)0xFB8A, (char)0xFB8B, (char)0xFB8A, (char)0xFB8B });    // PersianZe
+            mapping.Add(0x6AF, new char[4] { (char)0xFB92, (char)0xFB93, (char)0xFB94, (char)0xFB95 });    // PersianGaf
+            mapping.Add(0x6A9, new char[4] { (char)0xFB8E, (char)0xFB8F, (char)0xFB90, (char)0xFB91 });    // PersianGaf2
 
-        private static bool IsNumericChar(int unicode)
-        {
-            return numbers.ContainsKey(unicode);
-        }
-
-        private static char ReplaceChar(int unicode, CharState _state)
-        {
-            if (((ushort)unicode) == 0x200c)
-            {
-                return '\0';
-            }
-            switch (_state)
-            {
-                case CharState.init:
-                    if (init.ContainsKey(unicode))
-                    {
-                        return init[unicode];
-                    }
-                    return (char)unicode;
-
-                case CharState.middle:
-                    if (middle.ContainsKey(unicode))
-                    {
-                        return middle[unicode];
-                    }
-                    return (char)unicode;
-
-                case CharState.final:
-                    if (final.ContainsKey(unicode))
-                    {
-                        return final[unicode];
-                    }
-                    return (char)unicode;
-
-                case CharState.isolated:
-                    if (isolate.ContainsKey(unicode))
-                    {
-                        return isolate[unicode];
-                    }
-                    return (char)unicode;
-
-                case CharState.number:
-                    if (numbers.ContainsKey(unicode))
-                    {
-                        return numbers[unicode];
-                    }
-                    return (char)unicode;
-            }
-            return '*';
-        }
+            mapping.Add(0x6BE, new char[4] { (char)0xFEE9, (char)0xFEEA, (char)0xFEEB, (char)0xFEEC });
+            mapping.Add(0x6CC, new char[4] { (char)0xFBFC, (char)0xFBFD, (char)0xFBFE, (char)0xFBFF });
+        }               
 
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
         {
-            return (uc == ':' || uc == '：' || uc == ' ' || uc == '%' || uc == '+' || uc == '-' ||
+            return (uc == ':' || uc == '：' || uc == ' ' || /*uc == '%' ||*/ uc == '+' || /*uc == '-' ||*/ uc == '\n' || uc == '\r' || uc == '\t' || uc == '@' ||
                 (uc >= 0x2600 && uc <= 0x27BF)); // 表情符号
         }
-	    
-        // 判断字符方向
-        private static bool _IsRTLChar(char uc, bool pre)
+
+        // 是否句末标点符号
+        private static bool _IsEndPunctuation(char uc, char nextChar)
         {
-            bool bRTL = true;
+            if (uc == '.')
+                return _IsNeutrality(nextChar);
+            return (uc == '!' || uc == '！' || uc == '。' || uc == '،' || uc == '?' || uc == '؟');
+        }
+
+        // 判断字符方向
+        private static DirectionType _GetDirection(char uc, DirectionType ePre, char nextChar)
+        {
+            DirectionType eCType = DirectionType.RTL;
             int uni = uc;
 
-            if (_IsBracket(uc))
+            if (_IsBracket(uc) || _IsEndPunctuation(uc, nextChar))
             {
-                bRTL = true;
+                eCType = DirectionType.RTL;
             }
-            else if (IsArabicLetter(uc))
+            else if ((uni >= 0x660) && (uni <= 0x669))
             {
-                bRTL = true;
+                eCType = DirectionType.LTR;
+            }
+            else if (IsArabicLetter(uc) || uc == '-' || uc == '%')
+            {
+                eCType = DirectionType.RTL;
             }
             else if (_IsNeutrality(uc))    // 中立方向字符，方向就和上一个字符一样 [2018/3/24 16:03:27 --By aq_1000]
             {
-                bRTL = pre;
+                if (ePre == DirectionType.UNKNOW)
+                {
+                    eCType = DirectionType.NEUTRAL;
+                }
+                else
+                    eCType = ePre;
             }
-            else if (((uni >= 0x20) && (uni <= 0x7e)) || 
-                ((uni >= 0x660) && (uni <= 0x669)) || // 这个是阿拉伯字符的数字，很特殊，和英文的阿拉伯数字一样从左到右 [2018/3/24 16:03:29 --By aq_1000]
-                char.IsSurrogate(uc) || char.IsLowSurrogate(uc))
-            {
-                bRTL = false;
-            }
+            else
+                eCType = DirectionType.LTR;
 
-            return bRTL;
+            return eCType;
         }
 
 	    // 是否括号
@@ -577,94 +599,31 @@ namespace FairyGUI
             return (uc == ')' || uc == '(' || uc == '）' || uc == '（' ||
                     uc == ']' || uc == '[' || uc == '】' || uc == '【' ||
                     uc == '}' || uc == '{' || 
-                    uc == '≥' || uc == '≤' ||
-                    uc == '>' || uc == '<' || uc == '》' || uc == '《' ||
-                    uc == '“' || uc == '”');
+ //                   uc == '≥' || uc == '≤' || uc == '>' || uc == '<' || 
+                    uc == '》' || uc == '《' || uc == '“' || uc == '”' || uc == '"');
         }
 
+        // 这些配对符,在从右至左排列中应该逆序显示
         private static char _ProcessBracket(char uc)
         {
-            // 这些配对符,在从右至左排列中应该逆序显示
-            if (uc == '[')
-            {
-                return ']';
-            }
-            else if (uc == ']')
-            {
-                return '[';
-            }
-
-            else if(uc == '【')
-            {
-                return '】';
-            }
-            else if (uc == '】')
-            {
-                return '【';
-            }
-
-            else if (uc == '{')
-            {
-                return '}';
-            }
-            else if (uc == '}')
-            {
-                return '{';
-            }
-
-            else if (uc == '(')
-            {
-                return ')';
-            }
-            else if (uc == ')')
-            {
-                return '(';
-            }
-
-            else if (uc == '（')
-            {
-                return '）';
-            }
-            else if (uc == '）')
-            {
-                return '（';
-            }
-
-            else if (uc == '<')
-            {
-                return '>';
-            }
-            else if (uc == '>')
-            {
-                return '<';
-            }
-
-            else if (uc == '《')
-            {
-                return '》';
-            }
-            else if (uc == '》')
-            {
-                return '《';
-            }
-
-            else if (uc == '≤')
-            {
-                return '≥';
-            }
-            else if (uc == '≥')
-            {
-                return '≤';
-            }
-
-            else if (uc == '”')
-            {
-                return '“';
-            }
-            else if (uc == '”')
-            {
-                return '“';
-            }
+            if (uc == '[') return ']';
+            else if (uc == ']') return '[';
+            else if (uc == '【') return '】';
+            else if (uc == '】') return '【';
+            else if (uc == '{') return '}';
+            else if (uc == '}') return '{';
+            else if (uc == '(') return ')';
+            else if (uc == ')') return '(';
+            else if (uc == '（') return '）';
+            else if (uc == '）') return '（';
+            else if (uc == '<') return '>';
+            else if (uc == '>') return '<';
+            else if (uc == '《') return '》';
+            else if (uc == '》') return '《';
+            else if (uc == '≤') return '≥';
+            else if (uc == '≥') return '≤';
+            else if (uc == '”') return '“';
+            else if (uc == '”') return '“';
             else return uc;
         }
     }
