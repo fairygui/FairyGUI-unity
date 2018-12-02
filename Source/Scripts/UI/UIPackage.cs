@@ -603,6 +603,17 @@ namespace FairyGUI
 				stringTable[i] = buffer.ReadString();
 			buffer.stringTable = stringTable;
 
+			if (buffer.Seek(indexTablePos, 5))
+			{
+				cnt = buffer.ReadInt();
+				for (int i = 0; i < cnt; i++)
+				{
+					int index = buffer.ReadUshort();
+					int len = buffer.ReadInt();
+					stringTable[index] = buffer.ReadString(len);
+				}
+			}
+
 			buffer.Seek(indexTablePos, 1);
 
 			PackageItem pi;
