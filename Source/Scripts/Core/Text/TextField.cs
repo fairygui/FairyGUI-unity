@@ -835,7 +835,7 @@ namespace FairyGUI
 						wordPossible = false;
 					}
 
-					newLine.charIndex = (short)(line.charIndex + line.charCount);
+					newLine.charIndex = line.charIndex + line.charCount;
 					if (line.width > _textWidth)
 						_textWidth = line.width;
 
@@ -1435,16 +1435,32 @@ namespace FairyGUI
 				_charPositions.Add(cp);
 			}
 
-			bool hasShadow = _shadowOffset.x != 0 || _shadowOffset.y != 0;
-			if ((_stroke != 0 || hasShadow) && _font.canOutline)
+			int count = vertList.Count;
+			if (count > 65000)
 			{
-				int count = vertList.Count;
-				int allocCount = count;
-				int drawDirs = UIConfig.enhancedTextOutlineEffect ? 8 : 4;
-				if (_stroke != 0)
-					allocCount += count * drawDirs;
-				if (hasShadow)
-					allocCount += count;
+				Debug.LogWarning("Text is too large. A mesh may not have more than 65000 vertices.");
+				vertList.RemoveRange(65000, count - 65000);
+				count = 65000;
+			}
+
+			bool hasShadow = _shadowOffset.x != 0 || _shadowOffset.y != 0;
+			int allocCount = count;
+			int drawDirs = 0;
+			if (_stroke != 0)
+			{
+				drawDirs = UIConfig.enhancedTextOutlineEffect ? 8 : 4;
+				allocCount += count * drawDirs;
+			}
+			if (hasShadow)
+				allocCount += count;
+			if (allocCount > 65000)
+			{
+				Debug.LogWarning("Text is too large. Outline/shadow effect cannot be completed.");
+				allocCount = count;
+			}
+
+			if (allocCount != count && _font.canOutline)
+			{
 				graphics.Alloc(allocCount);
 
 				Vector3[] vertBuf = graphics.vertices;
@@ -1505,7 +1521,6 @@ namespace FairyGUI
 			}
 			else
 			{
-				int count = vertList.Count;
 				graphics.Alloc(count);
 				vertList.CopyTo(0, graphics.vertices, 0, count);
 				uvList.CopyTo(0, graphics.uv, 0, count);
@@ -1599,7 +1614,7 @@ namespace FairyGUI
 			/// <summary>
 			/// 行首的字符索引
 			/// </summary>
-			public short charIndex;
+			public int charIndex;
 
 			/// <summary>
 			/// 行包括的字符个数
