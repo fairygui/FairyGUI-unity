@@ -109,11 +109,17 @@ namespace FairyGUI
 		/// <param name="duration"></param>
 		public GTweener TweenValue(double value, float duration)
 		{
-			double oldValule = _value;
-			_value = value;
-
+			double oldValule;
 			if (_tweening)
-				GTween.Kill(this, TweenPropType.Progress, false);
+			{
+				GTweener twener = GTween.GetTween(this, TweenPropType.Progress);
+				oldValule = twener.value.d;
+				twener.Kill(false);
+			}
+			else
+				oldValule = _value;
+
+			_value = value;
 			_tweening = true;
 			return GTween.ToDouble(oldValule, _value, duration)
 				.SetEase(EaseType.Linear)
