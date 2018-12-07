@@ -329,6 +329,15 @@ namespace FairyGUI
                 listRep.Add(sbRep.ToString());
             }
 
+            // 一行中都只有中立字符的情况，就直接返回中立字符 [2018/12/6/ 16:34:38 by aq_1000]
+            if (sbN.Length > 0)
+            {
+                for (int n = 0; n < sbN.Length; ++n)
+                {
+                    listFinal.Add(sbN[n]);
+                }
+            }
+
             sbRep.Length = 0;
             sbN.Length = 0;
             sbFinal.Length = 0;
@@ -428,6 +437,15 @@ namespace FairyGUI
             if (sbRep.Length > 0)
             {
                 listRep.Add(sbRep.ToString());
+            }
+
+            // 一行中都只有中立字符的情况，就直接返回中立字符 [2018/12/6/ 16:34:38 by aq_1000]
+            if (sbN.Length > 0)
+            {
+                for (int n = 0; n < sbN.Length; ++n)
+                {
+                    listFinal.Add(sbN[n]);
+                }
             }
 
             sbFinal.Length = 0;
