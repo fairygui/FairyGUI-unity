@@ -63,7 +63,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool scrollItemToViewOnClick;
+		public bool scrollItemToViewOnClick = false;
 
 		ListLayoutType _layout;
 		int _lineCount;
