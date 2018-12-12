@@ -88,7 +88,7 @@ namespace FairyGUI
 		public EventListener onClick
 		{
 			get { if (onClick == null) onClick = new EventListener(this, "onClick"); return onClick; }
-			private set;
+			private set { onClick = value; }
 		}
 
 		/// <summary>
@@ -97,7 +97,7 @@ namespace FairyGUI
 		public EventListener onRightClick
 		{
 			get { if (onRightClick == null) onRightClick = new EventListener(this, "onRightClick"); return onRightClick; }
-			private set;
+			private set { onRightClick = value; }
 		}
 
 		/// <summary>
@@ -106,7 +106,7 @@ namespace FairyGUI
 		public EventListener onTouchBegin
 		{
 			get { if (onTouchBegin == null) onTouchBegin = new EventListener(this, "onTouchBegin"); return onTouchBegin; }
-			private set;
+			private set { onTouchBegin = value; }
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace FairyGUI
 		public EventListener onTouchMove
 		{
 			get { if (onTouchMove == null) onTouchMove = new EventListener(this, "onTouchMove"); return onTouchMove; }
-			private set;
+			private set { onTouchMove = value; }
 		}
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace FairyGUI
 		public EventListener onTouchEnd
 		{
 			get { if (onTouchEnd == null) onTouchEnd = new EventListener(this, "onTouchEnd"); return onTouchEnd; }
-			private set;
+			private set { onTouchEnd = value; }
 		}
 
 		/// <summary>
@@ -133,7 +133,7 @@ namespace FairyGUI
 		public EventListener onRollOver
 		{
 			get { if (onRollOver == null) onRollOver = new EventListener(this, "onRollOver"); return onRollOver; }
-			private set;
+			private set { onRollOver = value; }
 		}
 
 		/// <summary>
@@ -142,7 +142,7 @@ namespace FairyGUI
 		public EventListener onRollOut
 		{
 			get { if (onRollOut == null) onRollOut = new EventListener(this, "onRollOut"); return onRollOut; }
-			private set;
+			private set { onRollOut = value; }
 		}
 
 		/// <summary>
@@ -151,7 +151,7 @@ namespace FairyGUI
 		public EventListener onAddedToStage
 		{
 			get { if (onAddedToStage == null) onAddedToStage = new EventListener(this, "onAddedToStage"); return onAddedToStage; }
-			private set;
+			private set { onAddedToStage = value; }
 		}
 
 		/// <summary>
@@ -160,7 +160,7 @@ namespace FairyGUI
 		public EventListener onRemovedFromStage
 		{
 			get { if (onRemovedFromStage == null) onRemovedFromStage = new EventListener(this, "onRemovedFromStage"); return onRemovedFromStage; }
-			private set;
+			private set { onRemovedFromStage = value; }
 		}
 
 		/// <summary>
@@ -169,7 +169,7 @@ namespace FairyGUI
 		public EventListener onKeyDown
 		{
 			get { if (onKeyDown == null) onKeyDown = new EventListener(this, "onKeyDown"); return onKeyDown; }
-			private set;
+			private set { onKeyDown = value; }
 		}
 
 		/// <summary>
@@ -178,7 +178,7 @@ namespace FairyGUI
 		public EventListener onClickLink
 		{
 			get { if (onClickLink == null) onClickLink = new EventListener(this, "onClickLink"); return onClickLink; }
-			private set;
+			private set { onClickLink = value; }
 		}
 
 		/// <summary>
@@ -187,7 +187,7 @@ namespace FairyGUI
 		public EventListener onPositionChanged
 		{
 			get { if (onPositionChanged == null) onPositionChanged = new EventListener(this, "onPositionChanged"); return onPositionChanged; }
-			private set;
+			private set { onPositionChanged = value; }
 		}
 
 		/// <summary>
@@ -196,7 +196,7 @@ namespace FairyGUI
 		public EventListener onSizeChanged
 		{
 			get { if (onSizeChanged == null) onSizeChanged = new EventListener(this, "onSizeChanged"); return onSizeChanged; }
-			private set;
+			private set { onSizeChanged = value; }
 		}
 
 		/// <summary>
@@ -205,7 +205,7 @@ namespace FairyGUI
 		public EventListener onDragStart
 		{
 			get { if (onDragStart == null) onDragStart = new EventListener(this, "onDragStart"); return onDragStart; }
-			private set;
+			private set { onDragStart = value; }
 		}
 
 		/// <summary>
@@ -214,7 +214,7 @@ namespace FairyGUI
 		public EventListener onDragMove
 		{
 			get { if (onDragMove == null) onDragMove = new EventListener(this, "onDragMove"); return onDragMove; }
-			private set;
+			private set { onDragMove = value; }
 		}
 
 		/// <summary>
@@ -223,7 +223,7 @@ namespace FairyGUI
 		public EventListener onDragEnd
 		{
 			get { if (onDragEnd == null) onDragEnd = new EventListener(this, "onDragEnd"); return onDragEnd; }
-			private set;
+			private set { onDragEnd = value; }
 		}
 
 		/// <summary>
@@ -232,7 +232,7 @@ namespace FairyGUI
 		public EventListener OnGearStop
 		{
 			get { if (OnGearStop == null) OnGearStop = new EventListener(this, "OnGearStop"); return OnGearStop; }
-			private set;
+			private set { OnGearStop = value; }
 		}
 
 		/// <summary>
