@@ -100,7 +100,6 @@ namespace FairyGUI
 		{
 			int cnt = _totalActiveTweens;
 			int freePosStart = -1;
-			int freePosCount = 0;
 			for (int i = 0; i < cnt; i++)
 			{
 				GTweener tweener = _activeTweens[i];
@@ -108,7 +107,6 @@ namespace FairyGUI
 				{
 					if (freePosStart == -1)
 						freePosStart = i;
-					freePosCount++;
 				}
 				else if (tweener._killed)
 				{
@@ -118,7 +116,6 @@ namespace FairyGUI
 
 					if (freePosStart == -1)
 						freePosStart = i;
-					freePosCount++;
 				}
 				else
 				{
@@ -141,12 +138,16 @@ namespace FairyGUI
 					int j = cnt;
 					cnt = _totalActiveTweens - cnt;
 					for (int i = 0; i < cnt; i++)
-						_activeTweens[freePosStart++] = _activeTweens[j++];
+					{
+						_activeTweens[freePosStart++] = _activeTweens[j];
+						_activeTweens[j] = null;
+						j++;
+					}
 				}
 				_totalActiveTweens = freePosStart;
 			}
 		}
-		
+
 		internal static void Clean()
 		{
 			_tweenerPool.Clear();
