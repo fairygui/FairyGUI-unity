@@ -21,6 +21,7 @@ namespace FairyGUI
 #if RTL_TEXT_SUPPORT
 		RTLSupport.DirectionType _textDirection = RTLSupport.DirectionType.UNKNOW;
 #endif
+		int _maxWidth;
 
 		int _stroke;
 		Color _strokeColor;
@@ -313,6 +314,25 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public int maxWidth
+		{
+			get { return _maxWidth; }
+			set
+			{
+				if (_maxWidth != value)
+				{
+					_maxWidth = value;
+					_textChanged = true;
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public List<HtmlElement> htmlElements
 		{
 			get
@@ -324,6 +344,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public List<LineInfo> lines
 		{
 			get
@@ -335,6 +358,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public List<CharPosition> charPositions
 		{
 			get
@@ -349,6 +375,9 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public RichTextField richTextField
 		{
 			get { return _richTextField; }
@@ -669,7 +698,14 @@ namespace FairyGUI
 				wrap = !_singleLine;
 			}
 			else
+			{
 				wrap = _wordWrap && !_singleLine;
+				if (_maxWidth > 0)
+				{
+					wrap = true;
+					rectWidth = _maxWidth - GUTTER_X * 2;
+				}
+			}
 			_textWidth = _textHeight = 0;
 
 			RequestText();

@@ -66,6 +66,7 @@ namespace FairyGUI
 			if (_templateVars != null)
 				str = ParseTemplate(str);
 
+			_textField.maxWidth = maxWidth;
 			if (_ubbEnabled)
 				_textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
 			else
