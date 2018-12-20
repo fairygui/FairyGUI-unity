@@ -1217,6 +1217,13 @@ namespace FairyGUI
 		{
 			UpdateEvent();
 
+			if (downTargets.Count == 0
+				|| clickCancelled
+				|| Mathf.Abs(x - downX) > 50 || Mathf.Abs(y - downY) > 50)
+			{
+				downTargets.Clear();
+			}
+
 			if (touchMonitors.Count > 0)
 			{
 				int len = touchMonitors.Count;
