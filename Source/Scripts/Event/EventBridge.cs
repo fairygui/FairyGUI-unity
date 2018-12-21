@@ -1,6 +1,7 @@
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
+using System;
+#if FAIRYGUI_TOLUA
+using LuaInterface;
+#endif
 
 namespace FairyGUI
 {
@@ -54,6 +55,40 @@ namespace FairyGUI
 			_callback0 -= callback;
 		}
 
+#if FAIRYGUI_TOLUA
+		public void Add(LuaFunction func, LuaTable self)
+		{
+			EventCallback1 callback = (EventCallback1)DelegateTraits<EventCallback1>.Create(func, self);
+			_callback1 -= callback;
+			_callback1 += callback;
+		}
+
+		public void Remove(LuaFunction func, LuaTable self)
+		{
+			LuaState state = func.GetLuaState();
+			LuaDelegate target;
+			if (self != null)
+				target = state.GetLuaDelegate(func, self);
+			else
+				target = state.GetLuaDelegate(func);
+
+			Delegate[] ds = _callback1.GetInvocationList();
+
+			for (int i = 0; i < ds.Length; i++)
+			{
+				LuaDelegate ld = ds[i].Target as LuaDelegate;
+				if (ld != null && ld.Equals(target))
+				{
+					_callback1 = (EventCallback1)Delegate.Remove(_callback1, ds[i]);
+					state.DelayDispose(ld.func);
+					if (ld.self != null)
+						state.DelayDispose(ld.self);
+					break;
+				}
+			}
+		}
+#endif
+
 		public bool isEmpty
 		{
 			get { return _callback1 == null && _callback0 == null && _captureCallback == null; }
@@ -61,6 +96,23 @@ namespace FairyGUI
 
 		public void Clear()
 		{
+#if FAIRYGUI_TOLUA
+			if (_callback1 != null)
+			{
+				Delegate[] ds = _callback1.GetInvocationList();
+				for (int i = 0; i < ds.Length; i++)
+				{
+					LuaDelegate ld = ds[i].Target as LuaDelegate;
+					if (ld != null)
+					{
+						LuaState state = ld.func.GetLuaState();
+						state.DelayDispose(ld.func);
+						if (ld.self != null)
+							state.DelayDispose(ld.self);
+					}
+				}
+			}
+#endif
 			_callback1 = null;
 			_callback0 = null;
 			_captureCallback = null;

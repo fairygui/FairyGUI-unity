@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#if FAIRYGUI_TOLUA
+using System;
 using FairyGUI.Utils;
 using LuaInterface;
 
@@ -25,7 +25,7 @@ namespace FairyGUI
 			});
 		}
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public static LuaTable ConnectLua(GComponent gcom)
 		{
 			LuaTable peerTable = null;
@@ -49,7 +49,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -73,7 +73,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -97,7 +97,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -121,7 +121,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -145,7 +145,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -169,7 +169,7 @@ namespace FairyGUI
 	{
 		LuaTable _peerTable;
 
-		[NoToLuaAttribute]
+		[NoToLua]
 		public override void ConstructFromXML(XML xml)
 		{
 			base.ConstructFromXML(xml);
@@ -308,3 +308,4 @@ namespace FairyGUI
 		}
 	}
 }
+#endif

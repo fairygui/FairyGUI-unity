@@ -1,8 +1,7 @@
-﻿一、安装
+一、安装
 
-1、将LuaUIHelper.cs放入你的工程。
-
-2、将以下语句添加到CustomSettings.cs适当的位置，然后重新生成绑定文件。
+1、**如果你使用的是ToLua，在Scripting Define Symbols里加上** `FAIRYGUI_TOLUA`。XLUA则不需要。
+2、如果是ToLua，将以下语句添加到CustomSettings.cs适当的位置，然后重新生成绑定文件。
 
 _GT(typeof(EventContext)),
 _GT(typeof(EventDispatcher)),
@@ -17,7 +16,6 @@ _GT(typeof(GGraph)),
 _GT(typeof(GGroup)),
 _GT(typeof(GImage)),
 _GT(typeof(GLoader)),
-_GT(typeof(PlayState)),
 _GT(typeof(GMovieClip)),
 _GT(typeof(TextFormat)),
 _GT(typeof(GTextField)),
@@ -78,21 +76,21 @@ view.onClick:Add(OnClick)
 --view.onClick:Remove(OnClick)
 --view.onClick:Set(OnClick)
 	
-2、类方法的侦听和删除侦听
+2、**ToLua支持带self的回调**
 
 function TestClass:OnClick()
 	print('you click')
 end
 
---也可以带上事件参数
 function TestClass:OnClick(context)
 	print('you click'..context.sender)
 end
 
 self.view.onClick:Add(TestClass.OnClick, self)
---self.view.onClick:Remove(TestClass.OnClick, self)
+self.view.onClick:Remove(TestClass.OnClick, self)
 
 三、使用Window类
+
 FairyGUI提供的Window类，一般需要开发者自己扩展，例如覆盖OnShown,OnHide等。在Lua里，编写Window扩展的方法是：
 
 WindowBase = fgui.window_class()
@@ -107,13 +105,13 @@ end
 
 function WindowBase:OnShown()
 end
-
+
 function WindowBase:OnHide()
 end
 
 function WindowBase:DoShowAnimation()
 end
-
+
 function WindowBase:DoHideAnimation()
 end
 
@@ -126,6 +124,7 @@ function MyWindow:OnInit()
 end
 
 四、自定义扩展
+
 FairyGUI在C#里可以使用UIObjectFactory.SetPackageItemExtension进行自定义扩展。在Lua里，同样可以这样做。方法如下：
 
 1、定义扩展类。注意基础类型，不要搞错。例如按钮是GButton，一般组件是GComponent。
@@ -163,7 +162,3 @@ myButton.myProp = 'hello'
 local myButton2 = UIPackage.CreateObject("包名","我的按钮")
 myButton2:Test()
 myButton2.myProp = 'world'
-
-
-
-
