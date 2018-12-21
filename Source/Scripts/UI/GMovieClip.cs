@@ -8,18 +8,12 @@ namespace FairyGUI
 	/// </summary>
 	public class GMovieClip : GObject, IAnimationGear, IColorGear
 	{
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onPlayEnd { get; private set; }
-
 		MovieClip _content;
+		EventListener _onPlayEnd;
 
 		public GMovieClip()
 		{
 			_sizeImplType = 1;
-
-			onPlayEnd = new EventListener(this, "onPlayEnd");
 		}
 
 		override protected void CreateDisplayObject()
@@ -28,6 +22,14 @@ namespace FairyGUI
 			_content.gOwner = this;
 			_content.ignoreEngineTimeScale = true;
 			displayObject = _content;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onPlayEnd
+		{
+			get { return _onPlayEnd ?? (_onPlayEnd = new EventListener(this, "onPlayEnd")); }
 		}
 
 		/// <summary>

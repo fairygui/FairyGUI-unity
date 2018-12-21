@@ -27,18 +27,11 @@ namespace FairyGUI
 		float _barStartX;
 		float _barStartY;
 
+		EventListener _onChanged;
+		EventListener _onGripTouchEnd;
+
 		public bool changeOnClick;
 		public bool canDrag;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onGripTouchEnd { get; private set; }
 
 		public GSlider()
 		{
@@ -46,9 +39,22 @@ namespace FairyGUI
 			_max = 100;
 			changeOnClick = true;
 			canDrag = true;
+		}
 
-			onChanged = new EventListener(this, "onChanged");
-			onGripTouchEnd = new EventListener(this, "onGripTouchEnd");
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onChanged
+		{
+			get { return _onChanged ?? (_onChanged = new EventListener(this, "onChanged")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onGripTouchEnd
+		{
+			get { return _onGripTouchEnd ?? (_onGripTouchEnd = new EventListener(this, "onGripTouchEnd")); }
 		}
 
 		/// <summary>
@@ -310,7 +316,7 @@ namespace FairyGUI
 			if (newValue != _value)
 			{
 				_value = newValue;
-				if (onChanged.Call())
+				if (DispatchEvent("onChanged", null))
 					return;
 			}
 			UpdateWidthPercent(percent);
@@ -318,7 +324,7 @@ namespace FairyGUI
 
 		private void __gripTouchEnd(EventContext context)
 		{
-			onGripTouchEnd.Call();
+			DispatchEvent("onGripTouchEnd", null);
 		}
 
 		private void __barTouchBegin(EventContext context)
@@ -346,7 +352,7 @@ namespace FairyGUI
 			if (newValue != _value)
 			{
 				_value = newValue;
-				onChanged.Call();
+				DispatchEvent("onChanged", null);
 			}
 			UpdateWidthPercent(percent);
 		}

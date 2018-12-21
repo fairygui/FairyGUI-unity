@@ -127,7 +127,7 @@ namespace FairyGUI
 				_owner.ReleaseDisplayLock(_tweenConfig._displayLockToken);
 				_tweenConfig._displayLockToken = 0;
 			}
-			_owner.OnGearStop.Call(this);
+			_owner.DispatchEvent("onGearStop", this);
 		}
 
 		override public void UpdateState()

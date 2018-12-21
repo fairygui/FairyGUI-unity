@@ -105,16 +105,12 @@ namespace FairyGUI
 			GObject obj = GRoot.inst.touchTarget;
 			while (obj != null)
 			{
-				if (obj is GComponent)
+				if (obj.hasEventListeners("onDrop"))
 				{
-					if (!((GComponent)obj).onDrop.isEmpty)
-					{
-						obj.RequestFocus();
-						((GComponent)obj).onDrop.Call(sourceData);
-						return;
-					}
+					obj.RequestFocus();
+					obj.DispatchEvent("onDrop", sourceData);
+					return;
 				}
-
 				obj = obj.parent;
 			}
 		}

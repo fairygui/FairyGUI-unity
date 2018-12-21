@@ -24,7 +24,7 @@ namespace FairyGUI.Utils
 
 			_clickHandler = (EventContext context) =>
 			{
-				_owner.onClickLink.BubbleCall(_element.GetString("href"));
+				_owner.BubbleEvent("onClickLink", _element.GetString("href"));
 			};
 			_rolloverHandler = (EventContext context) =>
 			{

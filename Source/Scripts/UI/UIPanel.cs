@@ -333,7 +333,7 @@ namespace FairyGUI
 				HandleScreenSizeChanged();
 			}
 			else
-				Debug.LogError("Create " + componentName + "@" + packageName + " failed!");
+				Debug.LogError("Create " + packageName + "/" + componentName + " failed!");
 		}
 
 		void UpdateHitArea()
@@ -349,7 +349,14 @@ namespace FairyGUI
 
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			DisplayOptions.SetEditModeHideFlags();
-			_ui = (GComponent)UIPackage.CreateObject(packageName, componentName);
+			GObject obj = UIPackage.CreateObject(packageName, componentName);
+			if (obj != null && !(obj is GComponent))
+			{
+				obj.Dispose();
+				Debug.LogWarning("Not a GComponnet: " + packageName + "/" + componentName);
+				return;
+			}
+			_ui = (GComponent)obj;
 
 			if (_ui != null)
 			{

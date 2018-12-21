@@ -28,11 +28,6 @@ namespace FairyGUI
 		/// </summary>
 		public float soundVolume { get; set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onStageResized { get; private set; }
-
 		DisplayObject _touchTarget;
 		DisplayObject _focused;
 		InputTextField _lastInput;
@@ -50,6 +45,7 @@ namespace FairyGUI
 		EventCallback1 _focusRemovedDelegate;
 		AudioSource _audio;
 		List<NTexture> _toCollectTextures = new List<NTexture>();
+		EventListener _onStageResized;
 
 		static bool _touchScreen;
 #pragma warning disable 0649
@@ -164,8 +160,6 @@ namespace FairyGUI
 			_rollOutChain = new List<DisplayObject>();
 			_rollOverChain = new List<DisplayObject>();
 
-			onStageResized = new EventListener(this, "onStageResized");
-
 			StageEngine engine = GameObject.FindObjectOfType<StageEngine>();
 			if (engine != null)
 				Object.Destroy(engine.gameObject);
@@ -210,6 +204,14 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+		public EventListener onStageResized
+		{
+			get { return _onStageResized ?? (_onStageResized = new EventListener(this, "onStageResized")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public DisplayObject touchTarget
 		{
 			get
@@ -248,7 +250,7 @@ namespace FairyGUI
 				if (oldFocus != null)
 				{
 					if (oldFocus is InputTextField)
-						((InputTextField)oldFocus).onFocusOut.Call();
+						oldFocus.DispatchEvent("onFocusOut", null);
 
 					oldFocus.onRemovedFromStage.RemoveCapture(_focusRemovedDelegate);
 				}
@@ -258,7 +260,7 @@ namespace FairyGUI
 					if (_focused is InputTextField)
 					{
 						_lastInput = (InputTextField)_focused;
-						_lastInput.onFocusIn.Call();
+						_lastInput.DispatchEvent("onFocusIn", null);
 					}
 
 					_focused.onRemovedFromStage.AddCapture(_focusRemovedDelegate);
@@ -618,7 +620,7 @@ namespace FairyGUI
 			scaler.ApplyChange();
 			GRoot.inst.ApplyContentScaleFactor();
 
-			onStageResized.Call();
+			DispatchEvent("onStageResized", null);
 		}
 
 		internal void HandleGUIEvents(Event evt)
@@ -634,9 +636,9 @@ namespace FairyGUI
 				touch.UpdateEvent();
 				DisplayObject f = this.focus;
 				if (f != null)
-					f.onKeyDown.BubbleCall(touch.evt);
+					f.BubbleEvent("onKeyDown", touch.evt);
 				else
-					this.onKeyDown.Call(touch.evt);
+					DispatchEvent("onKeyDown", touch.evt);
 			}
 			else if (evt.rawType == EventType.KeyUp)
 			{
@@ -654,7 +656,7 @@ namespace FairyGUI
 					TouchInfo touch = _touches[0];
 					touch.mouseWheelDelta = (int)evt.delta.y;
 					touch.UpdateEvent();
-					_touchTarget.onMouseWheel.BubbleCall(touch.evt);
+					_touchTarget.BubbleEvent("onMouseWheel", touch.evt);
 					touch.mouseWheelDelta = 0;
 				}
 			}
@@ -769,7 +771,7 @@ namespace FairyGUI
 					this.focus = touch.target;
 
 					touch.UpdateEvent();
-					touch.target.onTouchBegin.BubbleCall(touch.evt);
+					touch.target.BubbleEvent("onTouchBegin", touch.evt);
 				}
 			}
 			else if (touch.began)
@@ -781,7 +783,7 @@ namespace FairyGUI
 				if (clickTarget != null)
 				{
 					touch.UpdateEvent();
-					clickTarget.onClick.BubbleCall(touch.evt);
+					clickTarget.BubbleEvent("onClick", touch.evt);
 				}
 
 				touch.button = -1;
@@ -811,7 +813,7 @@ namespace FairyGUI
 					this.focus = touch.target;
 
 					touch.UpdateEvent();
-					touch.target.onTouchBegin.BubbleCall(touch.evt);
+					touch.target.BubbleEvent("onTouchBegin", touch.evt);
 				}
 			}
 			if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
@@ -827,9 +829,9 @@ namespace FairyGUI
 						touch.UpdateEvent();
 
 						if (Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2))
-							clickTarget.onRightClick.BubbleCall(touch.evt);
+							clickTarget.BubbleEvent("onRightClick", touch.evt);
 						else
-							clickTarget.onClick.BubbleCall(touch.evt);
+							clickTarget.BubbleEvent("onClick", touch.evt);
 					}
 
 					touch.button = -1;
@@ -883,7 +885,7 @@ namespace FairyGUI
 						this.focus = touch.target;
 
 						touch.UpdateEvent();
-						touch.target.onTouchBegin.BubbleCall(touch.evt);
+						touch.target.BubbleEvent("onTouchBegin", touch.evt);
 					}
 				}
 				else if (uTouch.phase == TouchPhase.Canceled || uTouch.phase == TouchPhase.Ended)
@@ -900,7 +902,7 @@ namespace FairyGUI
 							{
 								touch.clickCount = uTouch.tapCount;
 								touch.UpdateEvent();
-								clickTarget.onClick.BubbleCall(touch.evt);
+								clickTarget.BubbleEvent("onClick", touch.evt);
 							}
 						}
 
@@ -947,7 +949,7 @@ namespace FairyGUI
 				{
 					element = _rollOutChain[i];
 					if (element.stage != null)
-						element.onRollOut.Call();
+						element.DispatchEvent("onRollOut", null);
 				}
 				_rollOutChain.Clear();
 			}
@@ -959,7 +961,7 @@ namespace FairyGUI
 				{
 					element = _rollOverChain[i];
 					if (element.stage != null)
-						element.onRollOver.Call();
+						element.DispatchEvent("onRollOver", null);
 				}
 				_rollOverChain.Clear();
 			}
@@ -1217,7 +1219,7 @@ namespace FairyGUI
 		{
 			UpdateEvent();
 
-			if(Mathf.Abs(x - downX) > 50 || Mathf.Abs(y - downY) > 50) clickCancelled= true;
+			if (Mathf.Abs(x - downX) > 50 || Mathf.Abs(y - downY) > 50) clickCancelled = true;
 
 			if (touchMonitors.Count > 0)
 			{
@@ -1239,7 +1241,7 @@ namespace FairyGUI
 				sHelperChain.Clear();
 			}
 			else
-				Stage.inst.onTouchMove.Call(evt);
+				Stage.inst.DispatchEvent("onTouchMove", evt);
 		}
 
 		public void End()
@@ -1263,7 +1265,7 @@ namespace FairyGUI
 				sHelperChain.Clear();
 			}
 			else
-				target.onTouchEnd.BubbleCall(evt);
+				target.BubbleEvent("onTouchEnd", evt);
 
 			if (Time.realtimeSinceStartup - lastClickTime < 0.35f)
 			{

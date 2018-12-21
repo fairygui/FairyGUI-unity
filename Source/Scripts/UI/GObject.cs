@@ -83,91 +83,6 @@ namespace FairyGUI
 		public DisplayObject displayObject { get; protected set; }
 
 		/// <summary>
-		/// Dispatched when the object or its child was clicked.
-		/// </summary>
-		public EventListener onClick { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the object or its child was clicked by right mouse button. Web only.
-		/// </summary>
-		public EventListener onRightClick { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the finger touched the object or its child just now.
-		/// </summary>
-		public EventListener onTouchBegin { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onTouchMove { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the finger was lifted from the screen or from the mouse button. 
-		/// </summary>
-		public EventListener onTouchEnd { get; private set; }
-
-		/// <summary>
-		/// The cursor or finger hovers over an object.
-		/// </summary>
-		public EventListener onRollOver { get; private set; }
-
-		/// <summary>
-		/// The cursor or finger leave an object.
-		/// </summary>
-		public EventListener onRollOut { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the object was added to the stage.
-		/// </summary>
-		public EventListener onAddedToStage { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the object was removed from the stage.
-		/// </summary>
-		public EventListener onRemovedFromStage { get; private set; }
-
-		/// <summary>
-		/// Dispatched on key pressed when the object is in focus.
-		/// </summary>
-		public EventListener onKeyDown { get; private set; }
-
-		/// <summary>
-		/// Dispatched when links in the object or its child was clicked.
-		/// </summary>
-		public EventListener onClickLink { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the object was moved.
-		/// </summary>
-		public EventListener onPositionChanged { get; private set; }
-
-		/// <summary>
-		/// Dispatched when the object was resized.
-		/// </summary>
-		public EventListener onSizeChanged { get; private set; }
-
-		/// <summary>
-		/// Dispatched when drag start. 
-		/// </summary>
-		public EventListener onDragStart { get; private set; }
-
-		/// <summary>
-		/// Dispatched when dragging.
-		/// </summary>
-		public EventListener onDragMove { get; private set; }
-
-		/// <summary>
-		/// Dispatched when drag end.
-		/// </summary>
-		public EventListener onDragEnd { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener OnGearStop { get; private set; }
-
-		/// <summary>
 		/// 当前全局正在被拖动的对象
 		/// </summary>
 		public static GObject draggingObject { get; private set; }
@@ -203,6 +118,24 @@ namespace FairyGUI
 
 		GearBase[] _gears;
 
+		EventListener _onClick;
+		EventListener _onRightClick;
+		EventListener _onTouchBegin;
+		EventListener _onTouchMove;
+		EventListener _onTouchEnd;
+		EventListener _onRollOver;
+		EventListener _onRollOut;
+		EventListener _onAddedToStage;
+		EventListener _onRemovedFromStage;
+		EventListener _onKeyDown;
+		EventListener _onClickLink;
+		EventListener _onPositionChanged;
+		EventListener _onSizeChanged;
+		EventListener _onDragStart;
+		EventListener _onDragMove;
+		EventListener _onDragEnd;
+		EventListener _onGearStop;
+
 		//Size的实现方式，有两种，0-GObject的w/h等于DisplayObject的w/h。1-GObject的sourceWidth/sourceHeight等于DisplayObject的w/h，剩余部分由scale实现
 		protected int _sizeImplType;
 
@@ -234,26 +167,142 @@ namespace FairyGUI
 
 			relations = new Relations(this);
 			_gears = new GearBase[8];
+		}
 
-			onClick = new EventListener(this, "onClick");
-			onRightClick = new EventListener(this, "onRightClick");
-			onTouchBegin = new EventListener(this, "onTouchBegin");
-			onTouchMove = new EventListener(this, "onTouchMove");
-			onTouchEnd = new EventListener(this, "onTouchEnd");
-			onRollOver = new EventListener(this, "onRollOver");
-			onRollOut = new EventListener(this, "onRollOut");
-			onAddedToStage = new EventListener(this, "onAddedToStage");
-			onRemovedFromStage = new EventListener(this, "onRemovedFromStage");
-			onKeyDown = new EventListener(this, "onKeyDown");
-			onClickLink = new EventListener(this, "onClickLink");
+		/// <summary>
+		/// Dispatched when the object or its child was clicked.
+		/// </summary>
+		public EventListener onClick
+		{
+			get { return _onClick ?? (_onClick = new EventListener(this, "onClick")); }
+		}
 
-			onPositionChanged = new EventListener(this, "onPositionChanged");
-			onSizeChanged = new EventListener(this, "onSizeChanged");
-			onDragStart = new EventListener(this, "onDragStart");
-			onDragMove = new EventListener(this, "onDragMove");
-			onDragEnd = new EventListener(this, "onDragEnd");
+		/// <summary>
+		/// Dispatched when the object or its child was clicked by right mouse button. Web only.
+		/// </summary>
+		public EventListener onRightClick
+		{
+			get { return _onRightClick ?? (_onRightClick = new EventListener(this, "onRightClick")); }
+		}
 
-			OnGearStop = new EventListener(this, "OnGearStop");
+		/// <summary>
+		/// Dispatched when the finger touched the object or its child just now.
+		/// </summary>
+		public EventListener onTouchBegin
+		{
+			get { return _onTouchBegin ?? (_onTouchBegin = new EventListener(this, "onTouchBegin")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onTouchMove
+		{
+			get { return _onTouchMove ?? (_onTouchMove = new EventListener(this, "onTouchMove")); }
+		}
+
+		/// <summary>
+		/// Dispatched when the finger was lifted from the screen or from the mouse button. 
+		/// </summary>
+		public EventListener onTouchEnd
+		{
+			get { return _onTouchEnd ?? (_onTouchEnd = new EventListener(this, "onTouchEnd")); }
+		}
+
+		/// <summary>
+		/// The cursor or finger hovers over an object.
+		/// </summary>
+		public EventListener onRollOver
+		{
+			get { return _onRollOver ?? (_onRollOver = new EventListener(this, "onRollOver")); }
+		}
+
+		/// <summary>
+		/// The cursor or finger leave an object.
+		/// </summary>
+		public EventListener onRollOut
+		{
+			get { return _onRollOut ?? (_onRollOut = new EventListener(this, "onRollOut")); }
+		}
+
+		/// <summary>
+		/// Dispatched when the object was added to the stage.
+		/// </summary>
+		public EventListener onAddedToStage
+		{
+			get { return _onAddedToStage ?? (_onAddedToStage = new EventListener(this, "onAddedToStage")); }
+		}
+
+		/// <summary>
+		/// Dispatched when the object was removed from the stage.
+		/// </summary>
+		public EventListener onRemovedFromStage
+		{
+			get { return _onRemovedFromStage ?? (_onRemovedFromStage = new EventListener(this, "onRemovedFromStage")); }
+		}
+
+		/// <summary>
+		/// Dispatched on key pressed when the object is in focus.
+		/// </summary>
+		public EventListener onKeyDown
+		{
+			get { return _onKeyDown ?? (_onKeyDown = new EventListener(this, "onKeyDown")); }
+		}
+
+		/// <summary>
+		/// Dispatched when links in the object or its child was clicked.
+		/// </summary>
+		public EventListener onClickLink
+		{
+			get { return _onClickLink ?? (_onClickLink = new EventListener(this, "onClickLink")); }
+		}
+
+		/// <summary>
+		/// Dispatched when the object was moved.
+		/// </summary>
+		public EventListener onPositionChanged
+		{
+			get { return _onPositionChanged ?? (_onPositionChanged = new EventListener(this, "onPositionChanged")); }
+		}
+
+		/// <summary>
+		/// Dispatched when the object was resized.
+		/// </summary>
+		public EventListener onSizeChanged
+		{
+			get { return _onSizeChanged ?? (_onSizeChanged = new EventListener(this, "onSizeChanged")); }
+		}
+
+		/// <summary>
+		/// Dispatched when drag start. 
+		/// </summary>
+		public EventListener onDragStart
+		{
+			get { return _onDragStart ?? (_onDragStart = new EventListener(this, "onDragStart")); }
+		}
+
+		/// <summary>
+		/// Dispatched when dragging.
+		/// </summary>
+		public EventListener onDragMove
+		{
+			get { return _onDragMove ?? (_onDragMove = new EventListener(this, "onDragMove")); }
+		}
+
+		/// <summary>
+		/// Dispatched when drag end.
+		/// </summary>
+		public EventListener onDragEnd
+		{
+			get { return _onDragEnd ?? (_onDragEnd = new EventListener(this, "onDragEnd")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onGearStop
+		{
+			get { return _onGearStop ?? (_onGearStop = new EventListener(this, "onGearStop")); }
 		}
 
 		/// <summary>
@@ -362,7 +411,7 @@ namespace FairyGUI
 					parent.SetBoundsChangedFlag();
 					if (_group != null)
 						_group.SetBoundsChangedFlag();
-					onPositionChanged.Call();
+					DispatchEvent("onPositionChanged", null);
 				}
 
 				if (draggingObject == this && !sUpdateInDragging)
@@ -534,7 +583,7 @@ namespace FairyGUI
 						_group.SetBoundsChangedFlag(true);
 				}
 
-				onSizeChanged.Call();
+				DispatchEvent("onSizeChanged", null);
 			}
 		}
 
@@ -1899,7 +1948,7 @@ namespace FairyGUI
 				GObject tmp = draggingObject;
 				draggingObject.StopDrag();
 				draggingObject = null;
-				tmp.onDragEnd.Call();
+				tmp.DispatchEvent("onDragEnd", null);
 			}
 
 			onTouchMove.Add(__touchMove);
@@ -1946,7 +1995,7 @@ namespace FairyGUI
 					return;
 
 				_dragTesting = false;
-				if (!onDragStart.Call(evt.touchId))
+				if (!DispatchEvent("onDragStart", evt.touchId))
 					DragBegin(evt.touchId);
 			}
 
@@ -1985,7 +2034,7 @@ namespace FairyGUI
 				this.SetXY(Mathf.RoundToInt(pt.x), Mathf.RoundToInt(pt.y));
 				sUpdateInDragging = false;
 
-				onDragMove.Call();
+				DispatchEvent("onDragMove", null);
 			}
 		}
 
@@ -1994,7 +2043,7 @@ namespace FairyGUI
 			if (draggingObject == this)
 			{
 				draggingObject = null;
-				onDragEnd.Call();
+				DispatchEvent("onDragEnd", null);
 			}
 		}
 		#endregion

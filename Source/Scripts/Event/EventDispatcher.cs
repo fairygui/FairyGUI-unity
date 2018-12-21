@@ -121,6 +121,34 @@ namespace FairyGUI
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strType"></param>
+		/// <returns></returns>
+		public bool hasEventListeners(string strType)
+		{
+			EventBridge bridge = TryGetEventBridge(strType);
+			if (bridge == null)
+				return false;
+
+			return !bridge.isEmpty;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strType"></param>
+		/// <returns></returns>
+		public bool isDispatching(string strType)
+		{
+			EventBridge bridge = TryGetEventBridge(strType);
+			if (bridge == null)
+				return false;
+
+			return bridge._dispatching;
+		}
+
 		internal EventBridge TryGetEventBridge(string strType)
 		{
 			if (_dic == null)

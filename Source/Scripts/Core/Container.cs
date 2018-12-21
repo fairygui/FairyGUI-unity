@@ -145,9 +145,9 @@ namespace FairyGUI
 					if (stage != null)
 					{
 						if (child is Container)
-							child.onAddedToStage.BroadcastCall();
+							child.BroadcastEvent("onAddedToStage", null);
 						else
-							child.onAddedToStage.Call();
+							child.DispatchEvent("onAddedToStage", null);
 					}
 
 					InvalidateBatchingState(true);
@@ -260,9 +260,9 @@ namespace FairyGUI
 				if (stage != null && !child._disposed)
 				{
 					if (child is Container)
-						child.onRemovedFromStage.BroadcastCall();
+						child.BroadcastEvent("onRemovedFromStage", null);
 					else
-						child.onRemovedFromStage.Call();
+						child.DispatchEvent("onRemovedFromStage", null);
 				}
 				_children.Remove(child);
 				InvalidateBatchingState(true);

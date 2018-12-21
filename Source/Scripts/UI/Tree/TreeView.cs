@@ -405,7 +405,7 @@ namespace FairyGUI
 				TreeNode node = folderNode.GetChildAt(i);
 				if (node.cell != null)
 				{
-					if(node.cell.parent != null)
+					if (node.cell.parent != null)
 						list.RemoveChild(node.cell);
 					list.itemPool.ReturnObject(node.cell);
 					node.cell.data = null;

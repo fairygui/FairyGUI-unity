@@ -18,12 +18,6 @@ namespace FairyGUI
 		/// </summary>
 		public string name;
 
-		/// <summary>
-		/// When controller page changed.
-		/// 当控制器活动页面改变时，此事件被触发。
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
 		internal GComponent parent;
 		internal bool autoRadioGroupDepth;
 		internal bool changing;
@@ -34,6 +28,8 @@ namespace FairyGUI
 		List<string> _pageNames;
 		List<ControllerAction> _actions;
 
+		EventListener _onChanged;
+
 		static uint _nextPageId;
 
 		public Controller()
@@ -42,13 +38,21 @@ namespace FairyGUI
 			_pageNames = new List<string>();
 			_selectedIndex = -1;
 			_previousIndex = -1;
-
-			onChanged = new EventListener(this, "onChanged");
 		}
 
 		public void Dispose()
 		{
 			RemoveEventListeners();
+		}
+
+
+		/// <summary>
+		/// When controller page changed.
+		/// 当控制器活动页面改变时，此事件被触发。
+		/// </summary>
+		public EventListener onChanged
+		{
+			get { return _onChanged ?? (_onChanged = new EventListener(this, "onChanged")); }
 		}
 
 		/// <summary>
@@ -74,7 +78,7 @@ namespace FairyGUI
 					_selectedIndex = value;
 					parent.ApplyController(this);
 
-					onChanged.Call();
+					DispatchEvent("onChanged", null);
 
 					changing = false;
 				}

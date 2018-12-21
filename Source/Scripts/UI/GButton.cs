@@ -35,12 +35,6 @@ namespace FairyGUI
 		/// </summary>
 		public GObject linkedPopup;
 
-		/// <summary>
-		/// Dispatched when the button status was changed.
-		/// 如果为单选或多选按钮，当按钮的选中状态发生改变时，此事件触发。
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
 		protected GObject _titleObject;
 		protected GObject _iconObject;
 		protected Controller _relatedController;
@@ -59,6 +53,8 @@ namespace FairyGUI
 		bool _down;
 		bool _over;
 
+		EventListener _onChanged;
+
 		public const string UP = "up";
 		public const string DOWN = "down";
 		public const string OVER = "over";
@@ -75,8 +71,15 @@ namespace FairyGUI
 			changeStateOnClick = true;
 			_downEffectValue = 0.8f;
 			_title = string.Empty;
+		}
 
-			onChanged = new EventListener(this, "onChanged");
+		/// <summary>
+		/// Dispatched when the button status was changed.
+		/// 如果为单选或多选按钮，当按钮的选中状态发生改变时，此事件触发。
+		/// </summary>
+		public EventListener onChanged
+		{
+			get { return _onChanged ?? (_onChanged = new EventListener(this, "onChanged")); }
 		}
 
 		/// <summary>
@@ -608,7 +611,7 @@ namespace FairyGUI
 				if (changeStateOnClick)
 				{
 					this.selected = !_selected;
-					onChanged.Call();
+					DispatchEvent("onChanged", null);
 				}
 			}
 			else if (_mode == ButtonMode.Radio)
@@ -616,7 +619,7 @@ namespace FairyGUI
 				if (changeStateOnClick && !_selected)
 				{
 					this.selected = true;
-					onChanged.Call();
+					DispatchEvent("onChanged", null);
 				}
 			}
 			else

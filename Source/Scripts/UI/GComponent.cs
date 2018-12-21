@@ -23,11 +23,6 @@ namespace FairyGUI
 		/// </summary>
 		public ScrollPane scrollPane { get; private set; }
 
-		/// <summary>
-		/// Dispatched when an object was dragged and dropped to this component.
-		/// </summary>
-		public EventListener onDrop { get; private set; }
-
 		internal List<GObject> _children;
 		internal List<Controller> _controllers;
 		internal List<Transition> _transitions;
@@ -45,6 +40,8 @@ namespace FairyGUI
 		EventCallback0 _buildDelegate;
 		Controller _applyingController;
 
+		EventListener _onDrop;
+
 		public GComponent()
 		{
 			_children = new List<GObject>();
@@ -52,8 +49,6 @@ namespace FairyGUI
 			_transitions = new List<Transition>();
 			_margin = new Margin();
 			_buildDelegate = BuildNativeDisplayList;
-
-			onDrop = new EventListener(this, "onDrop");
 		}
 
 		override protected void CreateDisplayObject()
@@ -94,6 +89,14 @@ namespace FairyGUI
 				obj.InternalSetParent(null); //Avoid GObject.RemoveParent call
 				obj.Dispose();
 			}
+		}
+
+		/// <summary>
+		/// Dispatched when an object was dragged and dropped to this component.
+		/// </summary>
+		public EventListener onDrop
+		{
+			get { return _onDrop ?? (_onDrop = new EventListener(this, "onDrop")); }
 		}
 
 		/// <summary>

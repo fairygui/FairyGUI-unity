@@ -54,11 +54,6 @@ namespace FairyGUI
 		/// </summary>
 		public bool ignoreEngineTimeScale;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onPlayEnd { get; private set; }
-
 		int _frame;
 		bool _playing;
 		int _start;
@@ -73,6 +68,8 @@ namespace FairyGUI
 		int _displayFrame;
 		TimerCallback _timerDelegate;
 
+		EventListener _onPlayEnd;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -84,8 +81,6 @@ namespace FairyGUI
 			timeScale = 1;
 			ignoreEngineTimeScale = false;
 
-			onPlayEnd = new EventListener(this, "onPlayEnd");
-
 			if (Application.isPlaying)
 			{
 				onAddedToStage.Add(OnAddedToStage);
@@ -93,6 +88,14 @@ namespace FairyGUI
 			}
 
 			SetPlaySettings();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onPlayEnd
+		{
+			get { return _onPlayEnd ?? (_onPlayEnd = new EventListener(this, "onPlayEnd")); }
 		}
 
 		/// <summary>
@@ -384,7 +387,7 @@ namespace FairyGUI
 				_frameElapsed = 0;
 				_status = 3; //ended
 
-				onPlayEnd.Call();
+				DispatchEvent("onPlayEnd", null);
 			}
 			else
 			{

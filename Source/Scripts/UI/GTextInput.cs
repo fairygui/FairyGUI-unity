@@ -11,38 +11,51 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public EventListener onFocusIn { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onFocusOut { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public EventListener onSubmit { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public InputTextField inputTextField { get; private set; }
+
+		EventListener _onFocusIn;
+		EventListener _onFocusOut;
+		EventListener _onChanged;
+		EventListener _onSubmit;
 
 		public GTextInput()
 		{
-			onFocusIn = new EventListener(this, "onFocusIn");
-			onFocusOut = new EventListener(this, "onFocusOut");
-			onChanged = new EventListener(this, "onChanged");
-			onSubmit = new EventListener(this, "onSubmit");
-
 			this.focusable = true;
 			_textField.autoSize = AutoSizeType.None;
 			_textField.wordWrap = false;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onFocusIn
+		{
+			get { return _onFocusIn ?? (_onFocusIn = new EventListener(this, "onFocusIn")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onFocusOut
+		{
+			get { return _onFocusOut ?? (_onFocusOut = new EventListener(this, "onFocusOut")); }
+
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onChanged
+		{
+			get { return _onChanged ?? (_onChanged = new EventListener(this, "onChanged")); }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public EventListener onSubmit
+		{
+			get { return _onSubmit ?? (_onSubmit = new EventListener(this, "onSubmit")); }
 		}
 
 		/// <summary>

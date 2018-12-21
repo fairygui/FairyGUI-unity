@@ -15,11 +15,6 @@ namespace FairyGUI
 		public int visibleItemCount;
 
 		/// <summary>
-		/// Dispatched when selection was changed.
-		/// </summary>
-		public EventListener onChanged { get; private set; }
-
-		/// <summary>
 		/// 
 		/// </summary>
 		public GComponent dropdown;
@@ -41,6 +36,8 @@ namespace FairyGUI
 		bool _down;
 		bool _over;
 
+		EventListener _onChanged;
+
 		public GComboBox()
 		{
 			visibleItemCount = UIConfig.defaultComboBoxVisibleItemCount;
@@ -49,8 +46,14 @@ namespace FairyGUI
 			_items = new string[0];
 			_values = new string[0];
 			_popupDirection = PopupDirection.Auto;
+		}
 
-			onChanged = new EventListener(this, "onChanged");
+		/// <summary>
+		/// Dispatched when selection was changed.
+		/// </summary>
+		public EventListener onChanged
+		{
+			get { return _onChanged ?? (_onChanged = new EventListener(this, "onChanged")); }
 		}
 
 		/// <summary>
@@ -519,7 +522,7 @@ namespace FairyGUI
 			_selectedIndex = int.MinValue;
 			this.selectedIndex = _list.GetChildIndex((GObject)context.data);
 
-			onChanged.Call();
+			DispatchEvent("onChanged", null);
 		}
 
 		private void __rollover()
