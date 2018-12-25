@@ -1,5 +1,8 @@
 ﻿using System;
 using UnityEngine;
+#if FAIRYGUI_TOLUA
+using LuaInterface;
+#endif
 
 namespace FairyGUI
 {
