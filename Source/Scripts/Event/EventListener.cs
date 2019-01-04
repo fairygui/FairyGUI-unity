@@ -152,7 +152,7 @@ namespace FairyGUI
 		{
 			get
 			{
-				return _bridge.owner.hasEventListeners(_type);
+				return !_bridge.owner.hasEventListeners(_type);
 			}
 		}
 
