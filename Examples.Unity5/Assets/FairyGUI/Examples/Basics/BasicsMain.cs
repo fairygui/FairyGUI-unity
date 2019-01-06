@@ -10,6 +10,8 @@ public class BasicsMain : MonoBehaviour
 	private Controller _viewController;
 	private Dictionary<string, GComponent> _demoObjects;
 
+	public Gradient lineGradient;
+
 	void Awake()
 	{
 #if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
@@ -41,7 +43,7 @@ public class BasicsMain : MonoBehaviour
 		_backBtn = _mainView.GetChild("btn_Back");
 		_backBtn.visible = false;
 		_backBtn.onClick.Add(onClickBack);
-		
+
 		_demoContainer = _mainView.GetChild("container").asCom;
 		_viewController = _mainView.GetController("c1");
 
@@ -73,6 +75,10 @@ public class BasicsMain : MonoBehaviour
 
 		switch (type)
 		{
+			case "Graph":
+				PlayGraph();
+				break;
+
 			case "Button":
 				PlayButton();
 				break;
@@ -124,6 +130,96 @@ public class BasicsMain : MonoBehaviour
 			Application.Quit();
 		}
 	}
+
+	//-----------------------------
+	private void PlayGraph()
+	{
+		GComponent obj = _demoObjects["Graph"];
+
+		Shape shape;
+
+		shape = obj.GetChild("pie").asGraph.shape;
+		EllipseMesh ellipse = shape.graphics.GetMeshFactory<EllipseMesh>();
+		ellipse.startDegree = 30;
+		ellipse.endDegreee = 300;
+		shape.graphics.SetMeshDirty();
+
+		shape = obj.GetChild("trapezoid").asGraph.shape;
+		PolygonMesh trapezoid = shape.graphics.GetMeshFactory<PolygonMesh>();
+		trapezoid.usePercentPositions = true;
+		trapezoid.points.Clear();
+		trapezoid.points.Add(new Vector2(0.3f, 0));
+		trapezoid.points.Add(new Vector2(0.7f, 0));
+		trapezoid.points.Add(new Vector2(1f, 1f));
+		trapezoid.points.Add(new Vector2(0f, 1f));
+		shape.graphics.SetMeshDirty();
+
+		shape = obj.GetChild("polygon").asGraph.shape;
+		shape.DrawPolygon(new Vector2[] {
+			new Vector2(20, 30),
+			new Vector2(80, 40),
+			new Vector2(80, 15),
+			new Vector2(140, 50),
+			new Vector2(80, 85),
+			new Vector2(80, 60),
+			new Vector2(20, 70)
+		}, shape.color);
+
+		shape = obj.GetChild("polygon2").asGraph.shape;
+		shape.DrawRegularPolygon(5, 2, Color.yellow, Color.black, shape.color, -18, null);
+
+		shape = obj.GetChild("radial").asGraph.shape;
+		shape.DrawRegularPolygon(6, 2, shape.color, new Color32(0xFF, 0x99, 0x00, 128), shape.color, 0, new float[] { 0.6f, 0.8f, 0.6f, 0.8f, 0.6f, 0.5f });
+
+		shape = obj.GetChild("line").asGraph.shape;
+		LineMesh line = shape.graphics.GetMeshFactory<LineMesh>();
+		line.lineWidthCurve = AnimationCurve.Linear(0, 25, 1, 10);
+		line.roundEdge = true;
+		line.gradient = lineGradient;
+		line.path.Create(new GPathPoint[] {
+			new GPathPoint(new Vector3(0, 120, 0)),
+			new GPathPoint(new Vector3(20, 120, 0)),
+			new GPathPoint(new Vector3(100, 100, 0)),
+			new GPathPoint(new Vector3(180, 30, 0)),
+			new GPathPoint(new Vector3(100, 0, 0)),
+			new GPathPoint(new Vector3(20, 30, 0)),
+			new GPathPoint(new Vector3(100, 100, 0)),
+			new GPathPoint(new Vector3(180, 120, 0)),
+			new GPathPoint(new Vector3(200, 120, 0)),
+		});
+		shape.graphics.SetMeshDirty();
+		GTween.To(0, 1, 5).SetEase(EaseType.Linear).SetTarget(shape.graphics).OnUpdate((GTweener t) =>
+		{
+			((NGraphics)t.target).GetMeshFactory<LineMesh>().fillEnd = t.value.x;
+			((NGraphics)t.target).SetMeshDirty();
+		});
+
+		shape = obj.GetChild("line2").asGraph.shape;
+		LineMesh line2 = shape.graphics.GetMeshFactory<LineMesh>();
+		line2.lineWidth = 3;
+		line2.roundEdge = true;
+		line2.path.Create(new GPathPoint[] {
+			new GPathPoint(new Vector3(0, 120, 0), GPathPoint.CurveType.Straight),
+			new GPathPoint(new Vector3(60, 30, 0), GPathPoint.CurveType.Straight),
+			new GPathPoint(new Vector3(80, 90, 0), GPathPoint.CurveType.Straight),
+			new GPathPoint(new Vector3(140, 30, 0), GPathPoint.CurveType.Straight),
+			new GPathPoint(new Vector3(160, 90, 0), GPathPoint.CurveType.Straight),
+			new GPathPoint(new Vector3(220, 30, 0), GPathPoint.CurveType.Straight)
+		});
+		shape.graphics.SetMeshDirty();
+
+		GObject image = obj.GetChild("line3");
+		LineMesh line3 = image.displayObject.graphics.GetMeshFactory<LineMesh>();
+		line3.lineWidth = 30;
+		line3.roundEdge = false;
+		line3.path.Create(new GPathPoint[] {
+			new GPathPoint(new Vector3(0, 30, 0), new Vector3(50, -30), new Vector3(150, -50)),
+			new GPathPoint(new Vector3(200, 30, 0), new Vector3(300, 130)),
+			new GPathPoint(new Vector3(400, 30, 0))
+		});
+		image.displayObject.graphics.SetMeshDirty();
+	}
+
 	//-----------------------------
 	private void PlayButton()
 	{
@@ -158,13 +254,13 @@ public class BasicsMain : MonoBehaviour
 		for (int i = 0; i < cnt; i++)
 		{
 			GButton item = list1.AddItemFromPool().asButton;
-			item.GetChild("t0").text = "" + (i+1);
+			item.GetChild("t0").text = "" + (i + 1);
 			item.GetChild("t1").text = testNames[i];
 			item.GetChild("t2").asTextField.color = testColor[UnityEngine.Random.Range(0, 4)];
 			item.GetChild("star").asProgress.value = (int)((float)UnityEngine.Random.Range(1, 4) / 3f * 100);
 		}
 
-		GList list2= obj.GetChild("list2").asList;
+		GList list2 = obj.GetChild("list2").asList;
 		list2.RemoveChildrenToPool();
 		for (int i = 0; i < cnt; i++)
 		{
@@ -328,7 +424,7 @@ public class BasicsMain : MonoBehaviour
 		Rect rect = bounds.TransformRect(new Rect(0, 0, bounds.width, bounds.height), GRoot.inst);
 
 		//---!!Because at this time the container is on the right side of the stage and beginning to move to left(transition), so we need to caculate the final position
-		rect.x -= obj.parent.x; 
+		rect.x -= obj.parent.x;
 		//----
 
 		GButton d = obj.GetChild("d").asButton;
@@ -341,7 +437,7 @@ public class BasicsMain : MonoBehaviour
 	{
 		GComponent obj = _demoObjects["ProgressBar"];
 		Timers.inst.Add(0.001f, 0, __playProgress);
-		obj.onRemovedFromStage.Add(() => { Timers.inst.Remove(__playProgress);  });
+		obj.onRemovedFromStage.Add(() => { Timers.inst.Remove(__playProgress); });
 	}
 
 	void __playProgress(object param)

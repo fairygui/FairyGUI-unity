@@ -88,35 +88,38 @@ public class RenderImage
 		Image source1 = (Image)image1.displayObject;
 		Image source2 = image2 != null ? (Image)image2.displayObject : null;
 
-		Vector3 pos = this._background.position;
+		Vector3 pos = _background.position;
 		pos.z = _camera.farClipPlane;
-		this._background.position = pos;
+		_background.position = pos;
 
-		Mesh mesh = new Mesh();
-		Rect rect = this._image.TransformRect(new Rect(0, 0, this._width, this._height), source1);
-		source1.PrintTo(mesh, rect);
+		Vector2[] uv = new Vector2[4];
+		Vector2[] uv2 = null;
 
-		Vector2[] tmp = mesh.uv;
+		Rect rect = _image.TransformRect(new Rect(0, 0, this._width, this._height), source1);
+		Rect uvRect = GetImageUVRect(source1, rect, uv);
+
 		if (source2 != null)
 		{
-			rect = this._image.TransformRect(new Rect(0, 0, this._width, this._height), source2);
-			source2.PrintTo(mesh, rect);
-
-			mesh.uv2 = mesh.uv;
-			mesh.uv = tmp;
+			rect = _image.TransformRect(new Rect(0, 0, this._width, this._height), source2);
+			uv2 = new Vector2[4];
+			GetImageUVRect(source2, rect, uv2);
 		}
 
-		Vector2[] tmp2 = new Vector2[tmp.Length];
-		FairyGUI.Utils.ToolSet.uvLerp(tmp, tmp2, 0, 1);
-
-		int cnt = tmp2.Length;
-		Vector3[] verts = mesh.vertices;
-		for (int i = 0; i < cnt; i++)
+		Vector3[] vertices = new Vector3[4];
+		for (int i = 0; i < 4; i++)
 		{
-			Vector2 v2 = tmp2[i];
-			verts[i] = new Vector3(v2.x * 2 - 1, v2.y * 2 - 1);
+			Vector2 v = uv[i];
+			vertices[i] = new Vector3((v.x - uvRect.x) / uvRect.width * 2 - 1,
+				(v.y - uvRect.y) / uvRect.height * 2 - 1, 0);
 		}
-		mesh.vertices = verts;
+
+		Mesh mesh = new Mesh();
+		mesh.vertices = vertices;
+		mesh.uv = uv;
+		if (uv2 != null)
+			mesh.uv2 = uv2;
+		mesh.colors32 = new Color32[] { Color.white, Color.white, Color.white, Color.white };
+		mesh.triangles = new int[] { 0, 1, 2, 2, 3, 0 };
 
 		MeshFilter meshFilter = this._background.gameObject.GetComponent<MeshFilter>();
 		if (meshFilter == null)
@@ -137,6 +140,48 @@ public class RenderImage
 		if (source2 != null)
 			mat.SetTexture("_Tex2", source2.texture.nativeTexture);
 		meshRenderer.material = mat;
+	}
+
+	Rect GetImageUVRect(Image image, Rect localRect, Vector2[] uv)
+	{
+		Rect imageRect = new Rect(0, 0, image.size.x, image.size.y);
+		Rect bound = ToolSet.Intersection(ref imageRect, ref localRect);
+		Rect uvRect = image.texture.uvRect;
+
+		if (image.scale9Grid != null)
+		{
+			Rect gridRect = (Rect)image.scale9Grid;
+			float sourceW = image.texture.width;
+			float sourceH = image.texture.height;
+			uvRect = Rect.MinMaxRect(Mathf.Lerp(uvRect.xMin, uvRect.xMax, gridRect.xMin / sourceW),
+				Mathf.Lerp(uvRect.yMin, uvRect.yMax, (sourceH - gridRect.yMax) / sourceH),
+				Mathf.Lerp(uvRect.xMin, uvRect.xMax, gridRect.xMax / sourceW),
+				Mathf.Lerp(uvRect.yMin, uvRect.yMax, (sourceH - gridRect.yMin) / sourceH));
+
+			float vw = imageRect.width - (sourceW - gridRect.width);
+			float vh = imageRect.height - (sourceH - gridRect.height);
+			uvRect = Rect.MinMaxRect(Mathf.Lerp(uvRect.xMin, uvRect.xMax, (bound.x - gridRect.x) / vw),
+				Mathf.Lerp(uvRect.yMin, uvRect.yMax, (imageRect.height - bound.yMax - (sourceH - gridRect.yMax)) / vh),
+				 Mathf.Lerp(uvRect.xMin, uvRect.xMax, (bound.xMax - gridRect.x) / vw),
+				 Mathf.Lerp(uvRect.yMin, uvRect.yMax, (imageRect.height - bound.yMin - gridRect.y) / vh));
+		}
+		else
+		{
+			uvRect = Rect.MinMaxRect(Mathf.Lerp(uvRect.xMin, uvRect.xMax, bound.xMin / imageRect.width),
+				Mathf.Lerp(uvRect.yMin, uvRect.yMax, (imageRect.height - bound.yMax) / imageRect.height),
+				Mathf.Lerp(uvRect.xMin, uvRect.xMax, bound.xMax / imageRect.width),
+				Mathf.Lerp(uvRect.yMin, uvRect.yMax, (imageRect.height - bound.yMin) / imageRect.height));
+		}
+
+		uv[0] = uvRect.position;
+		uv[1] = new Vector2(uvRect.xMin, uvRect.yMax);
+		uv[2] = new Vector2(uvRect.xMax, uvRect.yMax);
+		uv[3] = new Vector2(uvRect.xMax, uvRect.yMin);
+
+		if (image.texture.rotated)
+			ToolSet.RotateUV(uv, ref image.texture.uvRect);
+
+		return uvRect;
 	}
 
 	public void LoadModel(string model)
