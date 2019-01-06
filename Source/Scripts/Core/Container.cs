@@ -391,7 +391,11 @@ namespace FairyGUI
 			{
 				if (_mask != value)
 				{
+					if (_mask != null)
+						_mask.graphics._SetAsMask(false);
 					_mask = value;
+					if (_mask != null)
+						_mask.graphics._SetAsMask(true);
 					UpdateBatchingFlags();
 				}
 			}
@@ -406,21 +410,8 @@ namespace FairyGUI
 			set
 			{
 				base.touchable = value;
-				if (hitArea != null)
-					hitArea.SetEnabled(value);
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Rect contentRect
-		{
-			get { return _contentRect; }
-			set
-			{
-				_contentRect = value;
-				OnSizeChanged(true, true);
+				if (hitArea != null && (hitArea is ColliderHitTest))
+					((ColliderHitTest)hitArea).collider.enabled = value;
 			}
 		}
 
@@ -499,6 +490,7 @@ namespace FairyGUI
 			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(HitTestContext.screenPoint);
 			HitTestContext.direction = Vector3.back;
 			HitTestContext.forTouch = forTouch;
+			HitTestContext.camera = StageCamera.main;
 
 			DisplayObject ret = HitTest();
 			if (ret != null)
@@ -509,29 +501,6 @@ namespace FairyGUI
 				return null;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		public Vector2 GetHitTestLocalPoint()
-		{
-			if (this.renderMode == RenderMode.WorldSpace)
-			{
-				Camera camera = GetRenderCamera();
-
-				Vector3 screenPoint = camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
-				screenPoint.x = HitTestContext.screenPoint.x;
-				screenPoint.y = HitTestContext.screenPoint.y;
-
-				//获得本地z轴在世界坐标的方向
-				HitTestContext.worldPoint = camera.ScreenToWorldPoint(screenPoint);
-				Ray ray = camera.ScreenPointToRay(screenPoint);
-				HitTestContext.direction = Vector3.zero - ray.direction;
-			}
-
-			return WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
-		}
-
 		override protected DisplayObject HitTest()
 		{
 			if (_disabled)
@@ -540,26 +509,46 @@ namespace FairyGUI
 			if (this.cachedTransform.localScale.x == 0 || this.cachedTransform.localScale.y == 0)
 				return null;
 
-			Vector2 localPoint = new Vector2();
 			Vector3 savedWorldPoint = HitTestContext.worldPoint;
 			Vector3 savedDirection = HitTestContext.direction;
+			Camera savedCamera = HitTestContext.camera;
+
+			if (this.renderMode == RenderMode.WorldSpace)
+			{
+				HitTestContext.camera = GetRenderCamera();
+
+				Vector3 screenPoint = HitTestContext.camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
+				screenPoint.x = HitTestContext.screenPoint.x;
+				screenPoint.y = HitTestContext.screenPoint.y;
+
+				//获得本地z轴在世界坐标的方向
+				HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(screenPoint);
+				Ray ray = HitTestContext.camera.ScreenPointToRay(screenPoint);
+				HitTestContext.direction = Vector3.zero - ray.direction;
+			}
+
+			Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
 
 			if (hitArea != null)
 			{
-				if (!hitArea.HitTest(this, ref localPoint))
+				if (!hitArea.HitTest(_contentRect, localPoint))
 				{
 					HitTestContext.worldPoint = savedWorldPoint;
 					HitTestContext.direction = savedDirection;
+					HitTestContext.camera = savedCamera;
 					return null;
 				}
+
+				if (hitArea is MeshColliderHitTest)
+					localPoint = ((MeshColliderHitTest)hitArea).lastHit;
 			}
 			else
 			{
-				localPoint = GetHitTestLocalPoint();
 				if (_clipRect != null && !((Rect)_clipRect).Contains(localPoint))
 				{
 					HitTestContext.worldPoint = savedWorldPoint;
 					HitTestContext.direction = savedDirection;
+					HitTestContext.camera = savedCamera;
 					return null;
 				}
 			}
@@ -568,7 +557,12 @@ namespace FairyGUI
 			{
 				DisplayObject tmp = _mask.InternalHitTestMask();
 				if (!reversedMask && tmp == null || reversedMask && tmp != null)
+				{
+					HitTestContext.worldPoint = savedWorldPoint;
+					HitTestContext.direction = savedDirection;
+					HitTestContext.camera = savedCamera;
 					return null;
+				}
 			}
 
 			DisplayObject target = null;
@@ -578,7 +572,7 @@ namespace FairyGUI
 				for (int i = count - 1; i >= 0; --i) // front to back!
 				{
 					DisplayObject child = _children[i];
-					if (child == _mask)
+					if (child == _mask || child._touchDisabled)
 						continue;
 
 					target = child.InternalHitTest();
@@ -592,6 +586,7 @@ namespace FairyGUI
 
 			HitTestContext.worldPoint = savedWorldPoint;
 			HitTestContext.direction = savedDirection;
+			HitTestContext.camera = savedCamera;
 
 			return target;
 		}
@@ -717,9 +712,6 @@ namespace FairyGUI
 
 			if (context.batchingDepth > 0)
 			{
-				if (_mask != null)
-					_mask.graphics.maskFrameId = UpdateContext.frameId;
-
 				int cnt = _children.Count;
 				for (int i = 0; i < cnt; i++)
 				{
@@ -731,10 +723,7 @@ namespace FairyGUI
 			else
 			{
 				if (_mask != null)
-				{
-					_mask.graphics.maskFrameId = UpdateContext.frameId;
 					_mask.renderingOrder = context.renderingOrder++;
-				}
 
 				int cnt = _children.Count;
 				for (int i = 0; i < cnt; i++)
@@ -750,7 +739,7 @@ namespace FairyGUI
 				}
 
 				if (_mask != null)
-					_mask.graphics.SetStencilEraserOrder(context.renderingOrder++);
+					_mask.graphics._SetStencilEraserOrder(context.renderingOrder++);
 			}
 
 			if (_fBatching)
@@ -792,8 +781,8 @@ namespace FairyGUI
 					((Container)child).SetRenderingOrder(context);
 			}
 
-			if (_mask != null && _mask.graphics != null)
-				_mask.graphics.SetStencilEraserOrder(context.renderingOrder++);
+			if (_mask != null)
+				_mask.graphics._SetStencilEraserOrder(context.renderingOrder++);
 		}
 
 		private void DoFairyBatching()

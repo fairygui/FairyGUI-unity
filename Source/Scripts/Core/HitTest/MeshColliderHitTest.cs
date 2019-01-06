@@ -7,8 +7,7 @@ namespace FairyGUI
 	/// </summary>
 	public class MeshColliderHitTest : ColliderHitTest
 	{
-		float width;
-		float height;
+		public Vector2 lastHit;
 
 		/// <summary>
 		/// 
@@ -22,45 +21,23 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="width"></param>
-		/// <param name="height"></param>
-		override public void SetArea(float x, float y, float width, float height)
+		/// <param name="contentRect"></param>
+		/// <param name="localPoint"></param>
+		/// <returns></returns>
+		override public bool HitTest(Rect contentRect, Vector2 localPoint)
 		{
-			this.width = width;
-			this.height = height;
-		}
-
-		override public bool HitTest(Container container, ref Vector2 localPoint)
-		{
-			Camera camera = container.GetRenderCamera();
-
 			RaycastHit hit;
-			if (!HitTestContext.GetRaycastHitFromCache(camera, out hit))
+			if (!HitTestContext.GetRaycastHitFromCache(HitTestContext.camera, out hit))
 				return false;
 
 			if (hit.collider != collider)
 				return false;
 
-			localPoint = new Vector2(hit.textureCoord.x * this.width, (1 - hit.textureCoord.y) * this.height);
+			lastHit = new Vector2(hit.textureCoord.x * contentRect.width, (1 - hit.textureCoord.y) * contentRect.height);
 			HitTestContext.direction = Vector3.back;
-			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(new Vector2(localPoint.x, Screen.height - localPoint.y));
+			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(new Vector2(lastHit.x, Screen.height - lastHit.y));
 
 			return true;
-		}
-
-		public bool ScreenToLocal(Camera camera, Vector3 screenPoint, ref Vector2 point)
-		{
-			Ray ray = camera.ScreenPointToRay(screenPoint);
-			RaycastHit hit;
-			if (collider.Raycast(ray, out hit, 100))
-			{
-				point = new Vector2(hit.textureCoord.x * this.width, (1 - hit.textureCoord.y) * this.height);
-				return true;
-			}
-			else
-				return false;
 		}
 	}
 }

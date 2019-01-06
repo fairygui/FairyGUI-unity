@@ -86,67 +86,6 @@ namespace FairyGUI.Utils
 			return new Rect(x, y, Mathf.Max(rect1.xMax, rect2.xMax) - x, Mathf.Max(rect1.yMax, rect2.yMax) - y);
 		}
 
-		public static void FlipRect(ref Rect rect, FlipType flip)
-		{
-			if (flip == FlipType.Horizontal || flip == FlipType.Both)
-			{
-				float tmp = rect.xMin;
-				rect.xMin = rect.xMax;
-				rect.xMax = tmp;
-			}
-			if (flip == FlipType.Vertical || flip == FlipType.Both)
-			{
-				float tmp = rect.yMin;
-				rect.yMin = rect.yMax;
-				rect.yMax = tmp;
-			}
-		}
-
-		public static void FlipInnerRect(float sourceWidth, float sourceHeight, ref Rect rect, FlipType flip)
-		{
-			if (flip == FlipType.Horizontal || flip == FlipType.Both)
-			{
-				rect.x = sourceWidth - rect.xMax;
-				rect.xMax = rect.x + rect.width;
-			}
-
-			if (flip == FlipType.Vertical || flip == FlipType.Both)
-			{
-				rect.y = sourceHeight - rect.yMax;
-				rect.yMax = rect.y + rect.height;
-			}
-		}
-
-		public static void uvLerp(Vector2[] uvSrc, Vector2[] uvDest, float min, float max)
-		{
-			float uMin = float.MaxValue;
-			float uMax = float.MinValue;
-			float vMin = float.MaxValue;
-			float vMax = float.MinValue;
-			int len = uvSrc.Length;
-			for (int i = 0; i < len; i++)
-			{
-				Vector2 v = uvSrc[i];
-				if (v.x < uMin)
-					uMin = v.x;
-				if (v.x > uMax)
-					uMax = v.x;
-				if (v.y < vMin)
-					vMin = v.y;
-				if (v.y > vMax)
-					vMax = v.y;
-			}
-			float uLen = uMax - uMin;
-			float vLen = vMax - vMin;
-			for (int i = 0; i < len; i++)
-			{
-				Vector2 v = uvSrc[i];
-				v.x = (v.x - uMin) / uLen;
-				v.y = (v.y - vMin) / vLen;
-				uvDest[i] = v;
-			}
-		}
-
 		public static void SetParent(Transform t, Transform parent)
 		{
 			if ((object)t.parent == (object)parent)
@@ -189,30 +128,27 @@ namespace FairyGUI.Utils
 			matrix.m12 = m12;
 		}
 
-		//From Starling
-		public static bool IsPointInTriangle(ref Vector2 p, ref Vector2 a, ref Vector2 b, ref Vector2 c)
+		public static void RotateUV(Vector2[] uv, ref Rect baseUVRect)
 		{
-			// This algorithm is described well in this article:
-			// http://www.blackpawn.com/texts/pointinpoly/default.html
+			int vertCount = uv.Length;
+			float xMin = Mathf.Min(baseUVRect.xMin, baseUVRect.xMax);
+			float yMin = baseUVRect.yMin;
+			float yMax = baseUVRect.yMax;
+			if (yMin > yMax)
+			{
+				yMin = yMax;
+				yMax = baseUVRect.yMin;
+			}
 
-			float v0x = c.x - a.x;
-			float v0y = c.y - a.y;
-			float v1x = b.x - a.x;
-			float v1y = b.y - a.y;
-			float v2x = p.x - a.x;
-			float v2y = p.y - a.y;
-
-			float dot00 = v0x * v0x + v0y * v0y;
-			float dot01 = v0x * v1x + v0y * v1y;
-			float dot02 = v0x * v2x + v0y * v2y;
-			float dot11 = v1x * v1x + v1y * v1y;
-			float dot12 = v1x * v2x + v1y * v2y;
-
-			float invDen = 1.0f / (dot00 * dot11 - dot01 * dot01);
-			float u = (dot11 * dot02 - dot01 * dot12) * invDen;
-			float v = (dot00 * dot12 - dot01 * dot02) * invDen;
-
-			return (u >= 0) && (v >= 0) && (u + v < 1);
+			float tmp;
+			for (int i = 0; i < vertCount; i++)
+			{
+				Vector2 m = uv[i];
+				tmp = m.y;
+				m.y = yMin + m.x - xMin;
+				m.x = xMin + yMax - tmp;
+				uv[i] = m;
+			}
 		}
 	}
 }

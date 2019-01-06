@@ -40,8 +40,8 @@ namespace FairyGUI
 		/// <seealso cref="FlipType"/>
 		public FlipType flip
 		{
-			get { return _content.flip; }
-			set { _content.flip = value; }
+			get { return _content.graphics.flip; }
+			set { _content.graphics.flip = value; }
 		}
 
 		/// <summary>
@@ -139,7 +139,6 @@ namespace FairyGUI
 			_content.scale9Grid = packageItem.scale9Grid;
 			_content.scaleByTile = packageItem.scaleByTile;
 			_content.tileGridIndice = packageItem.tileGridIndice;
-
 			_content.texture = packageItem.texture;
 
 			SetSize(sourceWidth, sourceHeight);
@@ -153,7 +152,7 @@ namespace FairyGUI
 
 			if (buffer.ReadBool())
 				_content.color = buffer.ReadColor();
-			_content.flip = (FlipType)buffer.ReadByte();
+			_content.graphics.flip = (FlipType)buffer.ReadByte();
 			_content.fillMethod = (FillMethod)buffer.ReadByte();
 			if (_content.fillMethod != FillMethod.None)
 			{

@@ -384,7 +384,6 @@ namespace FairyGUI
 					_content.scale9Grid = _contentItem.scale9Grid;
 					_content.scaleByTile = _contentItem.scaleByTile;
 					_content.tileGridIndice = _contentItem.tileGridIndice;
-
 					_contentSourceWidth = _contentItem.width;
 					_contentSourceHeight = _contentItem.height;
 					UpdateLayout();
@@ -397,7 +396,7 @@ namespace FairyGUI
 					_content.interval = _contentItem.interval;
 					_content.swing = _contentItem.swing;
 					_content.repeatDelay = _contentItem.repeatDelay;
-					_content.SetData(_contentItem.texture, _contentItem.frames, new Rect(0, 0, _contentSourceWidth, _contentSourceHeight));
+					_content.frames = _contentItem.frames;
 
 					UpdateLayout();
 				}
@@ -498,12 +497,12 @@ namespace FairyGUI
 
 		private void UpdateLayout()
 		{
-			if (_content2 == null && _content.texture == null && _content.frameCount == 0)
+			if (_content2 == null && _content.texture == null && _content.frames == null)
 			{
 				if (_autoSize)
 				{
 					_updatingLayout = true;
-					this.SetSize(50, 30);
+					SetSize(50, 30);
 					_updatingLayout = false;
 				}
 				return;
@@ -519,7 +518,8 @@ namespace FairyGUI
 					_contentWidth = 50;
 				if (_contentHeight == 0)
 					_contentHeight = 30;
-				this.SetSize(_contentWidth, _contentHeight);
+				SetSize(_contentWidth, _contentHeight);
+
 				_updatingLayout = false;
 
 				if (_width == _contentWidth && _height == _contentHeight)
@@ -536,6 +536,8 @@ namespace FairyGUI
 						if (_content.texture != null)
 							_content.SetNativeSize();
 					}
+
+					InvalidateBatchingState();
 					return;
 				}
 				//如果不相等，可能是由于大小限制造成的，要后续处理
@@ -611,6 +613,8 @@ namespace FairyGUI
 				_content2.SetXY(nx, ny);
 			else
 				_content.SetXY(nx, ny);
+
+			InvalidateBatchingState();
 		}
 
 		private void ClearContent()
@@ -624,7 +628,6 @@ namespace FairyGUI
 				_content.texture = null;
 			}
 
-			_content.Clear();
 			if (_content2 != null)
 			{
 				_content2.Dispose();

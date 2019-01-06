@@ -41,75 +41,32 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="graphics"></param>
-		/// <param name="context"></param>
+		/// <param name="materialType"></param>
+		/// <param name="blendMode"></param>
+		/// <param name="clipId"></param>
 		/// <param name="firstInstance"></param>
 		/// <returns></returns>
-		public NMaterial GetMaterial(NGraphics graphics, UpdateContext context, out bool firstInstance)
+		public NMaterial GetMaterial(int materialType, BlendMode blendMode, uint clipId, out bool firstInstance)
 		{
 			uint frameId = UpdateContext.frameId;
-			BlendMode blendMode = graphics.blendMode;
-			int collectionIndex;
-			uint clipId;
-
-			if (context.clipped && !graphics.dontClip)
-			{
-				clipId = context.clipInfo.clipId;
-
-				if (graphics.maskFrameId == UpdateContext.frameId)
-					collectionIndex = 6;
-				else if (context.rectMaskDepth == 0)
-				{
-					if (graphics.grayed)
-						collectionIndex = 1;
-					else
-						collectionIndex = 0;
-				}
-				else
-				{
-					if (context.clipInfo.soft)
-					{
-						if (graphics.grayed)
-							collectionIndex = 5;
-						else
-							collectionIndex = 4;
-					}
-					else
-					{
-						if (graphics.grayed)
-							collectionIndex = 3;
-						else
-							collectionIndex = 2;
-					}
-				}
-			}
-			else
-			{
-				clipId = 0;
-				if (graphics.grayed)
-					collectionIndex = 1;
-				else
-					collectionIndex = 0;
-			}
-
 			List<NMaterial> items;
 
 			if (blendMode == BlendMode.Normal)
 			{
-				items = _materials[collectionIndex];
+				items = _materials[materialType];
 				if (items == null)
 				{
 					items = new List<NMaterial>();
-					_materials[collectionIndex] = items;
+					_materials[materialType] = items;
 				}
 			}
 			else
 			{
-				items = _materials[internalKeywordCount + collectionIndex];
+				items = _materials[internalKeywordCount + materialType];
 				if (items == null)
 				{
 					items = new List<NMaterial>();
-					_materials[internalKeywordCount + collectionIndex] = items;
+					_materials[internalKeywordCount + materialType] = items;
 				}
 			}
 
@@ -120,7 +77,7 @@ namespace FairyGUI
 				NMaterial mat = items[i];
 				if (mat.frameId == frameId)
 				{
-					if (collectionIndex != 6 && mat.clipId == clipId && mat.blendMode == blendMode)
+					if (materialType != 6 && mat.clipId == clipId && mat.blendMode == blendMode)
 					{
 						firstInstance = false;
 						return mat;
@@ -145,7 +102,7 @@ namespace FairyGUI
 			else
 			{
 				result = CreateMaterial();
-				string[] keywords = internalKeywords[collectionIndex];
+				string[] keywords = internalKeywords[materialType];
 				if (keywords != null)
 				{
 					cnt = keywords.Length;

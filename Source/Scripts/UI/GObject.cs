@@ -136,9 +136,6 @@ namespace FairyGUI
 		EventListener _onDragEnd;
 		EventListener _onGearStop;
 
-		//Size的实现方式，有两种，0-GObject的w/h等于DisplayObject的w/h。1-GObject的sourceWidth/sourceHeight等于DisplayObject的w/h，剩余部分由scale实现
-		protected int _sizeImplType;
-
 		internal protected bool underConstruct;
 		internal float _width;
 		internal float _height;
@@ -772,7 +769,7 @@ namespace FairyGUI
 				_pivotAsAnchor = asAnchor;
 				if (displayObject != null)
 					displayObject.pivot = new Vector2(_pivotX, _pivotY);
-				if (_sizeImplType == 1 || _pivotAsAnchor) //displayObject的轴心参考宽高与GObject的参看宽高不一样的情况下，需要调整displayObject的位置
+				if (_pivotAsAnchor) //displayObject的轴心参考宽高与GObject的参看宽高不一样的情况下，需要调整displayObject的位置
 					HandlePositionChanged();
 			}
 		}
@@ -1769,23 +1766,13 @@ namespace FairyGUI
 		virtual protected void HandleSizeChanged()
 		{
 			if (displayObject != null)
-			{
-				if (_sizeImplType == 0 || sourceWidth == 0 || sourceHeight == 0)
-					displayObject.SetSize(_width, _height);
-				else
-					displayObject.SetScale(_scaleX * _width / sourceWidth, _scaleY * _height / sourceHeight);
-			}
+				displayObject.SetSize(_width, _height);
 		}
 
 		virtual protected void HandleScaleChanged()
 		{
 			if (displayObject != null)
-			{
-				if (_sizeImplType == 0 || sourceWidth == 0 || sourceHeight == 0)
-					displayObject.SetScale(_scaleX, _scaleY);
-				else
-					displayObject.SetScale(_scaleX * _width / sourceWidth, _scaleY * _height / sourceHeight);
-			}
+				displayObject.SetScale(_scaleX, _scaleY);
 		}
 
 		virtual protected void HandleGrayedChanged()

@@ -10,8 +10,9 @@ namespace FairyGUI
 	public class TypingEffect
 	{
 		protected TextField _textField;
+		protected Vector3[] _backupVerts;
+		protected Vector3[] _vertices;
 
-		protected List<Vector3> _backupVerts;
 		protected bool _stroke;
 		protected bool _shadow;
 
@@ -32,7 +33,6 @@ namespace FairyGUI
 		{
 			_textField = textField;
 			_textField.EnableCharPositionSupport();
-			_backupVerts = new List<Vector3>();
 		}
 
 		/// <summary>
@@ -46,7 +46,6 @@ namespace FairyGUI
 			else
 				_textField = (TextField)textField.displayObject;
 			_textField.EnableCharPositionSupport();
-			_backupVerts = new List<Vector3>();
 		}
 
 		/// <summary>
@@ -58,7 +57,6 @@ namespace FairyGUI
 			_textField.Redraw();
 			_textField.graphics.meshModifier += OnMeshModified;
 
-			_backupVerts.Clear();
 			_stroke = false;
 			_shadow = false;
 			_strokeDrawDirs = 4;
@@ -68,17 +66,14 @@ namespace FairyGUI
 			_vertIndex = 0;
 			_started = true;
 
-			int vertCount = _textField.graphics.vertCount;
-
-			//备份所有顶点后将顶点置0
-			Vector3[] vertices = _textField.graphics.vertices;
+			int vertCount = _textField.graphics.mesh.vertexCount;
+			_backupVerts = _textField.graphics.mesh.vertices;
+			if (_vertices == null || _vertices.Length != vertCount)
+				_vertices = new Vector3[vertCount];
 			Vector3 zero = Vector3.zero;
 			for (int i = 0; i < vertCount; i++)
-			{
-				_backupVerts.Add(vertices[i]);
-				vertices[i] = zero;
-			}
-			_textField.graphics.mesh.vertices = vertices;
+				_vertices[i] = zero;
+			_textField.graphics.mesh.vertices = _vertices;
 
 			//隐藏所有混排的对象
 			if (_textField.richTextField != null)
@@ -144,16 +139,12 @@ namespace FairyGUI
 
 		private void output(int vertCount)
 		{
-			Vector3[] vertices = _textField.graphics.vertices;
 			int start, end;
 
 			start = _mainLayerStart + _vertIndex;
 			end = start + vertCount;
 			for (int i = start; i < end; i++)
-			{
-				vertices[i] = _backupVerts[i];
-				_backupVerts[i] = Vector3.zero;
-			}
+				_vertices[i] = _backupVerts[i];
 
 			if (_stroke)
 			{
@@ -164,8 +155,7 @@ namespace FairyGUI
 					for (int j = 0; j < _strokeDrawDirs; j++)
 					{
 						int k = i + _mainLayerVertCount * j;
-						vertices[k] = _backupVerts[k];
-						_backupVerts[k] = Vector3.zero;
+						_vertices[k] = _backupVerts[k];
 					}
 				}
 			}
@@ -176,12 +166,11 @@ namespace FairyGUI
 				end = start + vertCount;
 				for (int i = start; i < end; i++)
 				{
-					vertices[i] = _backupVerts[i];
-					_backupVerts[i] = Vector3.zero;
+					_vertices[i] = _backupVerts[i];
 				}
 			}
 
-			_textField.graphics.mesh.vertices = vertices;
+			_textField.graphics.mesh.vertices = _vertices;
 
 			_vertIndex += vertCount;
 		}
@@ -221,24 +210,23 @@ namespace FairyGUI
 		/// </summary>
 		void OnMeshModified()
 		{
-			Vector3[] vertices = _textField.graphics.vertices;
-
-			if (vertices.Length != _backupVerts.Count) //可能文字都改了
+			if (_textField.graphics.mesh.vertexCount != _backupVerts.Length) //可能文字都改了
 			{
 				Cancel();
 				return;
 			}
 
-			int vertCount = vertices.Length;
+			_backupVerts = _textField.graphics.mesh.vertices;
+
+			int vertCount = _vertices.Length;
 			Vector3 zero = Vector3.zero;
 			for (int i = 0; i < vertCount; i++)
 			{
-				if (_backupVerts[i] != zero) //not output yet
-				{
-					_backupVerts[i] = vertices[i];
-					vertices[i] = Vector3.zero;
-				}
+				if (_vertices[i] != zero)
+					_vertices[i] = _backupVerts[i];
 			}
+
+			_textField.graphics.mesh.vertices = _vertices;
 		}
 	}
 }

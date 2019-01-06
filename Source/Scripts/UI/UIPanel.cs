@@ -179,7 +179,11 @@ namespace FairyGUI
 			{
 				SetSortingOrder(this.sortingOrder, true);
 				if (this.hitTestMode == HitTestMode.Raycast)
-					this.container.hitArea = new BoxColliderHitTest(this.gameObject.AddComponent<BoxCollider>());
+				{
+					ColliderHitTest hitArea = new ColliderHitTest();
+					hitArea.collider = this.gameObject.AddComponent<BoxCollider>();
+					this.container.hitArea = hitArea;
+				}
 
 				if (setNativeChildrenOrder)
 				{
@@ -261,7 +265,9 @@ namespace FairyGUI
 				{
 					if (collider == null)
 						collider = this.gameObject.AddComponent<BoxCollider>();
-					this.container.hitArea = new BoxColliderHitTest(collider);
+					ColliderHitTest hitArea = new ColliderHitTest();
+					hitArea.collider = collider;
+					this.container.hitArea = hitArea;
 					if (_ui != null)
 						UpdateHitArea();
 				}
@@ -338,8 +344,12 @@ namespace FairyGUI
 
 		void UpdateHitArea()
 		{
-			if (this.container.hitArea != null)
-				((BoxColliderHitTest)this.container.hitArea).SetArea(_ui.xMin, _ui.yMin, _ui.width, _ui.height);
+			ColliderHitTest hitArea = this.container.hitArea as ColliderHitTest;
+			if (hitArea != null)
+			{
+				((BoxCollider)hitArea.collider).center = new Vector3(_ui.xMin + _ui.width / 2, -_ui.yMin - _ui.height / 2);
+				((BoxCollider)hitArea.collider).size = _ui.size;
+			}
 		}
 
 		void CreateUI_EditMode()

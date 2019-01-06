@@ -1012,15 +1012,6 @@ namespace FairyGUI
 				scrollPane.OnOwnerSizeChanged();
 			if (rootContainer.clipRect != null)
 				UpdateClipRect();
-
-			if (rootContainer.hitArea is PixelHitTest)
-			{
-				PixelHitTest test = (PixelHitTest)rootContainer.hitArea;
-				if (sourceWidth != 0)
-					test.scaleX = this.width / this.sourceWidth;
-				if (sourceHeight != 0)
-					test.scaleY = this.height / this.sourceHeight;
-			}
 		}
 
 		override protected void HandleGrayedChanged()
@@ -1443,7 +1434,7 @@ namespace FairyGUI
 				{
 					int i1 = buffer.ReadInt();
 					int i2 = buffer.ReadInt();
-					this.rootContainer.hitArea = new PixelHitTest(pi.pixelHitTestData, i1, i2);
+					this.rootContainer.hitArea = new PixelHitTest(pi.pixelHitTestData, i1, i2, sourceWidth, sourceHeight);
 				}
 			}
 

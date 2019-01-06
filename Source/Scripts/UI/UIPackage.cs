@@ -1204,6 +1204,7 @@ namespace FairyGUI
 			string spriteId;
 			MovieClip.Frame frame;
 			AtlasSprite sprite;
+			Rect frameRect = new Rect();
 
 			for (int i = 0; i < frameCount; i++)
 			{
@@ -1211,28 +1212,17 @@ namespace FairyGUI
 				nextPos += buffer.position;
 
 				frame = new MovieClip.Frame();
-				frame.rect.x = buffer.ReadInt();
-				frame.rect.y = buffer.ReadInt();
-				frame.rect.width = buffer.ReadInt();
-				frame.rect.height = buffer.ReadInt();
+				frameRect.x = buffer.ReadInt();
+				frameRect.y = buffer.ReadInt();
+				frameRect.width = buffer.ReadInt();
+				frameRect.height = buffer.ReadInt();
 				frame.addDelay = buffer.ReadInt() / 1000f;
 				spriteId = buffer.ReadS();
 
 				if (spriteId != null && _sprites.TryGetValue(spriteId, out sprite))
 				{
-					if (item.texture == null)
-						item.texture = (NTexture)GetItemAsset(sprite.atlas);
-					frame.uvRect = new Rect(sprite.rect.x / item.texture.width * item.texture.uvRect.width,
-						1 - sprite.rect.yMax * item.texture.uvRect.height / item.texture.height,
-						sprite.rect.width * item.texture.uvRect.width / item.texture.width,
-						sprite.rect.height * item.texture.uvRect.height / item.texture.height);
-					frame.rotated = sprite.rotated;
-					if (frame.rotated)
-					{
-						float tmp = frame.uvRect.width;
-						frame.uvRect.width = frame.uvRect.height;
-						frame.uvRect.height = tmp;
-					}
+					frame.texture = new NTexture((NTexture)GetItemAsset(sprite.atlas), sprite.rect, sprite.rotated,
+						new Vector2(item.width, item.height), frameRect.position);
 				}
 				item.frames[i] = frame;
 
@@ -1323,13 +1313,7 @@ namespace FairyGUI
 					if (_itemsById.TryGetValue(img, out charImg))
 					{
 						GetItemAsset(charImg);
-						Rect uvRect = charImg.texture.uvRect;
-						bg.uv[0] = uvRect.position;
-						bg.uv[1] = new Vector2(uvRect.xMin, uvRect.yMax);
-						bg.uv[2] = new Vector2(uvRect.xMax, uvRect.yMax);
-						bg.uv[3] = new Vector2(uvRect.xMax, uvRect.yMin);
-						if (charImg.texture.rotated)
-							NGraphics.RotateUV(bg.uv, ref uvRect);
+						charImg.texture.GetUV(bg.uv);
 						bg.width = charImg.texture.width;
 						bg.height = charImg.texture.height;
 

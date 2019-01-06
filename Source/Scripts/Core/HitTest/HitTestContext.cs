@@ -13,6 +13,7 @@ namespace FairyGUI
 		public static Vector3 worldPoint;
 		public static Vector3 direction;
 		public static bool forTouch;
+		public static Camera camera;
 
 		public static int layerMask = -1;
 		public static float maxDistance = Mathf.Infinity;
@@ -30,17 +31,17 @@ namespace FairyGUI
 		public static bool GetRaycastHitFromCache(Camera camera, out RaycastHit hit)
 		{
 			RaycastHit? hitRef;
-			if (!HitTestContext.raycastHits.TryGetValue(camera, out hitRef))
+			if (!raycastHits.TryGetValue(camera, out hitRef))
 			{
 				Ray ray = camera.ScreenPointToRay(HitTestContext.screenPoint);
 				if (Physics.Raycast(ray, out hit, maxDistance, layerMask))
 				{
-					HitTestContext.raycastHits[camera] = hit;
+					raycastHits[camera] = hit;
 					return true;
 				}
 				else
 				{
-					HitTestContext.raycastHits[camera] = null;
+					raycastHits[camera] = null;
 					return false;
 				}
 			}
@@ -63,7 +64,7 @@ namespace FairyGUI
 		/// <param name="hit"></param>
 		public static void CacheRaycastHit(Camera camera, ref RaycastHit hit)
 		{
-			HitTestContext.raycastHits[camera] = hit;
+			raycastHits[camera] = hit;
 		}
 
 		/// <summary>

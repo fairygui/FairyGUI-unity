@@ -90,7 +90,6 @@ namespace FairyGUI
 		protected bool _cacheAsBitmap;
 
 		protected Rect _contentRect;
-		protected bool _requireUpdateMesh;
 		protected Matrix4x4? _transformMatrix;
 		protected bool _ownsGameObject;
 
@@ -463,7 +462,7 @@ namespace FairyGUI
 			ApplyPivot();
 			_paintingFlag = 1;
 			if (graphics != null)
-				_requireUpdateMesh = true;
+				graphics.contentRect = _contentRect;
 			_outlineChanged = true;
 		}
 
@@ -711,7 +710,6 @@ namespace FairyGUI
 			{
 				this.graphics.cameraPosition = camPos;
 				this.graphics.vertexMatrix = _transformMatrix;
-				_requireUpdateMesh = true;
 			}
 
 			_outlineChanged = true;
@@ -1012,7 +1010,6 @@ namespace FairyGUI
 			_paintingMode ^= requestorId;
 			if (_paintingMode == 0)
 			{
-				paintingGraphics.ClearMesh();
 				paintingGraphics.enabled = false;
 
 				if (this is Container)
@@ -1128,23 +1125,22 @@ namespace FairyGUI
 			}
 			else if (targetSpace == parent && _rotation.z == 0)
 			{
-				float sx = this.scaleX;
-				float sy = this.scaleY;
-				return new Rect(this.x, this.y, _contentRect.width * sx, _contentRect.height * sy);
+				return new Rect(cachedTransform.localPosition.x, -cachedTransform.localPosition.y,
+					_contentRect.width * cachedTransform.localScale.x, _contentRect.height * cachedTransform.localScale.y);
 			}
 			else
 				return TransformRect(_contentRect, targetSpace);
 		}
 
-		protected internal DisplayObject InternalHitTest()
+		internal DisplayObject InternalHitTest()
 		{
-			if (!_visible || (HitTestContext.forTouch && (!_touchable || _touchDisabled)))
+			if (_visible && (!HitTestContext.forTouch || _touchable))
+				return HitTest();
+			else
 				return null;
-
-			return HitTest();
 		}
 
-		protected internal DisplayObject InternalHitTestMask()
+		internal DisplayObject InternalHitTestMask()
 		{
 			if (_visible)
 				return HitTest();
@@ -1185,8 +1181,11 @@ namespace FairyGUI
 
 				if (wsc.hitArea is MeshColliderHitTest)
 				{
-					if (((MeshColliderHitTest)wsc.hitArea).ScreenToLocal(cam, screenPoint, ref point))
+					Ray ray = cam.ScreenPointToRay(screenPoint);
+					RaycastHit hit;
+					if (((MeshColliderHitTest)wsc.hitArea).collider.Raycast(ray, out hit, 100))
 					{
+						point = new Vector2(hit.textureCoord.x * _contentRect.width, (1 - hit.textureCoord.y) * _contentRect.height);
 						worldPoint = Stage.inst.cachedTransform.TransformPoint(point.x, -point.y, 0);
 						direction = Vector3.back;
 					}
@@ -1369,11 +1368,7 @@ namespace FairyGUI
 		virtual public void Update(UpdateContext context)
 		{
 			if (graphics != null)
-			{
-				graphics.alpha = context.alpha * _alpha;
-				graphics.grayed = context.grayed | _grayed;
-				graphics.UpdateMaterial(context);
-			}
+				graphics.Update(context, context.alpha * _alpha, context.grayed | _grayed);
 
 			if (_paintingMode != 0)
 			{
@@ -1390,6 +1385,7 @@ namespace FairyGUI
 					//从优化考虑，决定使用绘画模式的容器都需要明确指定大小，而不是自动计算包围。这在UI使用上并没有问题，因为组件总是有固定大小的
 					int textureWidth = Mathf.RoundToInt(_contentRect.width + _paintingMargin.left + _paintingMargin.right);
 					int textureHeight = Mathf.RoundToInt(_contentRect.height + _paintingMargin.top + _paintingMargin.bottom);
+					paintingGraphics.contentRect = new Rect(-_paintingMargin.left, -_paintingMargin.top, textureWidth, textureHeight);
 					if (paintingTexture == null || paintingTexture.width != textureWidth || paintingTexture.height != textureHeight)
 					{
 						if (paintingTexture != null)
@@ -1403,16 +1399,6 @@ namespace FairyGUI
 							paintingTexture = null;
 						paintingGraphics.texture = paintingTexture;
 					}
-
-					if (paintingTexture != null)
-					{
-						paintingGraphics.DrawRect(
-							new Rect(-_paintingMargin.left, -_paintingMargin.top, paintingTexture.width, paintingTexture.height),
-							new Rect(0, 0, 1, 1), Color.white);
-						paintingGraphics.UpdateMesh();
-					}
-					else
-						paintingGraphics.ClearMesh();
 				}
 
 				if (paintingTexture != null)
@@ -1424,7 +1410,7 @@ namespace FairyGUI
 						UpdateContext.OnEnd += _captureDelegate;
 				}
 
-				paintingGraphics.UpdateMaterial(context);
+				paintingGraphics.Update(context, 1, false);
 			}
 
 			if (_filter != null)

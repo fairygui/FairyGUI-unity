@@ -18,6 +18,13 @@ namespace FairyGUI
 		{
 		}
 
+		override protected void CreateDisplayObject()
+		{
+			_shape = new Shape();
+			_shape.gOwner = this;
+			displayObject = _shape;
+		}
+
 		/// <summary>
 		/// Replace this object to another object in the display list.
 		/// 在显示列表中，将指定对象取代这个图形对象。这个图形对象相当于一个占位的用途。
@@ -82,15 +89,14 @@ namespace FairyGUI
 			if (displayObject == obj)
 				return;
 
-			if (displayObject != null)
+			if (_shape != null)
 			{
-				if (displayObject.parent != null)
-					displayObject.parent.RemoveChild(displayObject, true);
+				if (_shape.parent != null)
+					_shape.parent.RemoveChild(displayObject, true);
 				else
-					displayObject.Dispose();
+					_shape.Dispose();
+				_shape.gOwner = null;
 				_shape = null;
-				displayObject.gOwner = null;
-				displayObject = null;
 			}
 
 			displayObject = obj;
@@ -137,28 +143,7 @@ namespace FairyGUI
 		/// </summary>
 		public Shape shape
 		{
-			get
-			{
-				if (_shape != null)
-					return _shape;
-
-				if (displayObject != null)
-					displayObject.Dispose();
-
-				_shape = new Shape();
-				_shape.gOwner = this;
-				displayObject = _shape;
-				if (parent != null)
-					parent.ChildStateChanged(this);
-				HandleSizeChanged();
-				HandleScaleChanged();
-				HandlePositionChanged();
-				_shape.alpha = this.alpha;
-				_shape.rotation = this.rotation;
-				_shape.visible = this.visible;
-
-				return _shape;
-			}
+			get { return _shape; }
 		}
 
 		/// <summary>
@@ -173,7 +158,7 @@ namespace FairyGUI
 		public void DrawRect(float aWidth, float aHeight, int lineSize, Color lineColor, Color fillColor)
 		{
 			this.SetSize(aWidth, aHeight);
-			this.shape.DrawRect(lineSize, lineColor, fillColor);
+			_shape.DrawRect(lineSize, lineColor, fillColor);
 		}
 
 		/// <summary>
@@ -186,7 +171,7 @@ namespace FairyGUI
 		public void DrawRoundRect(float aWidth, float aHeight, Color fillColor, float[] corner)
 		{
 			this.SetSize(aWidth, aHeight);
-			this.shape.DrawRoundRect(fillColor, corner);
+			this.shape.DrawRoundRect(0, Color.white, fillColor, corner[0], corner[1], corner[2], corner[3]);
 		}
 
 		/// <summary>
@@ -198,60 +183,51 @@ namespace FairyGUI
 		public void DrawEllipse(float aWidth, float aHeight, Color fillColor)
 		{
 			this.SetSize(aWidth, aHeight);
-			this.shape.DrawEllipse(fillColor);
+			_shape.DrawEllipse(fillColor);
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="aWidth"></param>
+		/// <param name="aHeight"></param>
 		/// <param name="points"></param>
 		/// <param name="fillColor"></param>
 		public void DrawPolygon(float aWidth, float aHeight, Vector2[] points, Color fillColor)
 		{
 			this.SetSize(aWidth, aHeight);
-			this.shape.DrawPolygon(points, fillColor);
+			_shape.DrawPolygon(points, fillColor);
 		}
 
 		override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
 		{
+			base.Setup_BeforeAdd(buffer, beginPos);
+
 			buffer.Seek(beginPos, 5);
 
 			int type = buffer.ReadByte();
-			int lineSize = 0;
-			Color lineColor = new Color();
-			Color fillColor = new Color();
-			float[] cornerRadius = null;
-
 			if (type != 0)
 			{
-				_shape = new Shape();
-				_shape.gOwner = this;
-				displayObject = _shape;
-
-				lineSize = buffer.ReadInt();
-				lineColor = buffer.ReadColor();
-				fillColor = buffer.ReadColor();
-				cornerRadius = null;
-				if (buffer.ReadBool())
+				int lineSize = buffer.ReadInt();
+				Color lineColor = buffer.ReadColor();
+				Color fillColor = buffer.ReadColor();
+				bool roundedRect = buffer.ReadBool();
+				Vector4 cornerRadius = new Vector4();
+				if (roundedRect)
 				{
-					cornerRadius = new float[4];
 					for (int i = 0; i < 4; i++)
 						cornerRadius[i] = buffer.ReadFloat();
 				}
-			}
-			base.Setup_BeforeAdd(buffer, beginPos);
 
-			if (_shape != null)
-			{
 				if (type == 1)
 				{
-					if (cornerRadius != null)
-						DrawRoundRect(this.width, this.height, fillColor, cornerRadius);
+					if (roundedRect)
+						_shape.DrawRoundRect(lineSize, lineColor, fillColor, cornerRadius.x, cornerRadius.y, cornerRadius.z, cornerRadius.w);
 					else
-						DrawRect(this.width, this.height, lineSize, lineColor, fillColor);
+						_shape.DrawRect(lineSize, lineColor, fillColor);
 				}
 				else
-					DrawEllipse(this.width, this.height, fillColor);
+					_shape.DrawEllipse(lineSize, fillColor, lineColor, fillColor, 0, 360);
 			}
 		}
 	}

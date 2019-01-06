@@ -338,9 +338,15 @@ namespace FairyGUI
 			_updatingSize = true;
 
 			if (_textField.autoSize == AutoSizeType.Both)
+			{
 				this.size = displayObject.size;
+				InvalidateBatchingState();
+			}
 			else if (_textField.autoSize == AutoSizeType.Height)
+			{
 				this.height = displayObject.height;
+				InvalidateBatchingState();
+			}
 
 			_updatingSize = false;
 		}

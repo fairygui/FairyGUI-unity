@@ -75,7 +75,7 @@ namespace FairyGUI
 			return false;
 		}
 
-		virtual public bool GetGlyph(char ch, GlyphInfo glyph)
+		virtual public bool GetGlyph(char ch, ref GlyphInfo glyph)
 		{
 			return false;
 		}
@@ -93,10 +93,14 @@ namespace FairyGUI
 	/// <summary>
 	/// Character info.
 	/// </summary>
-	public class GlyphInfo
+	public struct GlyphInfo
 	{
-		public Rect vert;
-		public Vector2[] uv = new Vector2[4];
+		public Vector2 vertMin;
+		public Vector2 vertMax;
+		public Vector2 uvBottomLeft;
+		public Vector2 uvTopLeft;
+		public Vector2 uvTopRight;
+		public Vector2 uvBottomRight;
 		public float width;
 		public float height;
 		public int channel;

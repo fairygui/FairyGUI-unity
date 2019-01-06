@@ -183,7 +183,6 @@ namespace FairyGUI
 			if (_ui != null)
 			{
 				this.container.AddChild(_ui.displayObject);
-				((MeshColliderHitTest)this.container.hitArea).SetArea(0, 0, _ui.width, _ui.height);
 				this.container.size = _ui.size;
 				_texture = CaptureCamera.CreateRenderTexture(Mathf.RoundToInt(_ui.width), Mathf.RoundToInt(_ui.height), UIConfig.depthSupportForPaintingMode);
 				_renderer = this.GetComponent<Renderer>();

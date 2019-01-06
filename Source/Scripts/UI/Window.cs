@@ -147,8 +147,9 @@ namespace FairyGUI
 					_dragArea = value;
 					if (_dragArea != null)
 					{
-						if ((_dragArea is GGraph) && ((GGraph)_dragArea).displayObject == null)
-							((GGraph)_dragArea).DrawRect(_dragArea.width, _dragArea.height, 0, Color.clear, Color.clear);
+						GGraph graph = _dragArea as GGraph;
+						if (graph != null && graph.shape.isEmpty)
+							graph.DrawRect(_dragArea.width, _dragArea.height, 0, Color.clear, Color.clear);
 						_dragArea.draggable = true;
 						_dragArea.onDragStart.Add(__dragStart);
 					}

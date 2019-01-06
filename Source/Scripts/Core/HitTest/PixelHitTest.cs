@@ -33,8 +33,8 @@ namespace FairyGUI
 	{
 		public int offsetX;
 		public int offsetY;
-		public float scaleX;
-		public float scaleY;
+		public float sourceWidth;
+		public float sourceHeight;
 
 		PixelHitTestData _data;
 
@@ -44,26 +44,28 @@ namespace FairyGUI
 		/// <param name="data"></param>
 		/// <param name="offsetX"></param>
 		/// <param name="offsetY"></param>
-		public PixelHitTest(PixelHitTestData data, int offsetX, int offsetY)
+		public PixelHitTest(PixelHitTestData data, int offsetX, int offsetY, float sourceWidth, float sourceHeight)
 		{
 			_data = data;
 			this.offsetX = offsetX;
 			this.offsetY = offsetY;
-
-			scaleX = 1;
-			scaleY = 1;
+			this.sourceWidth = sourceWidth;
+			this.sourceHeight = sourceHeight;
 		}
 
-		public void SetEnabled(bool value)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="contentRect"></param>
+		/// <param name="localPoint"></param>
+		/// <returns></returns>
+		public bool HitTest(Rect contentRect, Vector2 localPoint)
 		{
-		}
+			if (!contentRect.Contains(localPoint))
+				return false;
 
-		public bool HitTest(Container container, ref Vector2 localPoint)
-		{
-			localPoint = container.GetHitTestLocalPoint();
-
-			int x = Mathf.FloorToInt((localPoint.x / scaleX - offsetX) * _data.scale);
-			int y = Mathf.FloorToInt((localPoint.y / scaleY - offsetY) * _data.scale);
+			int x = Mathf.FloorToInt((localPoint.x * sourceWidth / contentRect.width - offsetX) * _data.scale);
+			int y = Mathf.FloorToInt((localPoint.y * sourceHeight / contentRect.height - offsetY) * _data.scale);
 			if (x < 0 || y < 0 || x >= _data.pixelWidth)
 				return false;
 

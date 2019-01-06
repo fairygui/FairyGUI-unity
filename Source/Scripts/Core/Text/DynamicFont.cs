@@ -189,7 +189,7 @@ namespace FairyGUI
 			}
 		}
 
-		override public bool GetGlyph(char ch, GlyphInfo glyph)
+		override public bool GetGlyph(char ch, ref GlyphInfo glyph)
 		{
 			if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
 			{
@@ -202,43 +202,43 @@ namespace FairyGUI
 					ri = _lastRenderInfo = GetRenderInfo(_size);
 				}
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
-				glyph.vert.xMin = sTempChar.minX;
-				glyph.vert.yMin = sTempChar.minY - ri.yIndent;
-				glyph.vert.xMax = sTempChar.maxX;
+				glyph.vertMin.x = sTempChar.minX;
+				glyph.vertMin.y = sTempChar.minY - ri.yIndent;
+				glyph.vertMax.x = sTempChar.maxX;
 				if (sTempChar.glyphWidth == 0) //zero width, space etc
-					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
-				glyph.vert.yMax = sTempChar.maxY - ri.yIndent;
+					glyph.vertMax.x = glyph.vertMin.x + _size / 2;
+				glyph.vertMax.y = sTempChar.maxY - ri.yIndent;
 
-				glyph.uv[0] = sTempChar.uvBottomLeft;
-				glyph.uv[1] = sTempChar.uvTopLeft;
-				glyph.uv[2] = sTempChar.uvTopRight;
-				glyph.uv[3] = sTempChar.uvBottomRight;
+				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
+				glyph.uvTopLeft = sTempChar.uvTopLeft;
+				glyph.uvTopRight = sTempChar.uvTopRight;
+				glyph.uvBottomRight = sTempChar.uvBottomRight;
 
 				glyph.width = sTempChar.advance;
 				glyph.height = ri.height;
 				if (customBold)
 					glyph.width++;
 #else
-				glyph.vert.xMin = sTempChar.vert.xMin;
-				glyph.vert.yMin = sTempChar.vert.yMax - ri.yIndent;
-				glyph.vert.xMax = sTempChar.vert.xMax;
+				glyph.vertMin.x = sTempChar.vert.xMin;
+				glyph.vertMin.y = sTempChar.vert.yMax - ri.yIndent;
+				glyph.vertMax.x = sTempChar.vert.xMax;
 				if (sTempChar.vert.width == 0) //zero width, space etc
-					glyph.vert.xMax = glyph.vert.xMin + _size / 2;
-				glyph.vert.yMax = sTempChar.vert.yMin - ri.yIndent;
+					glyph.vertMax.x = glyph.vertMax.x + _size / 2;
+				glyph.vertMax.y = sTempChar.vert.yMin - ri.yIndent;
 
 				if (!sTempChar.flipped)
 				{
-					glyph.uv[0] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyph.uv[1] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
-					glyph.uv[2] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyph.uv[3] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
 				}
 				else
 				{
-					glyph.uv[0] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-					glyph.uv[1] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
-					glyph.uv[2] = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-					glyph.uv[3] = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+					glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
+					glyph.uvTopLeft = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
+					glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
+					glyph.uvBottomRight = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
 				}
 
 				glyph.width = Mathf.CeilToInt(sTempChar.width);
@@ -248,10 +248,8 @@ namespace FairyGUI
 #endif
 				if (keepCrisp)
 				{
-					glyph.vert.xMin /= UIContentScaler.scaleFactor;
-					glyph.vert.yMin /= UIContentScaler.scaleFactor;
-					glyph.vert.xMax /= UIContentScaler.scaleFactor;
-					glyph.vert.yMax /= UIContentScaler.scaleFactor;
+					glyph.vertMin /= UIContentScaler.scaleFactor;
+					glyph.vertMax /= UIContentScaler.scaleFactor;
 					glyph.width /= UIContentScaler.scaleFactor;
 					glyph.height /= UIContentScaler.scaleFactor;
 				}

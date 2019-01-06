@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -45,7 +46,11 @@ namespace FairyGUI
 
 		Texture _nativeTexture;
 		Texture _alphaTexture;
+
 		Rect _region;
+		Vector2 _offset;
+		Vector2 _originalSize;
+
 		NTexture _root;
 		Dictionary<string, MaterialManager> _materialManagers;
 
@@ -92,12 +97,8 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="texture"></param>
-		public NTexture(Texture texture)
+		public NTexture(Texture texture) : this(texture, null, 1, 1)
 		{
-			_root = this;
-			_nativeTexture = texture;
-			uvRect = new Rect(0, 0, 1, 1);
-			_region = new Rect(0, 0, texture.width, texture.height);
 		}
 
 		/// <summary>
@@ -108,11 +109,13 @@ namespace FairyGUI
 		/// <param name="yScale"></param>
 		public NTexture(Texture texture, Texture alphaTexture, float xScale, float yScale)
 		{
+
 			_root = this;
 			_nativeTexture = texture;
 			_alphaTexture = alphaTexture;
 			uvRect = new Rect(0, 0, xScale, yScale);
-			_region = new Rect(0, 0, texture.width, texture.height);
+			_originalSize = new Vector2(texture.width, texture.height);
+			_region = new Rect(0, 0, _originalSize.x, _originalSize.y);
 		}
 
 		/// <summary>
@@ -125,6 +128,7 @@ namespace FairyGUI
 			_root = this;
 			_nativeTexture = texture;
 			_region = region;
+			_originalSize = new Vector2(_region.width, _region.height);
 			uvRect = new Rect(region.x / _nativeTexture.width, 1 - region.yMax / _nativeTexture.height,
 				region.width / _nativeTexture.width, region.height / _nativeTexture.height);
 		}
@@ -134,6 +138,7 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="root"></param>
 		/// <param name="region"></param>
+		/// <param name="rotated"></param>
 		public NTexture(NTexture root, Rect region, bool rotated)
 		{
 			_root = root;
@@ -153,6 +158,22 @@ namespace FairyGUI
 				uvRect.height = tmp;
 			}
 			_region = region;
+			_originalSize = _region.size;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="root"></param>
+		/// <param name="region"></param>
+		/// <param name="rotated"></param>
+		/// <param name="originalSize"></param>
+		/// <param name="offset"></param>
+		public NTexture(NTexture root, Rect region, bool rotated, Vector2 originalSize, Vector2 offset)
+			: this(root, region, rotated)
+		{
+			_originalSize = originalSize;
+			_offset = offset;
 		}
 
 		/// <summary>
@@ -169,6 +190,65 @@ namespace FairyGUI
 		public int height
 		{
 			get { return (int)_region.height; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Vector2 offset
+		{
+			get { return _offset; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Vector2 originalSize
+		{
+			get { return _originalSize; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="drawRect"></param>
+		/// <returns></returns>
+		public Rect GetDrawRect(Rect drawRect)
+		{
+			if (_originalSize.x == _region.width && _originalSize.y == _region.height)
+				return drawRect;
+
+			float sx = drawRect.width / _originalSize.x;
+			float sy = drawRect.height / _originalSize.y;
+			return new Rect(_offset.x * sx, _offset.y * sy, _region.width * sx, _region.height * sy);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="uv"></param>
+		public void GetUV(Vector2[] uv)
+		{
+			uv[0] = uvRect.position;
+			uv[1] = new Vector2(uvRect.xMin, uvRect.yMax);
+			uv[2] = new Vector2(uvRect.xMax, uvRect.yMax);
+			uv[3] = new Vector2(uvRect.xMax, uvRect.yMin);
+			if (rotated)
+			{
+				float xMin = uvRect.xMin;
+				float yMin = uvRect.yMin;
+				float yMax = uvRect.yMax;
+
+				float tmp;
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2 m = uv[i];
+					tmp = m.y;
+					m.y = yMin + m.x - xMin;
+					m.x = xMin + yMax - tmp;
+					uv[i] = m;
+				}
+			}
 		}
 
 		/// <summary>

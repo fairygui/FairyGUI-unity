@@ -63,6 +63,7 @@ namespace FairyGUI
 		bool _ignoreEngineTimeScale;
 		bool _snapping;
 		object _userData;
+		GPath _path;
 
 		GTweenCallback _onUpdate;
 		GTweenCallback _onStart;
@@ -225,6 +226,17 @@ namespace FairyGUI
 		public GTweener SetSnapping(bool value)
 		{
 			_snapping = value;
+			return this;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public GTweener SetPath(GPath value)
+		{
+			_path = value;
 			return this;
 		}
 
@@ -567,6 +579,7 @@ namespace FairyGUI
 			_elapsedTime = 0;
 			_normalizedTime = 0;
 			_ended = 0;
+			_path = null;
 			_smoothStart = Time.frameCount == 1 ? 3 : 1;//刚启动时会有多帧的超时
 		}
 
@@ -699,6 +712,19 @@ namespace FairyGUI
 				}
 				else
 					_value.vec3 = _startValue.vec3;
+			}
+			else if (_path != null)
+			{
+				Vector3 vec3 = _path.GetPointAt(_normalizedTime);
+				vec3 += _startValue.vec3;
+				if (_snapping)
+				{
+					vec3.x = Mathf.Round(vec3.x);
+					vec3.y = Mathf.Round(vec3.y);
+					vec3.z = Mathf.Round(vec3.z);
+				}
+				_deltaValue.vec3 = vec3 - _value.vec3;
+				_value.vec3 = vec3;
 			}
 			else
 			{

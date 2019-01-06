@@ -20,15 +20,9 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="value"></param>
-		void SetEnabled(bool value);
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="container"></param>
+		/// <param name="contentRect"></param>
 		/// <param name="localPoint"></param>
 		/// <returns></returns>
-		bool HitTest(Container container, ref Vector2 localPoint);
+		bool HitTest(Rect contentRect, Vector2 localPoint);
 	}
 }

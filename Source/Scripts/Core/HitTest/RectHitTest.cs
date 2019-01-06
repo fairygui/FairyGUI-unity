@@ -10,15 +10,16 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public Rect rect { get; set; }
+		public Rect rect;
 
-		public void SetEnabled(bool value)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="contentRect"></param>
+		/// <param name="localPoint"></param>
+		/// <returns></returns>
+		public bool HitTest(Rect contentRect, Vector2 localPoint)
 		{
-		}
-
-		public bool HitTest(Container container, ref Vector2 localPoint)
-		{
-			localPoint = container.GetHitTestLocalPoint();
 			return rect.Contains(localPoint);
 		}
 	}

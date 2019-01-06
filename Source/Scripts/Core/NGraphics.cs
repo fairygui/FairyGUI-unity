@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -7,32 +8,12 @@ namespace FairyGUI
 	/// <summary>
 	/// 
 	/// </summary>
-	public class NGraphics
+	public class NGraphics : IMeshFactory
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		public Vector3[] vertices { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Vector2[] uv { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Color32[] colors { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public int[] triangles { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public int vertCount { get; private set; }
+		public GameObject gameObject { get; private set; }
 
 		/// <summary>
 		/// 
@@ -52,37 +33,12 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public GameObject gameObject { get; private set; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool grayed;
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public BlendMode blendMode;
 
 		/// <summary>
 		/// 不参与剪裁
 		/// </summary>
 		public bool dontClip;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public uint maskFrameId;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Matrix4x4? vertexMatrix;
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public Vector3? cameraPosition;
 
 		/// <summary>
 		/// 
@@ -100,50 +56,31 @@ namespace FairyGUI
 		bool _customMatarial;
 		MaterialManager _manager;
 		string[] _materialKeywords;
+		IMeshFactory _meshFactory;
 
 		float _alpha;
-		//透明度改变需要通过修改顶点颜色实现，但顶点颜色本身可能就带有透明度，所以这里要有一个备份
-		byte[] _alphaBackup;
+		Color _color;
+		bool _meshDirty;
+		Rect _contentRect;
+		FlipType _flip;
+		Matrix4x4? _vertexMatrix;
+		Vector3? _cameraPosition;
 
+		bool hasAlphaBackup;
+		List<byte> _alphaBackup; //透明度改变需要通过修改顶点颜色实现，但顶点颜色本身可能就带有透明度，所以这里要有一个备份
+
+		bool _isMask;
 		StencilEraser _stencilEraser;
 
-		/// <summary>
-		/// 写死的一些三角形顶点组合，避免每次new
-		/// 1---2
-		/// | / |
-		/// 0---3
-		/// </summary>
-		public static int[] TRIANGLES = new int[] { 0, 1, 2, 2, 3, 0 };
+#if !(UNITY_5_2 || UNITY_5_3_OR_NEWER)
+		Vector3[] _vertices;
+		Vector2[] _uv;
+		int[] _triangles;
+#endif
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public static int[] TRIANGLES_9_GRID = new int[] {
-			4,0,1,1,5,4,
-			5,1,2,2,6,5,
-			6,2,3,3,7,6,
-			8,4,5,5,9,8,
-			9,5,6,6,10,9,
-			10,6,7,7,11,10,
-			12,8,9,9,13,12,
-			13,9,10,10,14,13,
-			14,10,11,
-			11,15,14
-		};
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public static int[] TRIANGLES_4_GRID = new int[] {
-			4, 0, 5,
-			4, 5, 1,
-			4, 1, 6,
-			4, 6, 2,
-			4, 2, 7,
-			4, 7, 3,
-			4, 3, 8,
-			4, 8, 0
-		};
+#if !UNITY_5_6_OR_NEWER
+		Color32[] _colors;
+#endif
 
 		/// <summary>
 		/// 
@@ -152,26 +89,90 @@ namespace FairyGUI
 		public NGraphics(GameObject gameObject)
 		{
 			this.gameObject = gameObject;
+
 			_alpha = 1f;
 			_shader = ShaderConfig.imageShader;
+			_color = Color.white;
+			_meshFactory = this;
+
 			meshFilter = gameObject.AddComponent<MeshFilter>();
 			meshRenderer = gameObject.AddComponent<MeshRenderer>();
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 			meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 #else
-		meshRenderer.castShadows = false;
+			meshRenderer.castShadows = false;
 #endif
 			meshRenderer.receiveShadows = false;
+
 			mesh = new Mesh();
 			mesh.name = gameObject.name;
 			mesh.MarkDynamic();
+
+			meshFilter.mesh = mesh;
 
 			meshFilter.hideFlags = DisplayOptions.hideFlags;
 			meshRenderer.hideFlags = DisplayOptions.hideFlags;
 			mesh.hideFlags = DisplayOptions.hideFlags;
 
 			Stats.LatestGraphicsCreation++;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public IMeshFactory meshFactory
+		{
+			get { return _meshFactory; }
+			set
+			{
+				_meshFactory = value;
+				_meshDirty = true;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public T GetMeshFactory<T>() where T : IMeshFactory, new()
+		{
+			if (!(_meshFactory is T))
+			{
+				_meshFactory = new T();
+				_meshDirty = true;
+			}
+			return (T)_meshFactory;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Rect contentRect
+		{
+			get { return _contentRect; }
+			set
+			{
+				_contentRect = value;
+				_meshDirty = true;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public FlipType flip
+		{
+			get { return _flip; }
+			set
+			{
+				if (_flip != value)
+				{
+					_flip = value;
+					_meshDirty = true;
+				}
+			}
 		}
 
 		/// <summary>
@@ -187,6 +188,7 @@ namespace FairyGUI
 					_texture = value;
 					if (_customMatarial && _material != null)
 						_material.mainTexture = _texture != null ? _texture.nativeTexture : null;
+					_meshDirty = true;
 					UpdateManager();
 				}
 			}
@@ -216,6 +218,7 @@ namespace FairyGUI
 			_texture = texture;
 			if (_customMatarial && _material != null)
 				_material.mainTexture = _texture != null ? _texture.nativeTexture : null;
+			_meshDirty = true;
 			UpdateManager();
 		}
 
@@ -258,13 +261,14 @@ namespace FairyGUI
 
 		void UpdateManager()
 		{
-			if (_manager != null)
-				_manager.Release();
-
+			MaterialManager mm;
 			if (_texture != null)
-				_manager = _texture.GetMaterialManager(_shader, _materialKeywords);
+				mm = _texture.GetMaterialManager(_shader, _materialKeywords);
 			else
-				_manager = null;
+				mm = null;
+			if (_manager != null && _manager != mm)
+				_manager.Release();
+			_manager = mm;
 		}
 
 		/// <summary>
@@ -285,14 +289,164 @@ namespace FairyGUI
 			set { meshRenderer.sortingOrder = value; }
 		}
 
+		internal void _SetAsMask(bool value)
+		{
+			if (_isMask != value)
+			{
+				_isMask = value;
+				if (_isMask)
+				{
+					//设置擦除stencil的drawcall
+					if (_stencilEraser == null)
+					{
+						_stencilEraser = new StencilEraser(gameObject.transform);
+						_stencilEraser.meshFilter.mesh = mesh;
+					}
+					else
+						_stencilEraser.enabled = true;
+				}
+				else
+				{
+					if (_stencilEraser != null)
+						_stencilEraser.enabled = false;
+				}
+			}
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="value"></param>
-		public void SetStencilEraserOrder(int value)
+		internal void _SetStencilEraserOrder(int value)
 		{
-			if (_stencilEraser != null)
-				_stencilEraser.meshRenderer.sortingOrder = value;
+			_stencilEraser.meshRenderer.sortingOrder = value;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
+		public Color color
+		{
+			get { return _color; }
+			set { _color = value; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Tint()
+		{
+			if (_meshDirty)
+				return;
+
+			int vertCount = mesh.vertexCount;
+			if (vertCount == 0)
+				return;
+
+#if !UNITY_5_6_OR_NEWER
+			Color32[] colors = _colors;
+			if (colors == null)
+				colors = mesh.colors32;
+#else
+			VertexBuffer vb = VertexBuffer.Begin();
+			mesh.GetColors(vb.colors);
+			List<Color32> colors = vb.colors;
+#endif
+			for (int i = 0; i < vertCount; i++)
+			{
+				Color32 col = _color;
+				col.a = (byte)(_alpha * (hasAlphaBackup ? _alphaBackup[i] : (byte)255));
+				colors[i] = col;
+			}
+
+#if !UNITY_5_6_OR_NEWER
+			mesh.colors32 = colors;
+#else
+			mesh.SetColors(vb.colors);
+			vb.End();
+#endif
+		}
+
+		void ChangeAlpha(float value)
+		{
+			_alpha = value;
+
+			int vertCount = mesh.vertexCount;
+			if (vertCount == 0)
+				return;
+
+#if !UNITY_5_6_OR_NEWER
+			Color32[] colors = _colors;
+			if (colors == null)
+				colors = mesh.colors32;
+#else
+			VertexBuffer vb = VertexBuffer.Begin();
+			mesh.GetColors(vb.colors);
+			List<Color32> colors = vb.colors;
+#endif
+			for (int i = 0; i < vertCount; i++)
+			{
+				Color32 col = colors[i];
+				col.a = (byte)(_alpha * (hasAlphaBackup ? _alphaBackup[i] : (byte)255));
+				colors[i] = col;
+			}
+
+#if !UNITY_5_6_OR_NEWER
+			mesh.colors32 = colors;
+#else
+			mesh.SetColors(vb.colors);
+			vb.End();
+#endif
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Matrix4x4? vertexMatrix
+		{
+			get { return _vertexMatrix; }
+			set
+			{
+				_vertexMatrix = value;
+				_meshDirty = true;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Vector3? cameraPosition
+		{
+			get { return _cameraPosition; }
+			set
+			{
+				_cameraPosition = value;
+				_meshDirty = true;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void SetMeshDirty()
+		{
+			_meshDirty = true;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public bool UpdateMesh()
+		{
+			if (_meshDirty)
+			{
+				UpdateMeshNow();
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -303,9 +457,9 @@ namespace FairyGUI
 			if (mesh != null)
 			{
 				if (Application.isPlaying)
-					Object.Destroy(mesh);
+					UnityEngine.Object.Destroy(mesh);
 				else
-					Object.DestroyImmediate(mesh);
+					UnityEngine.Object.DestroyImmediate(mesh);
 				mesh = null;
 			}
 			if (_manager != null)
@@ -324,17 +478,46 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="context"></param>
-		public void UpdateMaterial(UpdateContext context)
+		/// <param name="alpha"></param>
+		/// <param name="grayed"></param>
+		public void Update(UpdateContext context, float alpha, bool grayed)
 		{
 			Stats.GraphicsCount++;
 
+			if (_meshDirty)
+			{
+				_alpha = alpha;
+				UpdateMeshNow();
+			}
+			else if (_alpha != alpha)
+				ChangeAlpha(alpha);
+
+			uint clipId = context.clipInfo.clipId;
+			int matType = 0;
 			NMaterial nm = null;
 			bool firstInstance = true;
 			if (!_customMatarial)
 			{
 				if (_manager != null)
 				{
-					nm = _manager.GetMaterial(this, context, out firstInstance);
+					if (context.clipped && !dontClip)
+					{
+						if (_isMask)
+							matType = 6;
+						else if (context.rectMaskDepth == 0)
+							matType = grayed ? 1 : 0;
+						else if (context.clipInfo.soft)
+							matType = grayed ? 5 : 4;
+						else
+							matType = grayed ? 3 : 2;
+					}
+					else
+					{
+						clipId = 0;
+						matType = grayed ? 1 : 0;
+					}
+
+					nm = _manager.GetMaterial(matType, blendMode, clipId, out firstInstance);
 					_material = nm.material;
 					if ((object)_material != (object)meshRenderer.sharedMaterial)
 						meshRenderer.sharedMaterial = _material;
@@ -347,13 +530,6 @@ namespace FairyGUI
 				}
 			}
 
-			if (maskFrameId != 0 && maskFrameId != UpdateContext.frameId)
-			{
-				//曾经是遮罩对象，现在不是了
-				if (_stencilEraser != null)
-					_stencilEraser.enabled = false;
-			}
-
 			if (firstInstance && (object)_material != null)
 			{
 				if (blendMode != BlendMode.Normal) //GetMateria已经保证了不同的blendMode会返回不同的共享材质，所以这里可以放心设置
@@ -362,7 +538,7 @@ namespace FairyGUI
 				bool clearStencil = false;
 				if (context.clipped)
 				{
-					if (maskFrameId != UpdateContext.frameId && context.rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
+					if (!_isMask && context.rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
 					{
 						_material.SetVector(ShaderConfig._properyIDs._ClipBox, context.clipInfo.clipBox);
 						if (context.clipInfo.soft)
@@ -371,7 +547,7 @@ namespace FairyGUI
 
 					if (context.stencilReferenceValue > 0)
 					{
-						if (maskFrameId == UpdateContext.frameId) //是遮罩
+						if (_isMask) //是遮罩
 						{
 							if (context.stencilReferenceValue == 1)
 							{
@@ -390,18 +566,9 @@ namespace FairyGUI
 								_material.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 							}
 
-							//设置擦除stencil的drawcall
-							if (_stencilEraser == null)
-							{
-								_stencilEraser = new StencilEraser(gameObject.transform);
-								_stencilEraser.meshFilter.mesh = mesh;
-							}
-							else
-								_stencilEraser.enabled = true;
-
 							if (nm != null)
 							{
-								NMaterial eraserNm = _manager.GetMaterial(this, context, out firstInstance);
+								NMaterial eraserNm = _manager.GetMaterial(matType, blendMode, clipId, out firstInstance);
 								eraserNm.stencilSet = true;
 								Material eraserMat = eraserNm.material;
 								if ((object)eraserMat != (object)_stencilEraser.meshRenderer.sharedMaterial)
@@ -438,6 +605,9 @@ namespace FairyGUI
 
 				if (clearStencil)
 				{
+					if (nm != null)
+						nm.stencilSet = false;
+
 					_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
 					_material.SetInt(ShaderConfig._properyIDs._Stencil, 0);
 					_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
@@ -447,39 +617,112 @@ namespace FairyGUI
 			}
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertCount"></param>
-		public void Alloc(int vertCount)
+		void UpdateMeshNow()
 		{
-			if (vertices == null || vertices.Length != vertCount)
+			_meshDirty = false;
+
+			if (_texture == null || _meshFactory == null)
 			{
-				vertices = new Vector3[vertCount];
-				uv = new Vector2[vertCount];
-				colors = new Color32[vertCount];
+				if (mesh.vertexCount > 0)
+				{
+					mesh.Clear();
+
+					if (meshModifier != null)
+						meshModifier();
+				}
+				return;
 			}
-		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public void UpdateMesh()
-		{
-			if (meshModifier != null)
-				meshModifier();
+			VertexBuffer vb = VertexBuffer.Begin();
+			vb.contentRect = _contentRect;
+			vb.uvRect = _texture.uvRect;
+			vb.vertexColor = _color;
+			_meshFactory.OnPopulateMesh(vb);
 
-			Vector3[] vertices = this.vertices;
-			vertCount = vertices.Length;
-			if (vertexMatrix != null)
+			int vertCount = vb.currentVertCount;
+			if (vertCount == 0)
 			{
-				Matrix4x4 mm = (Matrix4x4)vertexMatrix;
-				Vector3 camPos = cameraPosition != null ? (Vector3)cameraPosition : Vector3.zero;
+				if (mesh.vertexCount > 0)
+				{
+					mesh.Clear();
+
+					if (meshModifier != null)
+						meshModifier();
+				}
+				vb.End();
+				return;
+			}
+
+			if (_flip != FlipType.None)
+			{
+				bool h = _flip == FlipType.Horizontal || _flip == FlipType.Both;
+				bool v = _flip == FlipType.Vertical || _flip == FlipType.Both;
+				float xMax = _contentRect.xMax;
+				float yMax = _contentRect.yMax;
+				for (int i = 0; i < vertCount; i++)
+				{
+					Vector3 vec = vb.vertices[i];
+					if (h)
+						vec.x = xMax - (vec.x - _contentRect.x);
+					if (v)
+						vec.y = -(yMax - (-vec.y - _contentRect.y));
+					vb.vertices[i] = vec;
+				}
+				if (!(h && v))
+					vb.triangles.Reverse();
+			}
+
+			if (_texture.rotated)
+			{
+				float xMin = _texture.uvRect.xMin;
+				float yMin = _texture.uvRect.yMin;
+				float yMax = _texture.uvRect.yMax;
+				float tmp;
+				for (int i = 0; i < vertCount; i++)
+				{
+					Vector2 vec = vb.uv0[i];
+					tmp = vec.y;
+					vec.y = yMin + vec.x - xMin;
+					vec.x = xMin + yMax - tmp;
+					vb.uv0[i] = vec;
+				}
+			}
+
+			hasAlphaBackup = vb._alphaInVertexColor;
+			if (hasAlphaBackup)
+			{
+				if (_alphaBackup == null)
+					_alphaBackup = new List<byte>();
+				else
+					_alphaBackup.Clear();
+				for (int i = 0; i < vertCount; i++)
+				{
+					Color32 col = vb.colors[i];
+					_alphaBackup.Add(col.a);
+
+					col.a = (byte)(col.a * _alpha);
+					vb.colors[i] = col;
+				}
+			}
+			else if (_alpha != 1)
+			{
+				for (int i = 0; i < vertCount; i++)
+				{
+					Color32 col = vb.colors[i];
+					col.a = (byte)(col.a * _alpha);
+					vb.colors[i] = col;
+				}
+			}
+
+			if (_vertexMatrix != null)
+			{
+				Matrix4x4 mm = (Matrix4x4)_vertexMatrix;
+				Vector3 camPos = _cameraPosition != null ? (Vector3)_cameraPosition : Vector3.zero;
 				Vector3 center = new Vector3(camPos.x, camPos.y, 0);
 				center -= mm.MultiplyPoint(center);
 				for (int i = 0; i < vertCount; i++)
 				{
-					Vector3 pt = vertices[i];
+					Vector3 pt = vb.vertices[i];
 					pt = mm.MultiplyPoint(pt);
 					pt += center;
 					Vector3 vec = pt - camPos;
@@ -488,658 +731,90 @@ namespace FairyGUI
 					pt.y = camPos.y + lambda * vec.y;
 					pt.z = 0;
 
-					vertices[i] = pt;
+					vb.vertices[i] = pt;
 				}
-			}
-
-			Color32[] colors = this.colors;
-			for (int i = 0; i < vertCount; i++)
-			{
-				Color32 col = colors[i];
-				if (col.a != 255)
-				{
-					if (_alphaBackup == null)
-						_alphaBackup = new byte[vertCount];
-				}
-				col.a = (byte)(col.a * _alpha);
-				colors[i] = col;
-			}
-
-			if (_alphaBackup != null)
-			{
-				if (_alphaBackup.Length < vertCount)
-					_alphaBackup = new byte[vertCount];
-
-				for (int i = 0; i < vertCount; i++)
-					_alphaBackup[i] = colors[i].a;
 			}
 
 			mesh.Clear();
-			mesh.vertices = vertices;
-			mesh.uv = uv;
-			mesh.triangles = triangles;
-			mesh.colors32 = colors;
-			meshFilter.mesh = mesh;
 
-			if (_stencilEraser != null)
-				_stencilEraser.meshFilter.mesh = mesh;
+#if !(UNITY_5_2 || UNITY_5_3_OR_NEWER)
+			if (_vertices == null || _vertices.Length != vertCount)
+			{
+				_vertices = new Vector3[vertCount];
+				_uv = new Vector2[vertCount];
+				_colors = new Color32[vertCount];
+			}
+			vb.vertices.CopyTo(_vertices);
+			vb.uv0.CopyTo(_uv);
+			vb.colors.CopyTo(_colors);
+
+			if (_triangles == null || _triangles.Length != vb.triangles.Count)
+				_triangles = new int[vb.triangles.Count];
+			vb.triangles.CopyTo(_triangles);
+
+			mesh.vertices = _vertices;
+			mesh.uv = _uv;
+			mesh.triangles = _triangles;
+			mesh.colors32 = _colors;
+#else
+
+#if !UNITY_5_6_OR_NEWER
+			_colors = null;
+#endif
+			mesh.SetVertices(vb.vertices);
+			mesh.SetUVs(0, vb.uv0);
+			mesh.SetColors(vb.colors);
+			mesh.SetTriangles(vb.triangles, 0);
+#endif
+
+			vb.End();
+
+			if (meshModifier != null)
+				meshModifier();
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="color"></param>
-		public void DrawRect(Rect vertRect, Rect uvRect, Color color)
+		public void OnPopulateMesh(VertexBuffer vb)
 		{
-			//当四边形发生形变时，只用两个三角面表达会造成图形的变形较严重，这里做一个优化，自动增加更多的面
-			if (vertexMatrix != null)
+			Rect rect = texture.GetDrawRect(vb.contentRect);
+
+			if (_vertexMatrix != null)//画多边形时，要对UV处理才能有正确的显示，暂时未掌握，这里用更多的面来临时解决。
 			{
-				Alloc(9);
+				int hc = (int)Mathf.Min(Mathf.CeilToInt(rect.width / 30), 9);
+				int vc = (int)Mathf.Min(Mathf.CeilToInt(rect.height / 30), 9);
+				int eachPartX = Mathf.FloorToInt(rect.width / hc);
+				int eachPartY = Mathf.FloorToInt(rect.height / vc);
+				float x, y;
+				for (int i = 0; i <= vc; i++)
+				{
+					if (i == vc)
+						y = rect.yMax;
+					else
+						y = rect.y + i * eachPartY;
+					for (int j = 0; j <= hc; j++)
+					{
+						if (j == hc)
+							x = rect.xMax;
+						else
+							x = rect.x + j * eachPartX;
+						vb.AddVert(new Vector3(x, y, 0));
+					}
+				}
 
-				FillVerts(0, vertRect);
-				FillUV(0, uvRect);
-
-				Vector2 camPos;
-				camPos.x = vertRect.x + vertRect.width / 2;
-				camPos.y = -(vertRect.y + vertRect.height / 2);
-				float cx = uvRect.x + (camPos.x - vertRect.x) / vertRect.width * uvRect.width;
-				float cy = uvRect.y - (camPos.y - vertRect.y) / vertRect.height * uvRect.height;
-
-				vertices[4] = new Vector3(camPos.x, camPos.y, 0);
-				vertices[5] = new Vector3(vertRect.xMin, camPos.y, 0);
-				vertices[6] = new Vector3(camPos.x, -vertRect.yMin, 0);
-				vertices[7] = new Vector3(vertRect.xMax, camPos.y, 0);
-				vertices[8] = new Vector3(camPos.x, -vertRect.yMax, 0);
-
-				uv[4] = new Vector2(cx, cy);
-				uv[5] = new Vector2(uvRect.xMin, cy);
-				uv[6] = new Vector2(cx, uvRect.yMax);
-				uv[7] = new Vector2(uvRect.xMax, cy);
-				uv[8] = new Vector2(cx, uvRect.yMin);
-
-				this.triangles = TRIANGLES_4_GRID;
+				for (int i = 0; i < vc; i++)
+				{
+					int k = i * (hc + 1);
+					for (int j = 1; j <= hc; j++)
+					{
+						int m = k + j;
+						vb.AddTriangle(m - 1, m, m + hc);
+						vb.AddTriangle(m, m + hc + 1, m + hc);
+					}
+				}
 			}
 			else
 			{
-				Alloc(4);
-				FillVerts(0, vertRect);
-				FillUV(0, uvRect);
-				this.triangles = TRIANGLES;
-			}
-
-			FillColors(color);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="lineSize"></param>
-		/// <param name="lineColor"></param>
-		/// <param name="fillColor"></param>
-		public void DrawRect(Rect vertRect, Rect uvRect, int lineSize, Color lineColor, Color fillColor)
-		{
-			if (lineSize == 0)
-			{
-				DrawRect(vertRect, uvRect, fillColor);
-			}
-			else
-			{
-				Alloc(20);
-
-				Rect rect;
-				//left,right
-				rect = Rect.MinMaxRect(0, 0, lineSize, vertRect.height);
-				FillVerts(0, rect);
-				rect = Rect.MinMaxRect(vertRect.width - lineSize, 0, vertRect.width, vertRect.height);
-				FillVerts(4, rect);
-
-				//top, bottom
-				rect = Rect.MinMaxRect(lineSize, 0, vertRect.width - lineSize, lineSize);
-				FillVerts(8, rect);
-				rect = Rect.MinMaxRect(lineSize, vertRect.height - lineSize, vertRect.width - lineSize, vertRect.height);
-				FillVerts(12, rect);
-
-				//middle
-				rect = Rect.MinMaxRect(lineSize, lineSize, vertRect.width - lineSize, vertRect.height - lineSize);
-				FillVerts(16, rect);
-
-				FillShapeUV(ref vertRect, ref uvRect);
-
-				Color32[] arr = this.colors;
-				Color32 col32 = lineColor;
-				for (int i = 0; i < 16; i++)
-					arr[i] = col32;
-
-				col32 = fillColor;
-				for (int i = 16; i < 20; i++)
-					arr[i] = col32;
-
-				FillTriangles();
-			}
-		}
-
-		static float[] sCornerRadius = new float[] { 0, 0, 0, 0 };
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="fillColor"></param>
-		/// <param name="topLeftRadius"></param>
-		/// <param name="topRightRadius"></param>
-		/// <param name="bottomLeftRadius"></param>
-		/// <param name="bottomRightRadius"></param>
-		public void DrawRoundRect(Rect vertRect, Rect uvRect, Color fillColor,
-			float topLeftRadius, float topRightRadius, float bottomLeftRadius, float bottomRightRadius)
-		{
-			sCornerRadius[0] = topRightRadius;
-			sCornerRadius[1] = topLeftRadius;
-			sCornerRadius[2] = bottomLeftRadius;
-			sCornerRadius[3] = bottomRightRadius;
-
-			int numSides = 0;
-			for (int i = 0; i < 4; i++)
-			{
-				float radius = sCornerRadius[i];
-
-				if (radius != 0)
-				{
-					float radiusX = Mathf.Min(radius, vertRect.width / 2);
-					float radiusY = Mathf.Min(radius, vertRect.height / 2);
-					numSides += Mathf.Max(1, Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4 / 4)) + 1;
-				}
-				else
-					numSides++;
-			}
-
-			Alloc(numSides + 1);
-			Vector3[] vertices = this.vertices;
-
-			vertices[0] = new Vector3(vertRect.width / 2, -vertRect.height / 2);
-			int k = 1;
-
-			for (int i = 0; i < 4; i++)
-			{
-				float radius = sCornerRadius[i];
-
-				float radiusX = Mathf.Min(radius, vertRect.width / 2);
-				float radiusY = Mathf.Min(radius, vertRect.height / 2);
-
-				float offsetX = 0;
-				float offsetY = 0;
-
-				if (i == 0 || i == 3)
-					offsetX = vertRect.width - radiusX * 2;
-				if (i == 2 || i == 3)
-					offsetY = radiusY * 2 - vertRect.height;
-
-				if (radius != 0)
-				{
-					float partNumSides = Mathf.Max(1, Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4 / 4)) + 1;
-					float angleDelta = Mathf.PI / 2 / partNumSides;
-					float angle = Mathf.PI / 2 * i;
-					float startAngle = angle;
-
-					for (int j = 1; j <= partNumSides; j++)
-					{
-						if (j == partNumSides) //消除精度误差带来的不对齐
-							angle = startAngle + Mathf.PI / 2;
-						vertices[k] = new Vector3(offsetX + Mathf.Cos(angle) * radiusX + radiusX,
-							offsetY + Mathf.Sin(angle) * radiusY - radiusY, 0);
-						angle += angleDelta;
-						k++;
-					}
-				}
-				else
-				{
-					vertices[k] = new Vector3(offsetX, offsetY, 0);
-					k++;
-				}
-			}
-
-			FillShapeUV(ref vertRect, ref uvRect);
-
-			AllocTriangleArray(numSides * 3);
-			int[] triangles = this.triangles;
-
-			k = 0;
-			for (int i = 1; i < numSides; i++)
-			{
-				triangles[k++] = i + 1;
-				triangles[k++] = i;
-				triangles[k++] = 0;
-			}
-			triangles[k++] = 1;
-			triangles[k++] = numSides;
-			triangles[k++] = 0;
-
-			FillColors(fillColor);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="fillColor"></param>
-		public void DrawEllipse(Rect vertRect, Rect uvRect, Color fillColor)
-		{
-			float radiusX = vertRect.width / 2;
-			float radiusY = vertRect.height / 2;
-			int numSides = Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4);
-			if (numSides < 6) numSides = 6;
-
-			Alloc(numSides + 1);
-			Vector3[] vertices = this.vertices;
-
-			float angleDelta = 2 * Mathf.PI / numSides;
-			float angle = 0;
-
-			vertices[0] = new Vector3(radiusX, -radiusY);
-			for (int i = 1; i <= numSides; i++)
-			{
-				vertices[i] = new Vector3(Mathf.Cos(angle) * radiusX + radiusX,
-					Mathf.Sin(angle) * radiusY - radiusY, 0);
-				angle += angleDelta;
-			}
-
-			FillShapeUV(ref vertRect, ref uvRect);
-
-			AllocTriangleArray(numSides * 3);
-			int[] triangles = this.triangles;
-
-			int k = 0;
-			for (int i = 1; i < numSides; i++)
-			{
-				triangles[k++] = i + 1;
-				triangles[k++] = i;
-				triangles[k++] = 0;
-			}
-			triangles[k++] = 1;
-			triangles[k++] = numSides;
-			triangles[k++] = 0;
-
-			FillColors(fillColor);
-		}
-
-		static List<int> sRestIndices = new List<int>();
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="points"></param>
-		/// <param name="fillColor"></param>
-		public void DrawPolygon(Rect vertRect, Rect uvRect, Vector2[] points, Color fillColor)
-		{
-			int numVertices = points.Length;
-			if (numVertices < 3)
-				return;
-
-			int numTriangles = numVertices - 2;
-			int i, restIndexPos, numRestIndices;
-			int k = 0;
-
-			Alloc(numVertices);
-			Vector3[] vertices = this.vertices;
-
-			for (i = 0; i < numVertices; i++)
-				vertices[i] = new Vector3(points[i].x, -points[i].y);
-
-			FillShapeUV(ref vertRect, ref uvRect);
-
-			// Algorithm "Ear clipping method" described here:
-			// -> https://en.wikipedia.org/wiki/Polygon_triangulation
-			//
-			// Implementation inspired by:
-			// -> http://polyk.ivank.net
-			// -> Starling
-
-			AllocTriangleArray(numTriangles * 3);
-			int[] triangles = this.triangles;
-
-			sRestIndices.Clear();
-			for (i = 0; i < numVertices; ++i)
-				sRestIndices.Add(i);
-
-			restIndexPos = 0;
-			numRestIndices = numVertices;
-
-			Vector2 a, b, c, p;
-			int otherIndex;
-			bool earFound;
-			int i0, i1, i2;
-
-			while (numRestIndices > 3)
-			{
-				earFound = false;
-				i0 = sRestIndices[restIndexPos % numRestIndices];
-				i1 = sRestIndices[(restIndexPos + 1) % numRestIndices];
-				i2 = sRestIndices[(restIndexPos + 2) % numRestIndices];
-
-				a = points[i0];
-				b = points[i1];
-				c = points[i2];
-
-				if ((a.y - b.y) * (c.x - b.x) + (b.x - a.x) * (c.y - b.y) >= 0)
-				{
-					earFound = true;
-					for (i = 3; i < numRestIndices; ++i)
-					{
-						otherIndex = sRestIndices[(restIndexPos + i) % numRestIndices];
-						p = points[otherIndex];
-
-						if (ToolSet.IsPointInTriangle(ref p, ref a, ref b, ref c))
-						{
-							earFound = false;
-							break;
-						}
-					}
-				}
-
-				if (earFound)
-				{
-					triangles[k++] = i0;
-					triangles[k++] = i1;
-					triangles[k++] = i2;
-					sRestIndices.RemoveAt((restIndexPos + 1) % numRestIndices);
-
-					numRestIndices--;
-					restIndexPos = 0;
-				}
-				else
-				{
-					restIndexPos++;
-					if (restIndexPos == numRestIndices) break; // no more ears
-				}
-			}
-			triangles[k++] = sRestIndices[0];
-			triangles[k++] = sRestIndices[1];
-			triangles[k++] = sRestIndices[2];
-
-			FillColors(fillColor);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="vertRect"></param>
-		/// <param name="uvRect"></param>
-		/// <param name="method"></param>
-		/// <param name="amount"></param>
-		/// <param name="origin"></param>
-		/// <param name="clockwise"></param>
-		public void DrawRectWithFillMethod(Rect vertRect, Rect uvRect, Color fillColor,
-			FillMethod method, float amount, int origin, bool clockwise)
-		{
-			amount = Mathf.Clamp01(amount);
-			switch (method)
-			{
-				case FillMethod.Horizontal:
-					Alloc(4);
-					FillUtils.FillHorizontal((OriginHorizontal)origin, amount, vertRect, uvRect, vertices, uv);
-					break;
-
-				case FillMethod.Vertical:
-					Alloc(4);
-					FillUtils.FillVertical((OriginVertical)origin, amount, vertRect, uvRect, vertices, uv);
-					break;
-
-				case FillMethod.Radial90:
-					Alloc(4);
-					FillUtils.FillRadial90((Origin90)origin, amount, clockwise, vertRect, uvRect, vertices, uv);
-					break;
-
-				case FillMethod.Radial180:
-					Alloc(8);
-					FillUtils.FillRadial180((Origin180)origin, amount, clockwise, vertRect, uvRect, vertices, uv);
-					break;
-
-				case FillMethod.Radial360:
-					Alloc(12);
-					FillUtils.FillRadial360((Origin360)origin, amount, clockwise, vertRect, uvRect, vertices, uv);
-					break;
-			}
-
-			FillColors(fillColor);
-			FillTriangles();
-		}
-
-		void FillShapeUV(ref Rect vertRect, ref Rect uvRect)
-		{
-			Vector3[] vertices = this.vertices;
-			Vector2[] uv = this.uv;
-
-			int len = vertices.Length;
-			for (int i = 0; i < len; i++)
-			{
-				uv[i] = new Vector2(Mathf.Lerp(uvRect.xMin, uvRect.xMax, (vertices[i].x - vertRect.xMin) / vertRect.width),
-					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-vertices[i].y - vertRect.yMin) / vertRect.height));
-			}
-		}
-
-		/// <summary>
-		/// 从当前顶点缓冲区位置开始填入一个矩形的四个顶点
-		/// </summary>
-		/// <param name="index">填充位置顶点索引</param>
-		/// <param name="rect"></param>
-		public void FillVerts(int index, Rect rect)
-		{
-			vertices[index] = new Vector3(rect.xMin, -rect.yMax, 0f);
-			vertices[index + 1] = new Vector3(rect.xMin, -rect.yMin, 0f);
-			vertices[index + 2] = new Vector3(rect.xMax, -rect.yMin, 0f);
-			vertices[index + 3] = new Vector3(rect.xMax, -rect.yMax, 0f);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		/// <param name="rect"></param>
-		public void FillUV(int index, Rect rect)
-		{
-			uv[index] = new Vector2(rect.xMin, rect.yMin);
-			uv[index + 1] = new Vector2(rect.xMin, rect.yMax);
-			uv[index + 2] = new Vector2(rect.xMax, rect.yMax);
-			uv[index + 3] = new Vector2(rect.xMax, rect.yMin);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="value"></param>
-		public void FillColors(Color value)
-		{
-			Color32[] arr = this.colors;
-			int count = arr.Length;
-			Color32 col32 = value;
-			for (int i = 0; i < count; i++)
-				arr[i] = col32;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="value"></param>
-		public void FillColors(Color[] value)
-		{
-			Color32[] arr = this.colors;
-			int count = arr.Length;
-			int count2 = value.Length;
-			for (int i = 0; i < count; i++)
-				arr[i] = value[i % count2];
-		}
-
-		void AllocTriangleArray(int requestSize)
-		{
-			if (this.triangles == null
-				|| this.triangles.Length != requestSize
-				|| this.triangles == TRIANGLES
-				|| this.triangles == TRIANGLES_9_GRID
-				|| this.triangles == TRIANGLES_4_GRID)
-				this.triangles = new int[requestSize];
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public void FillTriangles()
-		{
-			int vertCount = this.vertices.Length;
-			AllocTriangleArray((vertCount >> 1) * 3);
-
-			int k = 0;
-			for (int i = 0; i < vertCount; i += 4)
-			{
-				triangles[k++] = i;
-				triangles[k++] = i + 1;
-				triangles[k++] = i + 2;
-
-				triangles[k++] = i + 2;
-				triangles[k++] = i + 3;
-				triangles[k++] = i;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="triangles"></param>
-		public void FillTriangles(int[] triangles)
-		{
-			this.triangles = triangles;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public void ClearMesh()
-		{
-			if (vertCount > 0)
-			{
-				vertCount = 0;
-
-				mesh.Clear();
-				meshFilter.mesh = mesh;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="value"></param>
-		public void Tint(Color value)
-		{
-			if (this.colors == null || vertCount == 0)
-				return;
-
-			Color32 value32 = value;
-			int count = this.colors.Length;
-			for (int i = 0; i < count; i++)
-			{
-				Color32 col = value32;
-				if (col.a != 255)
-				{
-					if (_alphaBackup == null)
-						_alphaBackup = new byte[vertCount];
-				}
-				col.a = (byte)(_alpha * 255);
-				this.colors[i] = col;
-			}
-
-			if (_alphaBackup != null)
-			{
-				if (_alphaBackup.Length < vertCount)
-					_alphaBackup = new byte[vertCount];
-
-				for (int i = 0; i < vertCount; i++)
-					_alphaBackup[i] = this.colors[i].a;
-			}
-
-			mesh.colors32 = this.colors;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public float alpha
-		{
-			get { return _alpha; }
-			set
-			{
-				if (_alpha != value)
-				{
-					_alpha = value;
-
-					if (vertCount > 0)
-					{
-						int count = this.colors.Length;
-						for (int i = 0; i < count; i++)
-						{
-							Color32 col = this.colors[i];
-							col.a = (byte)(_alpha * (_alphaBackup != null ? _alphaBackup[i] : (byte)255));
-							this.colors[i] = col;
-						}
-						mesh.colors32 = this.colors;
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="verts"></param>
-		/// <param name="index"></param>
-		/// <param name="rect"></param>
-		public static void FillVertsOfQuad(Vector3[] verts, int index, Rect rect)
-		{
-			verts[index] = new Vector3(rect.xMin, -rect.yMax, 0f);
-			verts[index + 1] = new Vector3(rect.xMin, -rect.yMin, 0f);
-			verts[index + 2] = new Vector3(rect.xMax, -rect.yMin, 0f);
-			verts[index + 3] = new Vector3(rect.xMax, -rect.yMax, 0f);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="uv"></param>
-		/// <param name="index"></param>
-		/// <param name="rect"></param>
-		public static void FillUVOfQuad(Vector2[] uv, int index, Rect rect)
-		{
-			uv[index] = new Vector2(rect.xMin, rect.yMin);
-			uv[index + 1] = new Vector2(rect.xMin, rect.yMax);
-			uv[index + 2] = new Vector2(rect.xMax, rect.yMax);
-			uv[index + 3] = new Vector2(rect.xMax, rect.yMin);
-		}
-
-		public static void RotateUV(Vector2[] uv, ref Rect baseUVRect)
-		{
-			int vertCount = uv.Length;
-			float xMin = Mathf.Min(baseUVRect.xMin, baseUVRect.xMax);
-			float yMin = baseUVRect.yMin;
-			float yMax = baseUVRect.yMax;
-			if (yMin > yMax)
-			{
-				yMin = yMax;
-				yMax = baseUVRect.yMin;
-			}
-
-			float tmp;
-			for (int i = 0; i < vertCount; i++)
-			{
-				Vector2 m = uv[i];
-				tmp = m.y;
-				m.y = yMin + m.x - xMin;
-				m.x = xMin + yMax - tmp;
-				uv[i] = m;
+				vb.AddQuad(rect, vb.vertexColor, vb.uvRect);
+				vb.AddTriangles();
 			}
 		}
 	}
@@ -1152,12 +827,14 @@ namespace FairyGUI
 
 		public StencilEraser(Transform parent)
 		{
-			gameObject = new GameObject("Eraser");
+			gameObject = new GameObject("StencilEraser");
 			ToolSet.SetParent(gameObject.transform, parent);
+
 			meshFilter = gameObject.AddComponent<MeshFilter>();
 			meshRenderer = gameObject.AddComponent<MeshRenderer>();
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+			meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 #else
 			meshRenderer.castShadows = false;
 #endif
