@@ -627,6 +627,7 @@ namespace FairyGUI
 					FreeExternal(image.texture);
 				_content.texture = null;
 			}
+			_content.frames = null;
 
 			if (_content2 != null)
 			{

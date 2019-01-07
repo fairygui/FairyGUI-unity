@@ -99,10 +99,15 @@ namespace FairyGUI
 			set
 			{
 				_frames = value;
+				_scale9Grid = null;
+				_scaleByTile = false;
+				this.fillMethod = FillMethod.None;
+				
 				if (_frames == null)
 				{
 					_frameCount = 0;
 					graphics.texture = null;
+					CheckTimer();
 					return;
 				}
 				_frameCount = frames.Length;
