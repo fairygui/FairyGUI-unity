@@ -129,7 +129,7 @@ namespace FairyGUI
 				_alphaInVertexColor = true;
 			uv0.Add(new Vector2(
 					Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
-					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (position.y - contentRect.yMin) / contentRect.height))
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height))
 				);
 		}
 

@@ -1262,9 +1262,9 @@ namespace FairyGUI
 							lastGlyphHeight = glyph.height;
 
 						v0.x = charX + glyph.vertMin.x;
-						v0.y = line.y + yIndent - glyph.vertMin.y;
+						v0.y = line.y + yIndent + glyph.vertMin.y;
 						v1.x = charX + glyph.vertMax.x;
-						v1.y = line.y + yIndent - glyph.vertMax.y;
+						v1.y = line.y + yIndent + glyph.vertMax.y;
 						u0 = glyph.uvBottomLeft;
 						u1 = glyph.uvTopLeft;
 						u2 = glyph.uvTopRight;
@@ -1300,10 +1300,10 @@ namespace FairyGUI
 							uvList.Add(u2);
 							uvList.Add(u3);
 
-							vertList.Add(new Vector3(v0.x, -v0.y));
 							vertList.Add(new Vector3(v0.x, -v1.y));
-							vertList.Add(new Vector3(v1.x, -v1.y));
+							vertList.Add(new Vector3(v0.x, -v0.y));
 							vertList.Add(new Vector3(v1.x, -v0.y));
+							vertList.Add(new Vector3(v1.x, -v1.y));
 
 							if (!_font.canTint)
 							{
@@ -1339,10 +1339,10 @@ namespace FairyGUI
 								float fx = BOLD_OFFSET[b * 2];
 								float fy = BOLD_OFFSET[b * 2 + 1];
 
-								vertList.Add(new Vector3(v0.x + fx, -(v0.y + fy)));
 								vertList.Add(new Vector3(v0.x + fx, -(v1.y + fy)));
-								vertList.Add(new Vector3(v1.x + fx, -(v1.y + fy)));
+								vertList.Add(new Vector3(v0.x + fx, -(v0.y + fy)));
 								vertList.Add(new Vector3(v1.x + fx, -(v0.y + fy)));
+								vertList.Add(new Vector3(v1.x + fx, -(v1.y + fy)));
 
 								if (!_font.canTint)
 								{
@@ -1389,17 +1389,17 @@ namespace FairyGUI
 								uvList.Add(u0);
 								uvList.Add(u0);
 
-								v0.y = line.y + yIndent - lineGlyph.vertMin.y + 1;
-								v1.y = line.y + yIndent - lineGlyph.vertMax.y + 1;
-								if (v0.y - v1.y > 2)
-									v0.y = v1.y + 2;
+								v0.y = line.y + yIndent + lineGlyph.vertMin.y + 1;
+								v1.y = line.y + yIndent + lineGlyph.vertMax.y + 1;
+								if (v1.y - v0.y > 2)
+									v1.y = v0.y + 2;
 
 								float tmpX = charX + letterSpacing + glyph.width;
 
-								vertList.Add(new Vector3(charX, -v0.y));
 								vertList.Add(new Vector3(charX, -v1.y));
-								vertList.Add(new Vector3(tmpX, -v1.y));
+								vertList.Add(new Vector3(charX, -v0.y));
 								vertList.Add(new Vector3(tmpX, -v0.y));
+								vertList.Add(new Vector3(tmpX, -v1.y));
 
 								if (!_font.canTint)
 								{

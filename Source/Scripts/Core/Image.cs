@@ -330,35 +330,10 @@ namespace FairyGUI
 			}
 			else
 			{
-				int hc, vc;
 				Rect drawRect;
 				Rect texRect;
 				int row, col;
 				int part;
-
-				//先计算需要的顶点数量
-				int vertCount = 0;
-				for (int pi = 0; pi < 9; pi++)
-				{
-					col = pi % 3;
-					row = pi / 3;
-					part = gridTileIndice[pi];
-
-					if (part != -1 && (_tileGridIndice & (1 << part)) != 0)
-					{
-						if (part == 0 || part == 1 || part == 4)
-							hc = Mathf.CeilToInt((gridX[col + 1] - gridX[col]) / gridRect.width);
-						else
-							hc = 1;
-						if (part == 2 || part == 3 || part == 4)
-							vc = Mathf.CeilToInt((gridY[row + 1] - gridY[row]) / gridRect.height);
-						else
-							vc = 1;
-						vertCount += hc * vc * 4;
-					}
-					else
-						vertCount += 4;
-				}
 
 				for (int pi = 0; pi < 9; pi++)
 				{
