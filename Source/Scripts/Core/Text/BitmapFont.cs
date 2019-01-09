@@ -104,9 +104,9 @@ namespace FairyGUI
 				glyph.width = Mathf.CeilToInt(bg.advance * scale);
 				glyph.height = Mathf.CeilToInt(bg.lineHeight * scale);
 				glyph.vertMin.x = bg.offsetX * scale;
-				glyph.vertMin.y = (-bg.height - bg.offsetY) * scale;
+				glyph.vertMin.y = bg.offsetY * scale;
 				glyph.vertMax.x = (bg.offsetX + bg.width) * scale;
-				glyph.vertMax.y = -bg.offsetY * scale;
+				glyph.vertMax.y = (bg.offsetY + bg.height) * scale;
 				glyph.uvBottomLeft = bg.uv[0];
 				glyph.uvTopLeft = bg.uv[1];
 				glyph.uvTopRight = bg.uv[2];

@@ -532,9 +532,7 @@ namespace FairyGUI
 					else
 					{
 						_content.SetXY(0, 0);
-						_content.SetScale(1, 1);
-						if (_content.texture != null)
-							_content.SetNativeSize();
+						_content.SetSize(_contentWidth, _contentHeight);
 					}
 
 					InvalidateBatchingState();
@@ -584,16 +582,9 @@ namespace FairyGUI
 			}
 
 			if (_content2 != null)
-			{
 				_content2.SetScale(sx, sy);
-			}
-			else if (_content.texture != null)
-			{
-				_content.SetScale(1, 1);
-				_content.size = new Vector2(_contentWidth, _contentHeight);
-			}
 			else
-				_content.SetScale(sx, sy);
+				_content.size = new Vector2(_contentWidth, _contentHeight);
 
 			float nx;
 			float ny;

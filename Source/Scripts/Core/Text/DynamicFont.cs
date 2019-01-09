@@ -203,11 +203,11 @@ namespace FairyGUI
 				}
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 				glyph.vertMin.x = sTempChar.minX;
-				glyph.vertMin.y = sTempChar.minY - ri.yIndent;
+				glyph.vertMin.y = ri.yIndent - sTempChar.maxY;
 				glyph.vertMax.x = sTempChar.maxX;
 				if (sTempChar.glyphWidth == 0) //zero width, space etc
 					glyph.vertMax.x = glyph.vertMin.x + _size / 2;
-				glyph.vertMax.y = sTempChar.maxY - ri.yIndent;
+				glyph.vertMax.y = ri.yIndent - sTempChar.minY;
 
 				glyph.uvBottomLeft = sTempChar.uvBottomLeft;
 				glyph.uvTopLeft = sTempChar.uvTopLeft;
@@ -220,11 +220,11 @@ namespace FairyGUI
 					glyph.width++;
 #else
 				glyph.vertMin.x = sTempChar.vert.xMin;
-				glyph.vertMin.y = sTempChar.vert.yMax - ri.yIndent;
+				glyph.vertMin.y = ri.yIndent - sTempChar.vert.yMin;
 				glyph.vertMax.x = sTempChar.vert.xMax;
 				if (sTempChar.vert.width == 0) //zero width, space etc
 					glyph.vertMax.x = glyph.vertMax.x + _size / 2;
-				glyph.vertMax.y = sTempChar.vert.yMin - ri.yIndent;
+				glyph.vertMax.y = ri.yIndent - sTempChar.vert.yMax;
 
 				if (!sTempChar.flipped)
 				{

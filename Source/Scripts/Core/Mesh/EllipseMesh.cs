@@ -150,7 +150,7 @@ namespace FairyGUI
 			{
 				//扇形内边缘的线条
 
-				vb.AddVert(new Vector3(radiusX, radiusY), lineColor);
+				vb.AddVert(new Vector3(radiusX, radiusY, 0), lineColor);
 				float centerRadius = lineWidth * 0.5f;
 
 				sectionStart -= lineAngle;
