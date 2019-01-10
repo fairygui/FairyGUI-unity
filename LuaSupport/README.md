@@ -109,6 +109,7 @@ FairyGUI提供的Window类，一般需要开发者自己扩展，例如覆盖OnS
     
     --可覆盖的函数(可选，不是说必须）
     function WindowBase:OnInit()
+        self.contentPane = UIPackage.CreateObject("Basics", "WindowA");
     end
     
     function WindowBase:OnShown()
@@ -118,10 +119,16 @@ FairyGUI提供的Window类，一般需要开发者自己扩展，例如覆盖OnS
     end
     
     function WindowBase:DoShowAnimation()
+        self:OnShown();
     end
     
     function WindowBase:DoHideAnimation()
+        self:HideImmediately();
     end
+
+    --创建并显示窗口
+    local win = WindowBase.New();
+    win:Show();
     
     也可以继续继承以上得到的Window类，例如:
     MyWindow = fgui.window_class(WindowBase)
@@ -130,7 +137,6 @@ FairyGUI提供的Window类，一般需要开发者自己扩展，例如覆盖OnS
     function MyWindow:OnInit()
     	WindowBase.OnInit(self)
     end
-
 ```
 
 ## 自定义扩展
