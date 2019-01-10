@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using FairyGUI.Utils;
+#if FAIRYGUI_TOLUA
+using LuaInterface;
+#endif
 
 namespace FairyGUI
 {
@@ -41,6 +43,24 @@ namespace FairyGUI
 
 			packageItemExtensions[url] = creator;
 		}
+
+#if FAIRYGUI_TOLUA
+		public static void SetExtension(string url, System.Type baseType, LuaFunction extendFunction)
+		{
+			SetPackageItemExtension(url, () =>
+			{
+				GComponent gcom = (GComponent)Activator.CreateInstance(baseType);
+
+				extendFunction.BeginPCall();
+				extendFunction.Push(gcom);
+				extendFunction.PCall();
+				gcom.SetLuaPeer(extendFunction.CheckLuaTable());
+				extendFunction.EndPCall();
+
+				return gcom;
+			});
+		}
+#endif
 
 		/// <summary>
 		/// 

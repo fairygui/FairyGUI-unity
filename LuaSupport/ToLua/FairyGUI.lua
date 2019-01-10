@@ -43,21 +43,29 @@ EaseType = FairyGUI.EaseType
 fgui = {}
 
 --[[
-用于继承FairyGUI的Window类，例如
-WindowBase = fgui.window_class()
-同时派生的Window类可以被继续被继承，例如
-MyWindow = fgui.window_class(WindowBase)
-可以重写的方法有（与Window类里的同名方法含义完全相同）
-OnInit
-DoHideAnimation
-DoShowAnimation
-OnShown
-OnHide
+用于继承FairyGUI的Window类，同时派生的Window类可以继续被继承。可以重写的方法有（与Window类里的同名方法含义完全相同）
+OnInit、DoHideAnimation、DoShowAnimation、OnShown、OnHide。
+
+例子：
+MyWinClass = fgui.window_class()
+
+function MyWinClass:ctor()
+	print('MyWinClass-ctor')
+	self.contentPane = UIPackage.CreateObject("Basics", "WindowA")
+end
+
+function MyWinClass:OnShown()
+	print('MyWinClass-onShown')
+end
+
+local win = MyWinClass.New()
+win:Show()
+
 ]]
 function fgui.window_class(base)
     local o = {}
 
-    local base = base or FairyGUI.LuaWindow
+    local base = base or FairyGUI.Window
     setmetatable(o, base)
 
     o.__index = o
@@ -67,10 +75,9 @@ function fgui.window_class(base)
         local t = {}
         setmetatable(t, o)
 
-        local ins = FairyGUI.LuaWindow.New()
+        local ins = FairyGUI.Window.New()
         tolua.setpeer(ins, t)
-        ins:ConnectLua(t)
-        ins.EventDelegates = {}
+        ins:SetLuaPeer(t)
         if t.ctor then
             t.ctor(ins,...)
         end
@@ -82,32 +89,46 @@ function fgui.window_class(base)
 end
 
 --[[
-注册组件扩展，例如
-fgui.register_extension(UIPackage.GetItemURL("包名","组件名"), my_extension)
-my_extension的定义方式见fgui.extension_class
-]]
-function fgui.register_extension(url, extension)
-	local base = extension.base
-	if base==GComponent then base=FairyGUI.GLuaComponent
-		elseif base==GLabel then base=FairyGUI.GLuaLabel
-			elseif base==GButton then base=FairyGUI.GLuaButton
-				elseif base==GSlider then base=FairyGUI.GLuaSlider
-					elseif base==GProgressBar then base=FairyGUI.GLuaProgressBar
-						elseif base==GComboBox then base=FairyGUI.GLuaComboBox
-						else
-							print("invalid extension base: "..base)
-							return
-						end
-	FairyGUI.LuaUIHelper.SetExtension(url, typeof(base), extension.Extend)
-end
+注册组件扩展，用于继承FairyGUI原来的组件类。
 
---[[
-用于继承FairyGUI原来的组件类，例如
-MyComponent = fgui.extension_class(GComponent)
-function MyComponent:ctor() --当组件构建完成时此方法被调用
+例子：
+
+MyButton = fgui.extension_class(GButton)
+fgui.register_extension("ui://包名/我的按钮", MyButton)
+
+function MyButton:ctor() --当组件构建完成时此方法被调用
 	print(self:GetChild("n1"))
 end
+
+--添加自定义的方法和字段
+function MyButton:Test()
+	print('test')
+end
+
+local get = tolua.initget(MyButton)
+local set = tolua.initset(MyButton)
+get.myProp = function(self)
+	return self._myProp
+end
+
+set.myProp = function(self, value)
+	self._myProp = value
+	self:GetChild('n1').text = value
+end
+
+local myButton = someComponent:GetChild("myButton") --这个myButton的资源是“我的按钮”
+myButton:Test()
+myButton.myProp = 'hello'
+
+local myButton2 = UIPackage.CreateObject("包名","我的按钮")
+myButton2:Test()
+myButton2.myProp = 'world'
 ]]
+
+function fgui.register_extension(url, extension)
+	FairyGUI.UIObjectFactory.SetExtension(url, typeof(extension.base), extension.Extend)
+end
+
 function fgui.extension_class(base)
 	local o = {}
 	o.__index = o
@@ -115,15 +136,10 @@ function fgui.extension_class(base)
 	o.base = base or GComponent
 
 	o.Extend = function(ins)
-		local t = {}
-	    setmetatable(t, o)
-	    tolua.setpeer(ins,t)
-	    ins.EventDelegates = {}
-	    if t.ctor then
-	    	t.ctor(ins)
-	   	end
-	    
-	    return t
+			local t = {}
+			setmetatable(t, o)
+			tolua.setpeer(ins,t)
+			return t
 	end
 
 	return o

@@ -66,7 +66,7 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="callback"></param>
-#if FAIRYGUI_TOLUA 
+#if FAIRYGUI_TOLUA
 		[NoToLua]
 #endif
 		public void Add(EventCallback0 callback)
@@ -119,7 +119,17 @@ namespace FairyGUI
 		/// <param name="self"></param>
 		public void Add(LuaFunction func, LuaTable self)
 		{
-			_bridge.Add((EventCallback1)DelegateTraits<EventCallback1>.Create(func, self));
+			_bridge.Add(func, self);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="func"></param>
+		/// <param name="self"></param>
+		public void Add(LuaFunction func, GComponent self)
+		{
+			_bridge.Add(func, self);
 		}
 
 		/// <summary>
@@ -137,7 +147,29 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="func"></param>
 		/// <param name="self"></param>
+		public void Remove(LuaFunction func, GComponent self)
+		{
+			_bridge.Remove(func, self);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="func"></param>
+		/// <param name="self"></param>
 		public void Set(LuaFunction func, LuaTable self)
+		{
+			_bridge.Clear();
+			if (func != null)
+				Add(func, self);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="func"></param>
+		/// <param name="self"></param>
+		public void Set(LuaFunction func, GComponent self)
 		{
 			_bridge.Clear();
 			if (func != null)

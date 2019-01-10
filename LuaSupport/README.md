@@ -47,16 +47,7 @@ Lua支持
     _GT(typeof(GTweener)),
     _GT(typeof(EaseType)),
     _GT(typeof(TweenValue)),
-    
-    _GT(typeof(LuaUIHelper)),
-    _GT(typeof(GLuaComponent)),
-    _GT(typeof(GLuaLabel)),
-    _GT(typeof(GLuaButton)),
-    _GT(typeof(GLuaProgressBar)),
-    _GT(typeof(GLuaSlider)),
-    _GT(typeof(GLuaComboBox)),
-    _GT(typeof(LuaWindow)),
-
+    _GT(typeof(UIObjectFactory)),
   ```
 
 3. 将FairyGUI.lua放入你的lua文件存放目录。
@@ -146,13 +137,13 @@ FairyGUI提供的Window类，一般需要开发者自己扩展，例如覆盖OnS
 
 FairyGUI在C#里可以使用`UIObjectFactory.SetPackageItemExtension`进行自定义扩展。在Lua里，同样可以这样做。方法如下：
 
-1. 定义扩展类。注意基础类型，不要搞错。例如按钮是GButton，一般组件是GComponent。
+1. 定义扩展类。注意基础类型，不要搞错。例如按钮是GButton，一般的组件则是GComponent。
 
   ```csharp
 
     MyButton = fgui.extension_class(GButton)
     
-    --注意这里不是构造函数，是当组件已经（通过XML）构建完毕后调用的
+    --注意这里不是构造函数，是当组件已经构建完毕后调用的
 
     function MyButton:ctor()
     	print(self:GetChild('n1'))
@@ -179,7 +170,7 @@ FairyGUI在C#里可以使用`UIObjectFactory.SetPackageItemExtension`进行自�
 2. 注册扩展类。要在创建任何对象前注册好。
 
   ```csharp
-    fgui.register_extension(UIPackage.GetItemURL("包名","我的按钮"), MyButton)
+    fgui.register_extension("ui://包名/我的按钮", MyButton)
   ```
 
 3. 完成以上两步后，任何“我的按钮”这个资源创建出来的对象都可以使用MyButton访问了。例如：

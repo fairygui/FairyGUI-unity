@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
+#if FAIRYGUI_TOLUA
+using LuaInterface;
+#endif
 
 namespace FairyGUI
 {
@@ -89,6 +92,14 @@ namespace FairyGUI
 				obj.InternalSetParent(null); //Avoid GObject.RemoveParent call
 				obj.Dispose();
 			}
+
+#if FAIRYGUI_TOLUA
+			if (_peerTable != null)
+			{
+				_peerTable.Dispose();
+				_peerTable = null;
+			}
+#endif
 		}
 
 		/// <summary>
@@ -1471,6 +1482,10 @@ namespace FairyGUI
 				ConstructExtension(buffer);
 
 			ConstructFromXML(null);
+
+#if FAIRYGUI_TOLUA
+			CallLua("ctor");
+#endif
 		}
 
 		virtual protected void ConstructExtension(ByteBuffer buffer)
@@ -1518,5 +1533,31 @@ namespace FairyGUI
 			for (int i = 0; i < cnt; ++i)
 				_transitions[i].OnOwnerRemovedFromStage();
 		}
+
+#if FAIRYGUI_TOLUA
+		internal LuaTable _peerTable;
+
+		public void SetLuaPeer(LuaTable peerTable)
+		{
+			_peerTable = peerTable;
+		}
+
+		[NoToLua]
+		public bool CallLua(string funcName)
+		{
+			if (_peerTable != null)
+			{
+				LuaFunction ctor = _peerTable.GetLuaFunction(funcName);
+				if (ctor != null)
+				{
+					ctor.Call(this);
+					ctor.Dispose();
+					return true;
+				}
+			}
+
+			return false;
+		}
+#endif
 	}
 }

@@ -63,6 +63,14 @@ namespace FairyGUI
 			_callback1 += callback;
 		}
 
+		public void Add(LuaFunction func, GComponent self)
+		{
+			if (self._peerTable == null)
+				throw new Exception("self is not connected to lua.");
+
+			Add(func, self._peerTable);
+		}
+
 		public void Remove(LuaFunction func, LuaTable self)
 		{
 			LuaState state = func.GetLuaState();
@@ -86,6 +94,14 @@ namespace FairyGUI
 					break;
 				}
 			}
+		}
+
+		public void Remove(LuaFunction func, GComponent self)
+		{
+			if (self._peerTable == null)
+				throw new Exception("self is not connected to lua.");
+
+			Remove(func, self._peerTable);
 		}
 #endif
 

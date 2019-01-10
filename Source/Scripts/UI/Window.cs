@@ -19,7 +19,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool bringToFontOnClick { get; set; }
+		public bool bringToFontOnClick;
 
 		GComponent _frame;
 		GComponent _contentPane;
@@ -386,6 +386,9 @@ namespace FairyGUI
 		/// </summary>
 		virtual protected void OnInit()
 		{
+#if FAIRYGUI_TOLUA
+			CallLua("OnInit");
+#endif
 		}
 
 		/// <summary>
@@ -393,6 +396,9 @@ namespace FairyGUI
 		/// </summary>
 		virtual protected void OnShown()
 		{
+#if FAIRYGUI_TOLUA
+			CallLua("OnShown");
+#endif
 		}
 
 		/// <summary>
@@ -400,6 +406,9 @@ namespace FairyGUI
 		/// </summary>
 		virtual protected void OnHide()
 		{
+#if FAIRYGUI_TOLUA
+			CallLua("OnHide");
+#endif
 		}
 
 		/// <summary>
@@ -407,7 +416,12 @@ namespace FairyGUI
 		/// </summary>
 		virtual protected void DoShowAnimation()
 		{
+#if FAIRYGUI_TOLUA
+			if (!CallLua("DoShowAnimation"))
+				OnShown();
+#else
 			OnShown();
+#endif
 		}
 
 		/// <summary>
@@ -415,7 +429,12 @@ namespace FairyGUI
 		/// </summary>
 		virtual protected void DoHideAnimation()
 		{
-			this.HideImmediately();
+#if FAIRYGUI_TOLUA
+			if (!CallLua("DoHideAnimation"))
+				HideImmediately();
+#else
+			HideImmediately();
+#endif
 		}
 
 		void __uiLoadComplete()
