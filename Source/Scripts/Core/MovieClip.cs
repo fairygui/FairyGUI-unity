@@ -101,7 +101,6 @@ namespace FairyGUI
 				_frames = value;
 				_scale9Grid = null;
 				_scaleByTile = false;
-				this.fillMethod = FillMethod.None;
 				
 				if (_frames == null)
 				{
