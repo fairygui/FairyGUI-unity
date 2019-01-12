@@ -594,6 +594,12 @@ namespace FairyGUI
 
 		internal void _Update()
 		{
+			if ((_target is GObject) && ((GObject)_target)._disposed)
+			{
+				_killed = true;
+				return;
+			}
+
 			if (_ended != 0) //Maybe completed by seek
 			{
 				CallCompleteCallback();
