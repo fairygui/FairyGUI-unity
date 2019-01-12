@@ -95,9 +95,13 @@ namespace FairyGUIEditor
 			EditorGUILayout.LabelField(packagePath.stringValue, (GUIStyle)"helpbox");
 			EditorGUILayout.EndHorizontal();
 
-			EditorGUILayout.PropertyField(renderMode);
+			if (Application.isPlaying)
+				EditorGUILayout.EnumPopup("Render Mode", panel.container.renderMode);
+			else
+				EditorGUILayout.PropertyField(renderMode);
 			if ((RenderMode)renderMode.enumValueIndex != RenderMode.ScreenSpaceOverlay)
 				EditorGUILayout.PropertyField(renderCamera);
+
 			int oldSortingOrder = panel.sortingOrder;
 			EditorGUILayout.PropertyField(sortingOrder);
 			EditorGUILayout.PropertyField(fairyBatching);
