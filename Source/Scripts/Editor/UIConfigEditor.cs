@@ -69,7 +69,7 @@ namespace FairyGUIEditor
 
 						UIConfig.ConfigValue value = new UIConfig.ConfigValue();
 						value.valid = true;
-						InitDefaultValue(selectedKey, value);
+						UIConfig.SetDefaultValue(selectedKey, value);
 						config.Items.Add(value);
 					}
 					else
@@ -79,13 +79,13 @@ namespace FairyGUIEditor
 						{
 							value = new UIConfig.ConfigValue();
 							value.valid = true;
-							InitDefaultValue(selectedKey, value);
+							UIConfig.SetDefaultValue(selectedKey, value);
 							config.Items[index] = value;
 						}
 						else if (!value.valid)
 						{
 							value.valid = true;
-							InitDefaultValue(selectedKey, value);
+							UIConfig.SetDefaultValue(selectedKey, value);
 						}
 					}
 				}
@@ -146,12 +146,19 @@ namespace FairyGUIEditor
 						case UIConfig.ConfigKey.InputHighlightColor:
 							value.c = EditorGUILayout.ColorField(value.c);
 							break;
+
+						case UIConfig.ConfigKey.RichTextRowVerticalAlign:
+							EditorGUI.BeginChangeCheck();
+							value.i = EditorGUILayout.EnumPopup((VertAlignType)value.i).GetHashCode();
+							if (EditorGUI.EndChangeCheck())
+								modified = true;
+							break;
 					}
 
 					if (GUILayout.Button(new GUIContent("X", "Delete Item"), EditorStyles.miniButtonRight, GUILayout.Width(30)))
 					{
 						config.Items[i].Reset();
-						InitDefaultValue((UIConfig.ConfigKey)i, config.Items[i]);
+						UIConfig.SetDefaultValue((UIConfig.ConfigKey)i, config.Items[i]);
 						if (i == (int)UIConfig.ConfigKey.EnhancedTextOutlineEffect || i == (int)UIConfig.ConfigKey.DepthSupportForPaintingMode)
 							modified = true;
 					}
@@ -227,69 +234,6 @@ namespace FairyGUIEditor
 
 			if (serializedObject.ApplyModifiedProperties() || modified)
 				(target as UIConfig).ApplyModifiedProperties();
-		}
-
-		void InitDefaultValue(UIConfig.ConfigKey key, UIConfig.ConfigValue value)
-		{
-			switch (key)
-			{
-				case UIConfig.ConfigKey.ButtonSoundVolumeScale:
-					value.f = 1;
-					break;
-
-				case UIConfig.ConfigKey.ClickDragSensitivity:
-					value.i = 2;
-					break;
-
-				case UIConfig.ConfigKey.DefaultComboBoxVisibleItemCount:
-					value.i = 10;
-					break;
-
-				case UIConfig.ConfigKey.DefaultScrollBarDisplay:
-					value.i = (int)ScrollBarDisplayType.Default;
-					break;
-
-				case UIConfig.ConfigKey.DefaultScrollBounceEffect:
-				case UIConfig.ConfigKey.DefaultScrollTouchEffect:
-					value.b = true;
-					break;
-
-				case UIConfig.ConfigKey.DefaultScrollStep:
-					value.i = 25;
-					break;
-
-				case UIConfig.ConfigKey.ModalLayerColor:
-					value.c = new Color(0f, 0f, 0f, 0.4f);
-					break;
-
-				case UIConfig.ConfigKey.RenderingTextBrighterOnDesktop:
-					value.b = true;
-					break;
-
-				case UIConfig.ConfigKey.TouchDragSensitivity:
-					value.i = 10;
-					break;
-
-				case UIConfig.ConfigKey.TouchScrollSensitivity:
-					value.i = 20;
-					break;
-
-				case UIConfig.ConfigKey.InputCaretSize:
-					value.i = 1;
-					break;
-
-				case UIConfig.ConfigKey.InputHighlightColor:
-					value.c = new Color32(255, 223, 141, 128);
-					break;
-
-				case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
-					value.b = true;
-					break;
-
-				case UIConfig.ConfigKey.DepthSupportForPaintingMode:
-					value.b = false;
-					break;
-			}
 		}
 	}
 }

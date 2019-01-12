@@ -165,6 +165,11 @@ namespace FairyGUI
 		/// </summary>
 		public static bool enhancedTextOutlineEffect = false;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public static VertAlignType richTextRowVerticalAlign = VertAlignType.Bottom;
+
 		public enum ConfigKey
 		{
 			DefaultFont,
@@ -193,6 +198,7 @@ namespace FairyGUI
 			InputHighlightColor,
 			EnhancedTextOutlineEffect,
 			DepthSupportForPaintingMode,
+			RichTextRowVerticalAlign,
 
 			PleaseSelect = 100
 		}
@@ -349,7 +355,78 @@ namespace FairyGUI
 					case ConfigKey.EnhancedTextOutlineEffect:
 						UIConfig.enhancedTextOutlineEffect = value.b;
 						break;
+
+					case ConfigKey.RichTextRowVerticalAlign:
+						UIConfig.richTextRowVerticalAlign = (VertAlignType)value.i;
+						break;
 				}
+			}
+		}
+
+		public static void SetDefaultValue(ConfigKey key, ConfigValue value)
+		{
+			switch (key)
+			{
+				case ConfigKey.ButtonSoundVolumeScale:
+					value.f = 1;
+					break;
+
+				case ConfigKey.ClickDragSensitivity:
+					value.i = 2;
+					break;
+
+				case ConfigKey.DefaultComboBoxVisibleItemCount:
+					value.i = 10;
+					break;
+
+				case ConfigKey.DefaultScrollBarDisplay:
+					value.i = (int)ScrollBarDisplayType.Default;
+					break;
+
+				case ConfigKey.DefaultScrollBounceEffect:
+				case ConfigKey.DefaultScrollTouchEffect:
+					value.b = true;
+					break;
+
+				case ConfigKey.DefaultScrollStep:
+					value.i = 25;
+					break;
+
+				case ConfigKey.ModalLayerColor:
+					value.c = new Color(0f, 0f, 0f, 0.4f);
+					break;
+
+				case ConfigKey.RenderingTextBrighterOnDesktop:
+					value.b = true;
+					break;
+
+				case ConfigKey.TouchDragSensitivity:
+					value.i = 10;
+					break;
+
+				case ConfigKey.TouchScrollSensitivity:
+					value.i = 20;
+					break;
+
+				case ConfigKey.InputCaretSize:
+					value.i = 1;
+					break;
+
+				case ConfigKey.InputHighlightColor:
+					value.c = new Color32(255, 223, 141, 128);
+					break;
+
+				case ConfigKey.EnhancedTextOutlineEffect:
+					value.b = true;
+					break;
+
+				case ConfigKey.DepthSupportForPaintingMode:
+					value.b = false;
+					break;
+
+				case ConfigKey.RichTextRowVerticalAlign:
+					value.i = (int)VertAlignType.Bottom;
+					break;
 			}
 		}
 

@@ -1075,6 +1075,7 @@ namespace FairyGUI
 			bool clipped = !_input && _autoSize == AutoSizeType.None;
 			bool lineClipped;
 			AlignType lineAlign;
+			VertAlignType lineVAlign = UIConfig.richTextRowVerticalAlign;
 			float lastGlyphHeight = 0;
 			GlyphInfo glyph = new GlyphInfo();
 			GlyphInfo lineGlyph = new GlyphInfo();
@@ -1199,7 +1200,14 @@ namespace FairyGUI
 									cp.offsetX = (int)charX;
 									_charPositions.Add(cp);
 								}
-								element.position = new Vector2(charX + 1, line.y + (int)((line.height - htmlObj.height) / 2));
+								if (lineVAlign == VertAlignType.Bottom)
+									yIndent = (int)(line.height - htmlObj.height);
+								else if (lineVAlign == VertAlignType.Middle)
+									yIndent = (int)((line.height - htmlObj.height) / 2);
+								else
+									yIndent = 0;
+
+								element.position = new Vector2(charX + 1, line.y + yIndent);
 								htmlObj.SetPosition(element.position.x, element.position.y);
 								if (lineClipped || clipped && (element.position.x < GUTTER_X || element.position.x + htmlObj.width > _contentRect.width - GUTTER_X))
 									element.status |= 1;
@@ -1253,7 +1261,13 @@ namespace FairyGUI
 							}
 						}
 
-						yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
+						if (lineVAlign == VertAlignType.Bottom)
+							yIndent = (int)(line.height - glyph.height);
+						else if (lineVAlign == VertAlignType.Middle)
+							yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
+						else
+							yIndent = (int)(line.textHeight - glyph.height);
+
 						if (format.specialStyle == TextFormat.SpecialStyle.Subscript)
 							yIndent += (int)(glyph.height * 0.333f);
 						else if (format.specialStyle == TextFormat.SpecialStyle.Superscript)
