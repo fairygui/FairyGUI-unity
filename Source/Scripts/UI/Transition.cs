@@ -408,6 +408,7 @@ namespace FairyGUI
 		{
 			int cnt = _items.Length;
 			object value;
+			bool found = false;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
@@ -417,10 +418,12 @@ namespace FairyGUI
 						value = item.tweenConfig.startValue;
 					else
 						value = item.value;
+					found = true;
 				}
 				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
 				{
 					value = item.tweenConfig.endValue;
+					found = true;
 				}
 				else
 					continue;
@@ -508,6 +511,9 @@ namespace FairyGUI
 						break;
 				}
 			}
+
+			if (!found)
+				throw new Exception("label not exists");
 		}
 
 		/// <summary>
@@ -518,20 +524,23 @@ namespace FairyGUI
 		public void SetHook(string label, TransitionHook callback)
 		{
 			int cnt = _items.Length;
+			bool found = false;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
 				if (item.label == label)
 				{
 					item.hook = callback;
-					break;
+					found = true;
 				}
 				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
 				{
 					item.tweenConfig.endHook = callback;
-					break;
+					found = true;
 				}
 			}
+			if (!found)
+				throw new Exception("label not exists");
 		}
 
 		/// <summary>
@@ -557,15 +566,27 @@ namespace FairyGUI
 		public void SetTarget(string label, GObject newTarget)
 		{
 			int cnt = _items.Length;
+			bool found = false;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
 				if (item.label == label)
 				{
-					item.targetId = newTarget.id;
-					item.target = null;
+					item.targetId = (newTarget == _owner || newTarget == null) ? string.Empty : newTarget.id;
+					if (_playing)
+					{
+						if (item.targetId.Length > 0)
+							item.target = _owner.GetChildById(item.targetId);
+						else
+							item.target = _owner;
+					}
+					else
+						item.target = null;
+					found = true;
 				}
 			}
+			if (!found)
+				throw new Exception("label not exists");
 		}
 
 		/// <summary>
@@ -576,12 +597,19 @@ namespace FairyGUI
 		public void SetDuration(string label, float value)
 		{
 			int cnt = _items.Length;
+			bool found = false;
 			for (int i = 0; i < cnt; i++)
 			{
 				TransitionItem item = _items[i];
 				if (item.tweenConfig != null && item.label == label)
+				{
 					item.tweenConfig.duration = value;
+					found = true;
+				}
 			}
+
+			if (!found)
+				throw new Exception("label not exists or not a tween label");
 		}
 
 		/// <summary>
