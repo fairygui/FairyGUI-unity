@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -31,8 +33,6 @@ namespace FairyGUI
 		MovieClip _content;
 		GObject _errorSign;
 		GComponent _content2;
-
-		static GObjectPool errorSignPool;
 
 		public GLoader()
 		{
@@ -426,6 +426,8 @@ namespace FairyGUI
 						this.SetSize(_contentItem.width, _contentItem.height);
 
 					SetErrorState();
+
+					Debug.LogWarning("Unsupported type of GLoader: " + _contentItem.type);
 				}
 			}
 			else
@@ -434,7 +436,7 @@ namespace FairyGUI
 
 		virtual protected void LoadExternal()
 		{
-			Texture2D tex = (Texture2D)Resources.Load(this.url, typeof(Texture2D));
+			Texture2D tex = (Texture2D)Resources.Load(_url, typeof(Texture2D));
 			if (tex != null)
 				onExternalLoadSuccess(new NTexture(tex));
 			else
@@ -468,12 +470,7 @@ namespace FairyGUI
 			if (_errorSign == null)
 			{
 				if (UIConfig.loaderErrorSign != null)
-				{
-					if (errorSignPool == null)
-						errorSignPool = new GObjectPool(Stage.inst.CreatePoolManager("LoaderErrorSignPool"));
-
-					_errorSign = errorSignPool.GetObject(UIConfig.loaderErrorSign);
-				}
+					_errorSign = UIPackage.CreateObjectFromURL(UIConfig.loaderErrorSign);
 				else
 					return;
 			}
@@ -487,12 +484,8 @@ namespace FairyGUI
 
 		private void ClearErrorState()
 		{
-			if (_errorSign != null)
-			{
+			if (_errorSign != null && _errorSign.displayObject.parent != null)
 				((Container)displayObject).RemoveChild(_errorSign.displayObject);
-				errorSignPool.ReturnObject(_errorSign);
-				_errorSign = null;
-			}
 		}
 
 		private void UpdateLayout()
