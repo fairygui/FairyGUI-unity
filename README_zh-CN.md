@@ -21,13 +21,6 @@ FairyGUI还对所有输入方式进行了完整的封装，无论是鼠标、单
 ![](images/2016-06-15_010207.png)
 
 
-开始使用
-====
-
-访问 [Release](https://github.com/fairygui/FairyGUI-unity/releases) 下载例子。
-
-或者，在Unity插件商店，搜索 `FairyGUI`，它是免费的。
-
 学习
 ====
 

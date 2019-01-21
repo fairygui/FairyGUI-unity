@@ -22,12 +22,7 @@ FairyGUI also fully encapsulates all input methods. Whether mouse, single touch,
 
 ![](images/2016-06-15_010207.png)
 
-Get Started
-====
-
-Go to [Release](https://github.com/fairygui/FairyGUI-unity/releases) to download examples,
-
-Or, in Unity Asset Store, search `FairyGUI`, it is free.
+![](images/turn_page.gif)
 
 Learn
 ====
