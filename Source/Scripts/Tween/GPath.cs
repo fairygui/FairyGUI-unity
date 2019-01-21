@@ -110,6 +110,7 @@ namespace FairyGUI
 		List<Vector3> _points;
 		float _fullLength;
 
+		static List<GPathPoint> helperList = new List<GPathPoint>();
 		static List<Vector3> splinePoints = new List<Vector3>();
 
 		public GPath()
@@ -124,6 +125,51 @@ namespace FairyGUI
 		public float length
 		{
 			get { return _fullLength; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="pt1"></param>
+		/// <param name="pt2"></param>
+		public void Create(GPathPoint pt1, GPathPoint pt2)
+		{
+			helperList.Clear();
+			helperList.Add(pt1);
+			helperList.Add(pt2);
+			Create(helperList);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="pt1"></param>
+		/// <param name="pt2"></param>
+		/// <param name="pt3"></param>
+		public void Create(GPathPoint pt1, GPathPoint pt2, GPathPoint pt3)
+		{
+			helperList.Clear();
+			helperList.Add(pt1);
+			helperList.Add(pt2);
+			helperList.Add(pt3);
+			Create(helperList);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="pt1"></param>
+		/// <param name="pt2"></param>
+		/// <param name="pt3"></param>
+		/// <param name="pt4"></param>
+		public void Create(GPathPoint pt1, GPathPoint pt2, GPathPoint pt3, GPathPoint pt4)
+		{
+			helperList.Clear();
+			helperList.Add(pt1);
+			helperList.Add(pt2);
+			helperList.Add(pt3);
+			helperList.Add(pt4);
+			Create(helperList);
 		}
 
 		/// <summary>
@@ -263,7 +309,7 @@ namespace FairyGUI
 				len -= seg.length;
 				if (len < 0)
 				{
-					t = len / seg.length;
+					t = 1 + len / seg.length;
 
 					if (seg.type == GPathPoint.CurveType.Straight)
 						pt = Vector3.Lerp(_points[seg.ptStart], _points[seg.ptStart + 1], t);
