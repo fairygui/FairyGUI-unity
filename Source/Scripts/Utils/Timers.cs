@@ -14,7 +14,7 @@ namespace FairyGUI
 		public static int repeat;
 		public static float time;
 
-		public static bool catchCallbackExceptions = true;
+		public static bool catchCallbackExceptions = false;
 
 		Dictionary<TimerCallback, Anymous_T> _items;
 		Dictionary<TimerCallback, Anymous_T> _toAdd;

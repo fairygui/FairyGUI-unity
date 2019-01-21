@@ -10,7 +10,7 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static bool catchCallbackExceptions = true;
+		public static bool catchCallbackExceptions = false;
 
 		/// <summary>
 		/// 
