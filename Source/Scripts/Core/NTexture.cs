@@ -109,7 +109,6 @@ namespace FairyGUI
 		/// <param name="yScale"></param>
 		public NTexture(Texture texture, Texture alphaTexture, float xScale, float yScale)
 		{
-
 			_root = this;
 			_nativeTexture = texture;
 			_alphaTexture = alphaTexture;
@@ -174,6 +173,23 @@ namespace FairyGUI
 		{
 			_originalSize = originalSize;
 			_offset = offset;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sprite"></param>
+		public NTexture(Sprite sprite)
+		{
+			Rect rect = sprite.rect;
+			rect.y = sprite.texture.height - rect.yMax;
+
+			_root = this;
+			_nativeTexture = sprite.texture;
+			_region = rect;
+			_originalSize = new Vector2(_region.width, _region.height);
+			uvRect = new Rect(_region.x / _nativeTexture.width, 1 - _region.yMax / _nativeTexture.height,
+				_region.width / _nativeTexture.width, _region.height / _nativeTexture.height);
 		}
 
 		/// <summary>
