@@ -69,7 +69,7 @@ namespace FairyGUI
 		bool hasAlphaBackup;
 		List<byte> _alphaBackup; //透明度改变需要通过修改顶点颜色实现，但顶点颜色本身可能就带有透明度，所以这里要有一个备份
 
-		bool _isMask;
+		int _maskFlag;
 		StencilEraser _stencilEraser;
 
 #if !(UNITY_5_2 || UNITY_5_3_OR_NEWER)
@@ -126,8 +126,11 @@ namespace FairyGUI
 			get { return _meshFactory; }
 			set
 			{
-				_meshFactory = value;
-				_meshDirty = true;
+				if (_meshFactory != value)
+				{
+					_meshFactory = value;
+					_meshDirty = true;
+				}
 			}
 		}
 
@@ -287,30 +290,6 @@ namespace FairyGUI
 		{
 			get { return meshRenderer.sortingOrder; }
 			set { meshRenderer.sortingOrder = value; }
-		}
-
-		internal void _SetAsMask(bool value)
-		{
-			if (_isMask != value)
-			{
-				_isMask = value;
-				if (_isMask)
-				{
-					//设置擦除stencil的drawcall
-					if (_stencilEraser == null)
-					{
-						_stencilEraser = new StencilEraser(gameObject.transform);
-						_stencilEraser.meshFilter.mesh = mesh;
-					}
-					else
-						_stencilEraser.enabled = true;
-				}
-				else
-				{
-					if (_stencilEraser != null)
-						_stencilEraser.enabled = false;
-				}
-			}
 		}
 
 		/// <summary>
@@ -495,14 +474,13 @@ namespace FairyGUI
 			uint clipId = context.clipInfo.clipId;
 			int matType = 0;
 			NMaterial nm = null;
-			bool firstInstance = true;
 			if (!_customMatarial)
 			{
 				if (_manager != null)
 				{
 					if (context.clipped && !dontClip)
 					{
-						if (_isMask)
+						if (_maskFlag == 1)
 							matType = 6;
 						else if (context.rectMaskDepth == 0)
 							matType = grayed ? 1 : 0;
@@ -517,7 +495,7 @@ namespace FairyGUI
 						matType = grayed ? 1 : 0;
 					}
 
-					nm = _manager.GetMaterial(matType, blendMode, clipId, out firstInstance);
+					nm = _manager.GetMaterial(matType, blendMode, clipId);
 					_material = nm.material;
 					if ((object)_material != (object)meshRenderer.sharedMaterial)
 						meshRenderer.sharedMaterial = _material;
@@ -530,15 +508,15 @@ namespace FairyGUI
 				}
 			}
 
-			if (firstInstance && (object)_material != null)
+			if ((nm == null || nm._firstInstance) && (object)_material != null)
 			{
 				if (blendMode != BlendMode.Normal) //GetMateria已经保证了不同的blendMode会返回不同的共享材质，所以这里可以放心设置
 					BlendModeUtils.Apply(_material, blendMode);
 
-				bool clearStencil = false;
+				bool clearStencil = nm == null || nm.stencilSet;
 				if (context.clipped)
 				{
-					if (!_isMask && context.rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
+					if (_maskFlag != 1 && context.rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
 					{
 						_material.SetVector(ShaderConfig._properyIDs._ClipBox, context.clipInfo.clipBox);
 						if (context.clipInfo.soft)
@@ -547,7 +525,7 @@ namespace FairyGUI
 
 					if (context.stencilReferenceValue > 0)
 					{
-						if (_isMask) //是遮罩
+						if (_maskFlag == 1) //是遮罩
 						{
 							if (context.stencilReferenceValue == 1)
 							{
@@ -565,22 +543,6 @@ namespace FairyGUI
 								_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue - 1);
 								_material.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 							}
-
-							if (nm != null)
-							{
-								NMaterial eraserNm = _manager.GetMaterial(matType, blendMode, clipId, out firstInstance);
-								eraserNm.stencilSet = true;
-								Material eraserMat = eraserNm.material;
-								if ((object)eraserMat != (object)_stencilEraser.meshRenderer.sharedMaterial)
-									_stencilEraser.meshRenderer.sharedMaterial = eraserMat;
-
-								int refValue = context.stencilReferenceValue - 1;
-								eraserMat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
-								eraserMat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
-								eraserMat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
-								eraserMat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
-								eraserMat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
-							}
 						}
 						else
 						{
@@ -596,12 +558,9 @@ namespace FairyGUI
 						}
 						if (nm != null)
 							nm.stencilSet = true;
+						clearStencil = false;
 					}
-					else
-						clearStencil = nm == null || nm.stencilSet;
 				}
-				else
-					clearStencil = nm == null || nm.stencilSet;
 
 				if (clearStencil)
 				{
@@ -614,6 +573,51 @@ namespace FairyGUI
 					_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, 255);
 					_material.SetInt(ShaderConfig._properyIDs._ColorMask, 15);
 				}
+			}
+
+			if (_maskFlag != 0)
+			{
+				if (_maskFlag == 1)
+					_maskFlag = 2;
+				else
+				{
+					if (_stencilEraser != null)
+						_stencilEraser.enabled = false;
+
+					_maskFlag = 0;
+				}
+			}
+		}
+
+		internal void _PreUpdateMask(UpdateContext context)
+		{
+			//_maskFlag: 0-new mask, 1-active mask, 2-mask complete
+			if (_maskFlag == 0)
+			{
+				if (_stencilEraser == null)
+				{
+					_stencilEraser = new StencilEraser(gameObject.transform);
+					_stencilEraser.meshFilter.mesh = mesh;
+				}
+				else
+					_stencilEraser.enabled = true;
+			}
+
+			_maskFlag = 1;
+
+			if (_manager != null)
+			{
+				NMaterial nm = _manager.GetMaterial(6, blendMode, context.clipInfo.clipId);
+				Material mat = nm.material;
+				if ((object)mat != (object)_stencilEraser.meshRenderer.sharedMaterial)
+					_stencilEraser.meshRenderer.sharedMaterial = mat;
+
+				int refValue = context.stencilReferenceValue - 1;
+				mat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+				mat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+				mat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+				mat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+				mat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
 			}
 		}
 
@@ -636,6 +640,21 @@ namespace FairyGUI
 			VertexBuffer vb = VertexBuffer.Begin();
 			vb.contentRect = _contentRect;
 			vb.uvRect = _texture.uvRect;
+			if (_flip != FlipType.None)
+			{
+				if (_flip == FlipType.Horizontal || _flip == FlipType.Both)
+				{
+					float tmp = vb.uvRect.xMin;
+					vb.uvRect.xMin = vb.uvRect.xMax;
+					vb.uvRect.xMax = tmp;
+				}
+				if (_flip == FlipType.Vertical || _flip == FlipType.Both)
+				{
+					float tmp = vb.uvRect.yMin;
+					vb.uvRect.yMin = vb.uvRect.yMax;
+					vb.uvRect.yMax = tmp;
+				}
+			}
 			vb.vertexColor = _color;
 			_meshFactory.OnPopulateMesh(vb);
 
@@ -653,25 +672,6 @@ namespace FairyGUI
 				return;
 			}
 
-			if (_flip != FlipType.None)
-			{
-				bool h = _flip == FlipType.Horizontal || _flip == FlipType.Both;
-				bool v = _flip == FlipType.Vertical || _flip == FlipType.Both;
-				float xMax = _contentRect.xMax;
-				float yMax = _contentRect.yMax;
-				for (int i = 0; i < vertCount; i++)
-				{
-					Vector3 vec = vb.vertices[i];
-					if (h)
-						vec.x = xMax - (vec.x - _contentRect.x);
-					if (v)
-						vec.y = -(yMax - (-vec.y - _contentRect.y));
-					vb.vertices[i] = vec;
-				}
-				if (!(h && v))
-					vb.triangles.Reverse();
-			}
-
 			if (_texture.rotated)
 			{
 				float xMin = _texture.uvRect.xMin;
@@ -680,7 +680,7 @@ namespace FairyGUI
 				float tmp;
 				for (int i = 0; i < vertCount; i++)
 				{
-					Vector2 vec = vb.uv0[i];
+					Vector4 vec = vb.uv0[i];
 					tmp = vec.y;
 					vec.y = yMin + vec.x - xMin;
 					vec.x = xMin + yMax - tmp;
@@ -737,7 +737,20 @@ namespace FairyGUI
 
 			mesh.Clear();
 
-#if !(UNITY_5_2 || UNITY_5_3_OR_NEWER)
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+			if (vb._isArbitraryQuad)
+				vb.FixUVForArbitraryQuad();
+
+			mesh.SetVertices(vb.vertices);
+			mesh.SetUVs(0, vb.uv0);
+			mesh.SetColors(vb.colors);
+			mesh.SetTriangles(vb.triangles, 0);
+
+#if !UNITY_5_6_OR_NEWER
+			_colors = null;
+#endif
+
+#else
 			if (_vertices == null || _vertices.Length != vertCount)
 			{
 				_vertices = new Vector3[vertCount];
@@ -756,17 +769,7 @@ namespace FairyGUI
 			mesh.uv = _uv;
 			mesh.triangles = _triangles;
 			mesh.colors32 = _colors;
-#else
-
-#if !UNITY_5_6_OR_NEWER
-			_colors = null;
 #endif
-			mesh.SetVertices(vb.vertices);
-			mesh.SetUVs(0, vb.uv0);
-			mesh.SetColors(vb.colors);
-			mesh.SetTriangles(vb.triangles, 0);
-#endif
-
 			vb.End();
 
 			if (meshModifier != null)
@@ -777,45 +780,9 @@ namespace FairyGUI
 		{
 			Rect rect = texture.GetDrawRect(vb.contentRect);
 
-			if (_vertexMatrix != null)//画多边形时，要对UV处理才能有正确的显示，暂时未掌握，这里用更多的面来临时解决。
-			{
-				int hc = (int)Mathf.Min(Mathf.CeilToInt(rect.width / 30), 9);
-				int vc = (int)Mathf.Min(Mathf.CeilToInt(rect.height / 30), 9);
-				int eachPartX = Mathf.FloorToInt(rect.width / hc);
-				int eachPartY = Mathf.FloorToInt(rect.height / vc);
-				float x, y;
-				for (int i = 0; i <= vc; i++)
-				{
-					if (i == vc)
-						y = rect.yMax;
-					else
-						y = rect.y + i * eachPartY;
-					for (int j = 0; j <= hc; j++)
-					{
-						if (j == hc)
-							x = rect.xMax;
-						else
-							x = rect.x + j * eachPartX;
-						vb.AddVert(new Vector3(x, y, 0));
-					}
-				}
-
-				for (int i = 0; i < vc; i++)
-				{
-					int k = i * (hc + 1);
-					for (int j = 1; j <= hc; j++)
-					{
-						int m = k + j;
-						vb.AddTriangle(m - 1, m, m + hc);
-						vb.AddTriangle(m, m + hc + 1, m + hc);
-					}
-				}
-			}
-			else
-			{
-				vb.AddQuad(rect, vb.vertexColor, vb.uvRect);
-				vb.AddTriangles();
-			}
+			vb.AddQuad(rect, vb.vertexColor, vb.uvRect);
+			vb.AddTriangles();
+			vb._isArbitraryQuad = vertexMatrix != null;
 		}
 	}
 

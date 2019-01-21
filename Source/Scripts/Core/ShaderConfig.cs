@@ -32,11 +32,6 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
-		public static string textBrighterShader = "FairyGUI/Text Brighter";
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public static string bmFontShader = "FairyGUI/BMFont";
 
 		/// <summary>

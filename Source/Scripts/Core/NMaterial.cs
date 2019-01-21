@@ -37,6 +37,8 @@ namespace FairyGUI
 		/// </summary>
 		public Material material;
 
+		internal bool _firstInstance;
+
 		/// <summary>
 		/// 
 		/// </summary>

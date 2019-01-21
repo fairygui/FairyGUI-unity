@@ -13,9 +13,15 @@ namespace FairyGUI
 		/// </summary>
 		public readonly List<IMeshFactory> elements;
 
+		/// <summary>
+		/// If it is -1, means all elements are active, otherwise, only the specific element is active
+		/// </summary>
+		public int activeIndex;
+
 		public CompositeMesh()
 		{
 			elements = new List<IMeshFactory>();
+			activeIndex = -1;
 		}
 
 		public void OnPopulateMesh(VertexBuffer vb)
@@ -32,9 +38,12 @@ namespace FairyGUI
 
 				for (int i = 0; i < cnt; i++)
 				{
-					vb2.Clear();
-					elements[i].OnPopulateMesh(vb2);
-					vb.Append(vb2);
+					if (activeIndex == -1 || i == activeIndex)
+					{
+						vb2.Clear();
+						elements[i].OnPopulateMesh(vb2);
+						vb.Append(vb2);
+					}
 				}
 
 				vb2.End();
@@ -50,14 +59,17 @@ namespace FairyGUI
 			int cnt = elements.Count;
 			for (int i = 0; i < cnt; i++)
 			{
-				IHitTest ht = elements[i] as IHitTest;
-				if (ht != null)
+				if (activeIndex == -1 || i == activeIndex)
 				{
-					if (ht.HitTest(contentRect, point))
-						return true;
+					IHitTest ht = elements[i] as IHitTest;
+					if (ht != null)
+					{
+						if (ht.HitTest(contentRect, point))
+							return true;
+					}
+					else
+						flag = true;
 				}
-				else
-					flag = true;
 			}
 
 			return flag;

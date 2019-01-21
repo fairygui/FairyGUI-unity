@@ -12,7 +12,7 @@ namespace FairyGUI
 		public bool done
 		{
 #if UNITY_2017_2_OR_NEWER
-			get { return _keyboard == null || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Done || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Canceled || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.LostFocus; }
+			get { return _keyboard == null || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Done || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Canceled; }
 #else
 			get { return _keyboard == null || _keyboard.done; }
 #endif

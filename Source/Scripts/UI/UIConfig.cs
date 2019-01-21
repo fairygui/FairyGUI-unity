@@ -17,11 +17,7 @@ namespace FairyGUI
 		/// </summary>
 		public static string defaultFont = "";
 
-		/// <summary>
-		/// When using chinese fonts on desktop, I found that the display effect is not very clear. So I wrote shaders to light up their outline.
-		/// If you dont use chinese fonts, or dont like the new effect, just set to false here.
-		/// The switch is meaningless on mobile platforms.
-		/// </summary>
+		[Obsolete("No use anymore")]
 		public static bool renderingTextBrighterOnDesktop = true;
 
 		/// <summary>
@@ -310,10 +306,6 @@ namespace FairyGUI
 
 					case ConfigKey.PopupMenu_seperator:
 						UIConfig.popupMenu_seperator = value.s;
-						break;
-
-					case ConfigKey.RenderingTextBrighterOnDesktop:
-						UIConfig.renderingTextBrighterOnDesktop = value.b;
 						break;
 
 					case ConfigKey.TooltipsWin:

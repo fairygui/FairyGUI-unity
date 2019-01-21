@@ -58,22 +58,21 @@ Shader "FairyGUI/BMFont"
 				{
 					float4 vertex : POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 texcoord : TEXCOORD0;
 				};
 
 				struct v2f
 				{
 					float4 vertex : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
-					fixed2 flags : TEXCOORD1;
+					float4 texcoord : TEXCOORD0;
 
 					#ifdef CLIPPED
-					float2 clipPos : TEXCOORD2;
+					float2 clipPos : TEXCOORD1;
 					#endif
 
 					#ifdef SOFT_CLIPPED
-					float2 clipPos : TEXCOORD2;
+					float2 clipPos : TEXCOORD1;
 					#endif
 				};
 
@@ -92,30 +91,13 @@ Shader "FairyGUI/BMFont"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.texcoord = v.texcoord;
 					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 550)
 					o.color.rgb = GammaToLinearSpace(v.color.rgb);
 					o.color.a = v.color.a;
 					#else
 					o.color = v.color;
 					#endif
-					
-					float2 texcoord = v.texcoord;
-					o.flags.x = floor(texcoord.x/10);
-					texcoord.x = texcoord.x - o.flags.x*10;
-						
-					#ifdef GRAYED
-					if(texcoord.y >1)
-					{
-						texcoord.y = texcoord.y - 10;
-						o.flags.y = 1;
-					}
-					else
-						o.flags.y = 0;
-					#else
-						o.flags.y = 0;
-					#endif
-					
-					o.texcoord = texcoord;
 
 					#ifdef CLIPPED
 					o.clipPos = mul(_Object2World, v.vertex).xy * _ClipBox.zw + _ClipBox.xy;
@@ -132,16 +114,11 @@ Shader "FairyGUI/BMFont"
 				{
 					fixed4 col = i.color;
 					fixed4 tcol = tex2D(_MainTex, i.texcoord);
-					col.a *= tcol[i.flags.x];
+					col.a *= tcol[i.texcoord.z];//z stores channel
 
 					#ifdef GRAYED
-					if(i.flags.y==1)
-					{
-						fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));
-						col.rgb = fixed3(grey, grey, grey);  
-					}
-					else
-						col.rgb = fixed3(0.8, 0.8, 0.8);
+					fixed grey = dot(col.rgb, fixed3(0.299, 0.587, 0.114));
+					col.rgb = fixed3(grey, grey, grey);
 					#endif
 
 					#ifdef SOFT_CLIPPED

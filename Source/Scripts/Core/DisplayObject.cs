@@ -691,25 +691,25 @@ namespace FairyGUI
 			//组件的transformMatrix是通过paintingMode实现的，因为全部通过矩阵变换的话，和unity自身的变换混杂在一起，无力理清。
 			if (_transformMatrix != null)
 			{
-				if (this is Container)
-					this.EnterPaintingMode(4, null);
+				if (graphics == null)
+					EnterPaintingMode(4, null);
 			}
 			else
 			{
-				if (this is Container)
-					this.LeavePaintingMode(4);
+				if (graphics == null)
+					LeavePaintingMode(4);
 			}
 
-			if (this._paintingMode > 0)
+			if (_paintingMode > 0)
 			{
-				this.paintingGraphics.cameraPosition = camPos;
-				this.paintingGraphics.vertexMatrix = _transformMatrix;
-				this._paintingFlag = 1;
+				paintingGraphics.cameraPosition = camPos;
+				paintingGraphics.vertexMatrix = _transformMatrix;
+				_paintingFlag = 1;
 			}
-			else if (this.graphics != null)
+			else if (graphics != null)
 			{
-				this.graphics.cameraPosition = camPos;
-				this.graphics.vertexMatrix = _transformMatrix;
+				graphics.cameraPosition = camPos;
+				graphics.vertexMatrix = _transformMatrix;
 			}
 
 			_outlineChanged = true;
@@ -1092,11 +1092,11 @@ namespace FairyGUI
 				_blendMode = value;
 				InvalidateBatchingState();
 
-				if (this is Container)
+				if (graphics == null)
 				{
 					if (_blendMode != BlendMode.Normal)
 					{
-						if (!Application.isPlaying) //编辑期间不支持！！
+						if (!Application.isPlaying) //Not supported in edit mode！
 							return;
 
 						EnterPaintingMode(2, null);

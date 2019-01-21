@@ -44,9 +44,8 @@ namespace FairyGUI
 		/// <param name="materialType"></param>
 		/// <param name="blendMode"></param>
 		/// <param name="clipId"></param>
-		/// <param name="firstInstance"></param>
 		/// <returns></returns>
-		public NMaterial GetMaterial(int materialType, BlendMode blendMode, uint clipId, out bool firstInstance)
+		public NMaterial GetMaterial(int materialType, BlendMode blendMode, uint clipId)
 		{
 			uint frameId = UpdateContext.frameId;
 			List<NMaterial> items;
@@ -79,7 +78,7 @@ namespace FairyGUI
 				{
 					if (materialType != 6 && mat.clipId == clipId && mat.blendMode == blendMode)
 					{
-						firstInstance = false;
+						mat._firstInstance = false;
 						return mat;
 					}
 				}
@@ -117,7 +116,7 @@ namespace FairyGUI
 				items.Add(result);
 			}
 
-			firstInstance = true;
+			result._firstInstance = true;
 			return result;
 		}
 

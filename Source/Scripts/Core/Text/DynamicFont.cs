@@ -30,18 +30,9 @@ namespace FairyGUI
 		{
 			this.name = name;
 			this.canTint = true;
-			this.canOutline = true;
-			this.hasChannel = false;
 			this.keepCrisp = true;
+			this.shader = ShaderConfig.textShader;
 			_lastFontSize = -1;
-
-			if (UIConfig.renderingTextBrighterOnDesktop && !Application.isMobilePlatform)
-			{
-				this.shader = ShaderConfig.textBrighterShader;
-				this.canLight = true;
-			}
-			else
-				this.shader = ShaderConfig.textShader;
 
 			//The fonts in mobile platform have no default bold effect.
 			if (name.ToLower().IndexOf("bold") == -1)

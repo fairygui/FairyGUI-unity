@@ -1058,11 +1058,14 @@ namespace FairyGUI
 				_charPositions.Clear();
 
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
-			Vector2 u0, u1, u2, u3;
-			float specFlag;
+			Vector4 u0, u1, u2, u3;
 
 			List<Vector3> vertList = vb.vertices;
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+			List<Vector4> uvList = vb.uv0;
+#else
 			List<Vector2> uvList = vb.uv0;
+#endif
 			List<Color32> colList = vb.colors;
 
 			HtmlLink currentLink = null;
@@ -1078,7 +1081,6 @@ namespace FairyGUI
 			VertAlignType lineVAlign = UIConfig.richTextRowVerticalAlign;
 			float lastGlyphHeight = 0;
 			GlyphInfo glyph = new GlyphInfo();
-			GlyphInfo lineGlyph = new GlyphInfo();
 
 			int elementIndex = 0;
 			int elementCount = _elements.Count;
@@ -1283,29 +1285,7 @@ namespace FairyGUI
 						u1 = glyph.uvTopLeft;
 						u2 = glyph.uvTopRight;
 						u3 = glyph.uvBottomRight;
-						specFlag = 0;
-
-						if (_font.hasChannel)
-						{
-							//对于由BMFont生成的字体，使用这个特殊的设置告诉着色器告诉用的是哪个通道
-							if (glyph.channel != 0)
-							{
-								specFlag = 10 * (glyph.channel - 1);
-								u0.x += specFlag;
-								u1.x += specFlag;
-								u2.x += specFlag;
-								u3.x += specFlag;
-							}
-						}
-						else if (_font.canLight && format.bold)
-						{
-							//对于动态字体，使用这个特殊的设置告诉着色器这个文字不需要点亮（粗体亮度足够，不需要）
-							specFlag = 10;
-							u0.x += specFlag;
-							u1.x += specFlag;
-							u2.x += specFlag;
-							u3.x += specFlag;
-						}
+						u0.w = u1.w = u2.w = u3.w = 1;
 
 						if (!boldVertice)
 						{
@@ -1314,10 +1294,10 @@ namespace FairyGUI
 							uvList.Add(u2);
 							uvList.Add(u3);
 
-							vertList.Add(new Vector3(v0.x, -v1.y));
-							vertList.Add(new Vector3(v0.x, -v0.y));
-							vertList.Add(new Vector3(v1.x, -v0.y));
-							vertList.Add(new Vector3(v1.x, -v1.y));
+							vertList.Add(new Vector3(v0.x, -v1.y, 0));
+							vertList.Add(new Vector3(v0.x, -v0.y, 0));
+							vertList.Add(new Vector3(v1.x, -v0.y, 0));
+							vertList.Add(new Vector3(v1.x, -v1.y, 0));
 
 							if (!_font.canTint)
 							{
@@ -1353,10 +1333,10 @@ namespace FairyGUI
 								float fx = BOLD_OFFSET[b * 2];
 								float fy = BOLD_OFFSET[b * 2 + 1];
 
-								vertList.Add(new Vector3(v0.x + fx, -(v1.y + fy)));
-								vertList.Add(new Vector3(v0.x + fx, -(v0.y + fy)));
-								vertList.Add(new Vector3(v1.x + fx, -(v0.y + fy)));
-								vertList.Add(new Vector3(v1.x + fx, -(v1.y + fy)));
+								vertList.Add(new Vector3(v0.x + fx, -(v1.y + fy), 0));
+								vertList.Add(new Vector3(v0.x + fx, -(v0.y + fy), 0));
+								vertList.Add(new Vector3(v1.x + fx, -(v0.y + fy), 0));
+								vertList.Add(new Vector3(v1.x + fx, -(v1.y + fy), 0));
 
 								if (!_font.canTint)
 								{
@@ -1384,36 +1364,37 @@ namespace FairyGUI
 
 						if (format.underline)
 						{
-							if (_font.GetGlyph('_', ref lineGlyph))
+							float glyphWidth = glyph.width;
+							if (_font.GetGlyph('_', ref glyph))
 							{
+								glyph.width = glyphWidth;
 								//取中点的UV
-								if (lineGlyph.uvBottomLeft.x != lineGlyph.uvBottomRight.x)
-									u0.x = (lineGlyph.uvBottomLeft.x + lineGlyph.uvBottomRight.x) * 0.5f;
+								if (glyph.uvBottomLeft.x != glyph.uvBottomRight.x)
+									u0.x = (glyph.uvBottomLeft.x + glyph.uvBottomRight.x) * 0.5f;
 								else
-									u0.x = (lineGlyph.uvBottomLeft.x + lineGlyph.uvTopLeft.x) * 0.5f;
-								u0.x += specFlag;
+									u0.x = (glyph.uvBottomLeft.x + glyph.uvTopLeft.x) * 0.5f;
 
-								if (lineGlyph.uvBottomLeft.y != lineGlyph.uvTopLeft.y)
-									u0.y = (lineGlyph.uvBottomLeft.y + lineGlyph.uvTopLeft.y) * 0.5f;
+								if (glyph.uvBottomLeft.y != glyph.uvTopLeft.y)
+									u0.y = (glyph.uvBottomLeft.y + glyph.uvTopLeft.y) * 0.5f;
 								else
-									u0.y = (lineGlyph.uvBottomLeft.y + lineGlyph.uvBottomRight.y) * 0.5f;
+									u0.y = (glyph.uvBottomLeft.y + glyph.uvBottomRight.y) * 0.5f;
 
 								uvList.Add(u0);
 								uvList.Add(u0);
 								uvList.Add(u0);
 								uvList.Add(u0);
 
-								v0.y = line.y + yIndent + lineGlyph.vertMin.y + 1;
-								v1.y = line.y + yIndent + lineGlyph.vertMax.y + 1;
+								v0.y = line.y + yIndent + glyph.vertMin.y + 1;
+								v1.y = line.y + yIndent + glyph.vertMax.y + 1;
 								if (v1.y - v0.y > 2)
 									v1.y = v0.y + 2;
 
 								float tmpX = charX + letterSpacing + glyph.width;
 
-								vertList.Add(new Vector3(charX, -v1.y));
-								vertList.Add(new Vector3(charX, -v0.y));
-								vertList.Add(new Vector3(tmpX, -v0.y));
-								vertList.Add(new Vector3(tmpX, -v1.y));
+								vertList.Add(new Vector3(charX, -v1.y, 0));
+								vertList.Add(new Vector3(charX, -v0.y, 0));
+								vertList.Add(new Vector3(tmpX, -v0.y, 0));
+								vertList.Add(new Vector3(tmpX, -v1.y, 0));
 
 								if (!_font.canTint)
 								{
@@ -1517,11 +1498,15 @@ namespace FairyGUI
 				allocCount = count;
 			}
 
-			if (allocCount != count && _font.canOutline)
+			if (allocCount != count)
 			{
 				VertexBuffer vb2 = VertexBuffer.Begin();
 				List<Vector3> vertList2 = vb2.vertices;
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+				List<Vector4> uvList2 = vb2.uv0;
+#else
 				List<Vector2> uvList2 = vb2.uv0;
+#endif
 				List<Color32> colList2 = vb2.colors;
 
 				Color32 strokeColor = _strokeColor;
@@ -1532,11 +1517,8 @@ namespace FairyGUI
 						for (int i = 0; i < count; i++)
 						{
 							Vector3 vert = vertList[i];
-							Vector2 u = uvList[i];
+							Vector4 u = uvList[i];
 
-							//使用这个特殊的设置告诉着色器这个是描边
-							if (_font.canOutline)
-								u.y = 10 + u.y;
 							uvList2.Add(u);
 							vertList2.Add(new Vector3(vert.x + STROKE_OFFSET[j * 2] * _stroke, vert.y + STROKE_OFFSET[j * 2 + 1] * _stroke, 0));
 							colList2.Add(strokeColor);
@@ -1549,11 +1531,8 @@ namespace FairyGUI
 					for (int i = 0; i < count; i++)
 					{
 						Vector3 vert = vertList[i];
-						Vector2 u = uvList[i];
+						Vector4 u = uvList[i];
 
-						//使用这个特殊的设置告诉着色器这个是描边
-						if (_font.canOutline)
-							u.y = 10 + u.y;
 						uvList2.Add(u);
 						vertList2.Add(new Vector3(vert.x + _shadowOffset.x, vert.y - _shadowOffset.y, 0));
 						colList2.Add(strokeColor);

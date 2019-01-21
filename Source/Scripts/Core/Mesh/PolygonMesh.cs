@@ -9,9 +9,14 @@ namespace FairyGUI
 	public class PolygonMesh : IMeshFactory, IHitTest
 	{
 		/// <summary>
-		/// 
+		/// points must be in clockwise order, and must start from bottom-left if stretchUV is set.
 		/// </summary>
 		public readonly List<Vector2> points;
+
+		/// <summary>
+		/// if you dont want to provide uv, leave it empty.
+		/// </summary>
+		public readonly List<Vector2> texcoords;
 
 		/// <summary>
 		/// 
@@ -33,6 +38,27 @@ namespace FairyGUI
 		public PolygonMesh()
 		{
 			points = new List<Vector2>();
+			texcoords = new List<Vector2>();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="point"></param>
+		public void Add(Vector2 point)
+		{
+			points.Add(point);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="point"></param>
+		/// <param name="texcoord"></param>
+		public void Add(Vector2 point, Vector2 texcoord)
+		{
+			points.Add(point);
+			texcoords.Add(texcoord);
 		}
 
 		public void OnPopulateMesh(VertexBuffer vb)
@@ -42,18 +68,35 @@ namespace FairyGUI
 				return;
 
 			int restIndexPos, numRestIndices;
-
 			Color32 color = fillColor != null ? (Color32)fillColor : vb.vertexColor;
+
+			float w = vb.contentRect.width;
+			float h = vb.contentRect.height;
+			bool useTexcoords = texcoords.Count >= numVertices;
+			bool fullUV = true;
 			for (int i = 0; i < numVertices; i++)
 			{
 				Vector3 vec = new Vector3(points[i].x, points[i].y, 0);
 				if (usePercentPositions)
 				{
-					vec.x *= vb.contentRect.width;
-					vec.y *= vb.contentRect.height;
+					vec.x *= w;
+					vec.y *= h;
 				}
-				vb.AddVert(vec, color);
+				if (useTexcoords)
+				{
+					Vector2 uv = texcoords[i];
+					if (uv.x != 0 && uv.x != 1 || uv.y != 0 && uv.y != 1)
+						fullUV = false;
+					uv.x = Mathf.Lerp(vb.uvRect.x, vb.uvRect.xMax, uv.x);
+					uv.y = Mathf.Lerp(vb.uvRect.y, vb.uvRect.yMax, uv.y);
+					vb.AddVert(vec, color, uv);
+				}
+				else
+					vb.AddVert(vec, color);
 			}
+
+			if (useTexcoords && fullUV && numVertices == 4)
+				vb._isArbitraryQuad = true;
 
 			// Algorithm "Ear clipping method" described here:
 			// -> https://en.wikipedia.org/wiki/Polygon_triangulation
@@ -159,6 +202,8 @@ namespace FairyGUI
 			int i;
 			int j = len - 1;
 			bool oddNodes = false;
+			float w = contentRect.width;
+			float h = contentRect.height;
 
 			for (i = 0; i < len; ++i)
 			{
@@ -166,6 +211,13 @@ namespace FairyGUI
 				float iy = points[i].y;
 				float jx = points[j].x;
 				float jy = points[j].y;
+				if (usePercentPositions)
+				{
+					ix *= w;
+					iy *= h;
+					ix *= w;
+					iy *= h;
+				}
 
 				if ((iy < point.y && jy >= point.y || jy < point.y && iy >= point.y) && (ix <= point.x || jx <= point.x))
 				{

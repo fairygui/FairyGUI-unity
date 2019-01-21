@@ -58,14 +58,14 @@ Shader "FairyGUI/Image"
 				{
 					float4 vertex : POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 texcoord : TEXCOORD0;
 				};
 	
 				struct v2f
 				{
 					float4 vertex : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 texcoord : TEXCOORD0;
 
 					#ifdef CLIPPED
 					float2 clipPos : TEXCOORD1;
@@ -122,7 +122,7 @@ Shader "FairyGUI/Image"
 				
 				fixed4 frag (v2f i) : SV_Target
 				{
-					fixed4 col = tex2D(_MainTex, i.texcoord) * i.color;
+					fixed4 col = tex2D(_MainTex, i.texcoord.xy / i.texcoord.w) * i.color;
 
 					#ifdef COMBINED
 					col.a *= tex2D(_AlphaTex, i.texcoord).g;

@@ -57,14 +57,14 @@ Shader "FairyGUI/Text"
 				{
 					float4 vertex : POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 texcoord : TEXCOORD0;
 				};
 
 				struct v2f
 				{
 					float4 vertex : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 texcoord : TEXCOORD0;
 
 					#ifdef CLIPPED
 					float2 clipPos : TEXCOORD1;
@@ -72,10 +72,6 @@ Shader "FairyGUI/Text"
 
 					#ifdef SOFT_CLIPPED
 					float2 clipPos : TEXCOORD1;
-					#endif
-
-					#ifdef GRAYED
-					fixed flag : TEXCOORD2;
 					#endif
 				};
 
@@ -94,25 +90,12 @@ Shader "FairyGUI/Text"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.texcoord = v.texcoord;
 					#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 550)
 					o.color.rgb = GammaToLinearSpace(v.color.rgb);
 					o.color.a = v.color.a;
 					#else
 					o.color = v.color;
-					#endif
-					
-					#ifdef GRAYED
-					float2 texcoord = v.texcoord;
-					if(texcoord.y >1)
-					{
-						texcoord.y = texcoord.y - 10;
-						o.flag = 1;
-					}
-					else
-						o.flag = 0;
-					o.texcoord = texcoord;
-					#else
-					o.texcoord = v.texcoord;
 					#endif
 
 					#ifdef CLIPPED

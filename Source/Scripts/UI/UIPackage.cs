@@ -1279,12 +1279,15 @@ namespace FairyGUI
 				bg.height = buffer.ReadInt();
 				bg.advance = buffer.ReadInt();
 				bg.channel = buffer.ReadByte();
+				//The texture channel where the character image is found (1 = blue, 2 = green, 4 = red, 8 = alpha).
 				if (bg.channel == 1)
-					bg.channel = 3;
-				else if (bg.channel == 2)
 					bg.channel = 2;
-				else if (bg.channel == 3)
+				else if (bg.channel == 2)
 					bg.channel = 1;
+				else if (bg.channel == 3)
+					bg.channel = 0;
+				else if (bg.channel == 8)
+					bg.channel = 3;
 
 				if (ttf)
 				{

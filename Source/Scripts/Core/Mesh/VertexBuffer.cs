@@ -36,14 +36,25 @@ namespace FairyGUI
 		/// <summary>
 		/// 
 		/// </summary>
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+		public readonly List<Vector4> uv0;
+#else
 		public readonly List<Vector2> uv0;
+#endif
 
 		/// <summary>
 		/// 
 		/// </summary>
 		public readonly List<int> triangles;
 
+		static public Vector2[] NormalizedUV = new Vector2[] {
+			new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) };
+
+		static public Vector2[] NormalizedPosition = new Vector2[] {
+			new Vector2(0, 1), new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1) };
+
 		internal bool _alphaInVertexColor;
+		internal bool _isArbitraryQuad;
 
 		static Stack<VertexBuffer> _pool = new Stack<VertexBuffer>();
 
@@ -67,7 +78,11 @@ namespace FairyGUI
 		{
 			vertices = new List<Vector3>();
 			colors = new List<Color32>();
+#if UNITY_5_2 || UNITY_5_3_OR_NEWER
+			uv0 = new List<Vector4>();
+#else
 			uv0 = new List<Vector2>();
+#endif
 			triangles = new List<int>();
 		}
 
@@ -88,6 +103,8 @@ namespace FairyGUI
 			colors.Clear();
 			uv0.Clear();
 			triangles.Clear();
+
+			_isArbitraryQuad = false;
 			_alphaInVertexColor = false;
 		}
 
@@ -111,8 +128,10 @@ namespace FairyGUI
 			position.y = -position.y;
 			vertices.Add(position);
 			colors.Add(vertexColor);
-			uv0.Add(new Vector2(Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
-					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height)));
+			uv0.Add(new Vector4(
+					Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height),
+					0, 1));
 		}
 
 		/// <summary>
@@ -127,10 +146,10 @@ namespace FairyGUI
 			colors.Add(color);
 			if (color.a != 255)
 				_alphaInVertexColor = true;
-			uv0.Add(new Vector2(
+			uv0.Add(new Vector4(
 					Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
-					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height))
-				);
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height),
+					0, 1));
 		}
 
 		/// <summary>
@@ -143,7 +162,7 @@ namespace FairyGUI
 		{
 			position.y = -position.y;
 			vertices.Add(position);
-			uv0.Add(uv);
+			uv0.Add(new Vector4(uv.x, uv.y, 0, 1));
 			colors.Add(color);
 			if (color.a != 255)
 				_alphaInVertexColor = true;
@@ -190,10 +209,10 @@ namespace FairyGUI
 			vertices.Add(new Vector3(vertRect.xMax, -vertRect.yMin, 0f));
 			vertices.Add(new Vector3(vertRect.xMax, -vertRect.yMax, 0f));
 
-			uv0.Add(new Vector2(uvRect.xMin, uvRect.yMin));
-			uv0.Add(new Vector2(uvRect.xMin, uvRect.yMax));
-			uv0.Add(new Vector2(uvRect.xMax, uvRect.yMax));
-			uv0.Add(new Vector2(uvRect.xMax, uvRect.yMin));
+			uv0.Add(new Vector4(uvRect.xMin, uvRect.yMin, 0, 1));
+			uv0.Add(new Vector4(uvRect.xMin, uvRect.yMax, 0, 1));
+			uv0.Add(new Vector4(uvRect.xMax, uvRect.yMax, 0, 1));
+			uv0.Add(new Vector4(uvRect.xMax, uvRect.yMin, 0, 1));
 
 			colors.Add(color);
 			colors.Add(color);
@@ -202,6 +221,48 @@ namespace FairyGUI
 
 			if (color.a != 255)
 				_alphaInVertexColor = true;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="startVertexIndex"></param>
+		internal void FixUVForArbitraryQuad()
+		{
+			//ref1 http://www.reedbeta.com/blog/quadrilateral-interpolation-part-1/
+			//ref2 https://bitlush.com/blog/arbitrary-quadrilaterals-in-opengl-es-2-0
+
+			Vector4 qq = Vector4.one;
+			Vector2 a = vertices[2] - vertices[0];
+			Vector2 b = vertices[1] - vertices[3];
+			Vector2 c = vertices[0] - vertices[3];
+
+			float cross = a.x * b.y - a.y * b.x;
+			if (cross != 0)
+			{
+				float s = (a.x * c.y - a.y * c.x) / cross;
+				if (s > 0 && s < 1)
+				{
+					float t = (b.x * c.y - b.y * c.x) / cross;
+					if (t > 0 && t < 1)
+					{
+						qq.x = 1 / (1 - t);
+						qq.y = 1 / s;
+						qq.z = 1 / t;
+						qq.w = 1 / (1 - s);
+					}
+				}
+			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				Vector4 v = uv0[i];
+				float q = qq[i];
+				v.x *= q;
+				v.y *= q;
+				v.w = q;
+				uv0[i] = v;
+			}
 		}
 
 		/// <summary>
@@ -292,6 +353,24 @@ namespace FairyGUI
 			Vector3 vec = vertices[index];
 			vec.y = -vec.y;
 			return vec;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="usePercent"></param>
+		/// <returns></returns>
+		public Vector2 GetUVAtPosition(Vector2 position, bool usePercent)
+		{
+			if (usePercent)
+			{
+				return new Vector2(Mathf.Lerp(uvRect.xMin, uvRect.xMax, position.x),
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, position.y));
+			}
+			else
+				return new Vector2(Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
+					Mathf.Lerp(uvRect.yMax, uvRect.yMin, (position.y - contentRect.yMin) / contentRect.height));
 		}
 
 		/// <summary>

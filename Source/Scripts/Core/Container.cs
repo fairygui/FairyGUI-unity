@@ -391,11 +391,10 @@ namespace FairyGUI
 			{
 				if (_mask != value)
 				{
-					if (_mask != null)
-						_mask.graphics._SetAsMask(false);
 					_mask = value;
-					if (_mask != null)
-						_mask.graphics._SetAsMask(true);
+					if (_mask != null && _mask.parent != this)
+						AddChild(_mask);
+
 					UpdateBatchingFlags();
 				}
 			}
@@ -553,7 +552,7 @@ namespace FairyGUI
 				}
 			}
 
-			if (_mask != null)
+			if (_mask != null && _mask.parent == this)
 			{
 				DisplayObject tmp = _mask.InternalHitTestMask();
 				if (!reversedMask && tmp == null || reversedMask && tmp != null)
@@ -698,9 +697,12 @@ namespace FairyGUI
 			}
 
 			if (_mask != null)
-				context.EnterClipping(this.id, null, null, reversedMask);
+			{
+				context.EnterClipping(this.id, reversedMask);
+				_mask.graphics._PreUpdateMask(context);
+			}
 			else if (_clipRect != null)
-				context.EnterClipping(this.id, this.TransformRect((Rect)_clipRect, null), clipSoftness, false);
+				context.EnterClipping(this.id, this.TransformRect((Rect)_clipRect, null), clipSoftness);
 
 			float savedAlpha = context.alpha;
 			context.alpha *= this.alpha;
