@@ -307,7 +307,12 @@ namespace FairyGUI
 		public MaterialManager GetMaterialManager(string shaderName, string[] keywords)
 		{
 			if (_root != this)
-				return _root.GetMaterialManager(shaderName, keywords);
+			{
+				if (_root == null)
+					return null;
+				else
+					return _root.GetMaterialManager(shaderName, keywords);
+			}
 
 			if (_materialManagers == null)
 				_materialManagers = new Dictionary<string, MaterialManager>();
