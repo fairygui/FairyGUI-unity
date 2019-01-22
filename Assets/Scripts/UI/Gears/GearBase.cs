@@ -18,6 +18,15 @@ namespace FairyGUI
 			_owner = owner;
 		}
 
+		public void Dispose()
+		{
+			if (_tweenConfig != null && _tweenConfig._tweener != null)
+			{
+				_tweenConfig._tweener.Kill();
+				_tweenConfig._tweener = null;
+			}
+		}
+
 		/// <summary>
 		/// Controller object.
 		/// </summary>
