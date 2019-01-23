@@ -532,11 +532,13 @@ namespace FairyGUI
 				{
 					item.hook = callback;
 					found = true;
+					break;
 				}
 				else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
 				{
 					item.tweenConfig.endHook = callback;
 					found = true;
+					break;
 				}
 			}
 			if (!found)
