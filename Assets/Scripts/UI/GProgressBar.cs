@@ -24,7 +24,6 @@ namespace FairyGUI
 		float _barMaxHeightDelta;
 		float _barStartX;
 		float _barStartY;
-		bool _tweening;
 
 		public GProgressBar()
 		{
@@ -82,14 +81,10 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (_tweening)
-				{
-					GTween.Kill(this, TweenPropType.Progress, true);
-					_tweening = false;
-				}
-
 				if (_value != value)
 				{
+					GTween.Kill(this, TweenPropType.Progress, false);
+
 					_value = value;
 					Update(_value);
 				}
@@ -110,9 +105,10 @@ namespace FairyGUI
 		public GTweener TweenValue(double value, float duration)
 		{
 			double oldValule;
-			if (_tweening)
+
+			GTweener twener = GTween.GetTween(this, TweenPropType.Progress);
+			if (twener != null)
 			{
-				GTweener twener = GTween.GetTween(this, TweenPropType.Progress);
 				oldValule = twener.value.d;
 				twener.Kill(false);
 			}
@@ -120,11 +116,9 @@ namespace FairyGUI
 				oldValule = _value;
 
 			_value = value;
-			_tweening = true;
 			return GTween.ToDouble(oldValule, _value, duration)
 				.SetEase(EaseType.Linear)
-				.SetTarget(this, TweenPropType.Progress)
-				.OnComplete(() => { _tweening = false; });
+				.SetTarget(this, TweenPropType.Progress);
 		}
 
 		/// <summary>
@@ -289,13 +283,6 @@ namespace FairyGUI
 
 			if (!this.underConstruct)
 				Update(_value);
-		}
-
-		public override void Dispose()
-		{
-			if (_tweening)
-				GTween.Kill(this);
-			base.Dispose();
 		}
 	}
 }
