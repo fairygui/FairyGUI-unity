@@ -2,13 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using FairyGUI;
+#if UNITY_5_4_OR_NEWER
+using UnityEngine.Networking;
+#endif
 
 public delegate void LoadCompleteCallback(NTexture texture);
 public delegate void LoadErrorCallback(string error);
 
- /// <summary>
- /// Use to load icons from asset bundle, and pool them
- /// </summary>
+/// <summary>
+/// Use to load icons from asset bundle, and pool them
+/// </summary>
 public class IconManager : MonoBehaviour
 {
 	static IconManager _instance;
@@ -54,7 +57,7 @@ public class IconManager : MonoBehaviour
 		item.onSuccess = onSuccess;
 		item.onFail = onFail;
 		_items.Add(item);
-		if(!_started)
+		if (!_started)
 			StartCoroutine(Run());
 	}
 
@@ -86,12 +89,27 @@ public class IconManager : MonoBehaviour
 				continue;
 			}
 
-			WWW www = new WWW(_basePath + item.url + ".ab");
-			yield return www;
+			string url = _basePath + item.url + ".ab";
+#if UNITY_5_4_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
+			UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);
+#else
+			UnityWebRequest www = UnityWebRequest.GetAssetBundle(url);
+#endif
+			yield return www.SendWebRequest();
 
+			if (!www.isNetworkError && !www.isHttpError)
+			{
+				AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+#else
+			WWW www = new WWW(url);
+			yield return www;
+			
 			if (string.IsNullOrEmpty(www.error))
 			{
 				AssetBundle bundle = www.assetBundle;
+#endif
+
 				if (bundle == null)
 				{
 					Debug.LogWarning("Run Window->Build FairyGUI example Bundles first.");
