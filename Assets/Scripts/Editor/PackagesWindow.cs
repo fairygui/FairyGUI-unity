@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 #if UNITY_5_3_OR_NEWER
 using UnityEditor.SceneManagement;
+#endif
+#if UNITY_2018_3_OR_NEWER
+using UnityEditor.Experimental.SceneManagement;
 #endif
 using FairyGUI;
 
@@ -39,7 +40,7 @@ namespace FairyGUIEditor
 		{
 			if (itemStyle == null)
 			{
-				itemStyle = new GUIStyle(GUI.skin.GetStyle("IN Toggle"));
+				itemStyle = new GUIStyle(EditorStyles.textField);
 				itemStyle.normal.background = null;
 				itemStyle.onNormal.background = GUI.skin.GetStyle("ObjectPickerResultsEven").active.background;
 				itemStyle.focused.background = null;
@@ -163,22 +164,39 @@ namespace FairyGUIEditor
 					packagePath = selectedPkg.assetPath.Substring(pos + 10);
 				else
 					packagePath = selectedPkg.assetPath;
+#if UNITY_2018_3_OR_NEWER
+				bool isPrefab = PrefabUtility.GetPrefabAssetType(Selection.activeGameObject) != PrefabAssetType.NotAPrefab;
+#else
 				bool isPrefab = PrefabUtility.GetPrefabType(Selection.activeGameObject) == PrefabType.Prefab;
-
+#endif
 				Selection.activeGameObject.SendMessage("OnUpdateSource",
 					new object[] { selectedPkg.name, packagePath, selectedComponentName, !isPrefab },
 					SendMessageOptions.DontRequireReceiver);
-#if UNITY_5_3_OR_NEWER
-				EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-#elif UNITY_5
-				EditorApplication.MarkSceneDirty();
+
+#if UNITY_2018_3_OR_NEWER
+				PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+				if (prefabStage != null)
+					EditorSceneManager.MarkSceneDirty(prefabStage.scene);
+				else
+					ApplyChange();
 #else
-				EditorUtility.SetDirty(Selection.activeGameObject);
+				ApplyChange();
 #endif
 				this.Close();
 			}
 
 			EditorGUILayout.EndHorizontal();
+		}
+
+		void ApplyChange()
+		{
+#if UNITY_5_3_OR_NEWER
+			EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+#elif UNITY_5
+			EditorApplication.MarkSceneDirty();
+#else
+			EditorUtility.SetDirty(Selection.activeGameObject);
+#endif
 		}
 	}
 }

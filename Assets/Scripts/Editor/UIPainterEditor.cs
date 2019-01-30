@@ -34,7 +34,7 @@ namespace FairyGUIEditor
 
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
 			propertyToExclude = new string[] { "m_Script", "packageName", "componentName", "packagePath",
-				"renderCamera", "fairyBatching", "touchDisabled","sortingOrder" 
+				"renderCamera", "fairyBatching", "touchDisabled","sortingOrder"
 			};
 #endif
 		}
@@ -54,7 +54,11 @@ namespace FairyGUIEditor
 
 			if (GUILayout.Button("Clear", GUILayout.Width(50)))
 			{
+#if UNITY_2018_3_OR_NEWER
+				bool isPrefab = PrefabUtility.GetPrefabAssetType(panel) != PrefabAssetType.NotAPrefab;
+#else
 				bool isPrefab = PrefabUtility.GetPrefabType(panel) == PrefabType.Prefab;
+#endif
 				panel.SendMessage("OnUpdateSource", new object[] { null, null, null, !isPrefab });
 
 #if UNITY_5_3_OR_NEWER
@@ -80,9 +84,14 @@ namespace FairyGUIEditor
 
 			if (serializedObject.ApplyModifiedProperties())
 			{
-				if (PrefabUtility.GetPrefabType(panel) != PrefabType.Prefab)
+#if UNITY_2018_3_OR_NEWER
+				bool isPrefab = PrefabUtility.GetPrefabAssetType(panel) != PrefabAssetType.NotAPrefab;
+#else
+				bool isPrefab = PrefabUtility.GetPrefabType(panel) == PrefabType.Prefab;
+#endif
+				if (!isPrefab)
 				{
-					panel.ApplyModifiedProperties(sortingOrder.intValue!=oldSortingOrder);
+					panel.ApplyModifiedProperties(sortingOrder.intValue != oldSortingOrder);
 				}
 			}
 		}
