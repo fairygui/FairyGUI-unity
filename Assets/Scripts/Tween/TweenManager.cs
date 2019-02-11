@@ -119,7 +119,9 @@ namespace FairyGUI
 				}
 				else
 				{
-					if (!tweener._paused)
+					if ((tweener._target is GObject) && ((GObject)tweener._target)._disposed)
+						tweener._killed = true;
+					else if (!tweener._paused)
 						tweener._Update();
 
 					if (freePosStart != -1)
