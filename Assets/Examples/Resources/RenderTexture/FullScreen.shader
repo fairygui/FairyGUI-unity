@@ -39,10 +39,15 @@
 				o.texcoord = v.texcoord;
 				o.texcoord1 = v.texcoord1;
 				o.pos = v.vertex;
-				#if UNITY_UV_STARTS_AT_TOP
-					o.pos.y = -o.pos.y;
-				#endif
+#if UNITY_UV_STARTS_AT_TOP
+				o.pos.y = -o.pos.y;
+#endif
+
+#if SHADER_API_D3D9 || SHADER_API_GLES || SHADER_API_GLES3 || SHADER_API_GLCORE
 				o.pos.z = 1;
+#else
+				o.pos.z = 0;
+#endif
 				o.pos.w = 1;
 				return o;
 			}
