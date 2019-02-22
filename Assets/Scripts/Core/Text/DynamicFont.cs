@@ -21,6 +21,7 @@ namespace FairyGUI
 		int _lastFontSize;
 		int _size;
 		FontStyle _style;
+		bool _bold;
 
 		static CharacterInfo sTempChar;
 
@@ -117,7 +118,8 @@ namespace FairyGUI
 			if (_size == 0)
 				_size = 1;
 
-			if (format.bold && !customBold)
+			_bold = format.bold;
+			if (_bold && !customBold)
 			{
 				if (format.italic)
 				{
@@ -161,7 +163,7 @@ namespace FairyGUI
 				width = Mathf.CeilToInt(sTempChar.width);
 #endif
 				height = ri.height;
-				if (customBold)
+				if (_bold && customBold)
 					width++;
 
 				if (keepCrisp)
@@ -207,7 +209,7 @@ namespace FairyGUI
 
 				glyph.width = sTempChar.advance;
 				glyph.height = ri.height;
-				if (customBold)
+				if (_bold && customBold)
 					glyph.width++;
 #else
 				glyph.vertMin.x = sTempChar.vert.xMin;
@@ -234,7 +236,7 @@ namespace FairyGUI
 
 				glyph.width = Mathf.CeilToInt(sTempChar.width);
 				glyph.height = sTempChar.size;
-				if (customBold)
+				if (_bold && customBold)
 					glyph.width++;
 #endif
 				if (keepCrisp)
