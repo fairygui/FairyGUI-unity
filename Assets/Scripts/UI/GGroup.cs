@@ -99,12 +99,9 @@ namespace FairyGUI
 
 		public void EnsureBoundsCorrect()
 		{
-			if (_boundsChanged)
-				UpdateBounds();
-		}
+			if (!_boundsChanged)
+				return;
 
-		void UpdateBounds()
-		{
 			UpdateContext.OnBegin -= _refreshDelegate;
 			_boundsChanged = false;
 
@@ -113,6 +110,11 @@ namespace FairyGUI
 
 			HandleLayout();
 
+			UpdateBounds();
+		}
+
+		void UpdateBounds()
+		{
 			int cnt = parent.numChildren;
 			int i;
 			GObject child;
@@ -127,16 +129,16 @@ namespace FairyGUI
 				if (child.group != this)
 					continue;
 
-				tmp = child.x;
+				tmp = child.xMin;
 				if (tmp < ax)
 					ax = tmp;
-				tmp = child.y;
+				tmp = child.yMin;
 				if (tmp < ay)
 					ay = tmp;
-				tmp = child.x + child.width;
+				tmp = child.xMin + child.width;
 				if (tmp > ar)
 					ar = tmp;
-				tmp = child.y + child.height;
+				tmp = child.yMin + child.height;
 				if (tmp > ab)
 					ab = tmp;
 
@@ -174,11 +176,11 @@ namespace FairyGUI
 						continue;
 
 					if (float.IsNaN(curX))
-						curX = (int)child.x;
+						curX = (int)child.xMin;
 					else
-						child.x = curX;
+						child.xMin = curX;
 					if (child.width != 0)
-						curX += (int)(child.width + _columnGap);
+						curX += child.width + _columnGap;
 				}
 				if (!_percentReady)
 					UpdatePercent();
@@ -194,11 +196,11 @@ namespace FairyGUI
 						continue;
 
 					if (float.IsNaN(curY))
-						curY = (int)child.y;
+						curY = (int)child.yMin;
 					else
-						child.y = curY;
+						child.yMin = curY;
 					if (child.height != 0)
-						curY += (int)(child.height + _lineGap);
+						curY += child.height + _lineGap;
 				}
 				if (!_percentReady)
 					UpdatePercent();
@@ -290,36 +292,30 @@ namespace FairyGUI
 			if (_layout == GroupLayoutType.None || (_updating & 2) != 0 || parent == null)
 				return;
 
-			_updating |= 2;
-
 			if (!_percentReady)
 				UpdatePercent();
 
 			int cnt = parent.numChildren;
 			int i;
-			int j;
 			GObject child;
-			int last = -1;
 			int numChildren = 0;
-			float lineSize = 0;
 			float remainSize = 0;
-			bool found = false;
+			float remainPercent = 1;
 
 			for (i = 0; i < cnt; i++)
 			{
 				child = parent.GetChildAt(i);
 				if (child.group != this)
 					continue;
-
-				last = i;
+				
 				numChildren++;
 			}
 
 			if (_layout == GroupLayoutType.Horizontal)
 			{
-				remainSize = lineSize = this.width - (numChildren - 1) * _columnGap;
+				_updating |= 2;
+				remainSize = this.width - (numChildren - 1) * _columnGap;
 				float curX = float.NaN;
-				float nw;
 				for (i = 0; i < cnt; i++)
 				{
 					child = parent.GetChildAt(i);
@@ -327,49 +323,22 @@ namespace FairyGUI
 						continue;
 
 					if (float.IsNaN(curX))
-						curX = (int)child.x;
+						curX = (int)child.xMin;
 					else
-						child.x = curX;
-					if (last == i)
-						nw = remainSize;
-					else
-						nw = Mathf.RoundToInt(child._sizePercentInGroup * lineSize);
-					child.SetSize(nw, child._rawHeight + dh, true);
+						child.xMin = curX;
+					child.SetSize(Mathf.Round(child._sizePercentInGroup / remainPercent * remainSize), child._rawHeight + dh, true);
 					remainSize -= child.width;
-					if (last == i)
-					{
-						if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
-						{
-							for (j = 0; j <= i; j++)
-							{
-								child = parent.GetChildAt(j);
-								if (child.group != this)
-									continue;
-
-								if (!found)
-								{
-									nw = child.width + remainSize;
-									if ((child.maxWidth == 0 || nw < child.maxWidth)
-										&& (child.minWidth == 0 || nw > child.minWidth))
-									{
-										child.SetSize(nw, child.height, true);
-										found = true;
-									}
-								}
-								else
-									child.x += remainSize;
-							}
-						}
-					}
-					else
-						curX += (child.width + _columnGap);
+					remainPercent -= child._sizePercentInGroup;
+					curX += child.width + _columnGap;
 				}
+				_updating &= 1;
+				UpdateBounds();
 			}
 			else if (_layout == GroupLayoutType.Vertical)
 			{
-				remainSize = lineSize = this.height - (numChildren - 1) * _lineGap;
+				_updating |= 2;
+				remainSize = this.height - (numChildren - 1) * _lineGap;
 				float curY = float.NaN;
-				float nh;
 				for (i = 0; i < cnt; i++)
 				{
 					child = parent.GetChildAt(i);
@@ -377,46 +346,17 @@ namespace FairyGUI
 						continue;
 
 					if (float.IsNaN(curY))
-						curY = (int)child.y;
+						curY = (int)child.yMin;
 					else
-						child.y = curY;
-					if (last == i)
-						nh = remainSize;
-					else
-						nh = Mathf.RoundToInt(child._sizePercentInGroup * lineSize);
-					child.SetSize(child._rawWidth + dw, nh, true);
+						child.yMin = curY;
+					child.SetSize(child._rawWidth + dw, Mathf.Round(child._sizePercentInGroup / remainPercent * remainSize), true);
 					remainSize -= child.height;
-					if (last == i)
-					{
-						if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
-						{
-							for (j = 0; j <= i; j++)
-							{
-								child = parent.GetChildAt(j);
-								if (child.group != this)
-									continue;
-
-								if (!found)
-								{
-									nh = child.height + remainSize;
-									if ((child.maxHeight == 0 || nh < child.maxHeight)
-										&& (child.minHeight == 0 || nh > child.minHeight))
-									{
-										child.SetSize(child.width, nh, true);
-										found = true;
-									}
-								}
-								else
-									child.y += remainSize;
-							}
-						}
-					}
-					else
-						curY += (child.height + _lineGap);
+					remainPercent -= child._sizePercentInGroup;
+					curY += child.height + _lineGap;
 				}
+				_updating &= 1;
+				UpdateBounds();
 			}
-
-			_updating &= 1;
 		}
 
 		override protected void HandleAlphaChanged()
