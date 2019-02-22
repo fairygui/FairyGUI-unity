@@ -471,8 +471,10 @@ namespace FairyGUI
 		/// 
 		/// </summary>
 		/// <param name="stagePoint"></param>
+		/// <param name="forTouch"></param>
+		/// <param name="displayIndex"></param>
 		/// <returns></returns>
-		public DisplayObject HitTest(Vector2 stagePoint, bool forTouch)
+		public DisplayObject HitTest(Vector2 stagePoint, bool forTouch, int displayIndex = -1)
 		{
 			if (StageCamera.main == null)
 			{
@@ -487,6 +489,7 @@ namespace FairyGUI
 			HitTestContext.direction = Vector3.back;
 			HitTestContext.forTouch = forTouch;
 			HitTestContext.camera = StageCamera.main;
+			HitTestContext.displayIndex = displayIndex;
 
 			DisplayObject ret = HitTest();
 			if (ret != null)
@@ -505,35 +508,27 @@ namespace FairyGUI
 			if (this.cachedTransform.localScale.x == 0 || this.cachedTransform.localScale.y == 0)
 				return null;
 
-			Vector3 savedWorldPoint = HitTestContext.worldPoint;
-			Vector3 savedDirection = HitTestContext.direction;
-			Camera savedCamera = HitTestContext.camera;
-
-			if (this.renderMode == RenderMode.WorldSpace)
+			switch (this.renderMode)
 			{
-				HitTestContext.camera = GetRenderCamera();
-
-				Vector3 screenPoint = HitTestContext.camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
-				screenPoint.x = HitTestContext.screenPoint.x;
-				screenPoint.y = HitTestContext.screenPoint.y;
-
-				//获得本地z轴在世界坐标的方向
-				HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(screenPoint);
-				Ray ray = HitTestContext.camera.ScreenPointToRay(screenPoint);
-				HitTestContext.direction = Vector3.zero - ray.direction;
+				case RenderMode.ScreenSpaceOverlay:
+					return HitTest_0();
+				case RenderMode.ScreenSpaceCamera:
+					return HitTest_1();
+				case RenderMode.WorldSpace:
+					return HitTest_2();
+				default:
+					return null;
 			}
+		}
 
+		DisplayObject HitTest_0()
+		{
 			Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
 
 			if (hitArea != null)
 			{
 				if (!hitArea.HitTest(_contentRect, localPoint))
-				{
-					HitTestContext.worldPoint = savedWorldPoint;
-					HitTestContext.direction = savedDirection;
-					HitTestContext.camera = savedCamera;
 					return null;
-				}
 
 				if (hitArea is MeshColliderHitTest)
 					localPoint = ((MeshColliderHitTest)hitArea).lastHit;
@@ -541,24 +536,14 @@ namespace FairyGUI
 			else
 			{
 				if (_clipRect != null && !((Rect)_clipRect).Contains(localPoint))
-				{
-					HitTestContext.worldPoint = savedWorldPoint;
-					HitTestContext.direction = savedDirection;
-					HitTestContext.camera = savedCamera;
 					return null;
-				}
 			}
 
 			if (_mask != null && _mask.parent == this)
 			{
 				DisplayObject tmp = _mask.InternalHitTestMask();
 				if (!reversedMask && tmp == null || reversedMask && tmp != null)
-				{
-					HitTestContext.worldPoint = savedWorldPoint;
-					HitTestContext.direction = savedDirection;
-					HitTestContext.camera = savedCamera;
 					return null;
-				}
 			}
 
 			DisplayObject target = null;
@@ -580,12 +565,59 @@ namespace FairyGUI
 			if (target == null && opaque && (hitArea != null || _contentRect.Contains(localPoint)))
 				target = this;
 
+			return target;
+		}
+
+		DisplayObject HitTest_1()
+		{
+			Camera cam = GetRenderCamera();
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+			if (HitTestContext.displayIndex != -1 && cam.targetDisplay != HitTestContext.displayIndex)
+				return null;
+#endif
+			Camera savedCamera = HitTestContext.camera;
+
+			HitTestContext.camera = cam;
+
+			DisplayObject target = HitTest_0();
+
+			HitTestContext.camera = savedCamera;
+
+			return target;
+		}
+
+		DisplayObject HitTest_2()
+		{
+			Camera cam = GetRenderCamera();
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+			if (HitTestContext.displayIndex != -1 && cam.targetDisplay != HitTestContext.displayIndex)
+				return null;
+#endif
+
+			Vector3 savedWorldPoint = HitTestContext.worldPoint;
+			Vector3 savedDirection = HitTestContext.direction;
+			Camera savedCamera = HitTestContext.camera;
+
+			HitTestContext.camera = cam;
+
+			Vector3 screenPoint = HitTestContext.camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
+			screenPoint.x = HitTestContext.screenPoint.x;
+			screenPoint.y = HitTestContext.screenPoint.y;
+
+			//获得本地z轴在世界坐标的方向
+			HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(screenPoint);
+			Ray ray = HitTestContext.camera.ScreenPointToRay(screenPoint);
+			HitTestContext.direction = Vector3.zero - ray.direction;
+
+			DisplayObject target = HitTest_0();
+
 			HitTestContext.worldPoint = savedWorldPoint;
 			HitTestContext.direction = savedDirection;
 			HitTestContext.camera = savedCamera;
 
 			return target;
 		}
+
 
 		/// <summary>
 		/// 

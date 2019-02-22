@@ -595,14 +595,29 @@ namespace FairyGUI
 			}
 			else
 			{
-				Vector2 pos = Input.mousePosition;
+				Vector2 pos;
+				int displayIndex;
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+				if (Display.displays.Length > 1)
+				{
+					Vector3 p = Display.RelativeMouseAt(Input.mousePosition);
+					pos = p;
+					displayIndex = (int)p.z;
+				}
+				else
+#endif
+				{
+					pos = Input.mousePosition;
+					displayIndex = -1;
+				}
+
 				pos.y = stageHeight - pos.y;
 
 				TouchInfo touch = _touches[0];
 				if (pos.x < 0 || pos.y < 0) //outside of the window
 					_touchTarget = this;
 				else
-					_touchTarget = HitTest(pos, true);
+					_touchTarget = HitTest(pos, true, displayIndex);
 				touch.target = _touchTarget;
 			}
 

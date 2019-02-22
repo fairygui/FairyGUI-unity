@@ -14,6 +14,7 @@ namespace FairyGUI
 		public static Vector3 direction;
 		public static bool forTouch;
 		public static Camera camera;
+		public static int displayIndex;
 
 		public static int layerMask = -1;
 		public static float maxDistance = Mathf.Infinity;
