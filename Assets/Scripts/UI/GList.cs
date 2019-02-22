@@ -2456,7 +2456,8 @@ namespace FairyGUI
 				{
 					float lineSize = 0;
 					int lineStart = 0;
-					float ratio;
+					float remainSize;
+					float remainPercent;
 
 					for (i = 0; i < cnt; i++)
 					{
@@ -2468,7 +2469,8 @@ namespace FairyGUI
 						j++;
 						if (j == _columnCount || i == cnt - 1)
 						{
-							ratio = (viewWidth - lineSize - (j - 1) * _columnGap) / lineSize;
+							remainSize = viewWidth - (j - 1) * _columnGap;
+							remainPercent = 1;
 							curX = 0;
 							for (j = lineStart; j <= i; j++)
 							{
@@ -2477,16 +2479,12 @@ namespace FairyGUI
 									continue;
 
 								child.SetXY(curX, curY);
+								float perc = child.sourceWidth / lineSize;
+								child.SetSize(Mathf.Round(perc / remainPercent * remainSize), child.height, true);
+								remainSize -= child.width;
+								remainPercent -= perc;
+								curX += child.width + _columnGap;
 
-								if (j < i)
-								{
-									child.SetSize(child.sourceWidth + Mathf.RoundToInt(child.sourceWidth * ratio), child.height, true);
-									curX += Mathf.CeilToInt(child.width) + _columnGap;
-								}
-								else
-								{
-									child.SetSize(viewWidth - curX, child.height, true);
-								}
 								if (child.height > maxHeight)
 									maxHeight = child.height;
 							}
@@ -2539,7 +2537,8 @@ namespace FairyGUI
 				{
 					float lineSize = 0;
 					int lineStart = 0;
-					float ratio;
+					float remainSize;
+					float remainPercent;
 
 					for (i = 0; i < cnt; i++)
 					{
@@ -2551,7 +2550,8 @@ namespace FairyGUI
 						j++;
 						if (j == _lineCount || i == cnt - 1)
 						{
-							ratio = (viewHeight - lineSize - (j - 1) * _lineGap) / lineSize;
+							remainSize = viewHeight - (j - 1) * _lineGap;
+							remainPercent = 1;
 							curY = 0;
 							for (j = lineStart; j <= i; j++)
 							{
@@ -2560,16 +2560,12 @@ namespace FairyGUI
 									continue;
 
 								child.SetXY(curX, curY);
+								float perc = child.sourceHeight / lineSize;
+								child.SetSize(child.width, Mathf.Round(perc / remainPercent * remainSize), true);
+								remainSize -= child.height;
+								remainPercent -= perc;
+								curY += child.height + _lineGap;
 
-								if (j < i)
-								{
-									child.SetSize(child.width, child.sourceHeight + Mathf.RoundToInt(child.sourceHeight * ratio), true);
-									curY += Mathf.CeilToInt(child.height) + _lineGap;
-								}
-								else
-								{
-									child.SetSize(child.width, viewHeight - curY, true);
-								}
 								if (child.width > maxWidth)
 									maxWidth = child.width;
 							}
@@ -2627,7 +2623,8 @@ namespace FairyGUI
 				{
 					float lineSize = 0;
 					int lineStart = 0;
-					float ratio;
+					float remainSize;
+					float remainPercent;
 
 					for (i = 0; i < cnt; i++)
 					{
@@ -2648,7 +2645,8 @@ namespace FairyGUI
 						j++;
 						if (j == _columnCount || i == cnt - 1)
 						{
-							ratio = (viewWidth - lineSize - (j - 1) * _columnGap) / lineSize;
+							remainSize = viewWidth - (j - 1) * _columnGap;
+							remainPercent = 1;
 							curX = 0;
 							for (j = lineStart; j <= i; j++)
 							{
@@ -2657,17 +2655,12 @@ namespace FairyGUI
 									continue;
 
 								child.SetXY(page * viewWidth + curX, curY);
+								float perc = child.sourceWidth / lineSize;
+								child.SetSize(Mathf.Round(perc / remainPercent * remainSize), _lineCount > 0 ? eachHeight : child.height, true);
+								remainSize -= child.width;
+								remainPercent -= perc;
+								curX += child.width + _columnGap;
 
-								if (j < i)
-								{
-									child.SetSize(child.sourceWidth + Mathf.RoundToInt(child.sourceWidth * ratio),
-										_lineCount > 0 ? eachHeight : child.height, true);
-									curX += Mathf.CeilToInt(child.width) + _columnGap;
-								}
-								else
-								{
-									child.SetSize(viewWidth - curX, _lineCount > 0 ? eachHeight : child.height, true);
-								}
 								if (child.height > maxHeight)
 									maxHeight = child.height;
 							}
