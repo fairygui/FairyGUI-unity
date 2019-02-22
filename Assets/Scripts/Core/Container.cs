@@ -392,9 +392,6 @@ namespace FairyGUI
 				if (_mask != value)
 				{
 					_mask = value;
-					if (_mask != null && _mask.parent != this)
-						AddChild(_mask);
-
 					UpdateBatchingFlags();
 				}
 			}
