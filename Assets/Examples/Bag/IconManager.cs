@@ -96,7 +96,11 @@ public class IconManager : MonoBehaviour
 #else
 			UnityWebRequest www = UnityWebRequest.GetAssetBundle(url);
 #endif
+#if UNITY_2017_2_OR_NEWER
 			yield return www.SendWebRequest();
+#else
+			yield return www.Send();
+#endif
 
 			if (!www.isNetworkError && !www.isHttpError)
 			{
