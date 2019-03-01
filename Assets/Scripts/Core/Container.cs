@@ -58,7 +58,7 @@ namespace FairyGUI
 		bool _fBatching;
 		List<DisplayObject> _descendants;
 
-		internal bool _disabled;
+		internal bool _isPanel;
 		internal int _panelOrder;
 
 		/// <summary>
@@ -484,7 +484,10 @@ namespace FairyGUI
 					return null;
 			}
 
-			HitTestContext.screenPoint = new Vector2(stagePoint.x, Screen.height - stagePoint.y);
+			if (displayIndex != -1)
+				HitTestContext.screenPoint = new Vector2(stagePoint.x, Display.displays[displayIndex].renderingHeight - stagePoint.y);
+			else
+				HitTestContext.screenPoint = new Vector2(stagePoint.x, Screen.height - stagePoint.y);
 			HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(HitTestContext.screenPoint);
 			HitTestContext.direction = Vector3.back;
 			HitTestContext.forTouch = forTouch;
@@ -502,29 +505,55 @@ namespace FairyGUI
 
 		override protected DisplayObject HitTest()
 		{
-			if (_disabled)
+			if (_isPanel && !gameObject.activeInHierarchy)
 				return null;
 
 			if (this.cachedTransform.localScale.x == 0 || this.cachedTransform.localScale.y == 0)
 				return null;
 
-			switch (this.renderMode)
+			Camera savedCamera = HitTestContext.camera;
+			Vector3 savedWorldPoint = HitTestContext.worldPoint;
+			Vector3 savedDirection = HitTestContext.direction;
+			DisplayObject target;
+
+			if (renderMode != RenderMode.ScreenSpaceOverlay || _isPanel)
 			{
-				case RenderMode.ScreenSpaceOverlay:
-					return HitTest_0();
-				case RenderMode.ScreenSpaceCamera:
-					return HitTest_1();
-				case RenderMode.WorldSpace:
-					return HitTest_2();
-				default:
+				Camera cam = GetRenderCamera();
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+				if (HitTestContext.displayIndex != -1 && cam.targetDisplay != HitTestContext.displayIndex)
 					return null;
+#endif
+
+				HitTestContext.camera = cam;
+				if (renderMode == RenderMode.WorldSpace)
+				{
+					Vector3 screenPoint = HitTestContext.camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
+					screenPoint.x = HitTestContext.screenPoint.x;
+					screenPoint.y = HitTestContext.screenPoint.y;
+
+					//获得本地z轴在世界坐标的方向
+					HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(screenPoint);
+					Ray ray = HitTestContext.camera.ScreenPointToRay(screenPoint);
+					HitTestContext.direction = Vector3.zero - ray.direction;
+				}
+				else if (renderMode == RenderMode.ScreenSpaceCamera)
+				{
+					HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(HitTestContext.screenPoint);
+				}
 			}
+
+			target = HitTest_Container();
+
+			HitTestContext.camera = savedCamera;
+			HitTestContext.worldPoint = savedWorldPoint;
+			HitTestContext.direction = savedDirection;
+
+			return target;
 		}
 
-		DisplayObject HitTest_0()
+		DisplayObject HitTest_Container()
 		{
 			Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
-
 			if (hitArea != null)
 			{
 				if (!hitArea.HitTest(_contentRect, localPoint))
@@ -567,57 +596,6 @@ namespace FairyGUI
 
 			return target;
 		}
-
-		DisplayObject HitTest_1()
-		{
-			Camera cam = GetRenderCamera();
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-			if (HitTestContext.displayIndex != -1 && cam.targetDisplay != HitTestContext.displayIndex)
-				return null;
-#endif
-			Camera savedCamera = HitTestContext.camera;
-
-			HitTestContext.camera = cam;
-
-			DisplayObject target = HitTest_0();
-
-			HitTestContext.camera = savedCamera;
-
-			return target;
-		}
-
-		DisplayObject HitTest_2()
-		{
-			Camera cam = GetRenderCamera();
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-			if (HitTestContext.displayIndex != -1 && cam.targetDisplay != HitTestContext.displayIndex)
-				return null;
-#endif
-
-			Vector3 savedWorldPoint = HitTestContext.worldPoint;
-			Vector3 savedDirection = HitTestContext.direction;
-			Camera savedCamera = HitTestContext.camera;
-
-			HitTestContext.camera = cam;
-
-			Vector3 screenPoint = HitTestContext.camera.WorldToScreenPoint(this.cachedTransform.position); //only for query z value
-			screenPoint.x = HitTestContext.screenPoint.x;
-			screenPoint.y = HitTestContext.screenPoint.y;
-
-			//获得本地z轴在世界坐标的方向
-			HitTestContext.worldPoint = HitTestContext.camera.ScreenToWorldPoint(screenPoint);
-			Ray ray = HitTestContext.camera.ScreenPointToRay(screenPoint);
-			HitTestContext.direction = Vector3.zero - ray.direction;
-
-			DisplayObject target = HitTest_0();
-
-			HitTestContext.worldPoint = savedWorldPoint;
-			HitTestContext.direction = savedDirection;
-			HitTestContext.camera = savedCamera;
-
-			return target;
-		}
-
 
 		/// <summary>
 		/// 
@@ -713,7 +691,7 @@ namespace FairyGUI
 
 		override public void Update(UpdateContext context)
 		{
-			if (_disabled)
+			if (_isPanel && !gameObject.activeInHierarchy)
 				return;
 
 			base.Update(context);

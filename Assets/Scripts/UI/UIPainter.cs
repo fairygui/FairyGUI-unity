@@ -53,7 +53,7 @@ namespace FairyGUI
 		[NonSerialized]
 		RenderTexture _texture;
 
-		EventCallback0 _captureDelegate; 
+		EventCallback0 _captureDelegate;
 
 		void OnEnable()
 		{
@@ -66,8 +66,6 @@ namespace FairyGUI
 					if (!string.IsNullOrEmpty(packagePath) && UIPackage.GetByName(packageName) == null)
 						UIPackage.AddPackage(packagePath);
 				}
-				else
-					this.container._disabled = false;
 			}
 			else
 			{
@@ -77,12 +75,7 @@ namespace FairyGUI
 
 		void OnDisable()
 		{
-			if (Application.isPlaying)
-			{
-				if (this.container != null)
-					this.container._disabled = true;
-			}
-			else
+			if (!Application.isPlaying)
 				EMRenderSupport.Remove(this);
 		}
 
@@ -128,6 +121,7 @@ namespace FairyGUI
 			this.container.renderCamera = renderCamera;
 			this.container.touchable = !touchDisabled;
 			this.container.fairyBatching = fairyBatching;
+			this.container._isPanel = true;
 			this.container._panelOrder = sortingOrder;
 			this.container.hitArea = new MeshColliderHitTest(this.gameObject.GetComponent<MeshCollider>());
 			SetSortingOrder(this.sortingOrder, true);

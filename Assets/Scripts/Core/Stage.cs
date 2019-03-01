@@ -603,15 +603,15 @@ namespace FairyGUI
 					Vector3 p = Display.RelativeMouseAt(Input.mousePosition);
 					pos = p;
 					displayIndex = (int)p.z;
+					pos.y = Display.displays[displayIndex].renderingHeight - pos.y;
 				}
 				else
 #endif
 				{
 					pos = Input.mousePosition;
+					pos.y = stageHeight - pos.y;
 					displayIndex = -1;
 				}
-
-				pos.y = stageHeight - pos.y;
 
 				TouchInfo touch = _touches[0];
 				if (pos.x < 0 || pos.y < 0) //outside of the window

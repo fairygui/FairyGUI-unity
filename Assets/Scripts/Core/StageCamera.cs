@@ -25,6 +25,8 @@ namespace FairyGUI
 		int screenHeight;
 		[System.NonSerialized]
 		bool isMain;
+		[System.NonSerialized]
+		Display _display;
 
 		/// <summary>
 		/// 
@@ -53,21 +55,37 @@ namespace FairyGUI
 				main = cachedCamera;
 				isMain = true;
 			}
-			OnScreenSizeChanged();
+#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+			if (Display.displays.Length > 1 && cachedCamera.targetDisplay != 0 && cachedCamera.targetDisplay < Display.displays.Length)
+				_display = Display.displays[cachedCamera.targetDisplay];
+#endif
+			if (_display == null)
+				OnScreenSizeChanged(Screen.width, Screen.height);
+			else
+				OnScreenSizeChanged(_display.renderingWidth, _display.renderingHeight);
 		}
 
 		void Update()
 		{
-			if (screenWidth != Screen.width || screenHeight != Screen.height)
-				OnScreenSizeChanged();
+			if (_display == null)
+			{
+				if (screenWidth != Screen.width || screenHeight != Screen.height)
+					OnScreenSizeChanged(Screen.width, Screen.height);
+			}
+			else
+			{
+				if (screenWidth != _display.renderingWidth || screenHeight != _display.renderingHeight)
+					OnScreenSizeChanged(_display.renderingWidth, _display.renderingHeight);
+			}
 		}
 
-		void OnScreenSizeChanged()
+		void OnScreenSizeChanged(int newWidth, int newHeight)
 		{
-			screenWidth = Screen.width;
-			screenHeight = Screen.height;
-			if (screenWidth == 0 || screenHeight == 0)
+			if (newWidth == 0 || newHeight == 0)
 				return;
+
+			screenWidth = newWidth;
+			screenHeight = newHeight;
 
 			float upp;
 			if (constantSize)
