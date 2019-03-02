@@ -25,8 +25,10 @@ namespace FairyGUI
 		int screenHeight;
 		[System.NonSerialized]
 		bool isMain;
+#pragma warning disable 0649
 		[System.NonSerialized]
 		Display _display;
+#pragma warning restore 0649
 
 		/// <summary>
 		/// 
