@@ -47,6 +47,8 @@ namespace FairyGUI
 
 			if (font == null)
 				LoadFont();
+			else
+				_font = font;
 
 			this.nativeFont = _font;
 		}
