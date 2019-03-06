@@ -27,7 +27,11 @@ namespace FairyGUI
 
 		internal static bool textRebuildFlag;
 
-		public DynamicFont(string name)
+		public DynamicFont(string name) : this(name, null)
+		{
+		}
+
+		public DynamicFont(string name, Font font)
 		{
 			this.name = name;
 			this.canTint = true;
@@ -41,7 +45,38 @@ namespace FairyGUI
 
 			_renderInfo = new Dictionary<int, RenderInfo>();
 
-			LoadFont();
+			if (font == null)
+				LoadFont();
+
+			this.nativeFont = _font;
+		}
+
+		public Font nativeFont
+		{
+			get { return _font; }
+			set
+			{
+				if (_font != null)
+				{
+#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
+					Font.textureRebuilt -= textureRebuildCallback;
+#else
+					_font.textureRebuildCallback -= textureRebuildCallback;
+#endif
+				}
+				_font = value;
+#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
+				Font.textureRebuilt += textureRebuildCallback;
+#else
+				_font.textureRebuildCallback += textureRebuildCallback;
+#endif
+				if (mainTexture != null)
+					mainTexture.Dispose();
+				mainTexture = new NTexture(_font.material.mainTexture);
+				mainTexture.destroyMethod = DestroyMethod.None;
+
+				_renderInfo.Clear();
+			}
 		}
 
 		void LoadFont()
@@ -91,15 +126,6 @@ namespace FairyGUI
 				_font.material.hideFlags = DisplayOptions.hideFlags;
 				_font.material.mainTexture.hideFlags = DisplayOptions.hideFlags;
 			}
-
-#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
-			Font.textureRebuilt += textureRebuildCallback;
-#else
-			_font.textureRebuildCallback += textureRebuildCallback;
-#endif
-
-			mainTexture = new NTexture(_font.material.mainTexture);
-			mainTexture.destroyMethod = DestroyMethod.None;
 		}
 
 		override public void SetFormat(TextFormat format, float fontSizeScale)
