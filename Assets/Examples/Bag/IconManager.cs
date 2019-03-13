@@ -90,17 +90,13 @@ public class IconManager : MonoBehaviour
 			}
 
 			string url = _basePath + item.url + ".ab";
-#if UNITY_5_4_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
 #if UNITY_2018_1_OR_NEWER
 			UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);
 #else
 			UnityWebRequest www = UnityWebRequest.GetAssetBundle(url);
 #endif
-#if UNITY_2017_2_OR_NEWER
 			yield return www.SendWebRequest();
-#else
-			yield return www.Send();
-#endif
 
 			if (!www.isNetworkError && !www.isHttpError)
 			{
