@@ -352,7 +352,8 @@ namespace FairyGUI
 			if (newValue != _value)
 			{
 				_value = newValue;
-				DispatchEvent("onChanged", null);
+				if (DispatchEvent("onChanged", null))
+					return;
 			}
 			UpdateWidthPercent(percent);
 		}
