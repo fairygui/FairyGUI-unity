@@ -1931,7 +1931,7 @@ namespace FairyGUI
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
 				this.scrollPane.ChangeContentSizeOnScrolling(0, deltaSize, 0, firstItemDeltaSize);
 
-			if (curIndex > 0 && this.numChildren > 0 && this.container.y < 0 && GetChildAt(0).y > -this.container.y)//最后一页没填满！
+			if (curIndex > 0 && this.numChildren > 0 && this.container.y <= 0 && GetChildAt(0).y > -this.container.y)//最后一页没填满！
 				return true;
 			else
 				return false;
@@ -2100,7 +2100,7 @@ namespace FairyGUI
 			if (deltaSize != 0 || firstItemDeltaSize != 0)
 				this.scrollPane.ChangeContentSizeOnScrolling(deltaSize, 0, firstItemDeltaSize, 0);
 
-			if (curIndex > 0 && this.numChildren > 0 && this.container.x < 0 && GetChildAt(0).x > -this.container.x)//最后一页没填满！
+			if (curIndex > 0 && this.numChildren > 0 && this.container.x <= 0 && GetChildAt(0).x > -this.container.x)//最后一页没填满！
 				return true;
 			else
 				return false;
