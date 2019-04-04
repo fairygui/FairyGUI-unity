@@ -403,6 +403,7 @@ namespace FairyGUI
 				if (!_textChanged)
 					RequestText();
 				graphics.texture = _font.mainTexture;
+				InvalidateBatchingState();
 			}
 
 			if (_textChanged)
@@ -575,6 +576,7 @@ namespace FairyGUI
 					_richTextField.SetSize(_textWidth, _textHeight);
 				else
 					SetSize(_textWidth, _textHeight);
+				InvalidateBatchingState();
 				_updatingSize = false;
 			}
 			else if (_autoSize == AutoSizeType.Height)
@@ -587,6 +589,7 @@ namespace FairyGUI
 					_richTextField.height = h;
 				else
 					this.height = h;
+				InvalidateBatchingState();
 				_updatingSize = false;
 			}
 
