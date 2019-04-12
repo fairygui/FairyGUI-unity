@@ -310,7 +310,7 @@ namespace FairyGUI
 		/// 模拟点击这个按钮。
 		/// </summary>
 		/// <param name="downEffect">If the down effect will simulate too.</param>
-		 public void FireClick(bool downEffect, bool clickCall = false)
+		public void FireClick(bool downEffect, bool clickCall = false)
         {
             if (downEffect && _mode == ButtonMode.Common)
             {
