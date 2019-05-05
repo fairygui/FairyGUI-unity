@@ -1482,6 +1482,8 @@ namespace FairyGUI
 			{
 				Debug.LogWarning("Text is too large. A mesh may not have more than 65000 vertices.");
 				vertList.RemoveRange(65000, count - 65000);
+				colList.RemoveRange(65000, count - 65000);
+				uvList.RemoveRange(65000, count - 65000);
 				count = 65000;
 			}
 
