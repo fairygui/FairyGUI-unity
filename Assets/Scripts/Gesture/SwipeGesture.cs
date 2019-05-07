@@ -192,11 +192,12 @@ namespace FairyGUI
 
 		void __touchEnd(EventContext context)
 		{
+			_touchBegan = false;
+
 			if (!_started)
 				return;
 
 			_started = false;
-			_touchBegan = false;
 
 			InputEvent evt = context.inputEvent;
 			Vector2 pt = host.GlobalToLocal(new Vector2(evt.x, evt.y));
