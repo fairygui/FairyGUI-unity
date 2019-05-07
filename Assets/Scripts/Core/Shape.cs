@@ -103,6 +103,7 @@ namespace FairyGUI
 			mesh.startDegree = 0;
 			mesh.endDegreee = 360;
 			mesh.fillColor = null;
+			mesh.centerColor = null;
 
 			graphics.color = fillColor;
 			graphics.SetMeshDirty();
@@ -121,7 +122,10 @@ namespace FairyGUI
 		{
 			EllipseMesh mesh = graphics.GetMeshFactory<EllipseMesh>();
 			mesh.lineWidth = lineSize;
-			mesh.centerColor = centerColor;
+			if (centerColor.Equals(fillColor))
+				mesh.centerColor = null;
+			else
+				mesh.centerColor = centerColor;
 			mesh.lineColor = lineColor;
 			mesh.fillColor = null;
 			mesh.startDegree = startDegree;
