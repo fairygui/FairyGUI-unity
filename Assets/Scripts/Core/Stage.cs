@@ -1299,18 +1299,24 @@ namespace FairyGUI
 			if (downTargets.Count == 0
 				|| clickCancelled
 				|| Mathf.Abs(x - downX) > 50 || Mathf.Abs(y - downY) > 50)
+			{
+				downTargets.Clear();
 				return null;
+			}
 
 			DisplayObject obj = downTargets[0];
 			if (obj.stage != null) //依然派发到原来的downTarget，虽然可能它已经偏离当前位置，主要是为了正确处理点击缩放的效果
+			{
+				downTargets.Clear();
 				return obj;
+			}
 
 			obj = target;
 			while (obj != null)
 			{
 				int i = downTargets.IndexOf(obj);
 				if (i != -1 && obj.stage != null)
-					return obj;
+					break;
 
 				obj = obj.parent;
 			}
