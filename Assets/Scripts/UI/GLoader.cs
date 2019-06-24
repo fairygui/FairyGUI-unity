@@ -74,6 +74,7 @@ namespace FairyGUI
 				if (_url == value)
 					return;
 
+				ClearContent();
 				_url = value;
 				LoadContent();
 				UpdateGear(7);
@@ -653,7 +654,10 @@ namespace FairyGUI
 			}
 
 			if (!string.IsNullOrEmpty(_url))
-				LoadContent();
+		    {
+                ClearContent();
+		        LoadContent();
+            }
 		}
 	}
 }
