@@ -313,13 +313,30 @@ namespace FairyGUI
 		/// 模拟点击这个按钮。
 		/// </summary>
 		/// <param name="downEffect">If the down effect will simulate too.</param>
-		public void FireClick(bool downEffect)
+		public void FireClick(bool downEffect, bool clickCall = false)
 		{
 			if (downEffect && _mode == ButtonMode.Common)
 			{
 				SetState(OVER);
+
 				Timers.inst.Add(0.1f, 1, (object param) => { SetState(DOWN); });
-				Timers.inst.Add(0.2f, 1, (object param) => { SetState(UP); });
+				Timers.inst.Add(0.2f, 1,
+					(object param) =>
+					{
+						SetState(UP);
+						if (clickCall)
+						{
+							onClick.Call();
+						}
+					}
+				);
+			}
+			else
+			{
+				if (clickCall)
+				{
+					onClick.Call();
+				}
 			}
 			__click();
 		}
