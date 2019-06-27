@@ -91,9 +91,11 @@ namespace FairyGUI
 
 			float ratio = clockwise ? amount : (1 - amount);
 			float tan = Mathf.Tan(Mathf.PI * 0.5f * ratio);
-			float thresold = vertRect.height / vertRect.width - tan;
+			bool thresold = false;
+			if (ratio != 1)
+				thresold = (vertRect.height / vertRect.width - tan) > 0;
 			if (!clockwise)
-				thresold = -thresold;
+				thresold = !thresold;
 			float x = vertRect.x + (ratio == 0 ? float.MaxValue : (vertRect.height / tan));
 			float y = vertRect.y + (ratio == 1 ? float.MaxValue : (vertRect.width * tan));
 			float x2 = x;
@@ -114,7 +116,7 @@ namespace FairyGUI
 
 			if (y > vertRect.yMax)
 			{
-				if (thresold > 0)
+				if (thresold)
 					vb.AddVert(new Vector3(x2, yMax, 0));
 				else
 					vb.AddVert(new Vector3(xMax, yMax, 0));
@@ -124,7 +126,7 @@ namespace FairyGUI
 
 			if (x > vertRect.xMax)
 			{
-				if (thresold > 0)
+				if (thresold)
 					vb.AddVert(new Vector3(xMax, y2, 0));
 				else
 					vb.AddVert(new Vector3(xMax, yMax, 0));
