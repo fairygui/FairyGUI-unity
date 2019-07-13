@@ -573,6 +573,8 @@ namespace FairyGUI
 				if (!_pageMode)
 					return;
 
+				_owner.EnsureBoundsCorrect();
+
 				if (_overlapSize.x > 0)
 					this.SetPosX(value * _pageSize.x, false);
 			}
@@ -585,6 +587,11 @@ namespace FairyGUI
 		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetCurrentPageX(int value, bool ani)
 		{
+			if (!_pageMode)
+				return;
+
+			_owner.EnsureBoundsCorrect();
+
 			if (_overlapSize.x > 0)
 				this.SetPosX(value * _pageSize.x, ani);
 		}
@@ -607,6 +614,11 @@ namespace FairyGUI
 			}
 			set
 			{
+				if (!_pageMode)
+					return;
+
+				_owner.EnsureBoundsCorrect();
+
 				if (_overlapSize.y > 0)
 					this.SetPosY(value * _pageSize.y, false);
 			}
@@ -619,6 +631,11 @@ namespace FairyGUI
 		/// <param name="ani">是否使用缓动到达目标。</param>
 		public void SetCurrentPageY(int value, bool ani)
 		{
+			if (!_pageMode)
+				return;
+
+			_owner.EnsureBoundsCorrect();
+
 			if (_overlapSize.y > 0)
 				this.SetPosY(value * _pageSize.y, ani);
 		}
