@@ -14,7 +14,7 @@ namespace FairyGUI
 		ProgressTitleType _titleType;
 		bool _reverse;
 
-		GTextField _titleObject;
+		GObject _titleObject;
 		GObject _barObjectH;
 		GObject _barObjectV;
 		float _barMaxWidth;
@@ -127,7 +127,7 @@ namespace FairyGUI
 				switch (_titleType)
 				{
 					case ProgressTitleType.Percent:
-						_titleObject.text = Mathf.RoundToInt(percent * 100) + "%";
+						_titleObject.text = Mathf.FloorToInt(percent * 100) + "%";
 						break;
 
 					case ProgressTitleType.ValueAndMax:
@@ -150,20 +150,12 @@ namespace FairyGUI
 			{
 				if (_barObjectH != null)
 				{
-					if ((_barObjectH is GImage) && ((GImage)_barObjectH).fillMethod != FillMethod.None)
-						((GImage)_barObjectH).fillAmount = percent;
-					else if ((_barObjectH is GLoader) && ((GLoader)_barObjectH).fillMethod != FillMethod.None)
-						((GLoader)_barObjectH).fillAmount = percent;
-					else
+					if (!SetFillAmount(_barObjectH, percent))
 						_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
 				}
 				if (_barObjectV != null)
 				{
-					if ((_barObjectV is GImage) && ((GImage)_barObjectV).fillMethod != FillMethod.None)
-						((GImage)_barObjectV).fillAmount = percent;
-					else if ((_barObjectV is GLoader) && ((GLoader)_barObjectV).fillMethod != FillMethod.None)
-						((GLoader)_barObjectV).fillAmount = percent;
-					else
+					if (!SetFillAmount(_barObjectV, percent))
 						_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
 				}
 			}
@@ -171,11 +163,7 @@ namespace FairyGUI
 			{
 				if (_barObjectH != null)
 				{
-					if ((_barObjectH is GImage) && ((GImage)_barObjectH).fillMethod != FillMethod.None)
-						((GImage)_barObjectH).fillAmount = 1 - percent;
-					else if ((_barObjectH is GLoader) && ((GLoader)_barObjectH).fillMethod != FillMethod.None)
-						((GLoader)_barObjectH).fillAmount = 1 - percent;
-					else
+					if (!SetFillAmount(_barObjectH, 1 - percent))
 					{
 						_barObjectH.width = Mathf.RoundToInt(fullWidth * percent);
 						_barObjectH.x = _barStartX + (fullWidth - _barObjectH.width);
@@ -183,11 +171,7 @@ namespace FairyGUI
 				}
 				if (_barObjectV != null)
 				{
-					if ((_barObjectV is GImage) && ((GImage)_barObjectV).fillMethod != FillMethod.None)
-						((GImage)_barObjectV).fillAmount = 1 - percent;
-					else if ((_barObjectV is GLoader) && ((GLoader)_barObjectV).fillMethod != FillMethod.None)
-						((GLoader)_barObjectV).fillAmount = 1 - percent;
-					else
+					if (!SetFillAmount(_barObjectV, 1 - percent))
 					{
 						_barObjectV.height = Mathf.RoundToInt(fullHeight * percent);
 						_barObjectV.y = _barStartY + (fullHeight - _barObjectV.height);
@@ -198,6 +182,18 @@ namespace FairyGUI
 			InvalidateBatchingState(true);
 		}
 
+		bool SetFillAmount(GObject bar, float amount)
+		{
+			if ((bar is GImage) && ((GImage)bar).fillMethod != FillMethod.None)
+				((GImage)bar).fillAmount = amount;
+			else if ((bar is GLoader) && ((GLoader)bar).fillMethod != FillMethod.None)
+				((GLoader)bar).fillAmount = amount;
+			else
+				return false;
+
+			return true;
+		}
+
 		override protected void ConstructExtension(ByteBuffer buffer)
 		{
 			buffer.Seek(0, 6);
@@ -205,7 +201,7 @@ namespace FairyGUI
 			_titleType = (ProgressTitleType)buffer.ReadByte();
 			_reverse = buffer.ReadBool();
 
-			_titleObject = GetChild("title") as GTextField;
+			_titleObject = GetChild("title");
 			_barObjectH = GetChild("bar");
 			_barObjectV = GetChild("bar_v");
 			_gripObject = GetChild("grip");
