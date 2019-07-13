@@ -654,10 +654,7 @@ namespace FairyGUI
 			}
 
 			if (!string.IsNullOrEmpty(_url))
-		    {
-                ClearContent();
-		        LoadContent();
-            }
+				LoadContent();
 		}
 	}
 }
