@@ -85,11 +85,8 @@ namespace FairyGUI
 				{
 					GTween.Kill(this, TweenPropType.Progress, false);
 					_maybeTweening = false;
-					if (_value != value)
-					{
-						_value = value;
-						Update(_value);
-					}
+					_value = value;
+					Update(_value);
 				}
 				else
 				{
