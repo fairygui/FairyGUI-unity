@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -24,6 +24,7 @@ namespace FairyGUI
 		float _barMaxHeightDelta;
 		float _barStartX;
 		float _barStartY;
+		bool _maybeTweening;
 
 		public GProgressBar()
 		{
@@ -36,7 +37,6 @@ namespace FairyGUI
 		/// </summary>
 		public ProgressTitleType titleType
 		{
-
 			get
 			{
 				return _titleType;
@@ -81,12 +81,23 @@ namespace FairyGUI
 			}
 			set
 			{
-				if (_value != value)
+				if (_maybeTweening)
 				{
 					GTween.Kill(this, TweenPropType.Progress, false);
-
-					_value = value;
-					Update(_value);
+					_maybeTweening = false;
+					if (_value != value)
+					{
+						_value = value;
+						Update(_value);
+					}
+				}
+				else
+				{
+					if (_value != value)
+					{
+						_value = value;
+						Update(_value);
+					}
 				}
 			}
 		}
@@ -116,6 +127,7 @@ namespace FairyGUI
 				oldValule = _value;
 
 			_value = value;
+			_maybeTweening = true;
 			return GTween.ToDouble(oldValule, _value, duration)
 				.SetEase(EaseType.Linear)
 				.SetTarget(this, TweenPropType.Progress);
