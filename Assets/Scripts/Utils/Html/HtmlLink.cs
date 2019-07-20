@@ -86,7 +86,7 @@ namespace FairyGUI.Utils
 		public void Add()
 		{
 			//add below _shape
-			_owner.AddChildAt(_shape);
+			_owner.AddChild(_shape);
 		}
 
 		public void Remove()
