@@ -666,6 +666,9 @@ namespace FairyGUI
 					i++;
 				}
 				_parsedText = buffer.ToString();
+#if RTL_TEXT_SUPPORT
+                _textDirection = RTLSupport.DetectTextDirection(_parsedText);   // element.text拼接完后再进行一次判断文本主语序，避免html标签存在把文本变成混合文本 [2018/12/12/ 16:47:42 by aq_1000]
+#endif
 			}
 		}
 
