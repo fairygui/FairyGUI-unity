@@ -12,9 +12,12 @@ namespace FairyGUI
 		public bool done
 		{
 #if UNITY_2017_2_OR_NEWER
-			get { return _keyboard == null || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Done || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Canceled; }
+			get { return _keyboard == null
+				|| _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Done
+				|| _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Canceled
+				|| _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.LostFocus; }
 #else
-			get { return _keyboard == null || _keyboard.done; }
+			get { return _keyboard == null || _keyboard.done || _keyboard.wasCanceled; }
 #endif
 		}
 
@@ -29,13 +32,8 @@ namespace FairyGUI
 			{
 				string s = _keyboard.text;
 
-#if UNITY_2017_2_OR_NEWER
-				if (_keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Done || _keyboard.status == UnityEngine.TouchScreenKeyboard.Status.Canceled)
+				if (this.done)
 					_keyboard = null;
-#else
-				if (_keyboard.done)
-					_keyboard = null;
-#endif
 
 				return s;
 			}
