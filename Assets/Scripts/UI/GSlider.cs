@@ -32,6 +32,7 @@ namespace FairyGUI
 
 		public bool changeOnClick;
 		public bool canDrag;
+		public bool wholeNumber;
 
 		public GSlider()
 		{
@@ -106,6 +107,7 @@ namespace FairyGUI
 			}
 			set
 			{
+				if (wholeNumber) value = Convert.ToInt32(value);
 				if (_value != value)
 				{
 					_value = value;
@@ -309,6 +311,11 @@ namespace FairyGUI
 				percent = 0;
 
 			double newValue = percent * _max;
+			if (wholeNumber)
+            {
+                newValue = Convert.ToInt32(newValue);
+                percent = (float)(newValue / _max);
+            }
 			if (newValue != _value)
 			{
 				_value = newValue;
@@ -345,6 +352,11 @@ namespace FairyGUI
 			else if (percent < 0)
 				percent = 0;
 			double newValue = percent * _max;
+			if (wholeNumber)
+            {
+                newValue = Convert.ToInt32(newValue);
+                percent = (float)(newValue / _max);
+            }
 			if (newValue != _value)
 			{
 				_value = newValue;
