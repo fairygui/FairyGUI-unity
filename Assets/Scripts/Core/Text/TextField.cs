@@ -1421,7 +1421,64 @@ namespace FairyGUI
 								format.underline = false;
 						}
 
-						if (_charPositions != null)
+                        // del杠
+					    if (format.deleteline)
+					    {
+					        float glyphWidth = glyph.width;
+					        if (_font.GetGlyph('_', ref glyph))
+					        {
+					            glyph.width = glyphWidth;
+					            // 取中点的UV
+					            if (glyph.uvBottomLeft.x != glyph.uvBottomRight.x)
+					                u0.x = (glyph.uvBottomLeft.x + glyph.uvBottomRight.x) * 0.5f;
+					            else
+					                u0.x = (glyph.uvBottomLeft.x + glyph.uvTopLeft.x) * 0.5f;
+
+					            if (glyph.uvBottomLeft.y != glyph.uvTopLeft.y)
+					                u0.y = (glyph.uvBottomLeft.y + glyph.uvTopLeft.y) * 0.5f;
+					            else
+					                u0.y = (glyph.uvBottomLeft.y + glyph.uvBottomRight.y) * 0.5f;
+
+					            uvList.Add(u0);
+					            uvList.Add(u0);
+					            uvList.Add(u0);
+					            uvList.Add(u0);
+
+					            v0.y = line.y + yIndent + glyph.vertMin.y / 2 + 2;
+					            v1.y = line.y + yIndent + glyph.vertMax.y / 2 + 2;
+					
+					            if (v1.y - v0.y > 2)
+					                v1.y = v0.y + 2;
+
+					            float tmpX = charX + letterSpacing + glyph.width;
+
+					            vertList.Add(new Vector3(charX, -v1.y, 0));
+					            vertList.Add(new Vector3(charX, -v0.y, 0));
+					            vertList.Add(new Vector3(tmpX, -v0.y, 0));
+					            vertList.Add(new Vector3(tmpX, -v1.y, 0));
+
+					            if (!_font.canTint)
+					            {
+					                colList.Add(Color.white);
+					                colList.Add(Color.white);
+					                colList.Add(Color.white);
+					                colList.Add(Color.white);
+					            }
+					            else
+					            {
+					                colList.Add(color);
+					                colList.Add(color);
+					                colList.Add(color);
+					                colList.Add(color);
+					            }
+					        }
+					        else
+					        {
+					            format.deleteline = false;
+					        }
+					    }
+
+                        if (_charPositions != null)
 						{
 							CharPosition cp = new CharPosition();
 							cp.lineIndex = (short)i;

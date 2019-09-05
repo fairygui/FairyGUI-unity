@@ -84,6 +84,21 @@ namespace FairyGUI.Utils
 							PopTextFormat();
 						break;
 
+				    case "del":
+				    {
+				        if (XMLIterator.tagType == XMLTagType.Start)
+				        {
+				            PushTextFormat();
+				            _format.deleteline = true;
+				        }
+				        else
+				        {
+				            PopTextFormat();
+				        }
+
+				        break;
+				    }
+
 					case "u":
 						if (XMLIterator.tagType == XMLTagType.Start)
 						{

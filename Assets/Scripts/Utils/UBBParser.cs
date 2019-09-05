@@ -28,6 +28,7 @@ namespace FairyGUI.Utils
 			handlers["b"] = onTag_Simple;
 			handlers["i"] = onTag_Simple;
 			handlers["u"] = onTag_Simple;
+			handlers["del"] = onTag_Simple;
 			handlers["sup"] = onTag_Simple;
 			handlers["sub"] = onTag_Simple;
 			handlers["color"] = onTag_COLOR;

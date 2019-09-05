@@ -49,10 +49,15 @@ namespace FairyGUI
 		/// </summary>
 		public bool underline;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool italic;
+        /// <summary>
+        /// html中删除标签
+        /// </summary>
+	    public bool deleteline;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool italic;
 
 		/// <summary>
 		/// 
@@ -100,6 +105,7 @@ namespace FairyGUI
 		{
 			return size == aFormat.size && color == aFormat.color
 				&& bold == aFormat.bold && underline == aFormat.underline
+                && deleteline == aFormat.deleteline
 				&& italic == aFormat.italic
 				&& gradientColor == aFormat.gradientColor
 				&& align == aFormat.align
@@ -119,6 +125,7 @@ namespace FairyGUI
 			this.letterSpacing = source.letterSpacing;
 			this.bold = source.bold;
 			this.underline = source.underline;
+            this.deleteline = source.deleteline;
 			this.italic = source.italic;
 			if (source.gradientColor != null)
 			{
