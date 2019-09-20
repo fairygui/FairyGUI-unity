@@ -136,7 +136,7 @@ Shader "FairyGUI/BMFont"
 
 					#ifdef CLIPPED
 					float2 factor = abs(i.clipPos);
-					col.a *= step(max(factor.x, factor.y), 1);
+					if(max(factor.x, factor.y)>1) col.a = 0;
 					#endif
 
 					return col;
