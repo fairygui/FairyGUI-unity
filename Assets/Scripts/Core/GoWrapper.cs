@@ -298,15 +298,10 @@ namespace FairyGUI
 					{
 						if (context.clipped && context.stencilReferenceValue > 0)
 						{
-							int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
-
-							if (context.clipInfo.reversedMask)
-								mat.SetFloat(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.NotEqual);
-							else
-								mat.SetFloat(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
-							mat.SetFloat(ShaderConfig._properyIDs._Stencil, refValue);
+							mat.SetFloat(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+							mat.SetFloat(ShaderConfig._properyIDs._Stencil, context.stencilCompareValue);
 							mat.SetFloat(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
-							mat.SetFloat(ShaderConfig._properyIDs._StencilReadMask, refValue);
+							mat.SetFloat(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue | (context.stencilReferenceValue - 1));
 							mat.SetFloat(ShaderConfig._properyIDs._ColorMask, 15);
 						}
 						else

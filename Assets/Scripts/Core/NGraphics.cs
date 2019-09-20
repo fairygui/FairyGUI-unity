@@ -537,7 +537,10 @@ namespace FairyGUI
 							}
 							else
 							{
-								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+								if (context.isStencilReversing)
+									_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.NotEqual);
+								else
+									_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
 								_material.SetInt(ShaderConfig._properyIDs._Stencil, context.stencilReferenceValue | (context.stencilReferenceValue - 1));
 								_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
 								_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue - 1);
@@ -546,14 +549,10 @@ namespace FairyGUI
 						}
 						else
 						{
-							int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
-							if (context.clipInfo.reversedMask)
-								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.NotEqual);
-							else
-								_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
-							_material.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+							_material.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+							_material.SetInt(ShaderConfig._properyIDs._Stencil, context.stencilCompareValue);
 							_material.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
-							_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+							_material.SetInt(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue | (context.stencilReferenceValue - 1));
 							_material.SetInt(ShaderConfig._properyIDs._ColorMask, 15);
 						}
 						if (nm != null)
@@ -612,12 +611,25 @@ namespace FairyGUI
 				if ((object)mat != (object)_stencilEraser.meshRenderer.sharedMaterial)
 					_stencilEraser.meshRenderer.sharedMaterial = mat;
 
-				int refValue = context.stencilReferenceValue - 1;
-				mat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
-				mat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
-				mat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
-				mat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
-				mat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
+
+				if (context.isStencilReversing)
+				{
+					int refValue = context.stencilReferenceValue | (context.stencilReferenceValue - 1);
+					mat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+					mat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+					mat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Zero);
+					mat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+					mat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
+				}
+				else
+				{
+					int refValue = context.stencilReferenceValue - 1;
+					mat.SetInt(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+					mat.SetInt(ShaderConfig._properyIDs._Stencil, refValue);
+					mat.SetInt(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+					mat.SetInt(ShaderConfig._properyIDs._StencilReadMask, refValue);
+					mat.SetInt(ShaderConfig._properyIDs._ColorMask, 0);
+				}
 			}
 		}
 

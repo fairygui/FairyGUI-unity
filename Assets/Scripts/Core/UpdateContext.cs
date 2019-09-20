@@ -17,10 +17,10 @@ namespace FairyGUI
 			public Vector4 softness;//left-top-right-bottom
 			public uint clipId;
 			public bool stencil;
-			public bool reversedMask;
 		}
 
 		Stack<ClipInfo> _clipStack;
+		int _stencilMaskType;
 
 		public bool clipped;
 		public ClipInfo clipInfo;
@@ -29,6 +29,8 @@ namespace FairyGUI
 		public int batchingDepth;
 		public int rectMaskDepth;
 		public int stencilReferenceValue;
+		public int stencilCompareValue;
+
 		public float alpha;
 		public bool grayed;
 
@@ -60,6 +62,7 @@ namespace FairyGUI
 			batchingDepth = 0;
 			rectMaskDepth = 0;
 			stencilReferenceValue = 0;
+			_stencilMaskType = 0;
 			alpha = 1;
 			grayed = false;
 
@@ -105,7 +108,7 @@ namespace FairyGUI
 		public void EnterClipping(uint clipId, Rect clipRect, Vector4? softness)
 		{
 			_clipStack.Push(clipInfo);
-			
+
 			if (rectMaskDepth > 0)
 				clipRect = ToolSet.Intersection(ref clipInfo.rect, ref clipRect);
 
@@ -167,13 +170,27 @@ namespace FairyGUI
 		{
 			_clipStack.Push(clipInfo);
 
+			bool prevMaskIsReversed = (_stencilMaskType & stencilReferenceValue) != 0;
+
 			if (stencilReferenceValue == 0)
 				stencilReferenceValue = 1;
 			else
 				stencilReferenceValue = stencilReferenceValue << 1;
+
+			if (reversedMask)
+			{
+				_stencilMaskType |= stencilReferenceValue;
+
+				if (prevMaskIsReversed)
+					stencilCompareValue = (stencilReferenceValue >> 1) - 1;
+				else
+					stencilCompareValue = stencilReferenceValue - 1;
+			}
+			else
+				stencilCompareValue = (stencilReferenceValue << 1) - 1;
+
 			clipInfo.clipId = clipId;
 			clipInfo.stencil = true;
-			clipInfo.reversedMask = reversedMask;
 			clipped = true;
 		}
 
@@ -189,6 +206,14 @@ namespace FairyGUI
 
 			clipInfo = _clipStack.Pop();
 			clipped = _clipStack.Count > 0;
+		}
+
+		public bool isStencilReversing
+		{
+			get
+			{
+				return (_stencilMaskType & (stencilReferenceValue >> 1)) != 0;
+			}
 		}
 	}
 }
