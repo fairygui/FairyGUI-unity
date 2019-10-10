@@ -61,12 +61,42 @@ namespace FairyGUI
 		/// </summary>
 		/// <param name="designResolutionX">Design resolution of x axis.</param>
 		/// <param name="designResolutionY">Design resolution of y axis.</param>
+		/// <param name="ignoreOrientation" />
+		public void SetContentScaleFactor(int designResolutionX, int designResolutionY, bool ignoreOrientation)
+		{
+			SetContentScaleFactor(designResolutionX, designResolutionY, ignoreOrientation, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
+		}
+
+		/// <summary>
+		/// Set content scale factor.
+		/// </summary>
+		/// <param name="designResolutionX">Design resolution of x axis.</param>
+		/// <param name="designResolutionY">Design resolution of y axis.</param>
 		/// <param name="screenMatchMode">Match mode.</param>
 		public void SetContentScaleFactor(int designResolutionX, int designResolutionY, UIContentScaler.ScreenMatchMode screenMatchMode)
 		{
 			UIContentScaler scaler = Stage.inst.gameObject.GetComponent<UIContentScaler>();
 			scaler.designResolutionX = designResolutionX;
 			scaler.designResolutionY = designResolutionY;
+			scaler.scaleMode = UIContentScaler.ScaleMode.ScaleWithScreenSize;
+			scaler.screenMatchMode = screenMatchMode;
+			scaler.ApplyChange();
+			ApplyContentScaleFactor();
+		}
+
+		/// <summary>
+		/// Set content scale factor.
+		/// </summary>
+		/// <param name="designResolutionX">Design resolution of x axis.</param>
+		/// <param name="designResolutionY">Design resolution of y axis.</param>
+		/// <param name="ignoreOrientation" />
+		/// <param name="screenMatchMode">Match mode.</param>
+		public void SetContentScaleFactor(int designResolutionX, int designResolutionY, bool ignoreOrientation, UIContentScaler.ScreenMatchMode screenMatchMode)
+		{
+			UIContentScaler scaler = Stage.inst.gameObject.GetComponent<UIContentScaler>();
+			scaler.designResolutionX = designResolutionX;
+			scaler.designResolutionY = designResolutionY;
+			scaler.ignoreOrientation = ignoreOrientation;
 			scaler.scaleMode = UIContentScaler.ScaleMode.ScaleWithScreenSize;
 			scaler.screenMatchMode = screenMatchMode;
 			scaler.ApplyChange();
@@ -678,13 +708,24 @@ namespace FairyGUI
 
 				if (!handled)
 				{
+					bool first = true;
 					for (int i = _popupStack.Count - 1; i >= 0; i--)
 					{
 						GObject popup = _popupStack[i];
+						if (first)
+						{
+							first = false;
+						}
+						else
+						{
+							Window window = popup as Window;
+							if (window != null && window.modal)
+								break;
+						}
 						ClosePopup(popup);
 						_justClosedPopups.Add(popup);
+						_popupStack.RemoveAt(i);
 					}
-					_popupStack.Clear();
 				}
 			}
 		}
