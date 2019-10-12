@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <component id="n1" name="n1" src="rt103t" xy="83,64">
+      <ComboBox visibleItemCount="10">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+        <item title="Item 8"/>
+      </ComboBox>
+    </component>
+    <component id="n4" name="n4" src="zd9g41" xy="258,137">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n5" name="n5" src="zd9g41" xy="80,141">
+      <ComboBox visibleItemCount="10">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+      </ComboBox>
+    </component>
+    <component id="n6" name="n6" src="rt103t" xy="256,66">
+      <ComboBox visibleItemCount="5">
+        <item title="Item 1"/>
+        <item title="Item 2"/>
+        <item title="Item 3"/>
+        <item title="Item 4"/>
+        <item title="Item 5"/>
+        <item title="Item 6"/>
+        <item title="Item 7"/>
+        <item title="Item 8"/>
+      </ComboBox>
+    </component>
+  </displayList>
+</component>

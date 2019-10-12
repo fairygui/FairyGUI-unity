@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <component id="n0" name="bagBtn" src="thi7c" xy="29,505" group="n1"/>
+    <group id="n1" name="n1" xy="29,505" size="90,100" advanced="true">
+      <relation target="" sidePair="bottom-bottom"/>
+    </group>
+    <text id="n2" name="n2" xy="31,23" size="1028,55" fontSize="24" color="#ffffff" align="center" autoSize="height" strokeColor="#000000" text="Icons are in seperated assetbundles. &#xA;Use 'Window Menu->Build FairyGUI example bundles' to create them"/>
+  </displayList>
+</component>

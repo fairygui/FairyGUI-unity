@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="300,300">
+  <displayList>
+    <image id="n3" name="n3" src="p6033" xy="55,56" group="n4"/>
+    <image id="n1" name="n1" src="p6032" xy="76,77" pivot="0.5,0.5" group="n4"/>
+    <group id="n4" name="n4" xy="55,56" size="189,188" advanced="true">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </group>
+  </displayList>
+</component>

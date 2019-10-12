@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <graph id="n15" name="n15" xy="532,43" size="586,536" type="rect" lineSize="4" lineColor="#ff339966" fillColor="#00ffffff"/>
+    <text id="n3" name="n3" xy="220,36" size="185,31" fontSize="27" color="#ffffff" ubb="true" bold="true" text="[color=#FF9900,#FFFFFF]Color Filter[/color]"/>
+    <component id="n5" name="s0" src="srct2" xy="128,121">
+      <Slider value="100" max="200"/>
+    </component>
+    <component id="n6" name="s1" src="srct2" xy="128,207">
+      <Slider value="100" max="200"/>
+    </component>
+    <component id="n7" name="s2" src="srct2" xy="128,293">
+      <Slider value="100" max="200"/>
+    </component>
+    <text id="n8" name="n8" xy="53,82" size="135,29" fontSize="25" color="#ffffff" text="brightness"/>
+    <text id="n9" name="n9" xy="53,167" size="109,29" fontSize="25" color="#ffffff" text="contrast"/>
+    <component id="n10" name="s3" src="srct2" xy="128,379">
+      <Slider value="100" max="200"/>
+    </component>
+    <text id="n11" name="n11" xy="53,252" size="135,29" fontSize="25" color="#ffffff" text="saturation"/>
+    <text id="n12" name="n12" xy="53,337" size="44,29" fontSize="25" color="#ffffff" text="hue"/>
+    <image id="n0" name="n0" src="v5sa1" xy="556,104" filter="color" filterData="0.00,0.00,0.00,1.00"/>
+    <jta id="n13" name="n13" src="srctk" xy="782,234" filter="color" filterData="0.00,0.00,0.00,1.00"/>
+    <component id="n14" name="n14" src="srctl" xy="742,493" pivot="0.5,0.5" filter="color" filterData="0.00,0.00,0.00,1.00">
+      <Button icon="ui://9fb2r88osrctn"/>
+    </component>
+    <text id="n16" name="n16" xy="220,451" size="170,31" fontSize="27" color="#ffffff" ubb="true" bold="true" text="[color=#FF9900,#FFFFFF]Blur Filter[/color]"/>
+    <component id="n17" name="s4" src="srct2" xy="128,536">
+      <Slider max="100"/>
+    </component>
+    <text id="n18" name="n18" xy="53,497" size="57,29" fontSize="25" color="#ffffff" text="size"/>
+    <image id="n21" name="n21" src="v5sa1" xy="917,104"/>
+  </displayList>
+</component>

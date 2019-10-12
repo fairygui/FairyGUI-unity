@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <graph id="n19_n3qd" name="n19" xy="61,48" size="474,561" type="rect" lineSize="2" lineColor="#ff999999">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <list id="n20_n3qd" name="list1" xy="62,49" size="472,559" overflow="scroll" ptrRes="ui://3u9795n0n3qdr," defaultItem="ui://3u9795n0n3qdm">
+      <relation target="" sidePair="width-width,height-height"/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <graph id="n21_9sfl" name="n21" xy="594,48" size="474,561" type="rect" lineSize="2" lineColor="#ff999999">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <list id="n22_9sfl" name="list2" xy="595,49" size="472,559" overflow="scroll" ptrRes=",ui://3u9795n09sflu" defaultItem="ui://3u9795n0n3qdm">
+      <relation target="" sidePair="width-width,height-height"/>
+      <item/>
+      <item/>
+      <item/>
+      <item/>
+    </list>
+    <text id="n23_9sfl" name="n23" xy="141,9" size="265,30" fontSize="26" color="#ffffff" text="Pull Down to Refresh"/>
+    <text id="n24_9sfl" name="n24" xy="715,9" size="239,30" fontSize="26" color="#ffffff" text="Pull Up to Refresh"/>
+  </displayList>
+</component>

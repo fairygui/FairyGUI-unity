@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="442,601">
+  <displayList>
+    <image id="n0" name="n0" src="mn71a" xy="15,15" size="404,562"/>
+    <image id="n1" name="n1" src="mn71b" xy="27,29" size="384,63"/>
+    <image id="n2" name="n2" src="mn71c" xy="145,41"/>
+    <list id="n3" name="mailList" xy="27,89" size="380,473" overflow="scroll" scrollBarFlags="2" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://qnypfqdkmn71d"/>
+  </displayList>
+</component>

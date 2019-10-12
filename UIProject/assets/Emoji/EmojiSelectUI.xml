@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="538,168">
+  <displayList>
+    <image id="n0" name="n0" src="fymi17" xy="0,0" size="538,168"/>
+    <list id="n1" name="list" xy="10,13" size="520,146" layout="flow_hz" margin="0,0,0,0" lineGap="15" colGap="15" defaultItem="ui://y768eypaiy2u1n">
+      <item title="88" icon="ui://y768eypaiy2u1q"/>
+      <item title="am" icon="ui://y768eypaiy2u1r"/>
+      <item title="bs" icon="ui://y768eypaiy2u1s"/>
+      <item title="bz" icon="ui://y768eypaiy2u1t"/>
+      <item title="ch" icon="ui://y768eypaiy2u1u"/>
+      <item title="cool" icon="ui://y768eypaiy2u1v"/>
+      <item title="dhq" icon="ui://y768eypaiy2u1w"/>
+      <item title="dn" icon="ui://y768eypaiy2u1x"/>
+      <item title="fd" icon="ui://y768eypaiy2u1y"/>
+      <item title="gz" icon="ui://y768eypaiy2u1z"/>
+      <item title="han" icon="ui://y768eypaiy2u20"/>
+      <item title="hx" icon="ui://y768eypaiy2u21"/>
+      <item title="hxiao" icon="ui://y768eypaiy2u22"/>
+      <item title="hxiu" icon="ui://y768eypaiy2u23"/>
+    </list>
+  </displayList>
+</component>

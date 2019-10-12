@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="gsia1" xy="73,18" size="404,562"/>
+    <image id="n1" name="n1" src="gsia2" xy="85,32" size="384,63"/>
+    <image id="n2" name="n2" src="gsia3" xy="203,44"/>
+    <list id="n3" name="mailList" xy="85,92" size="380,473" overflow="scroll" scrollBarFlags="2" margin="0,0,0,0" clipSoftness="0,20" defaultItem="ui://jou4kj6pgsia7"/>
+  </displayList>
+</component>

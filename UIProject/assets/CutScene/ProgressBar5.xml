@@ -1,0 +1,12 @@
+<component size="577,53" extention="ProgressBar">
+  <displayList>
+    <image id="n1" name="n0" src="fou92" xy="53,17" size="470,16" grayed="true"/>
+    <image id="n4" name="bar" src="fou92" xy="53,17" size="470,16"/>
+    <image id="n6" name="n6" src="fou93" xy="3,-4"/>
+    <image id="n7" name="n7" src="fou94" xy="485,-4"/>
+    <loader id="n8" name="ani" xy="455,-30" size="100,100" url="ui://ddm193o7fou95">
+      <relation target="n4" sidePair="right-right"/>
+    </loader>
+  </displayList>
+  <ProgressBar titleType="valueAndmax"/>
+</component>

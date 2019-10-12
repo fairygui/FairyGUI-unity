@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <graph id="n1" name="n1" xy="0,0" size="1136,640" type="rect" lineSize="0" fillColor="#ff336666">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <component id="n0" name="pb" src="fou91" xy="279,515">
+      <relation target="" sidePair="bottom-bottom,center-center"/>
+      <ProgressBar value="75" max="100"/>
+    </component>
+    <text id="n2" name="n2" xy="440,159" size="255,54" fontSize="50" color="#ffffff" strokeColor="#000000" text="Loading...">
+      <relation target="" sidePair="center-center"/>
+    </text>
+    <text id="n3" name="n3" xy="43,13" size="1058,30" fontSize="26" color="#ffffff" ubb="true" strokeColor="#000000" text="Please make sure Assets/Examples/Scenes/scene1 and scene2 is in [color=#FF3300]Build Scenes List[/b]"/>
+  </displayList>
+</component>

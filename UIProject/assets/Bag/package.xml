@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="rbw1tv9t" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="kcy10" name="BagWin.xml" path="/" exported="true"/>
+    <image id="dwwc2" name="5.png" path="/images/" scale="9grid" scale9grid="88,78,441,243"/>
+    <component id="dwwc3" name="WindowFrame.xml" path="/"/>
+    <component id="dwwc4" name="CloseButton.xml" path="/"/>
+    <image id="dwwc5" name="0.png" path="/images/"/>
+    <image id="dwwc6" name="4.png" path="/images/"/>
+    <component id="jlmg7" name="BagGridSub.xml" path="/"/>
+    <image id="jlmg8" name="1.png" path="/images/"/>
+    <image id="jlmg9" name="3.png" path="/images/"/>
+    <image id="jlmga" name="2.png" path="/images/" scale="9grid" scale9grid="17,16,74,73"/>
+    <component id="fvaib" name="Main.xml" path="/" exported="true"/>
+    <component id="thi7c" name="BagButton.xml" path="/"/>
+    <image id="thi7d" name="btnimage.png" path="/images/"/>
+    <image id="thi7g" name="7.png" path="/images/" scale="9grid" scale9grid="83,1,166,2"/>
+    <image id="thi7h" name="8.png" path="/images/" scale="9grid" scale9grid="31,26,62,52"/>
+    <movieclip id="thi7j" name="quan.jta" path="/images/"/>
+    <component id="osdok" name="dot.xml" path="/"/>
+  </resources>
+  <publish name="Bag">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

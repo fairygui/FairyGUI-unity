@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="9fb2r88o" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="v5sa0" name="Main.xml" path="/" exported="true"/>
+    <image id="v5sa1" name="pic.png" path="/"/>
+    <component id="srct2" name="Slider2.xml" path="/"/>
+    <image id="srct3" name="background.png" path="/" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="srct4" name="full bar.png" path="/" scale="9grid" scale9grid="15,6,109,12"/>
+    <component id="srct5" name="Slider2_grip.xml" path="/"/>
+    <image id="srct6" name="back btn.png" path="/"/>
+    <movieclip id="srctk" name="pet.jta" path="/"/>
+    <component id="srctl" name="Button5.xml" path="/"/>
+    <image id="srctm" name="VIP_png.png" path="/"/>
+    <image id="srctn" name="k18.png" path="/"/>
+    <image id="rkteo" name="sword.png" path="/"/>
+  </resources>
+  <publish name="Filter"/>
+</packageDescription>

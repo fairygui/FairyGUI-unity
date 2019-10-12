@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="rbw1tvvv" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="iitt1" name="Main.xml" path="/" exported="true"/>
+    <component id="q9do18" name="circle.xml" path="/"/>
+    <image id="q9do19" name="1.png" path="/images/"/>
+    <image id="q9do1a" name="0.png" path="/images/"/>
+  </resources>
+  <publish name="Joystick">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

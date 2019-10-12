@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="rbw1tc9t" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="iitt1" name="Main.xml" path="/" exported="true"/>
+    <component id="iitt5" name="TestWin.xml" path="/" exported="true"/>
+    <component id="iitt6" name="WindowFrame.xml" path="/"/>
+    <image id="iitt7" name="5.png" path="/images/" scale="9grid" scale9grid="64,54,484,303"/>
+    <component id="iitt8" name="CloseButton.xml" path="/"/>
+    <image id="iitt9" name="0.png" path="/images/"/>
+    <image id="iitta" name="4.png" path="/images/"/>
+    <image id="iittf" name="8.png" path="/images/" scale="9grid" scale9grid="20,22,84,61"/>
+    <component id="kotxz" name="ButtonRight.xml" path="/"/>
+    <image id="kotx10" name="10.png" path="/images/"/>
+    <image id="kotx11" name="9.png" path="/images/"/>
+    <component id="kotx12" name="ButtonLeft.xml" path="/"/>
+    <image id="kotx13" name="12.png" path="/images/"/>
+    <image id="kotx14" name="11.png" path="/images/"/>
+    <image id="kotx15" name="13.png" path="/images/"/>
+    <component id="p60317" name="Button1.xml" path="/"/>
+  </resources>
+  <publish name="RenderTexture">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

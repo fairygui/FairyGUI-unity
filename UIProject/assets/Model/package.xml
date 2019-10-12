@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="qef31w6w" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="rpol0" name="Main.xml" path="/" exported="true"/>
+    <image id="rpol1" name="change.png" path="/"/>
+    <movieclip id="rpol2" name="pet.jta" path="/"/>
+  </resources>
+  <publish name="Model">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

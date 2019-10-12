@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="538,168">
+  <displayList>
+    <image id="n0_w0d9" name="n0" src="fymi17" xy="0,0" size="538,168"/>
+    <list id="n1_w0d9" name="list" xy="9,7" size="518,156" layout="flow_hz" lineGap="15" colGap="15" defaultItem="ui://y768eypaiy2u1n">
+      <item icon="ui://y768eypamwdy2v"/>
+      <item icon="ui://y768eypamwdy2u"/>
+      <item icon="ui://y768eypamwdy2t"/>
+      <item icon="ui://y768eypamwdy2s"/>
+      <item icon="ui://y768eypamwdy2r"/>
+      <item icon="ui://y768eypamwdy2q"/>
+      <item icon="ui://y768eypamwdy2p"/>
+      <item icon="ui://y768eypamwdy2o"/>
+      <item icon="ui://y768eypamwdy2n"/>
+      <item icon="ui://y768eypamwdy2m"/>
+      <item icon="ui://y768eypamwdy2l"/>
+      <item icon="ui://y768eypamwdy2k"/>
+      <item icon="ui://y768eypamwdy2j"/>
+      <item icon="ui://y768eypamwdy2i"/>
+    </list>
+  </displayList>
+</component>

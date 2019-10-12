@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="400,71" overflow="hidden" bgColorEnabled="true">
+  <controller name="c1" pages="0,,1,,2,,3," selected="2"/>
+  <displayList>
+    <image id="n0_n3qd" name="n0" src="n3qds" xy="54,20" pivot="0.5,0.5" group="n2_n3qd">
+      <gearDisplay controller="c1" pages="2"/>
+    </image>
+    <text id="n1_n3qd" name="n1" xy="106,23" size="242,26" group="n2_n3qd" fontSize="22" color="#999999" align="center" autoSize="none" bold="true" singleLine="true" text="Loading">
+      <gearText controller="c1" pages="0,1,2" values="Pull down to refresh|Release to refresh|Loading" default="Pull down to refrsh"/>
+    </text>
+    <image id="n3_n3qd" name="n3" src="n3qdt" xy="52,14" pivot="0.5,0.5" group="n2_n3qd">
+      <gearDisplay controller="c1" pages="0,1"/>
+      <gearLook controller="c1" pages="0" values="1,180,0" default="1,0,0"/>
+    </image>
+    <group id="n2_n3qd" name="n2" xy="52,14" size="296,46" advanced="true">
+      <gearDisplay controller="c1" pages="0,1,2"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </group>
+    <graph id="n4_9sfl" name="n4" xy="0,0" size="400,35" group="n6_9sfl" type="rect" lineSize="0" fillColor="#ff3399ff">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n5_9sfl" name="n5" xy="104,4" size="192,26" group="n6_9sfl" fontSize="22" color="#ffffff" text="Refresh completed">
+      <relation target="" sidePair="center-center"/>
+    </text>
+    <group id="n6_9sfl" name="n6" xy="0,0" size="400,35" advanced="true">
+      <gearDisplay controller="c1" pages="3"/>
+    </group>
+  </displayList>
+  <transition name="t0" autoPlay="true" autoPlayRepeat="-1">
+    <item time="0" type="Rotation" target="n0_n3qd" tween="true" startValue="0" endValue="360" duration="24" ease="Linear"/>
+  </transition>
+</component>

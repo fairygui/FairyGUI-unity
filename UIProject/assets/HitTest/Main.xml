@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640" opaque="false">
+  <displayList>
+    <component id="n33" name="n33" src="g40jh" xy="518,39"/>
+    <text id="n21" name="n21" xy="558,53" size="563,40" fontSize="36" color="#ffffff" strokeColor="#000000" text="Click the cube, See log message"/>
+    <text id="n26" name="n26" xy="98,50" size="257,40" fontSize="36" color="#ffffff" strokeColor="#000000" text="Pixel Hit Test"/>
+    <component id="n30" name="n30" src="g40je" xy="202,244"/>
+    <component id="n31" name="n31" src="g40jf" xy="100,179"/>
+    <component id="n32" name="n32" src="g40jg" xy="174,138"/>
+  </displayList>
+</component>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <list id="n0" name="n0" xy="34,89" size="163,422" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n1" name="n1" xy="7,7" size="1072,29" fontSize="22" leading="6" autoSize="height" text="List provides four layouts. If the list supports selection, list item type must be radio button."/>
+    <text id="n2" name="n2" xy="40,54" size="148,26" fontSize="22" text="Single Column"/>
+    <list id="n4" name="n4" xy="534,110" size="571,126" layout="row" overflow="scroll" scroll="horizontal" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n5" name="n5" xy="534,74" size="115,26" fontSize="22" text="Single row"/>
+    <list id="n7" name="n7" xy="534,300" size="434,178" layout="flow_hz" overflow="scroll" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n8" name="n8" xy="534,263" size="170,26" fontSize="22" text="Flow horizontal"/>
+    <list id="n9" name="n9" xy="238,89" size="263,447" layout="flow_vt" overflow="scroll" scroll="horizontal" margin="0,0,0,0" clipSoftness="0,20" lineGap="6" colGap="6" defaultItem="ui://9leh0eyfkpev60">
+      <item title="100" icon="ui://9leh0eyfkpev64"/>
+      <item title="1" icon="ui://9leh0eyfkpev64"/>
+      <item title="2" icon="ui://9leh0eyfkpev64"/>
+      <item title="99" icon="ui://9leh0eyfkpev64"/>
+      <item title="4" icon="ui://9leh0eyfkpev64"/>
+      <item title="5" icon="ui://9leh0eyfkpev64"/>
+    </list>
+    <text id="n10" name="n10" xy="305,54" size="148,26" fontSize="22" text="Flow vertical"/>
+  </displayList>
+</component>

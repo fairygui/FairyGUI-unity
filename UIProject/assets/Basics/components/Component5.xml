@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="250,250">
+  <displayList>
+    <image id="n1" name="n1" src="rt103m" xy="0,0" size="250,250"/>
+    <text id="n2" name="n2" xy="70,110" size="109,30" fontSize="26" color="#ffffff" strokeColor="#000000" text="居中文字"/>
+    <image id="n4" name="n4" src="rpmbx" xy="199,213"/>
+  </displayList>
+</component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="200,200">
+  <displayList>
+    <graph id="n0" name="n0" xy="0,0" size="200,200" type="rect" lineSize="0" fillColor="#70000000">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <image id="n1" name="n1" src="p6035" xy="55,60" size="90,80" group="n4"/>
+    <jta id="n3" name="n3" src="p6036" xy="77,86" group="n4"/>
+    <group id="n4" name="n4" xy="55,60" size="90,80" advanced="true">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </group>
+  </displayList>
+</component>
