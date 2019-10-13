@@ -1,4 +1,8 @@
 {
+	"atlasSetting":{
+		"paging":true,
+		"sizeOption":"pot"
+	},
 	"binaryFormat":true,
 	"codeGeneration":{
 		"classNamePrefix":"",
@@ -10,7 +14,8 @@
 		"packageName":""
 	},
 	"compressDesc":true,
-	"fileExtension":"",
+	"includeHighResolution":1,
 	"packageCount":2,
-	"path":"D:\\FairyGUI-unity-demo\\Project-2017\\Assets\\FairyGUI\\Examples\\Resources\\UI"
+	"path":"../Assets/Examples/Resources/UI",
+	"unityDataFormat":1
 }

@@ -1,4 +1,4 @@
-EventContext  = CS.FairyGUI.EventContext
+EventContext = CS.FairyGUI.EventContext
 EventListener = CS.FairyGUI.EventListener
 EventDispatcher = CS.FairyGUI.EventDispatcher
 InputEvent = CS.FairyGUI.InputEvent

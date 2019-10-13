@@ -10,66 +10,66 @@ using UnityEngine.Networking;
 /// </summary>
 class BundleUsageMain : MonoBehaviour
 {
-	GComponent _mainView;
+    GComponent _mainView;
 
-	void Start()
-	{
-		Application.targetFrameRate = 60;
+    void Start()
+    {
+        Application.targetFrameRate = 60;
 
-		Stage.inst.onKeyDown.Add(OnKeyDown);
+        Stage.inst.onKeyDown.Add(OnKeyDown);
 
-		StartCoroutine(LoadUIPackage());
-	}
+        StartCoroutine(LoadUIPackage());
+    }
 
-	IEnumerator LoadUIPackage()
-	{
-		string url = Application.streamingAssetsPath.Replace("\\", "/") + "/fairygui-examples/bundleusage.ab";
-		if (Application.platform != RuntimePlatform.Android)
-			url = "file:///" + url;
+    IEnumerator LoadUIPackage()
+    {
+        string url = Application.streamingAssetsPath.Replace("\\", "/") + "/fairygui-examples/bundleusage.ab";
+        if (Application.platform != RuntimePlatform.Android)
+            url = "file:///" + url;
 
 #if UNITY_2017_2_OR_NEWER
 #if UNITY_2018_1_OR_NEWER
-		UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);
+        UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);
 #else
-		UnityWebRequest www = UnityWebRequest.GetAssetBundle(url);
+        UnityWebRequest www = UnityWebRequest.GetAssetBundle(url);
 #endif
-		yield return www.SendWebRequest();
+        yield return www.SendWebRequest();
 
-		if (!www.isNetworkError && !www.isHttpError)
-		{
-			AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+        if (!www.isNetworkError && !www.isHttpError)
+        {
+            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
 #else
-		WWW www = new WWW(url);
-		yield return www;
+        WWW www = new WWW(url);
+        yield return www;
 
-		if (string.IsNullOrEmpty(www.error))
-		{
-			AssetBundle bundle = www.assetBundle;
+        if (string.IsNullOrEmpty(www.error))
+        {
+            AssetBundle bundle = www.assetBundle;
 #endif
-			if (bundle == null)
-			{
-				Debug.LogWarning("Run Window->Build FairyGUI example Bundles first.");
-				yield return 0;
-			}
-			UIPackage.AddPackage(bundle);
+            if (bundle == null)
+            {
+                Debug.LogWarning("Run Window->Build FairyGUI example Bundles first.");
+                yield return 0;
+            }
+            UIPackage.AddPackage(bundle);
 
-			_mainView = UIPackage.CreateObject("BundleUsage", "Main").asCom;
-			_mainView.fairyBatching = true;
-			_mainView.SetSize(GRoot.inst.width, GRoot.inst.height);
-			_mainView.AddRelation(GRoot.inst, RelationType.Size);
+            _mainView = UIPackage.CreateObject("BundleUsage", "Main").asCom;
+            _mainView.fairyBatching = true;
+            _mainView.SetSize(GRoot.inst.width, GRoot.inst.height);
+            _mainView.AddRelation(GRoot.inst, RelationType.Size);
 
-			GRoot.inst.AddChild(_mainView);
-			_mainView.GetTransition("t0").Play();
-		}
-		else
-			Debug.LogError(www.error);
-	}
+            GRoot.inst.AddChild(_mainView);
+            _mainView.GetTransition("t0").Play();
+        }
+        else
+            Debug.LogError(www.error);
+    }
 
-	void OnKeyDown(EventContext context)
-	{
-		if (context.inputEvent.keyCode == KeyCode.Escape)
-		{
-			Application.Quit();
-		}
-	}
+    void OnKeyDown(EventContext context)
+    {
+        if (context.inputEvent.keyCode == KeyCode.Escape)
+        {
+            Application.Quit();
+        }
+    }
 }
