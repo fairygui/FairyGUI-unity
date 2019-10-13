@@ -25,6 +25,7 @@ namespace FairyGUI
         int _indent;
         GTreeNode _rootNode;
         int _clickToExpand;
+        bool _expandedStatusInEvt;
 
         private static List<int> helperIntList = new List<int>();
 
@@ -302,6 +303,8 @@ namespace FairyGUI
             if (cc != null)
                 cc.selectedIndex = 1;
 
+            node._cell.onTouchBegin.Add(__cellTouchBegin);
+
             if (node._cell.parent != null)
                 CheckChildren(node, GetChildIndex(node._cell));
         }
@@ -451,6 +454,12 @@ namespace FairyGUI
             }
         }
 
+        void __cellTouchBegin(EventContext context)
+        {
+            GTreeNode node = ((GObject)context.sender)._treeNode;
+            _expandedStatusInEvt = node.expanded;
+        }
+
         void __expandedStateChanged(EventContext context)
         {
             Controller cc = (Controller)context.sender;
@@ -463,7 +472,7 @@ namespace FairyGUI
             if (_clickToExpand != 0)
             {
                 GTreeNode node = item._treeNode;
-                if (node != null)
+                if (node != null && _expandedStatusInEvt == node.expanded)
                 {
                     if (_clickToExpand == 2)
                     {
