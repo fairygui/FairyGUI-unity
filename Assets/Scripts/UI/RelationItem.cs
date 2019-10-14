@@ -218,30 +218,50 @@ namespace FairyGUI
 
                 case RelationType.LeftExt_Left:
                 case RelationType.LeftExt_Right:
-                    tmp = _owner.xMin;
-                    _owner.width = _owner._rawWidth - dx;
-                    _owner.xMin = tmp + dx;
+                    if (_owner != _target.parent)
+                    {
+                        tmp = _owner.xMin;
+                        _owner.width = _owner._rawWidth - dx;
+                        _owner.xMin = tmp + dx;
+                    }
+                    else
+                        _owner.width = _owner._rawWidth - dx;
                     break;
 
                 case RelationType.RightExt_Left:
                 case RelationType.RightExt_Right:
-                    tmp = _owner.xMin;
-                    _owner.width = _owner._rawWidth + dx;
-                    _owner.xMin = tmp;
+                    if (_owner != _target.parent)
+                    {
+                        tmp = _owner.xMin;
+                        _owner.width = _owner._rawWidth + dx;
+                        _owner.xMin = tmp;
+                    }
+                    else
+                        _owner.width = _owner._rawWidth + dx;
                     break;
 
                 case RelationType.TopExt_Top:
                 case RelationType.TopExt_Bottom:
-                    tmp = _owner.yMin;
-                    _owner.height = _owner._rawHeight - dy;
-                    _owner.yMin = tmp + dy;
+                    if (_owner != _target.parent)
+                    {
+                        tmp = _owner.yMin;
+                        _owner.height = _owner._rawHeight - dy;
+                        _owner.yMin = tmp + dy;
+                    }
+                    else
+                        _owner.height = _owner._rawHeight - dy;
                     break;
 
                 case RelationType.BottomExt_Top:
                 case RelationType.BottomExt_Bottom:
-                    tmp = _owner.yMin;
-                    _owner.height = _owner._rawHeight + dy;
-                    _owner.yMin = tmp;
+                    if (_owner != _target.parent)
+                    {
+                        tmp = _owner.yMin;
+                        _owner.height = _owner._rawHeight + dy;
+                        _owner.yMin = tmp;
+                    }
+                    else
+                        _owner.height = _owner._rawHeight + dy;
                     break;
             }
         }
