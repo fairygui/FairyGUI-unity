@@ -13,12 +13,11 @@ namespace FairyGUI
         /// </summary>
         public class BMGlyph
         {
-            public int offsetX;
-            public int offsetY;
             public int width;
             public int height;
             public int advance;
             public int lineHeight;
+            public Rect vertRect = new Rect();
             public Vector2[] uv = new Vector2[4];
             public int channel;//0-n/a, 1-r,2-g,3-b,4-alpha
         }
@@ -105,10 +104,10 @@ namespace FairyGUI
             {
                 glyph.width = Mathf.CeilToInt(bg.advance * scale);
                 glyph.height = Mathf.CeilToInt(bg.lineHeight * scale);
-                glyph.vertMin.x = bg.offsetX * scale;
-                glyph.vertMin.y = bg.offsetY * scale;
-                glyph.vertMax.x = (bg.offsetX + bg.width) * scale;
-                glyph.vertMax.y = (bg.offsetY + bg.height) * scale;
+                glyph.vertMin.x = bg.vertRect.x * scale;
+                glyph.vertMin.y = bg.vertRect.y * scale;
+                glyph.vertMax.x = bg.vertRect.xMax * scale;
+                glyph.vertMax.y = bg.vertRect.yMax * scale;
                 glyph.uvBottomLeft = bg.uv[0];
                 glyph.uvTopLeft = bg.uv[1];
                 glyph.uvTopRight = bg.uv[2];

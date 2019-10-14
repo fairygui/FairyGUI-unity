@@ -62,6 +62,8 @@ namespace FairyGUI
         {
             public PackageItem atlas;
             public Rect rect = new Rect();
+            public Vector2 offset = new Vector2();
+            public Vector2 originalSize = new Vector2();
             public bool rotated;
         }
         Dictionary<string, AtlasSprite> _sprites;
@@ -856,6 +858,19 @@ namespace FairyGUI
                 sprite.rect.width = buffer.ReadInt();
                 sprite.rect.height = buffer.ReadInt();
                 sprite.rotated = buffer.ReadBool();
+                if (ver2 && buffer.ReadBool())
+                {
+                    sprite.offset.x = buffer.ReadInt();
+                    sprite.offset.y = buffer.ReadInt();
+                    sprite.originalSize.x = buffer.ReadInt();
+                    sprite.originalSize.y = buffer.ReadInt();
+                }
+                else
+                {
+                    sprite.originalSize.x = sprite.rect.width;
+                    sprite.originalSize.y = sprite.rect.height;
+                }
+
                 _sprites[itemId] = sprite;
 
                 buffer.position = nextPos;
@@ -1243,7 +1258,7 @@ namespace FairyGUI
         {
             AtlasSprite sprite;
             if (_sprites.TryGetValue(item.id, out sprite))
-                item.texture = new NTexture((NTexture)GetItemAsset(sprite.atlas), sprite.rect, sprite.rotated);
+                item.texture = new NTexture((NTexture)GetItemAsset(sprite.atlas), sprite.rect, sprite.rotated, sprite.originalSize, sprite.offset);
             else
                 item.texture = NTexture.Empty;
         }
@@ -1370,6 +1385,9 @@ namespace FairyGUI
 
             float texScaleX = 1;
             float texScaleY = 1;
+            int offsetX;
+            int offsetY;
+
             NTexture mainTexture = null;
             AtlasSprite mainSprite = null;
             if (ttf && _sprites.TryGetValue(item.id, out mainSprite))
@@ -1395,8 +1413,8 @@ namespace FairyGUI
                 string img = buffer.ReadS();
                 int bx = buffer.ReadInt();
                 int by = buffer.ReadInt();
-                bg.offsetX = buffer.ReadInt();
-                bg.offsetY = buffer.ReadInt();
+                offsetX = buffer.ReadInt();
+                offsetY = buffer.ReadInt();
                 bg.width = buffer.ReadInt();
                 bg.height = buffer.ReadInt();
                 bg.advance = buffer.ReadInt();
@@ -1431,6 +1449,7 @@ namespace FairyGUI
                     }
 
                     bg.lineHeight = lineHeight;
+                    bg.vertRect.Set(offsetX, offsetY, bg.width, bg.height);
                 }
                 else
                 {
@@ -1444,6 +1463,12 @@ namespace FairyGUI
                         GetItemAsset(charImg);
                         charImg.texture.GetUV(bg.uv);
 
+                        texScaleX = (float)bg.width / charImg.width;
+                        texScaleY = (float)bg.height / charImg.height;
+
+                        bg.vertRect.Set(offsetX + charImg.texture.offset.x * texScaleX, offsetY + charImg.texture.offset.y * texScaleY,
+                            charImg.texture.width * texScaleX, charImg.texture.height * texScaleY);
+
                         if (mainTexture == null)
                             mainTexture = charImg.texture.root;
                     }
@@ -1454,12 +1479,12 @@ namespace FairyGUI
                     if (bg.advance == 0)
                     {
                         if (xadvance == 0)
-                            bg.advance = bg.offsetX + bg.width;
+                            bg.advance = offsetX + bg.width;
                         else
                             bg.advance = xadvance;
                     }
 
-                    bg.lineHeight = bg.offsetY < 0 ? bg.height : (bg.offsetY + bg.height);
+                    bg.lineHeight = offsetY < 0 ? bg.height : (offsetY + bg.height);
                     if (bg.lineHeight < font.size)
                         bg.lineHeight = font.size;
                 }
