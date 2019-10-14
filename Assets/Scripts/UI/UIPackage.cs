@@ -78,11 +78,13 @@ namespace FairyGUI
 
         public const string URL_PREFIX = "ui://";
 
+#if UNITY_EDITOR
         static LoadResource _loadFromAssetsPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
             destroyMethod = DestroyMethod.Unload;
             return AssetDatabase.LoadAssetAtPath(name + extension, type);
         };
+#endif
 
         static LoadResource _loadFromResourcesPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
@@ -664,6 +666,7 @@ namespace FairyGUI
                 if (name != existingPkg.name)
                     Debug.LogWarning("FairyGUI: Package conflicts, '" + name + "' and '" + existingPkg.name + "'");
 
+#if UNITY_EDITOR
                 //maybe multiple pkgs in different folder, pefer the one in resources
                 if (Application.isEditor)
                 {
@@ -675,6 +678,7 @@ namespace FairyGUI
                     else //keep the existing
                         return false;
                 }
+#endif
             }
 
             buffer.Skip(20);
