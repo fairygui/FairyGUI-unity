@@ -1385,8 +1385,10 @@ namespace FairyGUI
 
             float texScaleX = 1;
             float texScaleY = 1;
-            int offsetX;
-            int offsetY;
+            int bgX;
+            int bgY;
+            int bgWidth;
+            int bgHeight;
 
             NTexture mainTexture = null;
             AtlasSprite mainSprite = null;
@@ -1413,10 +1415,10 @@ namespace FairyGUI
                 string img = buffer.ReadS();
                 int bx = buffer.ReadInt();
                 int by = buffer.ReadInt();
-                offsetX = buffer.ReadInt();
-                offsetY = buffer.ReadInt();
-                bg.width = buffer.ReadInt();
-                bg.height = buffer.ReadInt();
+                bgX = buffer.ReadInt();
+                bgY = buffer.ReadInt();
+                bgWidth = buffer.ReadInt();
+                bgHeight = buffer.ReadInt();
                 bg.advance = buffer.ReadInt();
                 bg.channel = buffer.ReadByte();
                 //The texture channel where the character image is found (1 = blue, 2 = green, 4 = red, 8 = alpha).
@@ -1433,23 +1435,26 @@ namespace FairyGUI
                 {
                     if (mainSprite.rotated)
                     {
-                        bg.uv[0] = new Vector2((float)(by + bg.height + mainSprite.rect.x) * texScaleX,
+                        bg.uv[0] = new Vector2((float)(by + bgHeight + mainSprite.rect.x) * texScaleX,
                             1 - (float)(mainSprite.rect.yMax - bx) * texScaleY);
-                        bg.uv[1] = new Vector2(bg.uv[0].x - (float)bg.height * texScaleX, bg.uv[0].y);
-                        bg.uv[2] = new Vector2(bg.uv[1].x, bg.uv[0].y + (float)bg.width * texScaleY);
+                        bg.uv[1] = new Vector2(bg.uv[0].x - (float)bgHeight * texScaleX, bg.uv[0].y);
+                        bg.uv[2] = new Vector2(bg.uv[1].x, bg.uv[0].y + (float)bgWidth * texScaleY);
                         bg.uv[3] = new Vector2(bg.uv[0].x, bg.uv[2].y);
                     }
                     else
                     {
                         bg.uv[0] = new Vector2((float)(bx + mainSprite.rect.x) * texScaleX,
-                            1 - (float)(by + bg.height + mainSprite.rect.y) * texScaleY);
-                        bg.uv[1] = new Vector2(bg.uv[0].x, bg.uv[0].y + (float)bg.height * texScaleY);
-                        bg.uv[2] = new Vector2(bg.uv[0].x + (float)bg.width * texScaleX, bg.uv[1].y);
+                            1 - (float)(by + bgHeight + mainSprite.rect.y) * texScaleY);
+                        bg.uv[1] = new Vector2(bg.uv[0].x, bg.uv[0].y + (float)bgHeight * texScaleY);
+                        bg.uv[2] = new Vector2(bg.uv[0].x + (float)bgWidth * texScaleX, bg.uv[1].y);
                         bg.uv[3] = new Vector2(bg.uv[2].x, bg.uv[0].y);
                     }
 
                     bg.lineHeight = lineHeight;
-                    bg.vertRect.Set(offsetX, offsetY, bg.width, bg.height);
+                    bg.x = bgX;
+                    bg.y = bgY;
+                    bg.xMax = bg.x + bgWidth;
+                    bg.yMax = bg.y + bgHeight;
                 }
                 else
                 {
@@ -1457,34 +1462,36 @@ namespace FairyGUI
                     if (_itemsById.TryGetValue(img, out charImg))
                     {
                         charImg = charImg.getBranch();
-                        bg.width = charImg.width;
-                        bg.height = charImg.height;
+                        bgWidth = charImg.width;
+                        bgHeight = charImg.height;
                         charImg = charImg.getHighResolution();
                         GetItemAsset(charImg);
                         charImg.texture.GetUV(bg.uv);
 
-                        texScaleX = (float)bg.width / charImg.width;
-                        texScaleY = (float)bg.height / charImg.height;
+                        texScaleX = (float)bgWidth / charImg.width;
+                        texScaleY = (float)bgHeight / charImg.height;
 
-                        bg.vertRect.Set(offsetX + charImg.texture.offset.x * texScaleX, offsetY + charImg.texture.offset.y * texScaleY,
-                            charImg.texture.width * texScaleX, charImg.texture.height * texScaleY);
+                        bg.x = bgX + charImg.texture.offset.x * texScaleX;
+                        bg.y = bgY + charImg.texture.offset.y * texScaleY;
+                        bg.xMax = bg.x + charImg.texture.width * texScaleX;
+                        bg.yMax = bg.y + charImg.texture.height * texScaleY;
 
                         if (mainTexture == null)
                             mainTexture = charImg.texture.root;
                     }
 
                     if (fontSize == 0)
-                        fontSize = bg.height;
+                        fontSize = bgHeight;
 
                     if (bg.advance == 0)
                     {
                         if (xadvance == 0)
-                            bg.advance = offsetX + bg.width;
+                            bg.advance = bgX + bgWidth;
                         else
                             bg.advance = xadvance;
                     }
 
-                    bg.lineHeight = offsetY < 0 ? bg.height : (offsetY + bg.height);
+                    bg.lineHeight = bgY < 0 ? bgHeight : (bgY + bgHeight);
                     if (bg.lineHeight < font.size)
                         bg.lineHeight = font.size;
                 }
