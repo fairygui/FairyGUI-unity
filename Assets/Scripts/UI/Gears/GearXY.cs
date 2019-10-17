@@ -54,16 +54,17 @@ namespace FairyGUI
 
             gv.x = buffer.ReadInt();
             gv.y = buffer.ReadInt();
-            if (buffer.version >= 2)
-            {
-                gv.px = buffer.ReadFloat();
-                gv.py = buffer.ReadFloat();
-            }
+        }
+
+        public void AddExtStatus(string pageId, ByteBuffer buffer)
+        {
+            GearXYValue gv;
+            if (pageId == null)
+                gv = _default;
             else
-            {
-                gv.px = gv.x / _owner.parent.width;
-                gv.py = gv.y / _owner.parent.height;
-            }
+                gv = _storage[pageId];
+            gv.px = buffer.ReadFloat();
+            gv.py = buffer.ReadFloat();
         }
 
         override public void Apply()

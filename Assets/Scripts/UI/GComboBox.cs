@@ -484,6 +484,7 @@ namespace FairyGUI
             if (_list.selectionMode == ListSelectionMode.Single)
                 _list.selectedIndex = -1;
             dropdown.width = this.width;
+            _list.EnsureBoundsCorrect(); //avoid flicker
 
             object downward = null;
             if (_popupDirection == PopupDirection.Down)

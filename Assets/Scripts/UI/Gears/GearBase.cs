@@ -74,7 +74,6 @@ namespace FairyGUI
             }
             else
             {
-
                 for (int i = 0; i < cnt; i++)
                 {
                     string page = buffer.ReadS();
@@ -99,7 +98,23 @@ namespace FairyGUI
             if (buffer.version >= 2)
             {
                 if (this is GearXY)
-                    ((GearXY)this).positionsInPercent = buffer.ReadBool();
+                {
+                    if(buffer.ReadBool())
+                    {
+                        ((GearXY)this).positionsInPercent = true;
+                        for (int i = 0; i < cnt; i++)
+                        {
+                            string page = buffer.ReadS();
+                            if (page == null)
+                                continue;
+
+                            ((GearXY)this).AddExtStatus(page, buffer);
+                        }
+
+                        if (buffer.ReadBool())
+                            ((GearXY)this).AddExtStatus(null, buffer);
+                    }
+                }
                 else if (this is GearDisplay2)
                     ((GearDisplay2)this).condition = buffer.ReadByte();
             }
