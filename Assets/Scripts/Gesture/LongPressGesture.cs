@@ -49,6 +49,7 @@ namespace FairyGUI
 
         Vector2 _startPoint;
         bool _started;
+        int _touchId;
 
         public static float TRIGGER = 1.5f;
         public static float INTERVAL = 1f;
@@ -114,6 +115,7 @@ namespace FairyGUI
             InputEvent evt = context.inputEvent;
             _startPoint = host.GlobalToLocal(new Vector2(evt.x, evt.y));
             _started = false;
+            _touchId = evt.touchId;
 
             Timers.inst.Add(trigger, 1, __timer);
             context.CaptureTouch();
@@ -121,7 +123,7 @@ namespace FairyGUI
 
         void __timer(object param)
         {
-            Vector2 pt = host.GlobalToLocal(Stage.inst.touchPosition);
+            Vector2 pt = host.GlobalToLocal(Stage.inst.GetTouchPosition(_touchId));
             if (Mathf.Pow(pt.x - _startPoint.x, 2) + Mathf.Pow(pt.y - _startPoint.y, 2) > Mathf.Pow(holdRangeRadius, 2))
             {
                 Timers.inst.Remove(__timer);
