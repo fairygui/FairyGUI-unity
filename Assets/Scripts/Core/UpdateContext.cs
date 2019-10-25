@@ -200,7 +200,11 @@ namespace FairyGUI
         public void LeaveClipping()
         {
             if (clipInfo.stencil)
+            {
                 stencilReferenceValue = stencilReferenceValue >> 1;
+                if (stencilReferenceValue == 0)
+                    _stencilMaskType = 0;
+            }
             else
                 rectMaskDepth--;
 
