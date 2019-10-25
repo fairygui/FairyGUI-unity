@@ -201,9 +201,8 @@ namespace FairyGUI
         {
             if (clipInfo.stencil)
             {
+                _stencilMaskType &= ~stencilReferenceValue;
                 stencilReferenceValue = stencilReferenceValue >> 1;
-                if (stencilReferenceValue == 0)
-                    _stencilMaskType = 0;
             }
             else
                 rectMaskDepth--;
