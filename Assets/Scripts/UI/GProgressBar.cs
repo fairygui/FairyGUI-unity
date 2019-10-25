@@ -147,7 +147,7 @@ namespace FairyGUI
         /// <param name="newValue"></param>
         public void Update(double newValue)
         {
-            float percent = Mathf.Clamp01((float)((_value - _min) / (_max - _min)));
+            float percent = Mathf.Clamp01((float)((newValue - _min) / (_max - _min)));
             if (_titleObject != null)
             {
                 switch (_titleType)
