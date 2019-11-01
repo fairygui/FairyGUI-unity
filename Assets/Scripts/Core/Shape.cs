@@ -211,8 +211,8 @@ namespace FairyGUI
 
         protected override DisplayObject HitTest()
         {
-            if (graphics.meshFactory == null)
-                return null;
+            //if (graphics.meshFactory == null)
+            //    return null;
 
             Vector2 localPoint = WorldToLocal(HitTestContext.worldPoint, HitTestContext.direction);
 
