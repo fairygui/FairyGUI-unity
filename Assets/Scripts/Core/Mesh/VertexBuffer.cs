@@ -128,6 +128,8 @@ namespace FairyGUI
             position.y = -position.y;
             vertices.Add(position);
             colors.Add(vertexColor);
+             if (vertexColor.a != 255)
+                _alphaInVertexColor = true;
             uv0.Add(new Vector4(
                     Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
                     Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height),
