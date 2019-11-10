@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="zgmoraj4" jpegQuality="80" compressPNG="true">
+<packageDescription id="zgmoraj4">
   <resources>
     <component id="gkq00" name="BOSS.xml" path="/" exported="true"/>
     <image id="gkq01" name="2.png" path="/images/"/>
@@ -53,6 +53,9 @@
     <image id="fou91e" name="h7.png" path="/"/>
     <image id="fou91f" name="h8.png" path="/"/>
     <image id="fou91g" name="h9.png" path="/"/>
+    <component id="ujnc1h" name="PathDemo.xml" path="/" exported="true"/>
+    <image id="ujnc1j" name="r1.png" path="/"/>
+    <image id="ujnc1k" name="glz.jpg" path="/"/>
   </resources>
   <publish name="Transition">
     <atlas name="Default" index="0"/>

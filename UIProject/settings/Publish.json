@@ -1,7 +1,9 @@
 {
 	"atlasSetting":{
+		"allowRotation":true,
 		"paging":true,
-		"sizeOption":"pot"
+		"sizeOption":"pot",
+		"trimImage":true
 	},
 	"binaryFormat":true,
 	"codeGeneration":{
@@ -16,6 +18,5 @@
 	"compressDesc":true,
 	"includeHighResolution":1,
 	"packageCount":2,
-	"path":"../Assets/Examples/Resources/UI",
-	"unityDataFormat":1
+	"path":"../Assets/Examples/Resources/UI"
 }

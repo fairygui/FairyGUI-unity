@@ -115,6 +115,32 @@ namespace FairyGUI
                 else
                     return null;
             }
+
+            set
+            {
+                if (_cell != null)
+                    _cell.text = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string icon
+        {
+            get
+            {
+                if (_cell != null)
+                    return _cell.icon;
+                else
+                    return null;
+            }
+
+            set
+            {
+                if (_cell != null)
+                    _cell.icon = value;
+            }
         }
 
         /// <summary>

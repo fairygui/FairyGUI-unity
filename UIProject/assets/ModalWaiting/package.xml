@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="oqv64gwp" jpegQuality="80" compressPNG="true">
+<packageDescription id="oqv64gwp">
   <resources>
     <component id="p6030" name="GlobalModalWaiting.xml" path="/" exported="true"/>
     <image id="p6032" name="0.png" path="/"/>
@@ -15,6 +15,7 @@
     <component id="p603c" name="TestWin.xml" path="/" exported="true"/>
     <component id="p603d" name="Button1.xml" path="/"/>
     <component id="p603e" name="Main.xml" path="/" exported="true"/>
+    <image id="ujncf" name="icon_zzz.png" path="/"/>
   </resources>
   <publish name="ModalWaiting">
     <atlas name="Default" index="0"/>

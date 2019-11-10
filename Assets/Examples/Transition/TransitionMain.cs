@@ -10,6 +10,7 @@ public class TransitionMain : MonoBehaviour
     GComponent _g3;
     GComponent _g4;
     GComponent _g5;
+    GComponent _g6;
 
     float _startValue;
     float _endValue;
@@ -31,11 +32,14 @@ public class TransitionMain : MonoBehaviour
         _g5 = UIPackage.CreateObject("Transition", "PowerUp").asCom;
         _g5.GetTransition("t0").SetHook("play_num_now", __playNum);
 
+        _g6 = UIPackage.CreateObject("Transition", "PathDemo").asCom;
+
         _mainView.GetChild("btn0").onClick.Add(() => { __play(_g1); });
         _mainView.GetChild("btn1").onClick.Add(() => { __play(_g2); });
         _mainView.GetChild("btn2").onClick.Add(() => { __play(_g3); });
         _mainView.GetChild("btn3").onClick.Add(__play4);
         _mainView.GetChild("btn4").onClick.Add(__play5);
+        _mainView.GetChild("btn5").onClick.Add(() => { __play(_g6); });
     }
 
     void __play(GComponent target)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="jqu05wyc" jpegQuality="80" compressPNG="true">
+<packageDescription id="jqu05wyc">
   <resources>
     <component id="x7kw0" name="Main.xml" path="/" exported="true"/>
-    <image id="chmf1" name="change.png" path="/"/>
+    <image id="chmf1" name="change.jpg" path="/"/>
     <component id="chmf5" name="CoolComponent.xml" path="/" exported="true"/>
     <movieclip id="chmf8" name="pet.jta" path="/"/>
   </resources>

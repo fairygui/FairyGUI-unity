@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component size="300,300">
+<component size="100,100">
   <displayList>
-    <image id="n3" name="n3" src="p6033" xy="55,56" group="n4"/>
-    <image id="n1" name="n1" src="p6032" xy="76,77" pivot="0.5,0.5" group="n4"/>
-    <group id="n4" name="n4" xy="55,56" size="189,188" advanced="true">
+    <image id="n5_ujnc" name="n5" src="ujncf" fileName="icon_zzz.png" xy="0,0" pivot="0.5,0.5">
       <relation target="" sidePair="center-center,middle-middle"/>
-    </group>
+    </image>
   </displayList>
+  <transition name="t0" autoPlay="true" autoPlayRepeat="-1">
+    <item time="0" type="Rotation" target="n5_ujnc" tween="true" startValue="0" endValue="360" duration="36" ease="Linear"/>
+  </transition>
 </component>

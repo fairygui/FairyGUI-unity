@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<packageDescription id="9leh0eyf" jpegQuality="80" compressPNG="true">
+<packageDescription id="9leh0eyf">
   <resources>
     <image id="rpmb1" name="VIP_png.png" path="/images/"/>
     <image id="rpmb2" name="a1_png.png" path="/images/"/>
@@ -70,7 +70,7 @@
     <component id="wa8u2x" name="Demo_Relation.xml" path="/" exported="true"/>
     <component id="es412y" name="Demo_Clip&amp;Scroll.xml" path="/" exported="true"/>
     <component id="es412z" name="Component1.xml" path="/components/"/>
-    <image id="es4130" name="change.png" path="/images/" scale="tile"/>
+    <image id="es4130" name="change.png" path="/images/"/>
     <component id="smv731" name="Component7.xml" path="/components/"/>
     <component id="smv73f" name="Component2.xml" path="/components/"/>
     <component id="smv73g" name="Component8.xml" path="/components/"/>
@@ -225,7 +225,7 @@
     <movieclip id="iwqq89" name="gz.jta" path="/images/"/>
     <image id="ty2k8a" name="radial.png" path="/images/" scale=""/>
   </resources>
-  <publish name="Basics" packageCount="1">
+  <publish name="Basics">
     <atlas name="Default" index="0"/>
   </publish>
 </packageDescription>

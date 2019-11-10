@@ -6,6 +6,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
+    [Obsolete("Use GTree and GTreeNode instead")]
     public class TreeNode
     {
         /// <summary>

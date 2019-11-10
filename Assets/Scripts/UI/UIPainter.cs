@@ -213,6 +213,9 @@ namespace FairyGUI
                 else
                     RenderTexture.DestroyImmediate(_texture);
                 _texture = null;
+
+                if (_renderer != null)
+                    _renderer.sharedMaterial.mainTexture = null;
             }
         }
 

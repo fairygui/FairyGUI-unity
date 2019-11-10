@@ -157,23 +157,6 @@ public class BasicsMain : MonoBehaviour
         shape.graphics.SetMeshDirty();
         shape.graphics.texture = (NTexture)UIPackage.GetItemAsset("Basics", "change");
 
-        shape = obj.GetChild("polygon").asGraph.shape;
-        shape.DrawPolygon(new Vector2[] {
-            new Vector2(20, 30),
-            new Vector2(80, 40),
-            new Vector2(80, 15),
-            new Vector2(140, 50),
-            new Vector2(80, 85),
-            new Vector2(80, 60),
-            new Vector2(20, 70)
-        }, shape.color);
-
-        shape = obj.GetChild("polygon2").asGraph.shape;
-        shape.DrawRegularPolygon(5, 2, Color.yellow, Color.black, shape.color, -18, null);
-
-        shape = obj.GetChild("radial").asGraph.shape;
-        shape.DrawRegularPolygon(6, 2, shape.color, new Color32(0xFF, 0x99, 0x00, 128), shape.color, 0, new float[] { 0.6f, 0.8f, 0.6f, 0.8f, 0.6f, 0.5f });
-
         shape = obj.GetChild("line").asGraph.shape;
         LineMesh line = shape.graphics.GetMeshFactory<LineMesh>();
         line.lineWidthCurve = AnimationCurve.Linear(0, 25, 1, 10);

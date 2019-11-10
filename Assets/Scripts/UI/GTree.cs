@@ -199,9 +199,10 @@ namespace FairyGUI
         /// <param name="node"></param>
         void CreateCell(GTreeNode node)
         {
-            GComponent child = itemPool.GetObject(node._resURL) as GComponent;
+            GComponent child = itemPool.GetObject(string.IsNullOrEmpty(node._resURL) ? this.defaultItem : node._resURL) as GComponent;
             if (child == null)
                 throw new Exception("FairyGUI: cannot create tree node object.");
+            child.displayObject.home = this.displayObject.cachedTransform;
             child._treeNode = node;
             node._cell = child;
 
@@ -221,6 +222,9 @@ namespace FairyGUI
             cc = child.GetController("leaf");
             if (cc != null)
                 cc.selectedIndex = node.isFolder ? 0 : 1;
+
+            if (node.isFolder)
+                child.onTouchBegin.Add(__cellTouchBegin);
 
             if (treeNodeRender != null)
                 treeNodeRender(node, node._cell);
@@ -302,8 +306,6 @@ namespace FairyGUI
             Controller cc = node._cell.GetController("expanded");
             if (cc != null)
                 cc.selectedIndex = 1;
-
-            node._cell.onTouchBegin.Add(__cellTouchBegin);
 
             if (node._cell.parent != null)
                 CheckChildren(node, GetChildIndex(node._cell));

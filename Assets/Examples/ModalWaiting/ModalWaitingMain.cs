@@ -12,8 +12,6 @@ public class ModalWaitingMain : MonoBehaviour
         UIPackage.AddPackage("UI/ModalWaiting");
         UIConfig.globalModalWaiting = "ui://ModalWaiting/GlobalModalWaiting";
         UIConfig.windowModalWaiting = "ui://ModalWaiting/WindowModalWaiting";
-
-        UIObjectFactory.SetPackageItemExtension("ui://ModalWaiting/GlobalModalWaiting", typeof(GlobalWaiting));
     }
 
     void Start()
