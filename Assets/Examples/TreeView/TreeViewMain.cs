@@ -6,8 +6,6 @@ public class TreeViewMain : MonoBehaviour
     GComponent _mainView;
     GTree _tree1;
     GTree _tree2;
-    string _folderURL1;
-    string _folderURL2;
     string _fileURL;
 
     void Awake()
@@ -20,8 +18,6 @@ public class TreeViewMain : MonoBehaviour
     {
         _mainView = this.GetComponent<UIPanel>().ui;
 
-        _folderURL1 = "ui://TreeView/folder_closed";
-        _folderURL2 = "ui://TreeView/folder_opened";
         _fileURL = "ui://TreeView/file";
 
         _tree1 = _mainView.GetChild("tree").asTree;
@@ -66,10 +62,6 @@ public class TreeViewMain : MonoBehaviour
     {
         if (node.isFolder)
         {
-            if (node.expanded)
-                obj.icon = _folderURL2;
-            else
-                obj.icon = _folderURL1;
             obj.text = (string)node.data;
         }
         else if (node.data is string[])
