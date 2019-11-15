@@ -702,6 +702,7 @@ namespace FairyGUI
                     d = Math.Round(d);
                 _deltaValue.d = d - _value.d;
                 _value.d = d;
+                _value.x = (float)d;
             }
             else if (_valueSize == 6)
             {
@@ -743,6 +744,7 @@ namespace FairyGUI
                     _deltaValue[i] = f - _value[i];
                     _value[i] = f;
                 }
+                _value.d = _value.x;
             }
 
             if (_target != null && _propType != TweenPropType.None)
