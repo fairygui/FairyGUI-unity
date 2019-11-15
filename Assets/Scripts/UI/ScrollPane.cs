@@ -1584,7 +1584,6 @@ namespace FairyGUI
 
             UpdateScrollBarPos();
             UpdateScrollBarVisible();
-            CheckRefreshBar();
             if (_pageMode)
                 UpdatePageController();
             _onScroll.Call();

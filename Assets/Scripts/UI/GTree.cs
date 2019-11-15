@@ -74,8 +74,9 @@ namespace FairyGUI
         /// <returns></returns>
         public GTreeNode GetSelectedNode()
         {
-            if (this.selectedIndex != -1)
-                return (GTreeNode)this.GetChildAt(this.selectedIndex)._treeNode;
+            int i = this.selectedIndex;
+            if (i != -1)
+                return (GTreeNode)this.GetChildAt(i)._treeNode;
             else
                 return null;
         }

@@ -295,7 +295,7 @@ namespace FairyGUI
                 if (seg.type == GPathPoint.CurveType.Straight)
                     return Vector3.Lerp(_points[seg.ptStart], _points[seg.ptStart + 1], t);
                 else if (seg.type == GPathPoint.CurveType.Bezier || seg.type == GPathPoint.CurveType.CubicBezier)
-                    return OnBezierCurve(seg.ptStart, seg.ptCount, t);
+                    return onBezierCurve(seg.ptStart, seg.ptCount, t);
                 else
                     return onCRSplineCurve(seg.ptStart, seg.ptCount, t);
             }
@@ -314,7 +314,7 @@ namespace FairyGUI
                     if (seg.type == GPathPoint.CurveType.Straight)
                         pt = Vector3.Lerp(_points[seg.ptStart], _points[seg.ptStart + 1], t);
                     else if (seg.type == GPathPoint.CurveType.Bezier || seg.type == GPathPoint.CurveType.CubicBezier)
-                        pt = OnBezierCurve(seg.ptStart, seg.ptCount, t);
+                        pt = onBezierCurve(seg.ptStart, seg.ptCount, t);
                     else
                         pt = onCRSplineCurve(seg.ptStart, seg.ptCount, t);
 
@@ -366,19 +366,19 @@ namespace FairyGUI
             }
             else if (seg.type == GPathPoint.CurveType.Bezier || seg.type == GPathPoint.CurveType.CubicBezier)
             {
-                points.Add(OnBezierCurve(seg.ptStart, seg.ptCount, t0));
+                points.Add(onBezierCurve(seg.ptStart, seg.ptCount, t0));
                 int SmoothAmount = (int)Mathf.Min(seg.length * pointDensity, 50);
                 for (int j = 0; j <= SmoothAmount; j++)
                 {
                     float t = (float)j / SmoothAmount;
                     if (t > t0 && t < t1)
                     {
-                        points.Add(OnBezierCurve(seg.ptStart, seg.ptCount, t));
+                        points.Add(onBezierCurve(seg.ptStart, seg.ptCount, t));
                         if (ts != null)
                             ts.Add(t);
                     }
                 }
-                points.Add(OnBezierCurve(seg.ptStart, seg.ptCount, t1));
+                points.Add(onBezierCurve(seg.ptStart, seg.ptCount, t1));
             }
             else
             {
@@ -447,7 +447,7 @@ namespace FairyGUI
             return result;
         }
 
-        Vector3 OnBezierCurve(int ptStart, int ptCount, float t)
+        Vector3 onBezierCurve(int ptStart, int ptCount, float t)
         {
             float t2 = 1f - t;
             Vector3 p0 = _points[ptStart];

@@ -869,6 +869,11 @@ namespace FairyGUI
                     sprite.originalSize.x = buffer.ReadInt();
                     sprite.originalSize.y = buffer.ReadInt();
                 }
+                else if (sprite.rotated)
+                {
+                    sprite.originalSize.x = sprite.rect.height;
+                    sprite.originalSize.y = sprite.rect.width;
+                }
                 else
                 {
                     sprite.originalSize.x = sprite.rect.width;
