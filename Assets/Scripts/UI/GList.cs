@@ -359,7 +359,6 @@ namespace FairyGUI
             }
 
             child.onClick.Add(_itemClickDelegate);
-            child.onRightClick.Add(_itemClickDelegate);
 
             return child;
         }
@@ -374,7 +373,6 @@ namespace FairyGUI
         {
             GObject child = base.RemoveChildAt(index, dispose);
             child.onClick.Remove(_itemClickDelegate);
-            child.onRightClick.Remove(_itemClickDelegate);
 
             return child;
         }
