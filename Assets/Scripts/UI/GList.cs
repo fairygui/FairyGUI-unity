@@ -907,7 +907,7 @@ namespace FairyGUI
         void __clickItem(EventContext context)
         {
             GObject item = context.sender as GObject;
-            if ((item is GButton) && selectionMode != ListSelectionMode.None && context.inputEvent.button == 0)
+            if ((item is GButton) && selectionMode != ListSelectionMode.None && context.type == item.onClick.type)
                 SetSelectionOnEvent(item, context.inputEvent);
 
             if (scrollPane != null && scrollItemToViewOnClick)
