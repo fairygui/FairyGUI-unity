@@ -201,7 +201,7 @@ namespace FairyGUI
             for (i = 0; i < cnt; i++)
             {
                 child = parent.GetChildAt(i);
-                if (child.group != this)
+               if (child.group != this || _excludeInvisibles && !child.internalVisible3)
                     continue;
 
                 tmp = child.xMin;
