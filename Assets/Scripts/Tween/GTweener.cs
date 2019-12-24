@@ -573,6 +573,7 @@ namespace FairyGUI
             _breakpoint = -1;
             _easeType = EaseType.QuadOut;
             _timeScale = 1;
+            _ignoreEngineTimeScale = false;
             _easePeriod = 0;
             _easeOvershootOrAmplitude = 1.70158f;
             _snapping = false;
