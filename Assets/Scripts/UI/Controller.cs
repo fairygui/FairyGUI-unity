@@ -184,6 +184,17 @@ namespace FairyGUI
         }
 
         /// <summary>
+        /// Get page id by an index.
+        /// 通过页面索引获得页面id。
+        /// </summary>
+        /// <param name="index">Page index</param>
+        /// <returns>Page Id</returns>
+        public string GetPageId(int index)
+        {
+            return _pageIds[index];
+        }
+
+        /// <summary>
         /// Get page id by name
         /// </summary>
         /// <param name="aName"></param>
@@ -296,11 +307,6 @@ namespace FairyGUI
                 return _pageNames[i];
             else
                 return null;
-        }
-
-        internal string GetPageId(int index)
-        {
-            return _pageIds[index];
         }
 
         internal string selectedPageId

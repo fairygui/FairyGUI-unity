@@ -9,11 +9,6 @@ namespace FairyGUI
     public class GButton : GComponent, IColorGear
     {
         /// <summary>
-        /// The button will be in down status in these pages.
-        /// </summary>
-        public PageOption pageOption { get; private set; }
-
-        /// <summary>
         /// Play sound when button is clicked.
         /// </summary>
         public NAudioClip sound;
@@ -38,6 +33,7 @@ namespace FairyGUI
         protected GObject _titleObject;
         protected GObject _iconObject;
         protected Controller _relatedController;
+        protected string _relatedPageId;
 
         ButtonMode _mode;
         bool _selected;
@@ -64,8 +60,6 @@ namespace FairyGUI
 
         public GButton()
         {
-            pageOption = new PageOption();
-
             sound = UIConfig.buttonSound;
             soundVolumeScale = UIConfig.buttonSoundVolumeScale;
             changeStateOnClick = true;
@@ -254,12 +248,12 @@ namespace FairyGUI
                     {
                         if (_selected)
                         {
-                            _relatedController.selectedPageId = pageOption.id;
+                            _relatedController.selectedPageId = _relatedPageId;
                             if (_relatedController.autoRadioGroupDepth)
                                 parent.AdjustRadioGroupDepth(this, _relatedController);
                         }
-                        else if (_mode == ButtonMode.Check && _relatedController.selectedPageId == pageOption.id)
-                            _relatedController.oppositePageId = pageOption.id;
+                        else if (_mode == ButtonMode.Check && _relatedController.selectedPageId == _relatedPageId)
+                            _relatedController.oppositePageId = _relatedPageId;
                     }
                 }
 
@@ -302,9 +296,23 @@ namespace FairyGUI
                 if (value != _relatedController)
                 {
                     _relatedController = value;
-                    pageOption.controller = value;
-                    pageOption.Clear();
+                    _relatedPageId = null;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string relatedPageId
+        {
+            get
+            {
+                return _relatedPageId;
+            }
+            set
+            {
+                _relatedPageId = value;
             }
         }
 
@@ -429,7 +437,7 @@ namespace FairyGUI
             base.HandleControllerChanged(c);
 
             if (_relatedController == c)
-                this.selected = pageOption.id == c.selectedPageId;
+                this.selected = _relatedPageId == c.selectedPageId;
         }
 
         override protected void HandleGrayedChanged()
@@ -520,7 +528,7 @@ namespace FairyGUI
             iv = buffer.ReadShort();
             if (iv >= 0)
                 _relatedController = parent.GetControllerAt(iv);
-            pageOption.id = buffer.ReadS();
+            _relatedPageId = buffer.ReadS();
 
             str = buffer.ReadS();
             if (str != null)
@@ -642,7 +650,7 @@ namespace FairyGUI
             else
             {
                 if (_relatedController != null)
-                    _relatedController.selectedPageId = pageOption.id;
+                    _relatedController.selectedPageId = _relatedPageId;
             }
         }
     }

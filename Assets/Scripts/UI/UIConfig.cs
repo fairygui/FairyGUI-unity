@@ -151,7 +151,7 @@ namespace FairyGUI
         public static float frameTimeForAsyncUIConstruction = 0.002f;
 
         /// <summary>
-        /// if RenderTexture using in paiting mode has depth support.
+        /// if RenderTexture using in painting mode has depth support.
         /// </summary>
         public static bool depthSupportForPaintingMode = false;
 

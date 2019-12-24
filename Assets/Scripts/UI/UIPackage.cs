@@ -356,7 +356,6 @@ namespace FairyGUI
         /// Remove a package. All resources in this package will be disposed.
         /// </summary>
         /// <param name="packageIdOrName"></param>
-        /// <param name="allowDestroyingAssets"></param>
         public static void RemovePackage(string packageIdOrName)
         {
             UIPackage pkg = null;
