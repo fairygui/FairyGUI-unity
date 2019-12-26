@@ -1295,13 +1295,15 @@ namespace FairyGUI
         {
             this.gameObjectName = packageItem.name;
 
-            if (!packageItem.translated)
+            PackageItem contentItem = packageItem.getBranch();
+
+            if (!contentItem.translated)
             {
-                packageItem.translated = true;
-                TranslationHelper.TranslateComponent(packageItem);
+                contentItem.translated = true;
+                TranslationHelper.TranslateComponent(contentItem);
             }
 
-            ByteBuffer buffer = packageItem.rawData;
+            ByteBuffer buffer = contentItem.rawData;
             buffer.Seek(0, 0);
 
             underConstruct = true;
@@ -1398,7 +1400,7 @@ namespace FairyGUI
                         if (pkgId != null)
                             pkg = UIPackage.GetById(pkgId);
                         else
-                            pkg = packageItem.owner;
+                            pkg = contentItem.owner;
 
                         pi = pkg != null ? pkg.GetItem(src) : null;
                     }
@@ -1406,7 +1408,6 @@ namespace FairyGUI
                     if (pi != null)
                     {
                         child = UIObjectFactory.NewObject(pi);
-                        child.packageItem = pi;
                         child.ConstructFromResource();
                     }
                     else
@@ -1473,7 +1474,7 @@ namespace FairyGUI
                 int i2 = buffer.ReadInt();
                 if (hitTestId != null)
                 {
-                    PackageItem pi = packageItem.owner.GetItem(hitTestId);
+                    PackageItem pi = contentItem.owner.GetItem(hitTestId);
                     if (pi != null && pi.pixelHitTestData != null)
                         rootContainer.hitArea = new PixelHitTest(pi.pixelHitTestData, i1, i2, sourceWidth, sourceHeight);
                 }
@@ -1512,7 +1513,7 @@ namespace FairyGUI
             BuildNativeDisplayList();
             SetBoundsChangedFlag();
 
-            if (packageItem.objectType != ObjectType.Component)
+            if (contentItem.objectType != ObjectType.Component)
                 ConstructExtension(buffer);
 
             ConstructFromXML(null);

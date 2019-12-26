@@ -36,7 +36,6 @@ namespace FairyGUI
                 if (di.packageItem != null)
                 {
                     obj = UIObjectFactory.NewObject(di.packageItem);
-                    obj.packageItem = di.packageItem;
                     objectPool.Add(obj);
 
                     UIPackage._constructing++;

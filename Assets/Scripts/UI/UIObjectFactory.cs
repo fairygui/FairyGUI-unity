@@ -97,16 +97,33 @@ namespace FairyGUI
         /// 
         /// </summary>
         /// <param name="pi"></param>
+        /// <param name="userClass"></param>
         /// <returns></returns>
-        public static GObject NewObject(PackageItem pi)
+        public static GObject NewObject(PackageItem pi, System.Type userClass = null)
         {
-            if (pi.extensionCreator != null)
+            GObject obj;
+            if (pi.type == PackageItemType.Component)
             {
-                Stats.LatestObjectCreation++;
-                return pi.extensionCreator();
+                if (userClass != null)
+                {
+                    Stats.LatestObjectCreation++;
+                    obj = (GComponent)Activator.CreateInstance(userClass);
+                }
+                else if (pi.extensionCreator != null)
+                {
+                    Stats.LatestObjectCreation++;
+                    obj = pi.extensionCreator();
+                }
+                else
+                    obj = NewObject(pi.objectType);
             }
             else
-                return NewObject(pi.objectType);
+                obj = NewObject(pi.objectType);
+
+            if (obj != null)
+                obj.packageItem = pi;
+
+            return obj;
         }
 
         /// <summary>
