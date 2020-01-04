@@ -147,6 +147,28 @@ namespace FairyGUI
             mesh.points.AddRange(points);
             mesh.fillColor = null;
             mesh.colors = null;
+            mesh.lineWidth = 0;
+
+            graphics.color = fillColor;
+            graphics.SetMeshDirty();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="points"></param>
+        /// <param name="fillColor"></param>
+        /// <param name="lineSize"></param>
+        /// <param name="lineColor"></param>
+        public void DrawPolygon(Vector2[] points, Color fillColor, float lineSize, Color lineColor)
+        {
+            PolygonMesh mesh = graphics.GetMeshFactory<PolygonMesh>();
+            mesh.points.Clear();
+            mesh.points.AddRange(points);
+            mesh.fillColor = fillColor;
+            mesh.lineWidth = lineSize;
+            mesh.lineColor = lineColor;
+            mesh.colors = null;
 
             graphics.color = fillColor;
             graphics.SetMeshDirty();
@@ -163,6 +185,7 @@ namespace FairyGUI
             mesh.points.Clear();
             mesh.points.AddRange(points);
             mesh.fillColor = null;
+            mesh.lineWidth = 0;
             mesh.colors = colors;
 
             graphics.SetMeshDirty();

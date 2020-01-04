@@ -199,6 +199,21 @@ namespace FairyGUI
             _shape.DrawPolygon(points, fillColor);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aWidth"></param>
+        /// <param name="aHeight"></param>
+        /// <param name="points"></param>
+        /// <param name="fillColor"></param>
+        /// <param name="lineSize"></param>
+        /// <param name="lineColor"></param>
+        public void DrawPolygon(float aWidth, float aHeight, Vector2[] points, Color fillColor, float lineSize, Color lineColor)
+        {
+            this.SetSize(aWidth, aHeight);
+            _shape.DrawPolygon(points, fillColor, lineSize, lineColor);
+        }
+
         override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
         {
             base.Setup_BeforeAdd(buffer, beginPos);
@@ -235,7 +250,7 @@ namespace FairyGUI
                     for (int i = 0; i < cnt; i++)
                         points[i].Set(buffer.ReadFloat(), buffer.ReadFloat());
 
-                    _shape.DrawPolygon(points, fillColor);
+                    _shape.DrawPolygon(points, fillColor, lineSize, lineColor);
                 }
                 else if (type == 4)
                 {

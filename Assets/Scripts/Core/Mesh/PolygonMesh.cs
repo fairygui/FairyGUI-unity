@@ -21,6 +21,16 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public float lineWidth;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color32 lineColor;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Color32? fillColor;
 
         /// <summary>
@@ -162,6 +172,53 @@ namespace FairyGUI
 
             if (colors != null)
                 vb.RepeatColors(colors, 0, vb.currentVertCount);
+
+            if (lineWidth > 0)
+                DrawOutline(vb);
+        }
+
+        void DrawOutline(VertexBuffer vb)
+        {
+            int numVertices = points.Count;
+            int start = vb.currentVertCount - numVertices;
+            int k = vb.currentVertCount;
+            for (int i = 0; i < numVertices; i++)
+            {
+                Vector3 p0 = vb.vertices[start + i];
+                p0.y = -p0.y;
+                Vector3 p1;
+                if (i < numVertices - 1)
+                    p1 = vb.vertices[start + i + 1];
+                else
+                    p1 = vb.vertices[start];
+                p1.y = -p1.y;
+
+                Vector3 lineVector = p1 - p0;
+                Vector3 widthVector = Vector3.Cross(lineVector, new Vector3(0, 0, 1));
+                widthVector.Normalize();
+
+                vb.AddVert(p0 - widthVector * lineWidth * 0.5f, lineColor);
+                vb.AddVert(p0 + widthVector * lineWidth * 0.5f, lineColor);
+                vb.AddVert(p1 - widthVector * lineWidth * 0.5f, lineColor);
+                vb.AddVert(p1 + widthVector * lineWidth * 0.5f, lineColor);
+
+                k += 4;
+                vb.AddTriangle(k - 4, k - 3, k - 1);
+                vb.AddTriangle(k - 4, k - 1, k - 2);
+
+                //joint
+                if (i != 0)
+                {
+                    vb.AddTriangle(k - 6, k - 5, k - 3);
+                    vb.AddTriangle(k - 6, k - 3, k - 4);
+                }
+                if (i == numVertices - 1)
+                {
+                    start += numVertices;
+                    vb.AddTriangle(k - 2, k - 1, start + 1);
+                    vb.AddTriangle(k - 2, start + 1, start);
+                }
+            }
         }
 
         bool IsPointInTriangle(ref Vector2 p, ref Vector2 a, ref Vector2 b, ref Vector2 c)
