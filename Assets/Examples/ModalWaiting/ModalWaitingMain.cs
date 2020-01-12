@@ -4,46 +4,44 @@ using FairyGUI;
 
 public class ModalWaitingMain : MonoBehaviour
 {
-	GComponent _mainView;
-	Window4 _testWin;
+    GComponent _mainView;
+    Window4 _testWin;
 
-	void Awake()
-	{
-		UIPackage.AddPackage("UI/ModalWaiting");
-		UIConfig.globalModalWaiting = "ui://ModalWaiting/GlobalModalWaiting";
-		UIConfig.windowModalWaiting = "ui://ModalWaiting/WindowModalWaiting";
+    void Awake()
+    {
+        UIPackage.AddPackage("UI/ModalWaiting");
+        UIConfig.globalModalWaiting = "ui://ModalWaiting/GlobalModalWaiting";
+        UIConfig.windowModalWaiting = "ui://ModalWaiting/WindowModalWaiting";
+    }
 
-		UIObjectFactory.SetPackageItemExtension("ui://ModalWaiting/GlobalModalWaiting", typeof(GlobalWaiting));
-	}
+    void Start()
+    {
+        Application.targetFrameRate = 60;
+        Stage.inst.onKeyDown.Add(OnKeyDown);
 
-	void Start()
-	{
-		Application.targetFrameRate = 60;
-		Stage.inst.onKeyDown.Add(OnKeyDown);
+        _mainView = this.GetComponent<UIPanel>().ui;
 
-		_mainView = this.GetComponent<UIPanel>().ui;
+        _testWin = new Window4();
 
-		_testWin = new Window4();
+        _mainView.GetChild("n0").onClick.Add(() => {  _testWin.Show(); });
 
-		_mainView.GetChild("n0").onClick.Add(() => {  _testWin.Show(); });
+        StartCoroutine(WaitSomeTime());
+    }
 
-		StartCoroutine(WaitSomeTime());
-	}
+    IEnumerator WaitSomeTime()
+    {
+        GRoot.inst.ShowModalWait();
 
-	IEnumerator WaitSomeTime()
-	{
-		GRoot.inst.ShowModalWait();
+        yield return new WaitForSeconds(3);
 
-		yield return new WaitForSeconds(3);
+        GRoot.inst.CloseModalWait();
+    }
 
-		GRoot.inst.CloseModalWait();
-	}
-
-	void OnKeyDown(EventContext context)
-	{
-		if (context.inputEvent.keyCode == KeyCode.Escape)
-		{
-			Application.Quit();
-		}
-	}
+    void OnKeyDown(EventContext context)
+    {
+        if (context.inputEvent.keyCode == KeyCode.Escape)
+        {
+            Application.Quit();
+        }
+    }
 }

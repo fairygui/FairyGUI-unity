@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <list id="n0" name="list" xy="176,70" size="784,460" layout="row" overflow="scroll" scroll="horizontal" scrollBarFlags="2" scrollBar="hidden" margin="0,0,0,0" clipSoftness="20,0" colGap="20" defaultItem="ui://qf88jb5nrpol1">
+      <relation target="" sidePair="center-center"/>
+      <item icon="ui://qf88jb5nrpol3"/>
+      <item icon="ui://qf88jb5nrpol4"/>
+      <item icon="ui://qf88jb5nrpol5"/>
+    </list>
+    <text id="n2" name="n2" xy="286,548" size="327,32" group="n4" fontSize="28" color="#ffffff" text="Index of the middle is:"/>
+    <text id="n3" name="n3" xy="616,547" size="145,32" group="n4" fontSize="28" color="#ffffff" autoSize="height" text=""/>
+    <group id="n4" name="n4" xy="286,547" size="475,33" advanced="true">
+      <relation target="" sidePair="center-center"/>
+    </group>
+  </displayList>
+</component>

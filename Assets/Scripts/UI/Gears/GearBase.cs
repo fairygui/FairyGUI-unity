@@ -2,149 +2,173 @@
 
 namespace FairyGUI
 {
-	/// <summary>
-	/// Gear is a connection between object and controller.
-	/// </summary>
-	abstract public class GearBase
-	{
-		public static bool disableAllTweenEffect = false;
+    /// <summary>
+    /// Gear is a connection between object and controller.
+    /// </summary>
+    abstract public class GearBase
+    {
+        public static bool disableAllTweenEffect = false;
 
-		protected GObject _owner;
-		protected Controller _controller;
-		protected GearTweenConfig _tweenConfig;
+        protected GObject _owner;
+        protected Controller _controller;
+        protected GearTweenConfig _tweenConfig;
 
-		public GearBase(GObject owner)
-		{
-			_owner = owner;
-		}
+        public GearBase(GObject owner)
+        {
+            _owner = owner;
+        }
 
-		public void Dispose()
-		{
-			if (_tweenConfig != null && _tweenConfig._tweener != null)
-			{
-				_tweenConfig._tweener.Kill();
-				_tweenConfig._tweener = null;
-			}
-		}
+        public void Dispose()
+        {
+            if (_tweenConfig != null && _tweenConfig._tweener != null)
+            {
+                _tweenConfig._tweener.Kill();
+                _tweenConfig._tweener = null;
+            }
+        }
 
-		/// <summary>
-		/// Controller object.
-		/// </summary>
-		public Controller controller
-		{
-			get
-			{
-				return _controller;
-			}
+        /// <summary>
+        /// Controller object.
+        /// </summary>
+        public Controller controller
+        {
+            get
+            {
+                return _controller;
+            }
 
-			set
-			{
-				if (value != _controller)
-				{
-					_controller = value;
-					if (_controller != null)
-						Init();
-				}
-			}
-		}
+            set
+            {
+                if (value != _controller)
+                {
+                    _controller = value;
+                    if (_controller != null)
+                        Init();
+                }
+            }
+        }
 
-		public GearTweenConfig tweenConfig
-		{
-			get
-			{
-				if (_tweenConfig == null)
-					_tweenConfig = new GearTweenConfig();
-				return _tweenConfig;
-			}
-		}
+        public GearTweenConfig tweenConfig
+        {
+            get
+            {
+                if (_tweenConfig == null)
+                    _tweenConfig = new GearTweenConfig();
+                return _tweenConfig;
+            }
+        }
 
-		public void Setup(ByteBuffer buffer)
-		{
-			_controller = _owner.parent.GetControllerAt(buffer.ReadShort());
-			Init();
+        public void Setup(ByteBuffer buffer)
+        {
+            _controller = _owner.parent.GetControllerAt(buffer.ReadShort());
+            Init();
 
-			if (this is GearDisplay)
-			{
-				int cnt = buffer.ReadShort();
-				string[] pages = new string[cnt];
-				for (int i = 0; i < cnt; i++)
-					pages[i] = buffer.ReadS();
-				((GearDisplay)this).pages = pages;
-			}
-			else
-			{
-				int cnt = buffer.ReadShort();
-				for (int i = 0; i < cnt; i++)
-				{
-					string page = buffer.ReadS();
-					if (page == null)
-						continue;
+            int cnt = buffer.ReadShort();
+            if (this is GearDisplay)
+            {
+                ((GearDisplay)this).pages = buffer.ReadSArray(cnt);
+            }
+            else if (this is GearDisplay2)
+            {
+                ((GearDisplay2)this).pages = buffer.ReadSArray(cnt);
+            }
+            else
+            {
+                for (int i = 0; i < cnt; i++)
+                {
+                    string page = buffer.ReadS();
+                    if (page == null)
+                        continue;
 
-					AddStatus(page, buffer);
-				}
+                    AddStatus(page, buffer);
+                }
 
-				if (buffer.ReadBool())
-					AddStatus(null, buffer);
-			}
+                if (buffer.ReadBool())
+                    AddStatus(null, buffer);
+            }
 
-			if (buffer.ReadBool())
-			{
-				_tweenConfig = new GearTweenConfig();
-				_tweenConfig.easeType = (EaseType)buffer.ReadByte();
-				_tweenConfig.duration = buffer.ReadFloat();
-				_tweenConfig.delay = buffer.ReadFloat();
-			}
-		}
+            if (buffer.ReadBool())
+            {
+                _tweenConfig = new GearTweenConfig();
+                _tweenConfig.easeType = (EaseType)buffer.ReadByte();
+                _tweenConfig.duration = buffer.ReadFloat();
+                _tweenConfig.delay = buffer.ReadFloat();
+            }
 
-		virtual public void UpdateFromRelations(float dx, float dy)
-		{
-		}
+            if (buffer.version >= 2)
+            {
+                if (this is GearXY)
+                {
+                    if(buffer.ReadBool())
+                    {
+                        ((GearXY)this).positionsInPercent = true;
+                        for (int i = 0; i < cnt; i++)
+                        {
+                            string page = buffer.ReadS();
+                            if (page == null)
+                                continue;
 
-		abstract protected void AddStatus(string pageId, ByteBuffer buffer);
-		abstract protected void Init();
+                            ((GearXY)this).AddExtStatus(page, buffer);
+                        }
 
-		/// <summary>
-		/// Call when controller active page changed.
-		/// </summary>
-		abstract public void Apply();
+                        if (buffer.ReadBool())
+                            ((GearXY)this).AddExtStatus(null, buffer);
+                    }
+                }
+                else if (this is GearDisplay2)
+                    ((GearDisplay2)this).condition = buffer.ReadByte();
+            }
+        }
 
-		/// <summary>
-		/// Call when object's properties changed.
-		/// </summary>
-		abstract public void UpdateState();
-	}
+        virtual public void UpdateFromRelations(float dx, float dy)
+        {
+        }
 
-	public class GearTweenConfig
-	{
-		/// <summary>
-		/// Use tween to apply change.
-		/// </summary>
-		public bool tween;
+        abstract protected void AddStatus(string pageId, ByteBuffer buffer);
+        abstract protected void Init();
 
-		/// <summary>
-		/// Ease type.
-		/// </summary>
-		public EaseType easeType;
+        /// <summary>
+        /// Call when controller active page changed.
+        /// </summary>
+        abstract public void Apply();
 
-		/// <summary>
-		/// Tween duration in seconds.
-		/// </summary>
-		public float duration;
+        /// <summary>
+        /// Call when object's properties changed.
+        /// </summary>
+        abstract public void UpdateState();
+    }
 
-		/// <summary>
-		/// Tween delay in seconds.
-		/// </summary>
-		public float delay;
+    public class GearTweenConfig
+    {
+        /// <summary>
+        /// Use tween to apply change.
+        /// </summary>
+        public bool tween;
 
-		internal uint _displayLockToken;
-		internal GTweener _tweener;
+        /// <summary>
+        /// Ease type.
+        /// </summary>
+        public EaseType easeType;
 
-		public GearTweenConfig()
-		{
-			tween = true;
-			easeType = EaseType.QuadOut;
-			duration = 0.3f;
-			delay = 0;
-		}
-	}
+        /// <summary>
+        /// Tween duration in seconds.
+        /// </summary>
+        public float duration;
+
+        /// <summary>
+        /// Tween delay in seconds.
+        /// </summary>
+        public float delay;
+
+        internal uint _displayLockToken;
+        internal GTweener _tweener;
+
+        public GearTweenConfig()
+        {
+            tween = true;
+            easeType = EaseType.QuadOut;
+            duration = 0.3f;
+            delay = 0;
+        }
+    }
 }

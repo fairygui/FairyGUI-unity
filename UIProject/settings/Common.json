@@ -1,0 +1,16 @@
+{
+	"buttonClickSound":"",
+	"colorScheme":["Custom color #FF0000"],
+	"font":"Heiti SC Medium,SimSun",
+	"fontScheme":["默认字体"],
+	"fontSize":12,
+	"fontSizeScheme":["Custom font size 30"],
+	"pivot":"default",
+	"scrollBars":{
+		"defaultDisplay":"visible",
+		"horizontal":"ui://9leh0eyfi3s65i",
+		"vertical":"ui://9leh0eyfi3s65w"
+	},
+	"textColor":"#000000",
+	"tipsRes":""
+}

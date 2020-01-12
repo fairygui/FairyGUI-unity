@@ -1,0 +1,21 @@
+<component size="80,22" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="2"/>
+  <controller name="checked" pages="0,,1,,2," selected="0"/>
+  <displayList>
+    <image id="n14" name="n14" src="l6f470" xy="0,0" size="80,22">
+      <gearDisplay controller="button" pages="1,2,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n6" name="n6" src="l6f471" xy="18,0" aspect="true">
+      <relation target="" sidePair="height-height"/>
+    </image>
+    <text id="n1" name="title" xy="22,3" size="50,16" fontSize="12" autoSize="none" singleLine="true" demoText="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n3" name="icon" xy="1,1" size="16,20" align="center" vAlign="middle"/>
+    <image id="n13" name="n13" src="l6f472" xy="3,7" aspect="true">
+      <gearDisplay controller="checked" pages="2"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

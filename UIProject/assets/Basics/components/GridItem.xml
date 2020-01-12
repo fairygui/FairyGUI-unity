@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="505,35" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="505,33" type="rect" lineColor="#ffccffff" fillColor="#0026498b">
+      <gearDisplay controller="button" pages="1,3"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n3" name="n3" xy="0,0" size="505,35" type="rect" lineColor="#ff7b98ac" fillColor="#b548797e">
+      <gearDisplay controller="button" pages="2"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n0" name="t0" xy="1,3" size="47,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="1"/>
+    <graph id="n4" name="n4" xy="0,34" size="505,1" type="rect" lineSize="0" fillColor="#ff325b62">
+      <relation target="" sidePair="width-width"/>
+    </graph>
+    <text id="n5" name="t1" xy="53,3" size="229,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="Name"/>
+    <text id="n6" name="t2" xy="289,3" size="94,28" fontSize="22" color="#ffffff" align="center" autoSize="none" singleLine="true" text="Fairy"/>
+    <component id="n7" name="star" src="fjqr7j" xy="402,5">
+      <ProgressBar value="67" max="100"/>
+    </component>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

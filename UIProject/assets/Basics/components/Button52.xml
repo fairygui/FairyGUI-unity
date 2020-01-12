@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="180,70" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <controller name="grayed" pages="0,,1," selected="1"/>
+  <displayList>
+    <image id="n0" name="bg" src="rpmb1" xy="0,-1" size="181,70" aspect="true">
+      <gearXY controller="button" pages="0,1,2,3" values="0,-1|1,1|0,0|1,1" default="1,5"/>
+      <gearSize controller="button" pages="0,1,2,3" values="181,70,1.00,1.00|178,68,1.00,1.00|-|178,68,1.00,1.00" default="181,70,1.00,1.00"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n1" name="title" xy="9,7" size="157,46" fontSize="22" color="#ffff00" align="center" vAlign="middle" autoSize="none" text="">
+      <relation target="" sidePair="width-width,height-height"/>
+    </text>
+    <loader id="n2" name="icon" xy="8,4" size="160,49" grayed="true" align="center" vAlign="middle">
+      <gearLook controller="grayed" pages="0,1" values="1.00,0,0|-" default="1.00,0,1"/>
+      <relation target="" sidePair="width-width,height-height"/>
+    </loader>
+  </displayList>
+  <Button/>
+</component>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="60,60" extention="Button">
+  <displayList>
+    <image id="n5" name="n5" src="ltiqo" xy="0,0" size="60,60" visible="false"/>
+    <loader id="n6" name="icon" xy="0,0" size="60,60" fill="scaleFree"/>
+    <image id="n9" name="n9" src="ltiqo" xy="0,0" size="60,60"/>
+    <image id="n10" name="mask" src="uo8117" xy="3,3" size="54,54" alpha="0.6" fillMethod="radial360" fillClockwise="false"/>
+  </displayList>
+  <Button/>
+</component>

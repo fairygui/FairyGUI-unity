@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <graph id="n0" name="holder" xy="70,37" size="1028,574" type="rect" lineSize="0" fillColor="#00000000">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </graph>
+    <text id="n1" name="n1" xy="48,19" size="815,67" fontSize="30" color="#ffffff" text="Try Pinch/Swipe/Rotate/Long-Press Gesture on the globe&#xA;试试在地球上使用摁捏扭扫手势"/>
+  </displayList>
+</component>

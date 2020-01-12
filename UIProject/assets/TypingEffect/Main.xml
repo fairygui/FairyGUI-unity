@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <text id="n2_jruo" name="n2" xy="39,79" size="459,251" fontSize="24" color="#ffffff" leading="12" ubb="true" autoSize="none" text="[color=#FF3300][b]FairyGUI Editor[/b][/color] is a [i]WYSWYG[/i][size=30] Game UI Editor[/size]，FairyGUI是一个所见即所得的[color=#FFFF00]游戏UI编辑器[/color]。"/>
+    <richtext id="n3_jruo" name="n3" xy="567,79" size="549,239" fontSize="24" color="#ccff00" ubb="true" autoSize="none" text="[color=#FF3300][b]FairyGUI Editor[/b][/color] is a [i]WYSWYG[/i][size=30] Game UI Editor[/size][img]ui://47s7ydvujruo1[/img][img]ui://47s7ydvujruo2[/img][img]ui://47s7ydvujruo3[/img]，&#xA;FairyGUI是一个所见即所得的[color=#FFFF00]游戏UI编辑器[/color]。&#xA;[img]ui://47s7ydvujruo4[/img][img]ui://47s7ydvujruo5[/img]&#xA;[url=xxxx]I am link[/url]&#xA;&#xA;"/>
+  </displayList>
+</component>

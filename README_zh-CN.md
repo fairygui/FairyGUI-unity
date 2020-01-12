@@ -2,7 +2,7 @@
 ====
 
 FairyGUI是一个适用于许多游戏引擎的UI中间件。<br>
-[下载编辑器](http://www.fairygui.com/product)  
+[下载编辑器](https://www.fairygui.com/product.html)  
 
 在运行效率方面，FairyGUI对DrawCall优化使用了特有的`FairyBatching`技术，相比NGUI、UGUI的传统优化技术更加高效而且容易控制，特别是对动静耦合越来越复杂的UI设计更是应付自如。<br>
 
@@ -24,10 +24,8 @@ FairyGUI还对所有输入方式进行了完整的封装，无论是鼠标、单
 学习
 ====
 
-[教程](http://www.fairygui.com/guide)
+[教程](https://www.fairygui.com/docs/guide/index.html)
 
 License
 ====
-MIT 
-
-[捐助](http://www.fairygui.com/service)
+MIT

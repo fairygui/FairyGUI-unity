@@ -1,4 +1,4 @@
-EventContext  = FairyGUI.EventContext
+EventContext = FairyGUI.EventContext
 EventListener = FairyGUI.EventListener
 EventDispatcher = FairyGUI.EventDispatcher
 InputEvent = FairyGUI.InputEvent
@@ -78,9 +78,7 @@ function fgui.window_class(base)
         local ins = FairyGUI.Window.New()
         tolua.setpeer(ins, t)
         ins:SetLuaPeer(t)
-        if t.ctor then
-            t.ctor(ins,...)
-        end
+        if t.ctor then t.ctor(ins, ...) end
 
         return ins
     end
@@ -126,7 +124,8 @@ myButton2.myProp = 'world'
 ]]
 
 function fgui.register_extension(url, extension)
-    FairyGUI.UIObjectFactory.SetExtension(url, typeof(extension.base), extension.Extend)
+    FairyGUI.UIObjectFactory.SetExtension(url, typeof(extension.base),
+                                          extension.Extend)
 end
 
 function fgui.extension_class(base)
@@ -138,7 +137,7 @@ function fgui.extension_class(base)
     o.Extend = function(ins)
         local t = {}
         setmetatable(t, o)
-        tolua.setpeer(ins,t)
+        tolua.setpeer(ins, t)
         return t
     end
 

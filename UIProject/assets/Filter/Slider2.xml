@@ -1,0 +1,12 @@
+<component size="361,23" extention="Slider">
+  <displayList>
+    <image id="n1" name="n1" src="srct3" xy="0,0" size="361,23">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="bar" src="srct4" xy="0,1" size="362,21"/>
+    <component id="n3" name="grip" src="srct5" xy="328,-13">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>

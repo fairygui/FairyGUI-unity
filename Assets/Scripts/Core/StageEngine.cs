@@ -1,49 +1,48 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FairyGUI
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	public class StageEngine : MonoBehaviour
-	{
-		public int ObjectsOnStage;
-		public int GraphicsOnStage;
+    /// <summary>
+    /// 
+    /// </summary>
+    public class StageEngine : MonoBehaviour
+    {
+        public int ObjectsOnStage;
+        public int GraphicsOnStage;
 
-		public static bool beingQuit;
+        public static bool beingQuit;
 
-		void Start()
-		{
-			useGUILayout = false;
-		}
+        void Start()
+        {
+            useGUILayout = false;
+        }
 
-		void LateUpdate()
-		{
-			Stage.inst.InternalUpdate();
+        void LateUpdate()
+        {
+            Stage.inst.InternalUpdate();
 
-			ObjectsOnStage = Stats.ObjectCount;
-			GraphicsOnStage = Stats.GraphicsCount;
-		}
+            ObjectsOnStage = Stats.ObjectCount;
+            GraphicsOnStage = Stats.GraphicsCount;
+        }
 
-		void OnGUI()
-		{
-			Stage.inst.HandleGUIEvents(Event.current);
-		}
+        void OnGUI()
+        {
+            Stage.inst.HandleGUIEvents(Event.current);
+        }
 
 #if !UNITY_5_4_OR_NEWER
-		void OnLevelWasLoaded()
-		{
-			StageCamera.CheckMainCamera();
-		}
+        void OnLevelWasLoaded()
+        {
+            StageCamera.CheckMainCamera();
+        }
 #endif
 
-		void OnApplicationQuit()
-		{
-			beingQuit = true;
+        void OnApplicationQuit()
+        {
+            beingQuit = true;
 
-			if (Application.isEditor)
-				UIPackage.RemoveAllPackages();
-		}
-	}
+            if (Application.isEditor)
+                UIPackage.RemoveAllPackages();
+        }
+    }
 }

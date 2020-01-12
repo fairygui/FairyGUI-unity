@@ -6,174 +6,194 @@ using LuaInterface;
 
 namespace FairyGUI
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	public class UIObjectFactory
-	{
-		public delegate GComponent GComponentCreator();
-		public delegate GLoader GLoaderCreator();
+    /// <summary>
+    /// 
+    /// </summary>
+    public class UIObjectFactory
+    {
+        public delegate GComponent GComponentCreator();
+        public delegate GLoader GLoaderCreator();
 
-		static Dictionary<string, GComponentCreator> packageItemExtensions = new Dictionary<string, GComponentCreator>();
-		static GLoaderCreator loaderCreator;
+        static Dictionary<string, GComponentCreator> packageItemExtensions = new Dictionary<string, GComponentCreator>();
+        static GLoaderCreator loaderCreator;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="url"></param>
-		/// <param name="type"></param>
-		public static void SetPackageItemExtension(string url, System.Type type)
-		{
-			SetPackageItemExtension(url, () => { return (GComponent)Activator.CreateInstance(type); });
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="type"></param>
+        public static void SetPackageItemExtension(string url, System.Type type)
+        {
+            SetPackageItemExtension(url, () => { return (GComponent)Activator.CreateInstance(type); });
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="url"></param>
-		/// <param name="creator"></param>
-		public static void SetPackageItemExtension(string url, GComponentCreator creator)
-		{
-			if (url == null)
-				throw new Exception("Invaild url: " + url);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="creator"></param>
+        public static void SetPackageItemExtension(string url, GComponentCreator creator)
+        {
+            if (url == null)
+                throw new Exception("Invaild url: " + url);
 
-			PackageItem pi = UIPackage.GetItemByURL(url);
-			if (pi != null)
-				pi.extensionCreator = creator;
+            PackageItem pi = UIPackage.GetItemByURL(url);
+            if (pi != null)
+                pi.extensionCreator = creator;
 
-			packageItemExtensions[url] = creator;
-		}
+            packageItemExtensions[url] = creator;
+        }
 
 #if FAIRYGUI_TOLUA
-		public static void SetExtension(string url, System.Type baseType, LuaFunction extendFunction)
-		{
-			SetPackageItemExtension(url, () =>
-			{
-				GComponent gcom = (GComponent)Activator.CreateInstance(baseType);
+        public static void SetExtension(string url, System.Type baseType, LuaFunction extendFunction)
+        {
+            SetPackageItemExtension(url, () =>
+            {
+                GComponent gcom = (GComponent)Activator.CreateInstance(baseType);
 
-				extendFunction.BeginPCall();
-				extendFunction.Push(gcom);
-				extendFunction.PCall();
-				gcom.SetLuaPeer(extendFunction.CheckLuaTable());
-				extendFunction.EndPCall();
+                extendFunction.BeginPCall();
+                extendFunction.Push(gcom);
+                extendFunction.PCall();
+                gcom.SetLuaPeer(extendFunction.CheckLuaTable());
+                extendFunction.EndPCall();
 
-				return gcom;
-			});
-		}
+                return gcom;
+            });
+        }
 #endif
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="type"></param>
-		public static void SetLoaderExtension(System.Type type)
-		{
-			loaderCreator = () => { return (GLoader)Activator.CreateInstance(type); };
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        public static void SetLoaderExtension(System.Type type)
+        {
+            loaderCreator = () => { return (GLoader)Activator.CreateInstance(type); };
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="creator"></param>
-		public static void SetLoaderExtension(GLoaderCreator creator)
-		{
-			loaderCreator = creator;
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="creator"></param>
+        public static void SetLoaderExtension(GLoaderCreator creator)
+        {
+            loaderCreator = creator;
+        }
 
-		internal static void ResolvePackageItemExtension(PackageItem pi)
-		{
-			if (!packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.id + pi.id, out pi.extensionCreator)
-				&& !packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.name + "/" + pi.name, out pi.extensionCreator))
-				pi.extensionCreator = null;
-		}
+        internal static void ResolvePackageItemExtension(PackageItem pi)
+        {
+            if (!packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.id + pi.id, out pi.extensionCreator)
+                && !packageItemExtensions.TryGetValue(UIPackage.URL_PREFIX + pi.owner.name + "/" + pi.name, out pi.extensionCreator))
+                pi.extensionCreator = null;
+        }
 
-		public static void Clear()
-		{
-			packageItemExtensions.Clear();
-			loaderCreator = null;
-		}
+        public static void Clear()
+        {
+            packageItemExtensions.Clear();
+            loaderCreator = null;
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="pi"></param>
-		/// <returns></returns>
-		public static GObject NewObject(PackageItem pi)
-		{
-			if (pi.extensionCreator != null)
-			{
-				Stats.LatestObjectCreation++;
-				return pi.extensionCreator();
-			}
-			else
-				return NewObject(pi.objectType);
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pi"></param>
+        /// <param name="userClass"></param>
+        /// <returns></returns>
+        public static GObject NewObject(PackageItem pi, System.Type userClass = null)
+        {
+            GObject obj;
+            if (pi.type == PackageItemType.Component)
+            {
+                if (userClass != null)
+                {
+                    Stats.LatestObjectCreation++;
+                    obj = (GComponent)Activator.CreateInstance(userClass);
+                }
+                else if (pi.extensionCreator != null)
+                {
+                    Stats.LatestObjectCreation++;
+                    obj = pi.extensionCreator();
+                }
+                else
+                    obj = NewObject(pi.objectType);
+            }
+            else
+                obj = NewObject(pi.objectType);
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-		public static GObject NewObject(ObjectType type)
-		{
-			Stats.LatestObjectCreation++;
+            if (obj != null)
+                obj.packageItem = pi;
 
-			switch (type)
-			{
-				case ObjectType.Image:
-					return new GImage();
+            return obj;
+        }
 
-				case ObjectType.MovieClip:
-					return new GMovieClip();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static GObject NewObject(ObjectType type)
+        {
+            Stats.LatestObjectCreation++;
 
-				case ObjectType.Component:
-					return new GComponent();
+            switch (type)
+            {
+                case ObjectType.Image:
+                    return new GImage();
 
-				case ObjectType.Text:
-					return new GTextField();
+                case ObjectType.MovieClip:
+                    return new GMovieClip();
 
-				case ObjectType.RichText:
-					return new GRichTextField();
+                case ObjectType.Component:
+                    return new GComponent();
 
-				case ObjectType.InputText:
-					return new GTextInput();
+                case ObjectType.Text:
+                    return new GTextField();
 
-				case ObjectType.Group:
-					return new GGroup();
+                case ObjectType.RichText:
+                    return new GRichTextField();
 
-				case ObjectType.List:
-					return new GList();
+                case ObjectType.InputText:
+                    return new GTextInput();
 
-				case ObjectType.Graph:
-					return new GGraph();
+                case ObjectType.Group:
+                    return new GGroup();
 
-				case ObjectType.Loader:
-					if (loaderCreator != null)
-						return loaderCreator();
-					else
-						return new GLoader();
+                case ObjectType.List:
+                    return new GList();
 
-				case ObjectType.Button:
-					return new GButton();
+                case ObjectType.Graph:
+                    return new GGraph();
 
-				case ObjectType.Label:
-					return new GLabel();
+                case ObjectType.Loader:
+                    if (loaderCreator != null)
+                        return loaderCreator();
+                    else
+                        return new GLoader();
 
-				case ObjectType.ProgressBar:
-					return new GProgressBar();
+                case ObjectType.Button:
+                    return new GButton();
 
-				case ObjectType.Slider:
-					return new GSlider();
+                case ObjectType.Label:
+                    return new GLabel();
 
-				case ObjectType.ScrollBar:
-					return new GScrollBar();
+                case ObjectType.ProgressBar:
+                    return new GProgressBar();
 
-				case ObjectType.ComboBox:
-					return new GComboBox();
+                case ObjectType.Slider:
+                    return new GSlider();
 
-				default:
-					return null;
-			}
-		}
-	}
+                case ObjectType.ScrollBar:
+                    return new GScrollBar();
+
+                case ObjectType.ComboBox:
+                    return new GComboBox();
+
+                case ObjectType.Tree:
+                    return new GTree();
+
+                default:
+                    return null;
+            }
+        }
+    }
 }

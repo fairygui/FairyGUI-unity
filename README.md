@@ -2,7 +2,7 @@
 ====
 
 FairyGUI is a Cross Platform UI Editor & UI framework.
-[Get FairyGUI-Editor](http://en.fairygui.com/product)  
+[Get FairyGUI-Editor](https://en.fairygui.com/product.html)  
 
 Compared with traditional Unity UI engines such as NGUI and UGUI, FairyGUI uses a way of thinking closer to the designer to redefine the production process of the UI, which greatly reduces the time the programmer needs to invest in making the UI.<br>
 
@@ -27,10 +27,8 @@ FairyGUI also fully encapsulates all input methods. Whether mouse, single touch,
 Learn
 ====
 
-[Guide](http://en.fairygui.com/guide)
+[Guide](https://en.fairygui.com/docs/guide/index.html)
 
 License
 ====
-MIT 
-
-[Donate](http://en.fairygui.com/service)
+MIT

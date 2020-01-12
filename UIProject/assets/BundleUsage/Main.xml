@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="fou91" xy="509,79" pivot="0.5,0.5"/>
+    <text id="n1" name="n1" xy="212,18" size="761,55" fontSize="24" color="#ffffff" align="center" strokeColor="#000000" text="This UIPackage is loaded from AssetBundle.&#xA;Use 'Window Menu->Build FairyGUI example bundles' to create it."/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Rotation" target="n0" tween="true" startValue="0" endValue="360" duration="48" ease="Linear" repeat="10000"/>
+  </transition>
+</component>

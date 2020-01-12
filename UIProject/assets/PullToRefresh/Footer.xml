@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="400,71" overflow="hidden" bgColorEnabled="true">
+  <controller name="c1" pages="0,,2," selected="1"/>
+  <displayList>
+    <image id="n0_n3qd" name="n0" src="n3qds" xy="65,20" pivot="0.5,0.5" group="n2_n3qd">
+      <gearDisplay controller="c1" pages="2"/>
+    </image>
+    <text id="n1_n3qd" name="n1" xy="68,23" size="282,26" group="n2_n3qd" fontSize="22" color="#999999" align="center" autoSize="none" bold="true" singleLine="true" text="Loading">
+      <gearText controller="c1" pages="0,2" values="Pull up to load more|Loading"/>
+    </text>
+    <group id="n2_n3qd" name="n2" xy="65,20" size="285,34" advanced="true">
+      <gearDisplay controller="c1" pages="0,1,2"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </group>
+  </displayList>
+  <transition name="t0" autoPlay="true" autoPlayRepeat="-1">
+    <item time="0" type="Rotation" target="n0_n3qd" tween="true" startValue="0" endValue="360" duration="24" ease="Linear"/>
+  </transition>
+</component>

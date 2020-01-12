@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <component id="n0" name="bagBtn" src="rpol1" xy="743,522" group="n1"/>
+    <group id="n1" name="n1" xy="743,522" size="90,100" advanced="true">
+      <relation target="" sidePair="bottom-bottom,center-center"/>
+    </group>
+    <component id="n2" name="n2" src="rpol5" xy="460,253" size="183,48">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button title="Start Guide"/>
+    </component>
+  </displayList>
+</component>

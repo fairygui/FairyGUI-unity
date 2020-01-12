@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n0" name="n0" src="gkq05" xy="0,60" size="1136,81">
+      <relation target="" sidePair="center-center"/>
+    </image>
+    <loader id="n4" name="icon" xy="99,62" size="938,68" url="ui://zgmoraj4gkq06" align="center">
+      <relation target="" sidePair="center-center"/>
+    </loader>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Alpha" target="n0" value="1.00"/>
+    <item time="0" type="XY" target="n4" tween="true" startValue="1180,-" endValue="167,-" duration="12"/>
+    <item time="12" type="XY" target="n4" tween="true" startValue="167,-" endValue="99,62" duration="36" ease="Linear"/>
+    <item time="48" type="Alpha" target="n0" tween="true" startValue="1.00" endValue="0.00" duration="12"/>
+    <item time="48" type="XY" target="n4" tween="true" startValue="99,62" endValue="-948,-" duration="12"/>
+  </transition>
+</component>

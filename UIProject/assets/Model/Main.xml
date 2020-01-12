@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n1" name="n1" src="rpol1" fileName="change.jpg" xy="352,0"/>
+    <graph id="n0" name="holder" xy="451,424" size="100,100"/>
+    <movieclip id="n3" name="n3" src="rpol2" fileName="pet.jta" xy="456,269"/>
+  </displayList>
+</component>

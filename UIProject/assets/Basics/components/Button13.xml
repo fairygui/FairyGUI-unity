@@ -1,0 +1,12 @@
+<component size="50,50" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="eut94y" xy="12,14" aspect="true">
+      <gearDisplay controller="button" pages="0,2"/>
+    </image>
+    <image id="n2" name="n2" src="eut94z" xy="12,14" aspect="true">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button/>
+</component>
