@@ -383,6 +383,7 @@ namespace FairyGUI
                 if (_contentItem.type == PackageItemType.Image)
                 {
                     _content.texture = _contentItem.texture;
+                    _content.textureScale = new Vector2(_contentItem.width / (float)_contentSourceWidth, _contentItem.height / (float)_contentSourceHeight);
                     _content.scale9Grid = _contentItem.scale9Grid;
                     _content.scaleByTile = _contentItem.scaleByTile;
                     _content.tileGridIndice = _contentItem.tileGridIndice;

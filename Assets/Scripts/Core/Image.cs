@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -10,6 +9,7 @@ namespace FairyGUI
     {
         protected Rect? _scale9Grid;
         protected bool _scaleByTile;
+        protected Vector2 _textureScale;
         protected int _tileGridIndice;
         protected FillMesh _fillMesh;
 
@@ -31,6 +31,8 @@ namespace FairyGUI
             graphics.shader = ShaderConfig.imageShader;
             graphics.meshFactory = this;
 
+            _textureScale = Vector2.one;
+
             if (texture != null)
                 UpdateTexture(texture);
         }
@@ -44,6 +46,16 @@ namespace FairyGUI
             set
             {
                 UpdateTexture(value);
+            }
+        }
+
+        public Vector2 textureScale
+        {
+            get { return _textureScale; }
+            set
+            {
+                _textureScale = value;
+                graphics.SetMeshDirty();
             }
         }
 
@@ -205,6 +217,7 @@ namespace FairyGUI
                 return;
 
             graphics.texture = value;
+            _textureScale = Vector2.one;
             if (_contentRect.width == 0)
                 SetNativeSize();
             InvalidateBatchingState();
@@ -218,23 +231,25 @@ namespace FairyGUI
             }
             else if (_scaleByTile)
             {
-                float sourceW = texture.width;
-                float sourceH = texture.height;
-
+                NTexture texture = graphics.texture;
                 if (texture.root == texture
                             && texture.nativeTexture != null
                             && texture.nativeTexture.wrapMode == TextureWrapMode.Repeat)
                 {
                     Rect uvRect = vb.uvRect;
-                    uvRect.width *= vb.contentRect.width / sourceW;
-                    uvRect.height *= vb.contentRect.height / sourceH;
+                    uvRect.width *= vb.contentRect.width / texture.width;
+                    uvRect.height *= vb.contentRect.height / texture.height;
 
                     vb.AddQuad(vb.contentRect, vb.vertexColor, uvRect);
                     vb.AddTriangles();
                 }
                 else
                 {
-                    TileFill(vb, vb.contentRect, vb.uvRect, sourceW, sourceH);
+                    Rect contentRect = vb.contentRect;
+                    contentRect.width *= _textureScale.x;
+                    contentRect.height *= _textureScale.y;
+
+                    TileFill(vb, contentRect, vb.uvRect, texture.width, texture.height);
                     vb.AddTriangles();
                 }
             }
@@ -267,8 +282,11 @@ namespace FairyGUI
 
         public void SliceFill(VertexBuffer vb)
         {
+            NTexture texture = graphics.texture;
             Rect gridRect = (Rect)_scale9Grid;
             Rect contentRect = vb.contentRect;
+            contentRect.width *= _textureScale.x;
+            contentRect.height *= _textureScale.y;
             Rect uvRect = vb.uvRect;
 
             float sourceW = texture.width;
@@ -340,7 +358,7 @@ namespace FairyGUI
                 for (int cy = 0; cy < 4; cy++)
                 {
                     for (int cx = 0; cx < 4; cx++)
-                        vb.AddVert(new Vector2(gridX[cx], gridY[cy]), vb.vertexColor, new Vector2(gridTexX[cx], gridTexY[cy]));
+                        vb.AddVert(new Vector2(gridX[cx] / _textureScale.x, gridY[cy] / _textureScale.y), vb.vertexColor, new Vector2(gridTexX[cx], gridTexY[cy]));
                 }
                 vb.AddTriangles(TRIANGLES_9_GRID);
             }
@@ -367,6 +385,11 @@ namespace FairyGUI
                     }
                     else
                     {
+                        drawRect.x /= _textureScale.x;
+                        drawRect.y /= _textureScale.y;
+                        drawRect.width /= _textureScale.x;
+                        drawRect.height /= _textureScale.y;
+
                         vb.AddQuad(drawRect, vb.vertexColor, texRect);
                     }
                 }
@@ -394,8 +417,15 @@ namespace FairyGUI
                     if (j == vc - 1)
                         uvTmp.yMin = Mathf.Lerp(uvRect.y, yMax, 1 - tailHeight / sourceH);
 
-                    vb.AddQuad(new Rect(contentRect.x + i * sourceW, contentRect.y + j * sourceH,
-                            i == (hc - 1) ? tailWidth : sourceW, j == (vc - 1) ? tailHeight : sourceH), vb.vertexColor, uvTmp);
+                    Rect drawRect = new Rect(contentRect.x + i * sourceW, contentRect.y + j * sourceH,
+                            i == (hc - 1) ? tailWidth : sourceW, j == (vc - 1) ? tailHeight : sourceH);
+
+                    drawRect.x /= _textureScale.x;
+                    drawRect.y /= _textureScale.y;
+                    drawRect.width /= _textureScale.x;
+                    drawRect.height /= _textureScale.y;
+
+                    vb.AddQuad(drawRect, vb.vertexColor, uvTmp);
                 }
             }
         }
