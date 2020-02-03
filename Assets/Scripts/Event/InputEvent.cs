@@ -35,7 +35,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public int mouseWheelDelta { get; internal set; }
+        public float mouseWheelDelta { get; internal set; }
 
         /// <summary>
         /// 

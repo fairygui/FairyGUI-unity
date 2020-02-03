@@ -1699,8 +1699,8 @@ namespace FairyGUI
                 return;
 
             InputEvent evt = context.inputEvent;
-            int delta = evt.mouseWheelDelta;
-            delta = Math.Sign(delta);
+            float delta = evt.mouseWheelDelta;
+            delta = Mathf.Sign(delta);
             if (_overlapSize.x > 0 && _overlapSize.y == 0)
             {
                 if (_pageMode)

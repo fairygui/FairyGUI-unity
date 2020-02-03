@@ -669,7 +669,7 @@ namespace FairyGUI
                 if (_touchTarget != null)
                 {
                     TouchInfo touch = _touches[0];
-                    touch.mouseWheelDelta = (int)evt.delta.y;
+                    touch.mouseWheelDelta = evt.delta.y;
                     touch.UpdateEvent();
                     _touchTarget.BubbleEvent("onMouseWheel", touch.evt);
                     touch.mouseWheelDelta = 0;
@@ -1152,7 +1152,7 @@ namespace FairyGUI
         public KeyCode keyCode;
         public char character;
         public EventModifiers modifiers;
-        public int mouseWheelDelta;
+        public float mouseWheelDelta;
         public int button;
 
         public float downX;
