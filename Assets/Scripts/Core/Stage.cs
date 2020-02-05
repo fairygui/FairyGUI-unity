@@ -1263,6 +1263,17 @@ namespace FairyGUI
         {
             began = false;
 
+            if (Time.realtimeSinceStartup - lastClickTime < 0.35f)
+            {
+                if (clickCount == 2)
+                    clickCount = 1;
+                else
+                    clickCount++;
+            }
+            else
+                clickCount = 1;
+            lastClickTime = Time.realtimeSinceStartup;
+
             UpdateEvent();
 
             if (touchMonitors.Count > 0)
@@ -1281,17 +1292,6 @@ namespace FairyGUI
             }
             else
                 target.BubbleEvent("onTouchEnd", evt);
-
-            if (Time.realtimeSinceStartup - lastClickTime < 0.35f)
-            {
-                if (clickCount == 2)
-                    clickCount = 1;
-                else
-                    clickCount++;
-            }
-            else
-                clickCount = 1;
-            lastClickTime = Time.realtimeSinceStartup;
         }
 
         public DisplayObject ClickTest()
