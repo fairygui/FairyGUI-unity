@@ -74,6 +74,20 @@ namespace FairyGUI
                 return new VertexBuffer();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        public static VertexBuffer Begin(VertexBuffer source)
+        {
+            VertexBuffer vb = Begin();
+            vb.contentRect = source.contentRect;
+            vb.uvRect = source.uvRect;
+            vb.vertexColor = source.vertexColor;
+
+            return vb;
+        }
+
         private VertexBuffer()
         {
             vertices = new List<Vector3>();
@@ -128,7 +142,7 @@ namespace FairyGUI
             position.y = -position.y;
             vertices.Add(position);
             colors.Add(vertexColor);
-             if (vertexColor.a != 255)
+            if (vertexColor.a != 255)
                 _alphaInVertexColor = true;
             uv0.Add(new Vector4(
                     Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),

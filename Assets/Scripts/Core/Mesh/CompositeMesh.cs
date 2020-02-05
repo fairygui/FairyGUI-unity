@@ -31,10 +31,7 @@ namespace FairyGUI
                 elements[0].OnPopulateMesh(vb);
             else
             {
-                VertexBuffer vb2 = VertexBuffer.Begin();
-                vb2.contentRect = vb.contentRect;
-                vb2.uvRect = vb.uvRect;
-                vb2.vertexColor = vb.vertexColor;
+                VertexBuffer vb2 = VertexBuffer.Begin(vb);
 
                 for (int i = 0; i < cnt; i++)
                 {
