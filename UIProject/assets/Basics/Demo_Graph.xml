@@ -2,7 +2,7 @@
 <component size="1136,570">
   <displayList>
     <graph id="n1" name="n1" xy="187,62" size="100,100" type="rect" lineSize="2" corner="20"/>
-    <graph id="n2" name="n2" xy="43,62" size="100,100" type="rect" lineSize="5" lineColor="#ffffff66" fillColor="#ffcc9933"/>
+    <graph id="n2" name="n2" xy="93,112" pivot="0.5,0.5" anchor="true" size="100,100" scale="2,2" rotation="14" type="rect" lineSize="5" lineColor="#ffffff66" fillColor="#ffcc9933"/>
     <graph id="n5" name="n5" xy="57,255" pivot="0.5,0.5" size="206,113" skew="60,30" rotation="-30" type="rect" lineSize="2" fillColor="#ff006600"/>
     <graph id="n7" name="n7" xy="323,62" size="139,92" type="rect" lineSize="15" lineColor="#ffff99ff" fillColor="#00ff6600"/>
     <text id="n8" name="n8" xy="13,10" size="82,26" fontSize="22" text="Shapes"/>
@@ -16,7 +16,7 @@
     <graph id="n12_ty2k" name="pie" xy="490,62" size="100,100" type="eclipse" lineSize="2" lineColor="#ff000099" fillColor="#6800cccc"/>
     <image id="n14_ty2k" name="n14" src="ty2k8a" fileName="images/radial.png" xy="978,333" pivot="0.5,0.5" anchor="true"/>
     <graph id="n15_ty2k" name="radial" xy="979,333" pivot="0.5,0.5" anchor="true" size="244,244" type="regular_polygon" lineSize="2" lineColor="#ffff9900" fillColor="#6999ff33" sides="6" distances="0.57,0.82,0.7,0.78,0.61,0.47"/>
-    <graph id="n19_ty2k" name="trapezoid" xy="317,245" size="144,145" type="rect" lineSize="0" lineColor="#ffffffff"/>
+    <graph id="n19_ty2k" name="trapezoid" xy="317,245" size="144,145" type="rect"/>
     <graph id="n21_7376" name="line2" xy="331,468" size="226,8" type="rect" lineSize="0" lineColor="#ff006600" fillColor="#ff0033cc"/>
   </displayList>
 </component>

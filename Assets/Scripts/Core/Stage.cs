@@ -658,7 +658,17 @@ namespace FairyGUI
             else if (evt.rawType == EventType.KeyUp)
             {
                 TouchInfo touch = _touches[0];
+                touch.keyCode = evt.keyCode;
                 touch.modifiers = evt.modifiers;
+                touch.character = evt.character;
+                InputEvent.shiftDown = (evt.modifiers & EventModifiers.Shift) != 0;
+
+                touch.UpdateEvent();
+                DisplayObject f = this.focus;
+                if (f != null)
+                    f.BubbleEvent("onKeyUp", touch.evt);
+                else
+                    DispatchEvent("onKeyUp", touch.evt);
             }
 #if UNITY_2017_1_OR_NEWER
             else if (evt.type == EventType.ScrollWheel)
