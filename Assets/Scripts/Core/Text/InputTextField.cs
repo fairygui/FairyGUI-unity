@@ -1078,7 +1078,7 @@ namespace FairyGUI
                 //Select All
                 case KeyCode.A:
                     {
-                        if (evt.ctrl)
+                        if (evt.ctrl || evt.command)
                         {
                             context.PreventDefault();
                             _selectionStart = 0;
@@ -1090,7 +1090,7 @@ namespace FairyGUI
                 //Copy
                 case KeyCode.C:
                     {
-                        if (evt.ctrl && !_displayAsPassword)
+                        if ((evt.ctrl || evt.command) && !_displayAsPassword)
                         {
                             context.PreventDefault();
                             string s = GetSelection();
@@ -1103,7 +1103,7 @@ namespace FairyGUI
                 //Paste
                 case KeyCode.V:
                     {
-                        if (evt.ctrl)
+                        if (evt.ctrl || evt.command)
                         {
                             context.PreventDefault();
                             DoPaste();
@@ -1114,7 +1114,7 @@ namespace FairyGUI
                 //Cut
                 case KeyCode.X:
                     {
-                        if (evt.ctrl && !_displayAsPassword)
+                        if ((evt.ctrl || evt.command) && !_displayAsPassword)
                         {
                             context.PreventDefault();
                             string s = GetSelection();
@@ -1142,7 +1142,7 @@ namespace FairyGUI
             char c = evt.character;
             if (c != 0)
             {
-                if (evt.ctrl)
+                if (evt.ctrl || evt.command)
                     return;
 
                 if (c == '\r' || (int)c == 3)

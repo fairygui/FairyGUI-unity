@@ -47,7 +47,7 @@ namespace FairyGUI
         /// </summary>
         public int button { get; internal set; }
 
-        internal int clickCount; 
+        public int clickCount { get; internal set; }
         internal static bool shiftDown;
 
         public InputEvent()
@@ -85,14 +85,7 @@ namespace FairyGUI
         {
             get
             {
-                RuntimePlatform rp = Application.platform;
-                bool isMac = (
-                    rp == RuntimePlatform.OSXEditor ||
-                    rp == RuntimePlatform.OSXPlayer);
-
-                return isMac ?
-                    ((modifiers & EventModifiers.Command) != 0) :
-                    ((modifiers & EventModifiers.Control) != 0);
+                return (modifiers & EventModifiers.Control) != 0;
             }
         }
 
@@ -116,6 +109,17 @@ namespace FairyGUI
             get
             {
                 return (modifiers & EventModifiers.Alt) != 0;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool command
+        {
+            get
+            {
+                return (modifiers & EventModifiers.Command) != 0;
             }
         }
     }

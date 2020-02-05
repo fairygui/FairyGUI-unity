@@ -977,7 +977,7 @@ namespace FairyGUI
                         }
                     }
                 }
-                else if (evt.ctrl || selectionMode == ListSelectionMode.Multiple_SingleClick)
+                else if (evt.ctrl || evt.command || selectionMode == ListSelectionMode.Multiple_SingleClick)
                 {
                     button.selected = !button.selected;
                 }
