@@ -11,7 +11,8 @@ namespace FairyGUI
     {
         Destroy,
         Unload,
-        None
+        None,
+        ReleaseTemp
     }
 
     /// <summary>
@@ -377,6 +378,12 @@ namespace FairyGUI
                     Resources.UnloadAsset(_nativeTexture);
                     if (_alphaTexture != null)
                         Resources.UnloadAsset(_alphaTexture);
+                }
+                else if (destroyMethod == DestroyMethod.ReleaseTemp)
+                {
+                    RenderTexture.ReleaseTemporary((RenderTexture)_nativeTexture);
+                    if (_alphaTexture is RenderTexture)
+                        RenderTexture.ReleaseTemporary((RenderTexture)_alphaTexture);
                 }
 
                 _nativeTexture = null;
