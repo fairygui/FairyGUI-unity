@@ -1005,6 +1005,16 @@ namespace FairyGUI
         /// If list layout is single column or flow horizontally, the height will change to fit. 
         /// If list layout is single row or flow vertically, the width will change to fit.
         /// </summary>
+        public void ResizeToFit()
+        {
+            ResizeToFit(int.MaxValue, 0);
+        }
+        
+        /// <summary>
+        /// Resize to list size to fit specified item count. 
+        /// If list layout is single column or flow horizontally, the height will change to fit. 
+        /// If list layout is single row or flow vertically, the width will change to fit.
+        /// </summary>
         /// <param name="itemCount">Item count</param>
         public void ResizeToFit(int itemCount)
         {
