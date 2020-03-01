@@ -176,7 +176,7 @@
     <image id="duef6t" name="h6.png" path="/images/"/>
     <image id="duef6u" name="h7.png" path="/images/"/>
     <image id="duef6v" name="h8.png" path="/images/"/>
-    <image id="duef6w" name="h9.png" path="/images/" atlas="alone_npot"/>
+    <image id="duef6w" name="h9.png" path="/images/"/>
     <component id="l6f46x" name="PopupMenu.xml" path="/popupmenu/" exported="true"/>
     <image id="l6f46y" name="p16_png.png" path="/images/" scale="9grid" scale9grid="7,4,144,49"/>
     <component id="l6f46z" name="PopupMenuItem.xml" path="/popupmenu/"/>
