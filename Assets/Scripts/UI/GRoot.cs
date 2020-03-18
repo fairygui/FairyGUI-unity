@@ -111,8 +111,8 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// Remove a window from stage immediatelly. window.Hide/window.OnHide will never be called.
-        ///立刻关闭一个窗口。不会调用Window.Hide方法，Window.OnHide也不会被调用。
+        /// Remove a window from stage immediatelly. window.Hide/window.DoHideAnimation will never be called.
+        ///立刻关闭一个窗口。不会调用Window.Hide方法，Window.DoHideAnimation也不会被调用。
         /// </summary>
         /// <param name="win"></param>
         public void HideWindowImmediately(Window win)
@@ -121,8 +121,8 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// Remove a window from stage immediatelly. window.Hide/window.OnHide will never be called.
-        /// 立刻关闭一个窗口。不会调用Window.Hide方法，Window.OnHide也不会被调用。
+        /// Remove a window from stage immediatelly. window.Hide/window.DoHideAnimation will never be called.
+        /// 立刻关闭一个窗口。不会调用Window.Hide方法，Window.DoHideAnimation也不会被调用。
         /// </summary>
         /// <param name="win"></param>
         /// <param name="dispose">True to dispose the window.</param>
@@ -163,8 +163,8 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// Display a modal layer and a waiting sign in the front.
-        /// 显示一个半透明层和一个等待标志在最前面。半透明层的颜色可以通过UIConfig.modalLayerColor设定。
+        /// Display a waiting sign in the front.
+        /// 显示一个等待标志在最前面。
         /// 等待标志的资源可以通过UIConfig.globalModalWaiting。等待标志组件会设置为屏幕大小，请内部做好关联。
         /// </summary>
         public void ShowModalWait()
@@ -175,16 +175,16 @@ namespace FairyGUI
                 {
                     _modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.globalModalWaiting);
                     _modalWaitPane.SetHome(this);
+                    _modalWaitPane.AddRelation(this, RelationType.Size);
                 }
                 _modalWaitPane.SetSize(this.width, this.height);
-                _modalWaitPane.AddRelation(this, RelationType.Size);
 
                 AddChild(_modalWaitPane);
             }
         }
 
         /// <summary>
-        /// Hide modal layer and waiting sign.
+        /// Hide waiting sign.
         /// </summary>
         public void CloseModalWait()
         {

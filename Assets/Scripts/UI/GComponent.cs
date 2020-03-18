@@ -1604,7 +1604,15 @@ namespace FairyGUI
                 LuaFunction ctor = _peerTable.GetLuaFunction(funcName);
                 if (ctor != null)
                 {
-                    ctor.Call(this);
+                    try
+                    {
+                        ctor.Call(this);
+                    }
+                    catch (Exception err)
+                    {
+                        Debug.LogError(err);
+                    }
+                    
                     ctor.Dispose();
                     return true;
                 }
