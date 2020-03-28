@@ -392,13 +392,15 @@ namespace FairyGUI
 
                 if (i != cnt - 1)
                 {
-                    if (!(gcom is GComponent))
+                    if (obj is GComponent)
+                        gcom = obj.asCom;
+                    else if (obj is GLoader)
+                        gcom = obj.asLoader.component;
+                    else
                     {
                         obj = null;
                         break;
                     }
-                    else
-                        gcom = (GComponent)obj;
                 }
             }
 
