@@ -80,12 +80,6 @@ namespace FairyGUI
             info.type = relationType;
             info.axis = (relationType <= RelationType.Right_Right || relationType == RelationType.Width || relationType >= RelationType.LeftExt_Left && relationType <= RelationType.RightExt_Right) ? 0 : 1;
             _defs.Add(info);
-
-            //当使用中线关联时，因为需要除以2，很容易因为奇数宽度/高度造成小数点坐标；当使用百分比时，也会造成小数坐标；
-            //所以设置了这类关联的对象，自动启用pixelSnapping
-            if (usePercent || relationType == RelationType.Left_Center || relationType == RelationType.Center_Center || relationType == RelationType.Right_Center
-                    || relationType == RelationType.Top_Middle || relationType == RelationType.Middle_Middle || relationType == RelationType.Bottom_Middle)
-                _owner.pixelSnapping = true;
         }
 
         public void Remove(RelationType relationType)

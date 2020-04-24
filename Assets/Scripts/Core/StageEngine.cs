@@ -39,10 +39,11 @@ namespace FairyGUI
 
         void OnApplicationQuit()
         {
-            beingQuit = true;
-
             if (Application.isEditor)
+            {
+                beingQuit = true;
                 UIPackage.RemoveAllPackages();
+            }
         }
     }
 }

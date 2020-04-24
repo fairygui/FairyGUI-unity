@@ -138,7 +138,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public static int inputCaretSize = 1;
+        public static float inputCaretSize = 1;
 
         /// <summary>
         /// 
@@ -153,7 +153,7 @@ namespace FairyGUI
         /// <summary>
         /// if RenderTexture using in painting mode has depth support.
         /// </summary>
-        public static bool depthSupportForPaintingMode = false;
+        public static bool depthSupportForPaintingMode = true;
 
         /// <summary>
         /// Indicates whether to draw extra 4 or 8 times to achieve stroke effect for textfield.
@@ -161,10 +161,13 @@ namespace FairyGUI
         /// </summary>
         public static bool enhancedTextOutlineEffect = false;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        [Obsolete("No use anymore.")]
         public static VertAlignType richTextRowVerticalAlign = VertAlignType.Bottom;
+
+        /// <summary>
+        /// Suggest to enable it on low dpi (e.g. 96dpi) screens.
+        /// </summary>
+        public static bool makePixelPerfect = false;
 
         public enum ConfigKey
         {
@@ -349,10 +352,6 @@ namespace FairyGUI
                         UIConfig.enhancedTextOutlineEffect = value.b;
                         break;
 
-                    case ConfigKey.RichTextRowVerticalAlign:
-                        UIConfig.richTextRowVerticalAlign = (VertAlignType)value.i;
-                        break;
-
                     case ConfigKey.Branch:
                         UIPackage.branch = value.s;
                         break;
@@ -413,16 +412,8 @@ namespace FairyGUI
                     value.c = new Color32(255, 223, 141, 128);
                     break;
 
-                case ConfigKey.EnhancedTextOutlineEffect:
-                    value.b = true;
-                    break;
-
                 case ConfigKey.DepthSupportForPaintingMode:
                     value.b = false;
-                    break;
-
-                case ConfigKey.RichTextRowVerticalAlign:
-                    value.i = (int)VertAlignType.Bottom;
                     break;
 
                 case ConfigKey.Branch:

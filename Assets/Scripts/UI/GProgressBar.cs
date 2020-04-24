@@ -153,29 +153,17 @@ namespace FairyGUI
                 switch (_titleType)
                 {
                     case ProgressTitleType.Percent:
-#if RTL_TEXT_SUPPORT
                         if (RTLSupport.BaseDirection == RTLSupport.DirectionType.RTL)
-                        {
                             _titleObject.text = "%" + Mathf.FloorToInt(percent * 100);
-                        }
                         else
                             _titleObject.text = Mathf.FloorToInt(percent * 100) + "%";
-#else
-                        _titleObject.text = Mathf.FloorToInt(percent * 100) + "%";
-#endif
                         break;
 
                     case ProgressTitleType.ValueAndMax:
-#if RTL_TEXT_SUPPORT
                         if (RTLSupport.BaseDirection == RTLSupport.DirectionType.RTL)
-                        {
                             _titleObject.text = Math.Round(max) + "/" + Math.Round(newValue);
-                        }
                         else
                             _titleObject.text = Math.Round(newValue) + "/" + Math.Round(max);
-#else
-                        _titleObject.text = Math.Round(newValue) + "/" + Math.Round(max);
-#endif
                         break;
 
                     case ProgressTitleType.Value:

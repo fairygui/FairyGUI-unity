@@ -145,11 +145,11 @@ namespace FairyGUI
             textField.EnsureSizeCorrect();
         }
 
-        override protected void OnSizeChanged(bool widthChanged, bool heightChanged)
+        override protected void OnSizeChanged()
         {
             textField.size = _contentRect.size; //千万不可以调用this.size,后者会触发EnsureSizeCorrect
 
-            base.OnSizeChanged(widthChanged, heightChanged);
+            base.OnSizeChanged();
         }
 
         public override void Update(UpdateContext context)
@@ -161,7 +161,7 @@ namespace FairyGUI
 
         public override void Dispose()
         {
-            if (_disposed)
+            if ((_flags & Flags.Disposed) != 0)
                 return;
 
             CleanupObjects();

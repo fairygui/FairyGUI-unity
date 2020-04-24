@@ -154,12 +154,12 @@ public class EmojiMain : MonoBehaviour
 
     void __clickEmojiBtn1(EventContext context)
     {
-        GRoot.inst.ShowPopup(_emojiSelectUI1, (GObject)context.sender, false);
+        GRoot.inst.ShowPopup(_emojiSelectUI1, (GObject)context.sender, PopupDirection.Up);
     }
 
     void __clickEmojiBtn2(EventContext context)
     {
-        GRoot.inst.ShowPopup(_emojiSelectUI2, (GObject)context.sender, false);
+        GRoot.inst.ShowPopup(_emojiSelectUI2, (GObject)context.sender, PopupDirection.Up);
     }
 
     void __clickEmoji1(EventContext context)

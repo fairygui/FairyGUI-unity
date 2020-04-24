@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -16,11 +17,12 @@ namespace FairyGUI
             public bool soft;
             public Vector4 softness;//left-top-right-bottom
             public uint clipId;
-            public bool stencil;
+            public int rectMaskDepth;
+            public int referenceValue;
+            public bool reversed;
         }
 
         Stack<ClipInfo> _clipStack;
-        int _stencilMaskType;
 
         public bool clipped;
         public ClipInfo clipInfo;
@@ -35,17 +37,16 @@ namespace FairyGUI
         public bool grayed;
 
         public static UpdateContext current;
-        public static uint frameId;
         public static bool working;
-        public static EventCallback0 OnBegin;
-        public static EventCallback0 OnEnd;
 
-        static EventCallback0 _tmpBegin;
+        public static event Action OnBegin;
+        public static event Action OnEnd;
+
+        static Action _tmpBegin;
 
         public UpdateContext()
         {
             _clipStack = new Stack<ClipInfo>();
-            frameId = 1;
         }
 
         /// <summary>
@@ -55,14 +56,10 @@ namespace FairyGUI
         {
             current = this;
 
-            frameId++;
-            if (frameId == 0)
-                frameId = 1;
             renderingOrder = 0;
             batchingDepth = 0;
             rectMaskDepth = 0;
             stencilReferenceValue = 0;
-            _stencilMaskType = 0;
             alpha = 1;
             grayed = false;
 
@@ -112,20 +109,17 @@ namespace FairyGUI
             if (rectMaskDepth > 0)
                 clipRect = ToolSet.Intersection(ref clipInfo.rect, ref clipRect);
 
-            rectMaskDepth++;
-            clipInfo.stencil = false;
             clipped = true;
-
+            clipInfo.rectMaskDepth = ++rectMaskDepth;
             /* clipPos = xy * clipBox.zw + clipBox.xy
                 * 利用这个公式，使clipPos变为当前顶点距离剪切区域中心的距离值，剪切区域的大小为2x2
                 * 那么abs(clipPos)>1的都是在剪切区域外
                 */
-
             clipInfo.rect = clipRect;
-            clipRect.x = clipRect.x + clipRect.width / 2f;
-            clipRect.y = clipRect.y + clipRect.height / 2f;
-            clipRect.width /= 2f;
-            clipRect.height /= 2f;
+            clipRect.x = clipRect.x + clipRect.width * 0.5f;
+            clipRect.y = clipRect.y + clipRect.height * 0.5f;
+            clipRect.width *= 0.5f;
+            clipRect.height *= 0.5f;
             if (clipRect.width == 0 || clipRect.height == 0)
                 clipInfo.clipBox = new Vector4(-2, -2, 0, 0);
             else
@@ -170,8 +164,6 @@ namespace FairyGUI
         {
             _clipStack.Push(clipInfo);
 
-            bool prevMaskIsReversed = (_stencilMaskType & stencilReferenceValue) != 0;
-
             if (stencilReferenceValue == 0)
                 stencilReferenceValue = 1;
             else
@@ -179,9 +171,7 @@ namespace FairyGUI
 
             if (reversedMask)
             {
-                _stencilMaskType |= stencilReferenceValue;
-
-                if (prevMaskIsReversed)
+                if (clipInfo.reversed)
                     stencilCompareValue = (stencilReferenceValue >> 1) - 1;
                 else
                     stencilCompareValue = stencilReferenceValue - 1;
@@ -190,7 +180,8 @@ namespace FairyGUI
                 stencilCompareValue = (stencilReferenceValue << 1) - 1;
 
             clipInfo.clipId = clipId;
-            clipInfo.stencil = true;
+            clipInfo.referenceValue = stencilReferenceValue;
+            clipInfo.reversed = reversedMask;
             clipped = true;
         }
 
@@ -199,23 +190,118 @@ namespace FairyGUI
         /// </summary>
         public void LeaveClipping()
         {
-            if (clipInfo.stencil)
-            {
-                _stencilMaskType &= ~stencilReferenceValue;
-                stencilReferenceValue = stencilReferenceValue >> 1;
-            }
-            else
-                rectMaskDepth--;
-
             clipInfo = _clipStack.Pop();
-            clipped = _clipStack.Count > 0;
+            stencilReferenceValue = clipInfo.referenceValue;
+            rectMaskDepth = clipInfo.rectMaskDepth;
+            clipped = stencilReferenceValue != 0 || rectMaskDepth != 0;
         }
 
-        public bool isStencilReversing
+        public void EnterPaintingMode()
         {
-            get
+            //Reset clipping
+            _clipStack.Push(clipInfo);
+
+            clipInfo.rectMaskDepth = 0;
+            clipInfo.referenceValue = 0;
+            clipInfo.reversed = false;
+            clipped = false;
+        }
+
+        public void LeavePaintingMode()
+        {
+            clipInfo = _clipStack.Pop();
+            stencilReferenceValue = clipInfo.referenceValue;
+            rectMaskDepth = clipInfo.rectMaskDepth;
+            clipped = stencilReferenceValue != 0 || rectMaskDepth != 0;
+        }
+
+        public void ApplyClippingProperties(Material mat, bool isStdMaterial)
+        {
+            if (rectMaskDepth > 0) //在矩形剪裁下，且不是遮罩对象
             {
-                return (_stencilMaskType & (stencilReferenceValue >> 1)) != 0;
+                mat.SetVector(ShaderConfig.ID_ClipBox, clipInfo.clipBox);
+                if (clipInfo.soft)
+                    mat.SetVector(ShaderConfig.ID_ClipSoftness, clipInfo.softness);
+            }
+
+            if (stencilReferenceValue > 0)
+            {
+                mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+                mat.SetInt(ShaderConfig.ID_Stencil, stencilCompareValue);
+                mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
+                mat.SetInt(ShaderConfig.ID_StencilReadMask, stencilReferenceValue | (stencilReferenceValue - 1));
+                mat.SetInt(ShaderConfig.ID_ColorMask, 15);
+            }
+            else
+            {
+                mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
+                mat.SetInt(ShaderConfig.ID_Stencil, 0);
+                mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
+                mat.SetInt(ShaderConfig.ID_StencilReadMask, 255);
+                mat.SetInt(ShaderConfig.ID_ColorMask, 15);
+            }
+
+            if (!isStdMaterial)
+            {
+                if (rectMaskDepth > 0)
+                {
+                    if (clipInfo.soft)
+                        mat.EnableKeyword("SOFT_CLIPPED");
+                    else
+                        mat.EnableKeyword("CLIPPED");
+                }
+                else
+                {
+                    mat.DisableKeyword("CLIPPED");
+                    mat.DisableKeyword("SOFT_CLIPPED");
+                }
+            }
+        }
+
+        public void ApplyAlphaMaskProperties(Material mat, bool erasing)
+        {
+            if (!erasing)
+            {
+                if (stencilReferenceValue == 1)
+                {
+                    mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
+                    mat.SetInt(ShaderConfig.ID_Stencil, 1);
+                    mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+                    mat.SetInt(ShaderConfig.ID_StencilReadMask, 255);
+                    mat.SetInt(ShaderConfig.ID_ColorMask, 0);
+                }
+                else
+                {
+                    if (stencilReferenceValue != 0 & _clipStack.Peek().reversed)
+                        mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.NotEqual);
+                    else
+                        mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+                    mat.SetInt(ShaderConfig.ID_Stencil, stencilReferenceValue | (stencilReferenceValue - 1));
+                    mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+                    mat.SetInt(ShaderConfig.ID_StencilReadMask, stencilReferenceValue - 1);
+                    mat.SetInt(ShaderConfig.ID_ColorMask, 0);
+                }
+            }
+            else
+            {
+                if (stencilReferenceValue != 0 & _clipStack.Peek().reversed)
+                {
+                    int refValue = stencilReferenceValue | (stencilReferenceValue - 1);
+                    mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+                    mat.SetInt(ShaderConfig.ID_Stencil, refValue);
+                    mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Zero);
+                    mat.SetInt(ShaderConfig.ID_StencilReadMask, refValue);
+                    mat.SetInt(ShaderConfig.ID_ColorMask, 0);
+                }
+                else
+                {
+                    int refValue = stencilReferenceValue - 1;
+                    mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
+                    mat.SetInt(ShaderConfig.ID_Stencil, refValue);
+                    mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Replace);
+                    mat.SetInt(ShaderConfig.ID_StencilReadMask, refValue);
+                    mat.SetInt(ShaderConfig.ID_ColorMask, 0);
+                }
             }
         }
     }

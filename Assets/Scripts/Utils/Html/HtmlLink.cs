@@ -18,6 +18,7 @@ namespace FairyGUI.Utils
         {
             _shape = new SelectionShape();
             _shape.gameObject.name = "HtmlLink";
+            _shape.cursor = "text-link";
 
             _clickHandler = (EventContext context) =>
             {

@@ -9,12 +9,11 @@ namespace FairyGUI
     public class HitTestContext
     {
         //set before hit test
-        public static Vector2 screenPoint;
+        public static Vector3 screenPoint;
         public static Vector3 worldPoint;
         public static Vector3 direction;
         public static bool forTouch;
         public static Camera camera;
-        public static int displayIndex;
 
         public static int layerMask = -1;
         public static float maxDistance = Mathf.Infinity;
@@ -34,7 +33,7 @@ namespace FairyGUI
             RaycastHit? hitRef;
             if (!raycastHits.TryGetValue(camera, out hitRef))
             {
-                Ray ray = camera.ScreenPointToRay(HitTestContext.screenPoint);
+                Ray ray = camera.ScreenPointToRay(screenPoint);
                 if (Physics.Raycast(ray, out hit, maxDistance, layerMask))
                 {
                     raycastHits[camera] = hit;

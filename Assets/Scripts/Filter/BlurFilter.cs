@@ -34,7 +34,7 @@ namespace FairyGUI
                 _target.onPaint += OnRenderImage;
 
                 _blitMaterial = new Material(ShaderConfig.GetShader("FairyGUI/BlurFilter"));
-                _blitMaterial.hideFlags = DisplayOptions.hideFlags;
+                _blitMaterial.hideFlags = DisplayObject.hideFlags;
             }
         }
 

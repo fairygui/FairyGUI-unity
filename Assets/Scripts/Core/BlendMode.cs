@@ -21,6 +21,7 @@ namespace FairyGUI
         Mask,
         Below,
         Off,
+        One_OneMinusSrcAlpha,
         Custom1,
         Custom2,
         Custom3
@@ -66,6 +67,8 @@ namespace FairyGUI
             new BlendFactor(NativeBlendMode.OneMinusDstAlpha, NativeBlendMode.DstAlpha),
             //Off
             new BlendFactor(NativeBlendMode.One, NativeBlendMode.Zero),
+            //One_OneMinusSrcAlpha
+            new BlendFactor(NativeBlendMode.One, NativeBlendMode.OneMinusSrcAlpha),
             //Custom1
             new BlendFactor(NativeBlendMode.SrcAlpha, NativeBlendMode.OneMinusSrcAlpha),
             //Custom2
@@ -82,13 +85,13 @@ namespace FairyGUI
         public static void Apply(Material mat, BlendMode blendMode)
         {
             BlendFactor bf = Factors[(int)blendMode];
-            mat.SetFloat(ShaderConfig._properyIDs._BlendSrcFactor, (float)bf.srcFactor);
-            mat.SetFloat(ShaderConfig._properyIDs._BlendDstFactor, (float)bf.dstFactor);
+            mat.SetFloat(ShaderConfig.ID_BlendSrcFactor, (float)bf.srcFactor);
+            mat.SetFloat(ShaderConfig.ID_BlendDstFactor, (float)bf.dstFactor);
 
             if (bf.pma)
-                mat.SetFloat(ShaderConfig._properyIDs._ColorOption, 1);
+                mat.SetFloat(ShaderConfig.ID_ColorOption, 1);
             else
-                mat.SetFloat(ShaderConfig._properyIDs._ColorOption, 0);
+                mat.SetFloat(ShaderConfig.ID_ColorOption, 0);
         }
 
         /// <summary>

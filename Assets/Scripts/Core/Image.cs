@@ -24,7 +24,7 @@ namespace FairyGUI
         public Image(NTexture texture)
             : base()
         {
-            _touchDisabled = true;
+            _flags |= Flags.TouchDisabled;
 
             CreateGameObject("Image");
             graphics = new NGraphics(gameObject);

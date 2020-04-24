@@ -1,4 +1,5 @@
-﻿using FairyGUI.Utils;
+﻿using System;
+using FairyGUI.Utils;
 using UnityEngine;
 
 namespace FairyGUI
@@ -25,7 +26,7 @@ namespace FairyGUI
         int _numChildren;
         internal int _updating;
 
-        EventCallback0 _refreshDelegate;
+        Action _refreshDelegate;
 
         public GGroup()
         {
@@ -201,7 +202,7 @@ namespace FairyGUI
             for (i = 0; i < cnt; i++)
             {
                 child = parent.GetChildAt(i);
-                if (child.group != this || _excludeInvisibles && !child.internalVisible3)
+                if (child.group != this)
                     continue;
 
                 tmp = child.xMin;

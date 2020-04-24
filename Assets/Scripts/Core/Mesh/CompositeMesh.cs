@@ -27,7 +27,7 @@ namespace FairyGUI
         public void OnPopulateMesh(VertexBuffer vb)
         {
             int cnt = elements.Count;
-            if (cnt == 0)
+            if (cnt == 1)
                 elements[0].OnPopulateMesh(vb);
             else
             {

@@ -66,7 +66,7 @@ namespace FairyGUI
         public void OnPopulateMesh(VertexBuffer vb)
         {
             int count = rects.Count;
-            if (count == 0)
+            if (count == 0 || this.color == Color.clear)
                 return;
 
             for (int i = 0; i < count; i++)

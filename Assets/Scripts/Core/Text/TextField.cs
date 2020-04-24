@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using FairyGUI.Utils;
@@ -18,14 +19,8 @@ namespace FairyGUI
         bool _wordWrap;
         bool _singleLine;
         bool _html;
-#if RTL_TEXT_SUPPORT
-        RTLSupport.DirectionType _textDirection = RTLSupport.DirectionType.UNKNOW;
-#endif
+        RTLSupport.DirectionType _textDirection;
         int _maxWidth;
-
-        int _stroke;
-        Color _strokeColor;
-        Vector2 _shadowOffset;
 
         List<HtmlElement> _elements;
         List<LineInfo> _lines;
@@ -34,18 +29,19 @@ namespace FairyGUI
         BaseFont _font;
         float _textWidth;
         float _textHeight;
-        float _minHeight;
         bool _textChanged;
-        int _yOffset;
+        float _yOffset;
         float _fontSizeScale;
         float _renderScale;
+        int _fontVersion;
+        Vector3 _lastPixelPerfectPos;
         string _parsedText;
-        bool _updatingSize; //防止重复调用BuildLines
 
         RichTextField _richTextField;
 
         const int GUTTER_X = 2;
         const int GUTTER_Y = 2;
+        const float IMAGE_BASELINE = 0.8f;
         static float[] STROKE_OFFSET = new float[]
         {
              -1, 0, 1, 0,
@@ -53,18 +49,13 @@ namespace FairyGUI
             -1, -1, 1, -1,
             -1, 1, 1, 1
         };
-        static float[] BOLD_OFFSET = new float[]
-        {
-            -0.5f, 0f, 0.5f, 0f,
-            0f, -0.5f, 0f, 0.5f
-        };
+        static List<LineCharInfo> sLineChars = new List<LineCharInfo>();
 
         public TextField()
         {
-            _touchDisabled = true;
+            _flags |= Flags.TouchDisabled;
 
             _textFormat = new TextFormat();
-            _strokeColor = Color.black;
             _fontSizeScale = 1;
             _renderScale = UIContentScaler.scaleFactor;
 
@@ -108,18 +99,28 @@ namespace FairyGUI
             set
             {
                 _textFormat = value;
-
-                string fontName = _textFormat.font;
-                if (string.IsNullOrEmpty(fontName))
-                    fontName = UIConfig.defaultFont;
-                if (_font == null || _font.name != fontName)
-                {
-                    _font = FontManager.GetFont(fontName);
-                    graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
-                }
-                if (!string.IsNullOrEmpty(_text))
-                    _textChanged = true;
+                ApplyFormat();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ApplyFormat()
+        {
+            string fontName = _textFormat.font;
+            if (string.IsNullOrEmpty(fontName))
+                fontName = UIConfig.defaultFont;
+            BaseFont newFont = FontManager.GetFont(fontName);
+            if (_font != newFont)
+            {
+                _font = newFont;
+                _fontVersion = _font.version;
+                graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+            }
+
+            if (!string.IsNullOrEmpty(_text))
+                _textChanged = true;
         }
 
         /// <summary>
@@ -153,7 +154,8 @@ namespace FairyGUI
                 if (_verticalAlign != value)
                 {
                     _verticalAlign = value;
-                    ApplyVertAlign();
+                    if (!_textChanged)
+                        ApplyVertAlign();
                 }
             }
         }
@@ -166,6 +168,9 @@ namespace FairyGUI
             get { return _text; }
             set
             {
+                if (_text == value && !_html)
+                    return;
+
                 _text = value;
                 _textChanged = true;
                 _html = false;
@@ -180,6 +185,9 @@ namespace FairyGUI
             get { return _text; }
             set
             {
+                if (_text == value && _html)
+                    return;
+
                 _text = value;
                 _textChanged = true;
                 _html = true;
@@ -215,8 +223,11 @@ namespace FairyGUI
             get { return _wordWrap; }
             set
             {
-                _wordWrap = value;
-                _textChanged = true;
+                if (_wordWrap != value)
+                {
+                    _wordWrap = value;
+                    _textChanged = true;
+                }
             }
         }
 
@@ -228,25 +239,28 @@ namespace FairyGUI
             get { return _singleLine; }
             set
             {
-                _singleLine = value;
-                _textChanged = true;
+                if (_singleLine != value)
+                {
+                    _singleLine = value;
+                    _textChanged = true;
+                }
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public int stroke
+        public float stroke
         {
             get
             {
-                return _stroke;
+                return _textFormat.outline;
             }
             set
             {
-                if (_stroke != value)
+                if (_textFormat.outline != value)
                 {
-                    _stroke = value;
+                    _textFormat.outline = value;
                     graphics.SetMeshDirty();
                 }
             }
@@ -259,13 +273,13 @@ namespace FairyGUI
         {
             get
             {
-                return _strokeColor;
+                return _textFormat.outlineColor;
             }
             set
             {
-                if (_strokeColor != value)
+                if (_textFormat.outlineColor != value)
                 {
-                    _strokeColor = value;
+                    _textFormat.outlineColor = value;
                     graphics.SetMeshDirty();
                 }
             }
@@ -278,11 +292,11 @@ namespace FairyGUI
         {
             get
             {
-                return _shadowOffset;
+                return _textFormat.shadowOffset;
             }
             set
             {
-                _shadowOffset = value;
+                _textFormat.shadowOffset = value;
                 graphics.SetMeshDirty();
             }
         }
@@ -392,18 +406,27 @@ namespace FairyGUI
             {
                 _font = FontManager.GetFont(UIConfig.defaultFont);
                 graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+                _fontVersion = _font.version;
                 _textChanged = true;
             }
 
             if (_font.keepCrisp && _renderScale != UIContentScaler.scaleFactor)
                 _textChanged = true;
 
-            if (_font.mainTexture != graphics.texture)
+            if (_font.version != _fontVersion)
             {
+                _fontVersion = _font.version;
+                if (_font.mainTexture != graphics.texture)
+                {
+                    graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+                    InvalidateBatchingState();
+                }
+
                 if (!_textChanged)
+                {
                     RequestText();
-                graphics.texture = _font.mainTexture;
-                InvalidateBatchingState();
+                    graphics.SetMeshDirty();
+                }
             }
 
             if (_textChanged)
@@ -480,13 +503,11 @@ namespace FairyGUI
             }
         }
 
-        override protected void OnSizeChanged(bool widthChanged, bool heightChanged)
+        override protected void OnSizeChanged()
         {
-            if (!_updatingSize)
+            if ((_flags & Flags.UpdatingSize) == 0)
             {
-                _minHeight = _contentRect.height;
-
-                if (_wordWrap && widthChanged)
+                if (_autoSize == AutoSizeType.Shrink || _wordWrap && (_flags & Flags.WidthChanged) != 0)
                     _textChanged = true;
                 else if (_autoSize != AutoSizeType.None)
                     graphics.SetMeshDirty();
@@ -495,7 +516,7 @@ namespace FairyGUI
                     ApplyVertAlign();
             }
 
-            base.OnSizeChanged(widthChanged, heightChanged);
+            base.OnSizeChanged();
         }
 
         public override void EnsureSizeCorrect()
@@ -508,6 +529,7 @@ namespace FairyGUI
         {
             if (_richTextField == null) //如果是richTextField，会在update前主动调用了Redraw
                 Redraw();
+
             base.Update(context);
         }
 
@@ -520,7 +542,6 @@ namespace FairyGUI
             {
                 _font.SetFormat(_textFormat, _fontSizeScale);
                 _font.PrepareCharacters(_parsedText);
-                _font.PrepareCharacters("_-*");
             }
             else
             {
@@ -532,17 +553,20 @@ namespace FairyGUI
                     {
                         _font.SetFormat(element.format, _fontSizeScale);
                         _font.PrepareCharacters(element.text);
-                        _font.PrepareCharacters("_-*");
                     }
                 }
             }
-
-            if ((_font is DynamicFont) && DynamicFont.textRebuildFlag)
-                graphics.texture = _font.mainTexture;
         }
 
         void BuildLines()
         {
+            if (_font == null)
+            {
+                _font = FontManager.GetFont(UIConfig.defaultFont);
+                _fontVersion = _font.version;
+                graphics.SetShaderAndTexture(_font.shader, _font.mainTexture);
+            }
+
             _textChanged = false;
             graphics.SetMeshDirty();
             _renderScale = UIContentScaler.scaleFactor;
@@ -553,7 +577,8 @@ namespace FairyGUI
             if (_text.Length == 0)
             {
                 LineInfo emptyLine = LineInfo.Borrow();
-                emptyLine.width = emptyLine.height = 0;
+                emptyLine.width = 0;
+                emptyLine.height = _font.GetLineHeight(_textFormat.size);
                 emptyLine.charIndex = emptyLine.charCount = 0;
                 emptyLine.y = emptyLine.y2 = GUTTER_Y;
                 _lines.Add(emptyLine);
@@ -569,28 +594,39 @@ namespace FairyGUI
                     DoShrink();
             }
 
-            if (!_input && _autoSize == AutoSizeType.Both)
+            if (_autoSize == AutoSizeType.Both)
             {
-                _updatingSize = true;
+                _flags |= Flags.UpdatingSize;
                 if (_richTextField != null)
-                    _richTextField.SetSize(_textWidth, _textHeight);
+                {
+                    if (_input)
+                    {
+                        float w = Mathf.Max(_textFormat.size, _textWidth);
+                        float h = Mathf.Max(_font.GetLineHeight(_textFormat.size) + GUTTER_Y * 2, _textHeight);
+                        _richTextField.SetSize(w, h);
+                    }
+                    else
+                        _richTextField.SetSize(_textWidth, _textHeight);
+                }
                 else
                     SetSize(_textWidth, _textHeight);
                 InvalidateBatchingState();
-                _updatingSize = false;
+                _flags &= ~Flags.UpdatingSize;
             }
             else if (_autoSize == AutoSizeType.Height)
             {
-                _updatingSize = true;
-                float h = _textHeight;
-                if (_input && h < _minHeight)
-                    h = _minHeight;
+                _flags |= Flags.UpdatingSize;
                 if (_richTextField != null)
-                    _richTextField.height = h;
+                {
+                    if (_input)
+                        _richTextField.height = Mathf.Max(_font.GetLineHeight(_textFormat.size) + GUTTER_Y * 2, _textHeight);
+                    else
+                        _richTextField.height = _textHeight;
+                }
                 else
-                    this.height = h;
+                    this.height = _textHeight;
                 InvalidateBatchingState();
-                _updatingSize = false;
+                _flags &= ~Flags.UpdatingSize;
             }
 
             _yOffset = 0;
@@ -615,10 +651,8 @@ namespace FairyGUI
             int elementCount = _elements.Count;
             if (elementCount == 0)
             {
-#if RTL_TEXT_SUPPORT
                 if (_textDirection != RTLSupport.DirectionType.UNKNOW)
                     _parsedText = RTLSupport.DoMapping(_parsedText);
-#endif
 
                 bool flag = _input || _richTextField != null && _richTextField.emojies != null;
                 if (!flag)
@@ -628,7 +662,7 @@ namespace FairyGUI
                     for (int i = 0; i < cnt; i++)
                     {
                         char ch = _parsedText[i];
-                        if (ch == '\r' || ch == '\t' || char.IsHighSurrogate(ch))
+                        if (ch == '\r' || char.IsHighSurrogate(ch))
                         {
                             flag = true;
                             break;
@@ -654,10 +688,9 @@ namespace FairyGUI
                     element.charIndex = buffer.Length;
                     if (element.type == HtmlElementType.Text)
                     {
-#if RTL_TEXT_SUPPORT
                         if (_textDirection != RTLSupport.DirectionType.UNKNOW)
                             element.text = RTLSupport.DoMapping(element.text);
-#endif
+
                         i = ParseText(buffer, element.text, i);
                         elementCount = _elements.Count;
                     }
@@ -666,44 +699,31 @@ namespace FairyGUI
                     i++;
                 }
                 _parsedText = buffer.ToString();
+
 #if RTL_TEXT_SUPPORT
-                _textDirection = RTLSupport.DetectTextDirection(_parsedText);   // element.text拼接完后再进行一次判断文本主语序，避免html标签存在把文本变成混合文本 [2018/12/12/ 16:47:42 by aq_1000]
+                // element.text拼接完后再进行一次判断文本主语序，避免html标签存在把文本变成混合文本 [2018/12/12/ 16:47:42 by aq_1000]
+                _textDirection = RTLSupport.DetectTextDirection(_parsedText);
 #endif
             }
         }
 
         void BuildLines2()
         {
-            int letterSpacing = _textFormat.letterSpacing;
-            int lineSpacing = _textFormat.lineSpacing - 1;
+            float letterSpacing = _textFormat.letterSpacing * _fontSizeScale;
+            float lineSpacing = (_textFormat.lineSpacing - 1) * _fontSizeScale;
             float rectWidth = _contentRect.width - GUTTER_X * 2;
-            float glyphWidth = 0, glyphHeight = 0;
-            short wordChars = 0;
-            float wordStart = 0;
+            float glyphWidth = 0, glyphHeight = 0, baseline = 0;
+            short wordLen = 0;
             bool wordPossible = false;
-            int supSpace = 0, subSpace = 0;
+            float posx = 0;
 
             TextFormat format = _textFormat;
             _font.SetFormat(format, _fontSizeScale);
-            bool wrap;
-            if (_input)
+            bool wrap = _wordWrap && !_singleLine;
+            if (_maxWidth > 0)
             {
-#if RTL_TEXT_SUPPORT
-                if (_textDirection == RTLSupport.DirectionType.UNKNOW)
-                    letterSpacing++;
-#else
-                letterSpacing++;
-#endif
-                wrap = !_singleLine;
-            }
-            else
-            {
-                wrap = _wordWrap && !_singleLine;
-                if (_maxWidth > 0)
-                {
-                    wrap = true;
-                    rectWidth = _maxWidth - GUTTER_X * 2;
-                }
+                wrap = true;
+                rectWidth = _maxWidth - GUTTER_X * 2;
             }
             _textWidth = _textHeight = 0;
 
@@ -719,12 +739,13 @@ namespace FairyGUI
             LineInfo line = LineInfo.Borrow();
             _lines.Add(line);
             line.y = line.y2 = GUTTER_Y;
+            sLineChars.Clear();
 
             for (int charIndex = 0; charIndex < textLength; charIndex++)
             {
                 char ch = _parsedText[charIndex];
 
-                glyphWidth = glyphHeight = 0;
+                glyphWidth = glyphHeight = baseline = 0;
 
                 while (element != null && element.charIndex == charIndex)
                 {
@@ -744,14 +765,13 @@ namespace FairyGUI
                         }
                         if (htmlObject != null)
                         {
-                            glyphWidth = (int)htmlObject.width;
-                            glyphHeight = (int)htmlObject.height;
-
-                            glyphWidth += 2;
+                            glyphWidth = htmlObject.width + 2;
+                            glyphHeight = htmlObject.height;
+                            baseline = glyphHeight * IMAGE_BASELINE;
                         }
 
                         if (element.isEntity)
-                            ch = '\0'; //字符只是用作占位，不需要显示
+                            ch = '\0'; //indicate it is a place holder
                     }
 
                     elementIndex++;
@@ -761,75 +781,91 @@ namespace FairyGUI
                         element = null;
                 }
 
-                line.charCount++;
                 if (ch == '\0' || ch == '\n')
                 {
-                    wordChars = 0;
                     wordPossible = false;
                 }
-                else
+                else if (_font.GetGlyph(ch == '\t' ? ' ' : ch, out glyphWidth, out glyphHeight, out baseline))
                 {
-                    if (char.IsWhiteSpace(ch))
+                    if (ch == '\t')
+                        glyphWidth *= 4;
+
+                    if (wordPossible)
                     {
-                        wordChars = 0;
+                        if (char.IsWhiteSpace(ch))
+                        {
+                            wordLen = 0;
+                        }
+                        else if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z'
+                            || ch >= '0' && ch <= '9'
+                            || ch == '.' || ch == '"' || ch == '\''
+                            || format.specialStyle == TextFormat.SpecialStyle.Subscript
+                            || format.specialStyle == TextFormat.SpecialStyle.Superscript
+                            || _textDirection != RTLSupport.DirectionType.UNKNOW && RTLSupport.IsArabicLetter(ch))
+                        {
+                            wordLen++;
+                        }
+                        else
+                            wordPossible = false;
+                    }
+                    else if (char.IsWhiteSpace(ch))
+                    {
+                        wordLen = 0;
                         wordPossible = true;
                     }
-                    else if (wordPossible && (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '.' || ch == '"' || ch == '\''
-#if RTL_TEXT_SUPPORT
-                        || (_textDirection != RTLSupport.DirectionType.UNKNOW && RTLSupport.IsArabicLetter(ch))
-#endif
-                    ))
+                    else if (format.specialStyle == TextFormat.SpecialStyle.Subscript
+                        || format.specialStyle == TextFormat.SpecialStyle.Superscript)
                     {
-                        if (wordChars == 0)
-                            wordStart = line.width;
-                        else if (wordChars > 10)
-                            wordChars = short.MinValue;
-
-                        wordChars++;
+                        if (sLineChars.Count > 0)
+                        {
+                            wordLen = 2; //避免上标和下标折到下一行
+                            wordPossible = true;
+                        }
                     }
                     else
-                    {
-                        wordChars = 0;
                         wordPossible = false;
-                    }
+                }
+                else
+                    wordPossible = false;
 
-                    if (_font.GetGlyphSize(ch, out glyphWidth, out glyphHeight))
-                    {
-                        if (glyphHeight > line.textHeight)
-                            line.textHeight = glyphHeight;
-
-                        if (format.specialStyle == TextFormat.SpecialStyle.Subscript)
-                            subSpace = (int)(glyphHeight * 0.333f);
-                        else if (format.specialStyle == TextFormat.SpecialStyle.Superscript)
-                            supSpace = (int)(glyphHeight * 0.333f);
-                    }
+                sLineChars.Add(new LineCharInfo() { width = glyphWidth, height = glyphHeight, baseline = baseline });
+                if (glyphWidth != 0)
+                {
+                    if (posx != 0)
+                        posx += letterSpacing;
+                    posx += glyphWidth;
                 }
 
-                if (glyphWidth > 0)
+                if (ch == '\n' && !_singleLine)
                 {
-                    if (glyphHeight > line.height)
-                        line.height = glyphHeight;
+                    UpdateLineInfo(line, letterSpacing, sLineChars.Count);
 
-                    if (line.width != 0)
-                        line.width += letterSpacing;
-                    line.width += glyphWidth;
+                    LineInfo newLine = LineInfo.Borrow();
+                    _lines.Add(newLine);
+                    newLine.y = line.y + (line.height + lineSpacing);
+                    if (newLine.y < GUTTER_Y) //lineSpacing maybe negative
+                        newLine.y = GUTTER_Y;
+                    newLine.y2 = newLine.y;
+                    newLine.charIndex = line.charIndex + line.charCount;
+
+                    sLineChars.Clear();
+                    wordPossible = false;
+                    posx = 0;
+                    line = newLine;
                 }
-
-                if (ch == '\n' || wrap && line.width > rectWidth && format.specialStyle == TextFormat.SpecialStyle.None)
+                else if (wrap && posx > rectWidth)
                 {
-                    if (line.textHeight == 0)
-                    {
-                        if (line.height == 0)
-                        {
-                            if (_lines.Count == 1)
-                                line.height = format.size;
-                            else
-                                line.height = _lines[_lines.Count - 2].height;
-                        }
-                        line.textHeight = line.height;
-                    }
-                    if (supSpace != 0)
-                        line.height = Mathf.Max(line.textHeight + supSpace, line.height);
+                    int lineCharCount = sLineChars.Count;
+                    int toMoveChars;
+
+                    if (wordPossible && wordLen < 20 && lineCharCount > 2) //if word had broken, move word to new line
+                        toMoveChars = wordLen;
+                    else if (lineCharCount != 1) //only one char here, we cant move it to new line
+                        toMoveChars = 1;
+                    else
+                        toMoveChars = 0;
+
+                    UpdateLineInfo(line, letterSpacing, lineCharCount - toMoveChars);
 
                     LineInfo newLine = LineInfo.Borrow();
                     _lines.Add(newLine);
@@ -837,74 +873,73 @@ namespace FairyGUI
                     if (newLine.y < GUTTER_Y)
                         newLine.y = GUTTER_Y;
                     newLine.y2 = newLine.y;
-
-                    if (ch == '\n' || line.charCount == 1) //the line cannt fit even a char
-                    {
-                        wordChars = 0;
-                        wordPossible = false;
-                    }
-                    else if (wordChars > 0 && wordStart > 0) //if word had broken, move it to new line
-                    {
-                        newLine.charCount = wordChars;
-                        newLine.width = line.width - wordStart;
-                        newLine.height = line.textHeight;
-                        newLine.textHeight = line.textHeight;
-
-                        line.charCount -= wordChars;
-                        line.width = wordStart;
-
-                        wordStart = 0;
-                    }
-                    else //move last char to new line
-                    {
-                        newLine.charCount = 1;
-                        newLine.width = glyphWidth;
-                        newLine.height = glyphHeight;
-                        if (ch != '\0')
-                            newLine.textHeight = newLine.height;
-
-                        line.charCount -= 1;
-                        line.width = line.width - (glyphWidth + letterSpacing);
-
-                        wordChars = 0;
-                        wordPossible = false;
-                    }
-
                     newLine.charIndex = line.charIndex + line.charCount;
-                    if (line.width > _textWidth)
-                        _textWidth = line.width;
 
-                    if (subSpace != 0 && subSpace > lineSpacing)
-                        supSpace = subSpace - (lineSpacing > 0 ? lineSpacing : 0);
-                    subSpace = 0;
+                    posx = 0;
+                    if (toMoveChars != 0)
+                    {
+                        for (int i = line.charCount; i < lineCharCount; i++)
+                        {
+                            LineCharInfo ci = sLineChars[i];
+                            if (posx != 0)
+                                posx += letterSpacing;
+                            posx += ci.width;
+                        }
 
+                        sLineChars.RemoveRange(0, line.charCount);
+                    }
+                    else
+                        sLineChars.Clear();
+
+                    wordPossible = false;
                     line = newLine;
                 }
             }
 
-            line = _lines[_lines.Count - 1];
-            if (line.textHeight == 0)
-            {
-                if (line.height == 0)
-                {
-                    if (_lines.Count == 1)
-                        line.height = format.size;
-                    else
-                        line.height = _lines[_lines.Count - 2].height;
-                }
-                line.textHeight = line.height;
-            }
-            if (subSpace > 0)
-                line.height += subSpace;
+            UpdateLineInfo(line, letterSpacing, sLineChars.Count);
 
-            if (line.width > _textWidth)
-                _textWidth = line.width;
             if (_textWidth > 0)
                 _textWidth += GUTTER_X * 2;
             _textHeight = line.y + line.height + GUTTER_Y;
 
-            _textWidth = Mathf.CeilToInt(_textWidth);
-            _textHeight = Mathf.CeilToInt(_textHeight);
+            _textWidth = Mathf.RoundToInt(_textWidth);
+            _textHeight = Mathf.RoundToInt(_textHeight);
+        }
+
+        void UpdateLineInfo(LineInfo line, float letterSpacing, int cnt)
+        {
+            for (int i = 0; i < cnt; i++)
+            {
+                LineCharInfo ci = sLineChars[i];
+                if (ci.baseline > line.baseline)
+                {
+                    line.height += (ci.baseline - line.baseline);
+                    line.baseline = ci.baseline;
+                }
+
+                if (ci.height - ci.baseline > line.height - line.baseline)
+                    line.height += (ci.height - ci.baseline - (line.height - line.baseline));
+
+                if (ci.width > 0)
+                {
+                    if (line.width != 0)
+                        line.width += letterSpacing;
+                    line.width += ci.width;
+                }
+            }
+
+            if (line.height == 0)
+            {
+                if (_lines.Count == 1)
+                    line.height = _textFormat.size;
+                else
+                    line.height = _lines[_lines.Count - 2].height;
+            }
+
+            if (line.width > _textWidth)
+                _textWidth = line.width;
+
+            line.charCount = (short)cnt;
         }
 
         void DoShrink()
@@ -973,12 +1008,6 @@ namespace FairyGUI
                     appendPos = j + 1;
                     buffer.Append('\n');
                 }
-                else if (ch == '\t')
-                {
-                    buffer.Append(source, appendPos, j - appendPos);
-                    appendPos = j + 1;
-                    buffer.Append(' ');
-                }
                 else
                 {
                     bool highSurrogate = char.IsHighSurrogate(ch);
@@ -1042,51 +1071,38 @@ namespace FairyGUI
                 return;
             }
 
-            int letterSpacing = _textFormat.letterSpacing;
-            float rectWidth = _contentRect.width - GUTTER_X * 2;
+            float letterSpacing = _textFormat.letterSpacing * _fontSizeScale;
             TextFormat format = _textFormat;
-            Color32 color = format.color;
             _font.SetFormat(format, _fontSizeScale);
-            Color32[] gradientColor = format.gradientColor;
-            bool boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
+            _font.UpdateGraphics(graphics);
 
-            if (_input)
-            {
-#if RTL_TEXT_SUPPORT
-                if (_textDirection == RTLSupport.DirectionType.UNKNOW)
-                    letterSpacing++;
-#else
-                letterSpacing++;
-#endif
-            }
+            float rectWidth = _contentRect.width > 0 ? (_contentRect.width - GUTTER_X * 2) : 0;
+            float rectHeight = _contentRect.height > 0 ? Mathf.Max(_contentRect.height, _font.GetLineHeight(format.size)) : 0;
 
             if (_charPositions != null)
                 _charPositions.Clear();
 
-            Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
-            Vector4 u0, u1, u2, u3;
-
             List<Vector3> vertList = vb.vertices;
-#if UNITY_5_2 || UNITY_5_3_OR_NEWER
-            List<Vector4> uvList = vb.uv0;
-#else
-            List<Vector2> uvList = vb.uv0;
-#endif
+            List<Vector2> uvList = vb.uvs;
+            List<Vector2> uv2List = vb.uvs2;
             List<Color32> colList = vb.colors;
 
             HtmlLink currentLink = null;
             float linkStartX = 0;
             int linkStartLine = 0;
 
-            float charX = 0;
-            float xIndent;
-            int yIndent = 0;
-            bool clipped = !_input && _autoSize == AutoSizeType.None;
+            float posx = 0;
+            float indent_x;
+            bool clipping = !_input && _autoSize == AutoSizeType.None;
             bool lineClipped;
             AlignType lineAlign;
-            VertAlignType lineVAlign = UIConfig.richTextRowVerticalAlign;
-            float lastGlyphHeight = 0;
-            GlyphInfo glyph = new GlyphInfo();
+            float glyphWidth, glyphHeight, baseline;
+            short vertCount;
+            float underlineStart;
+            float strikethroughStart;
+            int minFontSize;
+            int maxFontSize;
+            string rtlLine = null;
 
             int elementIndex = 0;
             int elementCount = _elements.Count;
@@ -1101,74 +1117,120 @@ namespace FairyGUI
                 if (line.charCount == 0)
                     continue;
 
-                lineClipped = clipped && i != 0 && line.y + line.height > _contentRect.height; //超出区域，剪裁
+                lineClipped = clipping && i != 0 && line.y + line.height > rectHeight;
                 lineAlign = format.align;
                 if (element != null && element.charIndex == line.charIndex)
                     lineAlign = element.format.align;
                 else
                     lineAlign = format.align;
-#if RTL_TEXT_SUPPORT
+
                 if (_textDirection == RTLSupport.DirectionType.RTL)
                 {
                     if (lineAlign == AlignType.Center)
-                        xIndent = (int)((rectWidth + line.width) / 2);
+                        indent_x = (int)((rectWidth + line.width) / 2);
                     else if (lineAlign == AlignType.Right)
-                        xIndent = rectWidth;
+                        indent_x = rectWidth;
                     else
-                        xIndent = Mathf.Ceil(line.width) + GUTTER_X * 2;
+                        indent_x = line.width + GUTTER_X * 2;
 
-                    if (xIndent > rectWidth)
-                        xIndent = rectWidth;
+                    if (indent_x > rectWidth)
+                        indent_x = rectWidth;
 
-                    charX = xIndent - GUTTER_X;
+                    posx = indent_x - GUTTER_X;
                 }
                 else
-#endif
                 {
                     if (lineAlign == AlignType.Center)
-                        xIndent = (int)((rectWidth - line.width) / 2);
+                        indent_x = (int)((rectWidth - line.width) / 2);
                     else if (lineAlign == AlignType.Right)
-                        xIndent = rectWidth - line.width;
+                        indent_x = rectWidth - line.width;
                     else
-                        xIndent = 0;
+                        indent_x = 0;
 
-                    if (xIndent < 0)
-                        xIndent = 0;
+                    if (indent_x < 0)
+                        indent_x = 0;
 
-                    charX = GUTTER_X + xIndent;
+                    posx = GUTTER_X + indent_x;
                 }
 
-#if RTL_TEXT_SUPPORT
-                string strLine = "";
-                int charCount = line.charCount;
+                int lineCharCount = line.charCount;
+                underlineStart = posx;
+                strikethroughStart = posx;
+                minFontSize = maxFontSize = format.size;
+
                 if (_textDirection != RTLSupport.DirectionType.UNKNOW)
                 {
-                    strLine = _parsedText.Substring(line.charIndex, line.charCount);
+                    rtlLine = _parsedText.Substring(line.charIndex, lineCharCount);
                     if (_textDirection == RTLSupport.DirectionType.RTL)
-                        strLine = RTLSupport.ConvertLineR(strLine);
+                        rtlLine = RTLSupport.ConvertLineR(rtlLine);
                     else
-                        strLine = RTLSupport.ConvertLineL(strLine);
-                    charCount = strLine.Length;
+                        rtlLine = RTLSupport.ConvertLineL(rtlLine);
+                    lineCharCount = rtlLine.Length;
                 }
-                for (int j = 0; j < charCount; j++)
+
+                for (int j = 0; j < lineCharCount; j++)
                 {
                     int charIndex = line.charIndex + j;
-                    char ch = _textDirection != RTLSupport.DirectionType.UNKNOW ? strLine[j] : _parsedText[charIndex];
-#else
-                for (int j = 0; j < line.charCount; j++)
-                {
-                    int charIndex = line.charIndex + j;
-                    char ch = _parsedText[charIndex];
-#endif
+                    char ch = rtlLine != null ? rtlLine[j] : _parsedText[charIndex];
+
                     while (element != null && charIndex == element.charIndex)
                     {
                         if (element.type == HtmlElementType.Text)
                         {
+                            vertCount = 0;
+                            if (format.underline != element.format.underline)
+                            {
+                                if (format.underline)
+                                {
+                                    if (!lineClipped)
+                                    {
+                                        float lineWidth;
+                                        if (_textDirection == RTLSupport.DirectionType.UNKNOW)
+                                            lineWidth = (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx) - underlineStart;
+                                        else
+                                            lineWidth = underlineStart - (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx);
+                                        if (lineWidth > 0)
+                                            vertCount += (short)_font.DrawLine(underlineStart < posx ? underlineStart : posx, -(line.y + line.baseline), lineWidth,
+                                                maxFontSize, 0, vertList, uvList, uv2List, colList);
+                                    }
+                                    maxFontSize = 0;
+                                }
+                                else
+                                    underlineStart = posx;
+                            }
+
+                            if (format.strikethrough != element.format.strikethrough)
+                            {
+                                if (format.strikethrough)
+                                {
+                                    if (!lineClipped)
+                                    {
+                                        float lineWidth;
+                                        if (_textDirection == RTLSupport.DirectionType.UNKNOW)
+                                            lineWidth = (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx) - strikethroughStart;
+                                        else
+                                            lineWidth = strikethroughStart - (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx);
+                                        if (lineWidth > 0)
+                                            vertCount += (short)_font.DrawLine(strikethroughStart < posx ? strikethroughStart : posx, -(line.y + line.baseline), lineWidth,
+                                                minFontSize, 1, vertList, uvList, uv2List, colList);
+                                    }
+                                    minFontSize = int.MaxValue;
+                                }
+                                else
+                                    strikethroughStart = posx;
+                            }
+
+                            if (vertCount > 0 && _charPositions != null)
+                            {
+                                CharPosition cp = _charPositions[_charPositions.Count - 1];
+                                cp.vertCount += vertCount;
+                                _charPositions[_charPositions.Count - 1] = cp;
+                            }
+
                             format = element.format;
+                            minFontSize = Math.Min(minFontSize, format.size);
+                            maxFontSize = Math.Max(maxFontSize, format.size);
                             _font.SetFormat(format, _fontSizeScale);
-                            color = format.color;
-                            gradientColor = format.gradientColor;
-                            boldVertice = format.bold && (_font.customBold || (format.italic && _font.customBoldAndItalic));
                         }
                         else if (element.type == HtmlElementType.Link)
                         {
@@ -1177,7 +1239,7 @@ namespace FairyGUI
                             {
                                 element.position = Vector2.zero;
                                 currentLink.SetPosition(0, 0);
-                                linkStartX = charX;
+                                linkStartX = posx;
                                 linkStartLine = i;
                             }
                         }
@@ -1185,7 +1247,7 @@ namespace FairyGUI
                         {
                             if (currentLink != null)
                             {
-                                currentLink.SetArea(linkStartLine, linkStartX, i, charX);
+                                currentLink.SetArea(linkStartLine, linkStartX, i, posx);
                                 currentLink = null;
                             }
                         }
@@ -1194,42 +1256,31 @@ namespace FairyGUI
                             IHtmlObject htmlObj = element.htmlObject;
                             if (htmlObj != null)
                             {
-#if RTL_TEXT_SUPPORT
                                 if (_textDirection == RTLSupport.DirectionType.RTL)
-                                    charX -= htmlObj.width - 2;
-#endif
+                                    posx -= htmlObj.width - 2;
 
                                 if (_charPositions != null)
                                 {
                                     CharPosition cp = new CharPosition();
                                     cp.lineIndex = (short)i;
                                     cp.charIndex = _charPositions.Count;
-                                    cp.vertCount = (short)(-1 - elementIndex); //借用
-                                    cp.offsetX = (int)charX;
+                                    cp.imgIndex = (short)(elementIndex + 1);
+                                    cp.offsetX = posx;
                                     _charPositions.Add(cp);
                                 }
-                                if (lineVAlign == VertAlignType.Bottom)
-                                    yIndent = (int)(line.height - htmlObj.height);
-                                else if (lineVAlign == VertAlignType.Middle)
-                                    yIndent = (int)((line.height - htmlObj.height) / 2);
-                                else
-                                    yIndent = 0;
 
-                                element.position = new Vector2(charX + 1, line.y + yIndent);
-                                htmlObj.SetPosition(element.position.x, element.position.y);
-                                if (lineClipped || clipped && (element.position.x < GUTTER_X || element.position.x + htmlObj.width > _contentRect.width - GUTTER_X))
+                                if (lineClipped || clipping && (posx < GUTTER_X || posx > GUTTER_X && posx + htmlObj.width > _contentRect.width - GUTTER_X))
                                     element.status |= 1;
                                 else
                                     element.status &= 254;
 
-#if RTL_TEXT_SUPPORT
+                                element.position = new Vector2(posx + 1, line.y + line.baseline - htmlObj.height * IMAGE_BASELINE);
+                                htmlObj.SetPosition(element.position.x, element.position.y);
+
                                 if (_textDirection == RTLSupport.DirectionType.RTL)
-                                    charX -= letterSpacing;
+                                    posx -= letterSpacing;
                                 else
-#endif
-                                {
-                                    charX += htmlObj.width + letterSpacing + 2;
-                                }
+                                    posx += htmlObj.width + letterSpacing + 2;
                             }
                         }
 
@@ -1246,201 +1297,46 @@ namespace FairyGUI
                     if (ch == '\0')
                         continue;
 
-                    if (_font.GetGlyph(ch, ref glyph))
+                    if (_font.GetGlyph(ch == '\t' ? ' ' : ch, out glyphWidth, out glyphHeight, out baseline))
                     {
-#if RTL_TEXT_SUPPORT
+                        if (ch == '\t')
+                            glyphWidth *= 4;
+
                         if (_textDirection == RTLSupport.DirectionType.RTL)
                         {
-                            if (lineClipped || clipped && (rectWidth < 7 || charX != (xIndent - GUTTER_X)) && charX < GUTTER_X - 0.5f) //超出区域，剪裁
+                            if (lineClipped || clipping && (rectWidth < 7 || posx != (indent_x - GUTTER_X)) && posx < GUTTER_X - 0.5f) //超出区域，剪裁
                             {
-                                charX -= (letterSpacing + glyph.width);
+                                posx -= (letterSpacing + glyphWidth);
                                 continue;
                             }
 
-                            charX -= glyph.width;
+                            posx -= glyphWidth;
                         }
                         else
-#endif
                         {
-                            if (lineClipped || clipped && (rectWidth < 7 || charX != (GUTTER_X + xIndent)) && charX + glyph.width > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
+                            if (lineClipped || clipping && (rectWidth < 7 || posx != (GUTTER_X + indent_x)) && posx + glyphWidth > _contentRect.width - GUTTER_X + 0.5f) //超出区域，剪裁
                             {
-                                charX += letterSpacing + glyph.width;
+                                posx += letterSpacing + glyphWidth;
                                 continue;
                             }
                         }
 
-                        if (lineVAlign == VertAlignType.Bottom)
-                            yIndent = (int)(line.height - glyph.height);
-                        else if (lineVAlign == VertAlignType.Middle)
-                            yIndent = (int)((line.height + line.textHeight) / 2 - glyph.height);
-                        else
-                            yIndent = (int)(line.textHeight - glyph.height);
-
-                        if (format.specialStyle == TextFormat.SpecialStyle.Subscript)
-                            yIndent += (int)(glyph.height * 0.333f);
-                        else if (format.specialStyle == TextFormat.SpecialStyle.Superscript)
-                            yIndent -= (int)(lastGlyphHeight - glyph.height * 0.667f);
-                        else
-                            lastGlyphHeight = glyph.height;
-
-                        v0.x = charX + glyph.vertMin.x;
-                        v0.y = line.y + yIndent + glyph.vertMin.y;
-                        v1.x = charX + glyph.vertMax.x;
-                        v1.y = line.y + yIndent + glyph.vertMax.y;
-                        u0 = glyph.uvBottomLeft;
-                        u1 = glyph.uvTopLeft;
-                        u2 = glyph.uvTopRight;
-                        u3 = glyph.uvBottomRight;
-                        u0.w = u1.w = u2.w = u3.w = 1;
-
-                        if (!boldVertice)
-                        {
-                            uvList.Add(u0);
-                            uvList.Add(u1);
-                            uvList.Add(u2);
-                            uvList.Add(u3);
-
-                            vertList.Add(new Vector3(v0.x, -v1.y, 0));
-                            vertList.Add(new Vector3(v0.x, -v0.y, 0));
-                            vertList.Add(new Vector3(v1.x, -v0.y, 0));
-                            vertList.Add(new Vector3(v1.x, -v1.y, 0));
-
-                            if (!_font.canTint)
-                            {
-                                colList.Add(Color.white);
-                                colList.Add(Color.white);
-                                colList.Add(Color.white);
-                                colList.Add(Color.white);
-                            }
-                            else if (gradientColor != null)
-                            {
-                                colList.Add(gradientColor[1]);
-                                colList.Add(gradientColor[0]);
-                                colList.Add(gradientColor[2]);
-                                colList.Add(gradientColor[3]);
-                            }
-                            else
-                            {
-                                colList.Add(color);
-                                colList.Add(color);
-                                colList.Add(color);
-                                colList.Add(color);
-                            }
-                        }
-                        else
-                        {
-                            for (int b = 0; b < 4; b++)
-                            {
-                                uvList.Add(u0);
-                                uvList.Add(u1);
-                                uvList.Add(u2);
-                                uvList.Add(u3);
-
-                                float fx = BOLD_OFFSET[b * 2];
-                                float fy = BOLD_OFFSET[b * 2 + 1];
-
-                                vertList.Add(new Vector3(v0.x + fx, -(v1.y + fy), 0));
-                                vertList.Add(new Vector3(v0.x + fx, -(v0.y + fy), 0));
-                                vertList.Add(new Vector3(v1.x + fx, -(v0.y + fy), 0));
-                                vertList.Add(new Vector3(v1.x + fx, -(v1.y + fy), 0));
-
-                                if (!_font.canTint)
-                                {
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                }
-                                else if (gradientColor != null)
-                                {
-                                    colList.Add(gradientColor[1]);
-                                    colList.Add(gradientColor[0]);
-                                    colList.Add(gradientColor[2]);
-                                    colList.Add(gradientColor[3]);
-                                }
-                                else
-                                {
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                }
-                            }
-                        }
-
-                        if (format.underline)
-                        {
-                            float glyphWidth = glyph.width;
-                            if (_font.GetGlyph('_', ref glyph))
-                            {
-                                glyph.width = glyphWidth;
-                                //取中点的UV
-                                if (glyph.uvBottomLeft.x != glyph.uvBottomRight.x)
-                                    u0.x = (glyph.uvBottomLeft.x + glyph.uvBottomRight.x) * 0.5f;
-                                else
-                                    u0.x = (glyph.uvBottomLeft.x + glyph.uvTopLeft.x) * 0.5f;
-
-                                if (glyph.uvBottomLeft.y != glyph.uvTopLeft.y)
-                                    u0.y = (glyph.uvBottomLeft.y + glyph.uvTopLeft.y) * 0.5f;
-                                else
-                                    u0.y = (glyph.uvBottomLeft.y + glyph.uvBottomRight.y) * 0.5f;
-
-                                uvList.Add(u0);
-                                uvList.Add(u0);
-                                uvList.Add(u0);
-                                uvList.Add(u0);
-
-                                v0.y = line.y + yIndent + glyph.vertMin.y + 1;
-                                v1.y = line.y + yIndent + glyph.vertMax.y + 1;
-                                if (v1.y - v0.y > 2)
-                                    v1.y = v0.y + 2;
-
-                                float tmpX = charX + letterSpacing + glyph.width;
-
-                                vertList.Add(new Vector3(charX, -v1.y, 0));
-                                vertList.Add(new Vector3(charX, -v0.y, 0));
-                                vertList.Add(new Vector3(tmpX, -v0.y, 0));
-                                vertList.Add(new Vector3(tmpX, -v1.y, 0));
-
-                                if (!_font.canTint)
-                                {
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                    colList.Add(Color.white);
-                                }
-                                else
-                                {
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                    colList.Add(color);
-                                }
-                            }
-                            else
-                                format.underline = false;
-                        }
+                        vertCount = (short)_font.DrawGlyph(posx, -(line.y + line.baseline), vertList, uvList, uv2List, colList);
 
                         if (_charPositions != null)
                         {
                             CharPosition cp = new CharPosition();
                             cp.lineIndex = (short)i;
                             cp.charIndex = _charPositions.Count;
-                            cp.vertCount = (short)(((boldVertice ? 4 : 1) + (format.underline ? 1 : 0)) * 4);
-                            cp.offsetX = (int)charX;
+                            cp.vertCount = vertCount;
+                            cp.offsetX = posx;
                             _charPositions.Add(cp);
                         }
-#if RTL_TEXT_SUPPORT
-                        if (_textDirection == RTLSupport.DirectionType.RTL)
-                        {
-                            charX -= letterSpacing;
-                        }
-                        else
-#endif
-                        {
 
-                            charX += letterSpacing + glyph.width;
-                        }
+                        if (_textDirection == RTLSupport.DirectionType.RTL)
+                            posx -= letterSpacing;
+                        else
+                            posx += letterSpacing + glyphWidth;
                     }
                     else //if GetGlyph failed
                     {
@@ -1449,34 +1345,63 @@ namespace FairyGUI
                             CharPosition cp = new CharPosition();
                             cp.lineIndex = (short)i;
                             cp.charIndex = _charPositions.Count;
-                            cp.vertCount = 0;
-                            cp.offsetX = (int)charX;
+                            cp.offsetX = posx;
                             _charPositions.Add(cp);
                         }
 
-#if RTL_TEXT_SUPPORT
                         if (_textDirection == RTLSupport.DirectionType.RTL)
-                        {
-                            charX -= letterSpacing;
-                        }
+                            posx -= letterSpacing;
                         else
-#endif
-                        {
-                            charX += letterSpacing;
-                        }
+                            posx += letterSpacing;
                     }
                 }//text loop
+
+                if (!lineClipped)
+                {
+                    vertCount = 0;
+                    if (format.underline)
+                    {
+                        float lineWidth;
+                        if (_textDirection == RTLSupport.DirectionType.UNKNOW)
+                            lineWidth = (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx) - underlineStart;
+                        else
+                            lineWidth = underlineStart - (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx);
+                        if (lineWidth > 0)
+                            vertCount += (short)_font.DrawLine(underlineStart < posx ? underlineStart : posx, -(line.y + line.baseline), lineWidth,
+                                maxFontSize, 0, vertList, uvList, uv2List, colList);
+                    }
+
+                    if (format.strikethrough)
+                    {
+                        float lineWidth;
+                        if (_textDirection == RTLSupport.DirectionType.UNKNOW)
+                            lineWidth = (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx) - strikethroughStart;
+                        else
+                            lineWidth = strikethroughStart - (clipping ? Mathf.Clamp(posx, GUTTER_X, GUTTER_X + rectWidth) : posx);
+                        if (lineWidth > 0)
+                            vertCount += (short)_font.DrawLine(strikethroughStart < posx ? strikethroughStart : posx, -(line.y + line.baseline), lineWidth,
+                                minFontSize, 1, vertList, uvList, uv2List, colList);
+                    }
+
+                    if (vertCount > 0 && _charPositions != null)
+                    {
+                        CharPosition cp = _charPositions[_charPositions.Count - 1];
+                        cp.vertCount += vertCount;
+                        _charPositions[_charPositions.Count - 1] = cp;
+                    }
+                }
+
             }//line loop
 
             if (element != null && element.type == HtmlElementType.LinkEnd && currentLink != null)
-                currentLink.SetArea(linkStartLine, linkStartX, lineCount - 1, charX);
+                currentLink.SetArea(linkStartLine, linkStartX, lineCount - 1, posx);
 
             if (_charPositions != null)
             {
                 CharPosition cp = new CharPosition();
                 cp.lineIndex = (short)(lineCount - 1);
                 cp.charIndex = _charPositions.Count;
-                cp.offsetX = (int)charX;
+                cp.offsetX = posx;
                 _charPositions.Add(cp);
             }
 
@@ -1487,68 +1412,73 @@ namespace FairyGUI
                 vertList.RemoveRange(65000, count - 65000);
                 colList.RemoveRange(65000, count - 65000);
                 uvList.RemoveRange(65000, count - 65000);
+                if (uv2List.Count > 0)
+                    uv2List.RemoveRange(65000, count - 65000);
                 count = 65000;
             }
 
-            bool hasShadow = _shadowOffset.x != 0 || _shadowOffset.y != 0;
-            int allocCount = count;
-            int drawDirs = 0;
-            if (_stroke != 0)
+            if (_font.customOutline)
             {
-                drawDirs = UIConfig.enhancedTextOutlineEffect ? 8 : 4;
-                allocCount += count * drawDirs;
-            }
-            if (hasShadow)
-                allocCount += count;
-            if (allocCount > 65000)
-            {
-                Debug.LogWarning("Text is too large. Outline/shadow effect cannot be completed.");
-                allocCount = count;
-            }
-
-            if (allocCount != count)
-            {
-                VertexBuffer vb2 = VertexBuffer.Begin();
-                List<Vector3> vertList2 = vb2.vertices;
-#if UNITY_5_2 || UNITY_5_3_OR_NEWER
-                List<Vector4> uvList2 = vb2.uv0;
-#else
-                List<Vector2> uvList2 = vb2.uv0;
-#endif
-                List<Color32> colList2 = vb2.colors;
-
-                Color32 strokeColor = _strokeColor;
-                if (_stroke != 0)
+                bool hasShadow = _textFormat.shadowOffset.x != 0 || _textFormat.shadowOffset.y != 0;
+                int allocCount = count;
+                int drawDirs = 0;
+                if (_textFormat.outline != 0)
                 {
-                    for (int j = 0; j < drawDirs; j++)
+                    drawDirs = UIConfig.enhancedTextOutlineEffect ? 8 : 4;
+                    allocCount += count * drawDirs;
+                }
+                if (hasShadow)
+                    allocCount += count;
+                if (allocCount > 65000)
+                {
+                    Debug.LogWarning("Text is too large. Outline/shadow effect cannot be completed.");
+                    allocCount = count;
+                }
+
+                if (allocCount != count)
+                {
+                    VertexBuffer vb2 = VertexBuffer.Begin();
+                    List<Vector3> vertList2 = vb2.vertices;
+                    List<Color32> colList2 = vb2.colors;
+
+                    Color32 col = _textFormat.outlineColor;
+                    float outline = _textFormat.outline;
+                    if (outline != 0)
                     {
+                        for (int j = 0; j < drawDirs; j++)
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                Vector3 vert = vertList[i];
+                                vertList2.Add(new Vector3(vert.x + STROKE_OFFSET[j * 2] * outline, vert.y + STROKE_OFFSET[j * 2 + 1] * outline, 0));
+                                colList2.Add(col);
+                            }
+
+                            vb2.uvs.AddRange(uvList);
+                            if (uv2List.Count > 0)
+                                vb2.uvs2.AddRange(uv2List);
+                        }
+                    }
+
+                    if (hasShadow)
+                    {
+                        col = _textFormat.shadowColor;
+                        Vector2 offset = _textFormat.shadowOffset;
                         for (int i = 0; i < count; i++)
                         {
                             Vector3 vert = vertList[i];
-                            Vector4 u = uvList[i];
-
-                            uvList2.Add(u);
-                            vertList2.Add(new Vector3(vert.x + STROKE_OFFSET[j * 2] * _stroke, vert.y + STROKE_OFFSET[j * 2 + 1] * _stroke, 0));
-                            colList2.Add(strokeColor);
+                            vertList2.Add(new Vector3(vert.x + offset.x, vert.y - offset.y, 0));
+                            colList2.Add(col);
                         }
+
+                        vb2.uvs.AddRange(uvList);
+                        if (uv2List.Count > 0)
+                            vb2.uvs2.AddRange(uv2List);
                     }
+
+                    vb.Insert(vb2);
+                    vb2.End();
                 }
-
-                if (hasShadow)
-                {
-                    for (int i = 0; i < count; i++)
-                    {
-                        Vector3 vert = vertList[i];
-                        Vector4 u = uvList[i];
-
-                        uvList2.Add(u);
-                        vertList2.Add(new Vector3(vert.x + _shadowOffset.x, vert.y - _shadowOffset.y, 0));
-                        colList2.Add(strokeColor);
-                    }
-                }
-
-                vb.Insert(vb2);
-                vb2.End();
             }
 
             vb.AddTriangles();
@@ -1567,24 +1497,23 @@ namespace FairyGUI
             _textWidth = 0;
             _textHeight = 0;
             _parsedText = string.Empty;
-#if RTL_TEXT_SUPPORT
             _textDirection = RTLSupport.DirectionType.UNKNOW;
-#endif
+
             if (_charPositions != null)
                 _charPositions.Clear();
         }
 
         void ApplyVertAlign()
         {
-            int oldOffset = _yOffset;
+            float oldOffset = _yOffset;
             if (_autoSize == AutoSizeType.Both || _autoSize == AutoSizeType.Height
                 || _verticalAlign == VertAlignType.Top)
                 _yOffset = 0;
             else
             {
                 float dh;
-                if (_textHeight == 0)
-                    dh = _contentRect.height - this.textFormat.size;
+                if (_textHeight == 0 && _lines.Count > 0)
+                    dh = _contentRect.height - _lines[0].height;
                 else
                     dh = _contentRect.height - _textHeight;
                 if (dh < 0)
@@ -1592,7 +1521,7 @@ namespace FairyGUI
                 if (_verticalAlign == VertAlignType.Middle)
                     _yOffset = (int)(dh / 2);
                 else
-                    _yOffset = (int)dh;
+                    _yOffset = dh;
             }
 
             if (oldOffset != _yOffset)
@@ -1621,9 +1550,9 @@ namespace FairyGUI
             public float height;
 
             /// <summary>
-            /// 行内文本的高度
+            /// 文字渲染基线
             /// </summary>
-            public float textHeight;
+            public float baseline;
 
             /// <summary>
             /// 行首的字符索引
@@ -1656,7 +1585,7 @@ namespace FairyGUI
                 if (pool.Count > 0)
                 {
                     LineInfo ret = pool.Pop();
-                    ret.width = ret.height = ret.textHeight = 0;
+                    ret.width = ret.height = ret.baseline = 0;
                     ret.y = ret.y2 = 0;
                     ret.charIndex = ret.charCount = 0;
                     return ret;
@@ -1691,6 +1620,16 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public struct LineCharInfo
+        {
+            public float width;
+            public float height;
+            public float baseline;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public struct CharPosition
         {
             /// <summary>
@@ -1706,12 +1645,17 @@ namespace FairyGUI
             /// <summary>
             /// 字符的x偏移
             /// </summary>
-            public int offsetX;
+            public float offsetX;
 
             /// <summary>
-            /// 字符占用的顶点数量。如果小于0，用于表示一个图片。对应的图片索引为-vertCount-1
+            /// 字符占用的顶点数量。
             /// </summary>
             public short vertCount;
+
+            /// <summary>
+            /// 大于0表示图片索引。
+            /// </summary>
+            public short imgIndex;
         }
     }
 }

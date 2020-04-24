@@ -5,7 +5,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class ShaderConfig
+    public static class ShaderConfig
     {
         /// <summary>
         /// 
@@ -37,23 +37,44 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public class PropertyIDs
+        public static string TMPFontShader = "FairyGUI/TMP";
+
+        public static int ID_ClipBox;
+        public static int ID_ClipSoftness;
+        public static int ID_AlphaTex;
+        public static int ID_StencilComp;
+        public static int ID_Stencil;
+        public static int ID_StencilOp;
+        public static int ID_StencilReadMask;
+        public static int ID_ColorMask;
+        public static int ID_ColorMatrix;
+        public static int ID_ColorOffset;
+        public static int ID_BlendSrcFactor;
+        public static int ID_BlendDstFactor;
+        public static int ID_ColorOption;
+
+        public static int ID_StencilComp2;
+        public static int ID_Stencil2;
+
+        static ShaderConfig()
         {
-            public int _ClipBox;
-            public int _ClipSoftness;
-            public int _AlphaTex;
-            public int _StencilComp;
-            public int _Stencil;
-            public int _StencilOp;
-            public int _StencilReadMask;
-            public int _ColorMask;
-            public int _ColorMatrix;
-            public int _ColorOffset;
-            public int _BlendSrcFactor;
-            public int _BlendDstFactor;
-            public int _ColorOption;
+            ID_ClipBox = Shader.PropertyToID("_ClipBox");
+            ID_ClipSoftness = Shader.PropertyToID("_ClipSoftness");
+            ID_AlphaTex = Shader.PropertyToID("_AlphaTex");
+            ID_StencilComp = Shader.PropertyToID("_StencilComp");
+            ID_Stencil = Shader.PropertyToID("_Stencil");
+            ID_StencilOp = Shader.PropertyToID("_StencilOp");
+            ID_StencilReadMask = Shader.PropertyToID("_StencilReadMask");
+            ID_ColorMask = Shader.PropertyToID("_ColorMask");
+            ID_ColorMatrix = Shader.PropertyToID("_ColorMatrix");
+            ID_ColorOffset = Shader.PropertyToID("_ColorOffset");
+            ID_BlendSrcFactor = Shader.PropertyToID("_BlendSrcFactor");
+            ID_BlendDstFactor = Shader.PropertyToID("_BlendDstFactor");
+            ID_ColorOption = Shader.PropertyToID("_ColorOption");
+
+            ID_Stencil2 = Shader.PropertyToID("_StencilRef");
+            ID_StencilComp2 = Shader.PropertyToID("_StencilComp");
         }
-        internal static PropertyIDs _properyIDs;
 
         /// <summary>
         /// 
@@ -68,44 +89,9 @@ namespace FairyGUI
                 Debug.LogWarning("FairyGUI: shader not found: " + name);
                 shader = Shader.Find("UI/Default");
             }
-            shader.hideFlags = DisplayOptions.hideFlags;
-
-            if (_properyIDs == null)
-                InitPropertyIDs();
+            shader.hideFlags = DisplayObject.hideFlags;
 
             return shader;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static PropertyIDs propertyIDs
-        {
-            get
-            {
-                if (_properyIDs == null)
-                    InitPropertyIDs();
-
-                return _properyIDs;
-            }
-        }
-
-        static void InitPropertyIDs()
-        {
-            _properyIDs = new PropertyIDs();
-            _properyIDs._ClipBox = Shader.PropertyToID("_ClipBox");
-            _properyIDs._ClipSoftness = Shader.PropertyToID("_ClipSoftness");
-            _properyIDs._AlphaTex = Shader.PropertyToID("_AlphaTex");
-            _properyIDs._StencilComp = Shader.PropertyToID("_StencilComp");
-            _properyIDs._Stencil = Shader.PropertyToID("_Stencil");
-            _properyIDs._StencilOp = Shader.PropertyToID("_StencilOp");
-            _properyIDs._StencilReadMask = Shader.PropertyToID("_StencilReadMask");
-            _properyIDs._ColorMask = Shader.PropertyToID("_ColorMask");
-            _properyIDs._ColorMatrix = Shader.PropertyToID("_ColorMatrix");
-            _properyIDs._ColorOffset = Shader.PropertyToID("_ColorOffset");
-            _properyIDs._BlendSrcFactor = Shader.PropertyToID("_BlendSrcFactor");
-            _properyIDs._BlendDstFactor = Shader.PropertyToID("_BlendDstFactor");
-            _properyIDs._ColorOption = Shader.PropertyToID("_ColorOption");
         }
     }
 }

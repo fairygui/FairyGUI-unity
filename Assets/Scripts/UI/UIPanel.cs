@@ -166,7 +166,6 @@ namespace FairyGUI
             this.container.renderMode = renderMode;
             this.container.renderCamera = renderCamera;
             this.container.touchable = !touchDisabled;
-            this.container._isPanel = true;
             this.container._panelOrder = sortingOrder;
             this.container.fairyBatching = fairyBatching;
             if (Application.isPlaying)
@@ -183,7 +182,7 @@ namespace FairyGUI
                 {
                     CacheNativeChildrenRenderers();
 
-                    this.container.onUpdate = () =>
+                    this.container.onUpdate += () =>
                     {
                         int cnt = _renders.Count;
                         int sv = UpdateContext.current.renderingOrder++;
@@ -351,8 +350,8 @@ namespace FairyGUI
             if (!EMRenderSupport.packageListReady || UIPackage.GetByName(packageName) == null)
                 return;
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-            DisplayOptions.SetEditModeHideFlags();
+
+            DisplayObject.hideFlags = HideFlags.DontSaveInEditor;
             GObject obj = UIPackage.CreateObject(packageName, componentName);
             if (obj != null && !(obj is GComponent))
             {
@@ -379,32 +378,37 @@ namespace FairyGUI
                 uiBounds.size = cachedUISize;
                 HandleScreenSizeChanged();
             }
-#else
-            PackageItem pi = UIPackage.GetByName(packageName).GetItemByName(componentName);
-            if (pi != null)
-            {
-                cachedUISize = new Vector2(pi.width, pi.height);
-                uiBounds.size = cachedUISize;
-                HandleScreenSizeChanged();
-            }
-#endif
         }
 
         void HandleScreenSizeChanged()
         {
             if (!Application.isPlaying)
-                DisplayOptions.SetEditModeHideFlags();
+                DisplayObject.hideFlags = HideFlags.DontSaveInEditor;
 
             screenSizeVer = StageCamera.screenSizeVer;
 
+            int width = Screen.width;
+            int height = Screen.height;
             if (this.container != null)
             {
+                Camera cam = container.GetRenderCamera();
+                if (cam.targetDisplay != 0 && cam.targetDisplay < Display.displays.Length)
+                {
+                    width = Display.displays[cam.targetDisplay].renderingWidth;
+                    height = Display.displays[cam.targetDisplay].renderingHeight;
+                }
+
                 if (this.container.renderMode != RenderMode.WorldSpace)
-                    this.container.scale = new Vector2(StageCamera.UnitsPerPixel * UIContentScaler.scaleFactor, StageCamera.UnitsPerPixel * UIContentScaler.scaleFactor);
+                {
+                    StageCamera sc = cam.GetComponent<StageCamera>();
+                    if (sc == null)
+                        sc = StageCamera.main.GetComponent<StageCamera>();
+                    this.container.scale = new Vector2(sc.unitsPerPixel * UIContentScaler.scaleFactor, sc.unitsPerPixel * UIContentScaler.scaleFactor);
+                }
             }
 
-            int width = Mathf.CeilToInt(Screen.width / UIContentScaler.scaleFactor);
-            int height = Mathf.CeilToInt(Screen.height / UIContentScaler.scaleFactor);
+            width = Mathf.CeilToInt(width / UIContentScaler.scaleFactor);
+            height = Mathf.CeilToInt(height / UIContentScaler.scaleFactor);
             if (_ui != null)
             {
                 switch (fitScreen)
@@ -576,7 +580,7 @@ namespace FairyGUI
 
         public void EM_Update(UpdateContext context)
         {
-            DisplayOptions.SetEditModeHideFlags();
+            DisplayObject.hideFlags = HideFlags.DontSaveInEditor;
 
             container.Update(context);
 

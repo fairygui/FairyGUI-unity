@@ -75,8 +75,7 @@ namespace FairyGUI
             float radiusX = rect.width / 2;
             float radiusY = rect.height / 2;
             int sides = Mathf.CeilToInt(Mathf.PI * (radiusX + radiusY) / 4);
-            if (sides < 6)
-                sides = 6;
+            sides = Mathf.Clamp(sides, 40, 800);
             float angleDelta = 2 * Mathf.PI / sides;
             float angle = 0;
             float lineAngle = 0;
@@ -175,14 +174,13 @@ namespace FairyGUI
 
         public bool HitTest(Rect contentRect, Vector2 point)
         {
-            Rect rect = drawRect != null ? (Rect)drawRect : contentRect;
-            if (!rect.Contains(point))
+            if (!contentRect.Contains(point))
                 return false;
 
-            float radiusX = rect.width * 0.5f;
-            float raduisY = rect.height * 0.5f;
-            float xx = point.x - radiusX - rect.x;
-            float yy = point.y - raduisY - rect.y;
+            float radiusX = contentRect.width * 0.5f;
+            float raduisY = contentRect.height * 0.5f;
+            float xx = point.x - radiusX - contentRect.x;
+            float yy = point.y - raduisY - contentRect.y;
             if (Mathf.Pow(xx / radiusX, 2) + Mathf.Pow(yy / raduisY, 2) < 1)
             {
                 if (startDegree != 0 || endDegreee != 360)

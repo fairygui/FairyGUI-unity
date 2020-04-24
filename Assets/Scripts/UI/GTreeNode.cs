@@ -98,6 +98,19 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public void ExpandToRoot()
+        {
+            GTreeNode p = this;
+            while (p != null)
+            {
+                p.expanded = true;
+                p = p.parent;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool isFolder
         {
             get { return _children != null; }

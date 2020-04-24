@@ -14,21 +14,18 @@ namespace FairyGUIEditor
 
         static bool _loaded;
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
         [InitializeOnLoadMethod]
         static void Startup()
         {
             EditorApplication.update += EditorApplication_Update;
         }
-#endif
 
         [MenuItem("GameObject/FairyGUI/UI Panel", false, 0)]
         static void CreatePanel()
         {
-#if !(UNITY_5 || UNITY_5_3_OR_NEWER)
             EditorApplication.update -= EditorApplication_Update;
             EditorApplication.update += EditorApplication_Update;
-#endif
+
             StageCamera.CheckMainCamera();
 
             GameObject panelObject = new GameObject("UIPanel");
@@ -87,10 +84,9 @@ namespace FairyGUIEditor
             if (Application.isPlaying || _loaded)
                 return;
 
-#if !(UNITY_5 || UNITY_5_3_OR_NEWER)
             EditorApplication.update -= EditorApplication_Update;
             EditorApplication.update += EditorApplication_Update;
-#endif
+
             _loaded = true;
 
             UIPackage.RemoveAllPackages();

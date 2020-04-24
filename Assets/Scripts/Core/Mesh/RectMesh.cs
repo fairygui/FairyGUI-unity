@@ -51,22 +51,23 @@ namespace FairyGUI
                 Rect part;
 
                 //left,right
-                part = Rect.MinMaxRect(rect.x, rect.y, lineWidth, rect.height);
+                part = new Rect(rect.x, rect.y, lineWidth, rect.height);
                 vb.AddQuad(part, lineColor);
-                part = Rect.MinMaxRect(rect.xMax - lineWidth, 0, rect.xMax, rect.yMax);
+                part = new Rect(rect.xMax - lineWidth, rect.y, lineWidth, rect.height);
                 vb.AddQuad(part, lineColor);
 
                 //top, bottom
-                part = Rect.MinMaxRect(lineWidth, rect.x, rect.xMax - lineWidth, lineWidth);
+                part = new Rect(rect.x + lineWidth, rect.y, rect.width - lineWidth * 2, lineWidth);
                 vb.AddQuad(part, lineColor);
-                part = Rect.MinMaxRect(lineWidth, rect.yMax - lineWidth, rect.xMax - lineWidth, rect.yMax);
+                part = new Rect(rect.x + lineWidth, rect.yMax - lineWidth, rect.width - lineWidth * 2, lineWidth);
                 vb.AddQuad(part, lineColor);
 
                 //middle
                 if (color.a != 0)//optimized
                 {
-                    part = Rect.MinMaxRect(lineWidth, lineWidth, rect.xMax - lineWidth, rect.yMax - lineWidth);
-                    vb.AddQuad(part, color);
+                    part = Rect.MinMaxRect(rect.x + lineWidth, rect.y + lineWidth, rect.xMax - lineWidth, rect.yMax - lineWidth);
+                    if (part.width > 0 && part.height > 0)
+                        vb.AddQuad(part, color);
                 }
             }
 
@@ -78,10 +79,7 @@ namespace FairyGUI
 
         public bool HitTest(Rect contentRect, Vector2 point)
         {
-            if (drawRect != null)
-                return ((Rect)drawRect).Contains(point);
-            else
-                return contentRect.Contains(point);
+            return contentRect.Contains(point);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -144,6 +143,19 @@ namespace FairyGUI
         /// </summary>
         public void ApplyChange()
         {
+            float screenWidth;
+            float screenHeight;
+
+            if (Application.isPlaying) //In case of multi display， we keep using the display which Stage object resides.
+            {
+                screenWidth = Stage.inst.width;
+                screenHeight = Stage.inst.height;
+            }
+            else
+            {
+                screenWidth = Screen.width;
+                screenHeight = Screen.height;
+            }
             if (scaleMode == ScaleMode.ScaleWithScreenSize)
             {
                 if (designResolutionX == 0 || designResolutionY == 0)
@@ -151,7 +163,7 @@ namespace FairyGUI
 
                 int dx = designResolutionX;
                 int dy = designResolutionY;
-                if (!ignoreOrientation && (Screen.width > Screen.height && dx < dy || Screen.width < Screen.height && dx > dy))
+                if (!ignoreOrientation && (screenWidth > screenHeight && dx < dy || screenWidth < screenHeight && dx > dy))
                 {
                     //scale should not change when orientation change
                     int tmp = dx;
@@ -161,14 +173,14 @@ namespace FairyGUI
 
                 if (screenMatchMode == ScreenMatchMode.MatchWidthOrHeight)
                 {
-                    float s1 = (float)Screen.width / dx;
-                    float s2 = (float)Screen.height / dy;
+                    float s1 = (float)screenWidth / dx;
+                    float s2 = (float)screenHeight / dy;
                     scaleFactor = Mathf.Min(s1, s2);
                 }
                 else if (screenMatchMode == ScreenMatchMode.MatchWidth)
-                    scaleFactor = (float)Screen.width / dx;
+                    scaleFactor = (float)screenWidth / dx;
                 else
-                    scaleFactor = (float)Screen.height / dy;
+                    scaleFactor = (float)screenHeight / dy;
             }
             else if (scaleMode == ScaleMode.ConstantPhysicalSize)
             {
@@ -192,11 +204,11 @@ namespace FairyGUI
 
         void UpdateScaleLevel()
         {
-            if (scaleFactor >= 3.5)
+            if (scaleFactor > 3)
                 scaleLevel = 3; //x4
-            else if (scaleFactor >= 2.5)
+            else if (scaleFactor > 2)
                 scaleLevel = 2; //x3
-            else if (scaleFactor >= 1.5)
+            else if (scaleFactor > 1)
                 scaleLevel = 1; //x2
             else
                 scaleLevel = 0;

@@ -87,8 +87,7 @@ namespace FairyGUI
             for (int i = 0; i < charCount; i++)
             {
                 TextField.CharPosition cp = _textField.charPositions[i];
-                if (cp.vertCount > 0)
-                    _mainLayerVertCount += cp.vertCount;
+                _mainLayerVertCount += cp.vertCount;
             }
 
             if (_mainLayerVertCount < vertCount) //说明有描边或者阴影
@@ -118,19 +117,15 @@ namespace FairyGUI
             while (_printIndex < listCnt - 1) //最后一个是占位的，无效的，所以-1
             {
                 cp = charPositions[_printIndex++];
-                if (cp.vertCount < 0) //这是一个图片
+                if (cp.vertCount > 0)
+                    output(cp.vertCount);
+                if (cp.imgIndex > 0) //这是一个图片
                 {
-                    _textField.richTextField.ShowHtmlObject(-cp.vertCount - 1, true);
+                    _textField.richTextField.ShowHtmlObject(cp.imgIndex - 1, true);
                     return true;
                 }
                 else if (!char.IsWhiteSpace(_textField.parsedText[_printIndex - 1]))
-                {
-                    if (cp.vertCount > 0)
-                        output(cp.vertCount);
                     return true;
-                }
-                else if (cp.vertCount > 0) //空白
-                    output(cp.vertCount);
             }
 
             Cancel();

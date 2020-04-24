@@ -135,7 +135,7 @@ namespace FairyGUI.Utils
                 _linkPool.Push(obj);
 
             if (obj.displayObject != null)
-                ToolSet.SetParent(obj.displayObject.cachedTransform, _poolManager);
+                obj.displayObject.cachedTransform.SetParent(_poolManager, false);
         }
 
         virtual public NTexture GetImageTexture(HtmlImage image)

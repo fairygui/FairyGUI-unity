@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -23,9 +24,9 @@ namespace FairyGUI
         protected GObject _iconObject;
         protected GList _list;
 
-        protected string[] _items;
-        protected string[] _icons;
-        protected string[] _values;
+        protected List<string> _items;
+        protected List<string> _icons;
+        protected List<string> _values;
         protected PopupDirection _popupDirection;
         protected Controller _selectionController;
 
@@ -43,8 +44,8 @@ namespace FairyGUI
             visibleItemCount = UIConfig.defaultComboBoxVisibleItemCount;
             _itemsUpdated = true;
             _selectedIndex = -1;
-            _items = new string[0];
-            _values = new string[0];
+            _items = new List<string>();
+            _values = new List<string>();
             _popupDirection = PopupDirection.Auto;
         }
 
@@ -159,43 +160,29 @@ namespace FairyGUI
         {
             get
             {
-                return _items;
+                return _items.ToArray();
             }
             set
             {
-                if (value == null)
-                    _items = new string[0];
-                else
-                    _items = (string[])value.Clone();
-                if (_items.Length > 0)
-                {
-                    if (_selectedIndex >= _items.Length)
-                        _selectedIndex = _items.Length - 1;
-                    else if (_selectedIndex == -1)
-                        _selectedIndex = 0;
-                    this.text = _items[_selectedIndex];
-                    if (_icons != null && _selectedIndex < _icons.Length)
-                        this.icon = _icons[_selectedIndex];
-                }
-                else
-                {
-                    this.text = string.Empty;
-                    if (_icons != null)
-                        this.icon = null;
-                    _selectedIndex = -1;
-                }
-                _itemsUpdated = true;
+                _items.Clear();
+                if (value != null)
+                    _items.AddRange(value);
+                ApplyListChange();
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string[] icons
         {
-            get { return _icons; }
+            get { return _icons != null ? _icons.ToArray() : null; }
             set
             {
-                _icons = value;
-                if (_icons != null && _selectedIndex != -1 && _selectedIndex < _icons.Length)
-                    this.icon = _icons[_selectedIndex];
+                this.iconList.Clear();
+                if (value != null)
+                    _icons.AddRange(value);
+                ApplyListChange();
             }
         }
 
@@ -204,17 +191,64 @@ namespace FairyGUI
         /// </summary>
         public string[] values
         {
-            get
-            {
-                return _values;
-            }
+            get { return _values.ToArray(); }
             set
             {
-                if (value == null)
-                    _values = new string[0];
-                else
-                    _values = (string[])value.Clone();
+                _values.Clear();
+                if (value != null)
+                    _values.AddRange(value);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<string> itemList
+        {
+            get { return _items; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<string> valueList
+        {
+            get { return _values; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<string> iconList
+        {
+            get { return _icons ?? (_icons = new List<string>()); }
+        }
+
+        /// <summary>
+        /// Call this method after you made changes on itemList or iconList
+        /// </summary>
+        public void ApplyListChange()
+        {
+            if (_items.Count > 0)
+            {
+                if (_selectedIndex >= _items.Count)
+                    _selectedIndex = _items.Count - 1;
+                else if (_selectedIndex == -1)
+                    _selectedIndex = 0;
+
+                this.text = _items[_selectedIndex];
+                if (_icons != null && _selectedIndex < _icons.Count)
+                    this.icon = _icons[_selectedIndex];
+            }
+            else
+            {
+                this.text = string.Empty;
+                if (_icons != null)
+                    this.icon = null;
+                _selectedIndex = -1;
+            }
+
+            _itemsUpdated = true;
         }
 
         /// <summary>
@@ -232,10 +266,10 @@ namespace FairyGUI
                     return;
 
                 _selectedIndex = value;
-                if (_selectedIndex >= 0 && _selectedIndex < _items.Length)
+                if (_selectedIndex >= 0 && _selectedIndex < _items.Count)
                 {
                     this.text = (string)_items[_selectedIndex];
-                    if (_icons != null && _selectedIndex < _icons.Length)
+                    if (_icons != null && _selectedIndex < _icons.Count)
                         this.icon = _icons[_selectedIndex];
                 }
                 else
@@ -265,16 +299,18 @@ namespace FairyGUI
         {
             get
             {
-                if (_selectedIndex >= 0 && _selectedIndex < _values.Length)
+                if (_selectedIndex >= 0 && _selectedIndex < _values.Count)
                     return _values[_selectedIndex];
                 else
                     return null;
             }
             set
             {
-                int index = Array.IndexOf(_values, value);
+                int index = _values.IndexOf(value);
                 if (index == -1 && value == null)
-                    index = Array.IndexOf(_values, string.Empty);
+                    index = _values.IndexOf(string.Empty);
+                if (index == -1)
+                    index = 0;
                 this.selectedIndex = index;
             }
         }
@@ -418,21 +454,19 @@ namespace FairyGUI
 
             string str;
             int itemCount = buffer.ReadShort();
-            _items = new string[itemCount];
-            _values = new string[itemCount];
             for (int i = 0; i < itemCount; i++)
             {
                 int nextPos = buffer.ReadShort();
                 nextPos += buffer.position;
 
-                _items[i] = buffer.ReadS();
-                _values[i] = buffer.ReadS();
+                _items.Add(buffer.ReadS());
+                _values.Add(buffer.ReadS());
                 str = buffer.ReadS();
                 if (str != null)
                 {
                     if (_icons == null)
-                        _icons = new string[itemCount];
-                    _icons[i] = str;
+                        _icons = new List<string>();
+                    _icons.Add(str);
                 }
 
                 buffer.position = nextPos;
@@ -442,9 +476,9 @@ namespace FairyGUI
             if (str != null)
             {
                 this.text = str;
-                _selectedIndex = Array.IndexOf(_items, str);
+                _selectedIndex = _items.IndexOf(str);
             }
-            else if (_items.Length > 0)
+            else if (_items.Count > 0)
             {
                 _selectedIndex = 0;
                 this.text = _items[0];
@@ -486,13 +520,7 @@ namespace FairyGUI
             dropdown.width = this.width;
             _list.EnsureBoundsCorrect(); //avoid flicker
 
-            object downward = null;
-            if (_popupDirection == PopupDirection.Down)
-                downward = true;
-            else if (_popupDirection == PopupDirection.Up)
-                downward = false;
-
-            this.root.TogglePopup(dropdown, this, downward);
+            this.root.TogglePopup(dropdown, this, _popupDirection);
             if (dropdown.parent != null)
             {
                 dropdown.displayObject.onRemovedFromStage.Add(__popupWinClosed);
@@ -503,13 +531,13 @@ namespace FairyGUI
         virtual protected void RenderDropdownList()
         {
             _list.RemoveChildrenToPool();
-            int cnt = _items.Length;
+            int cnt = _items.Count;
             for (int i = 0; i < cnt; i++)
             {
                 GObject item = _list.AddItemFromPool();
                 item.text = _items[i];
-                item.icon = (_icons != null && i < _icons.Length) ? _icons[i] : null;
-                item.name = i < _values.Length ? _values[i] : string.Empty;
+                item.icon = (_icons != null && i < _icons.Count) ? _icons[i] : null;
+                item.name = i < _values.Count ? _values[i] : string.Empty;
             }
         }
 

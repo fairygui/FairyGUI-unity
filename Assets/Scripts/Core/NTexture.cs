@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using FairyGUI.Utils;
+using Object = UnityEngine.Object;
 
 namespace FairyGUI
 {
@@ -45,6 +46,11 @@ namespace FairyGUI
         /// </summary>
         public DestroyMethod destroyMethod;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public event Action onSizeChanged;
+
         Texture _nativeTexture;
         Texture _alphaTexture;
 
@@ -59,7 +65,7 @@ namespace FairyGUI
         {
             Texture2D emptyTexture = new Texture2D(1, 1, TextureFormat.RGB24, false);
             emptyTexture.name = "White Texture";
-            emptyTexture.hideFlags = DisplayOptions.hideFlags;
+            emptyTexture.hideFlags = DisplayObject.hideFlags;
             emptyTexture.SetPixel(0, 0, Color.white);
             emptyTexture.Apply();
             return emptyTexture;
@@ -114,7 +120,18 @@ namespace FairyGUI
             _nativeTexture = texture;
             _alphaTexture = alphaTexture;
             uvRect = new Rect(0, 0, xScale, yScale);
-            _originalSize = new Vector2(texture.width, texture.height);
+            if (yScale < 0)
+            {
+                uvRect.y = -yScale;
+                uvRect.yMax = 0;
+            }
+            if (xScale < 0)
+            {
+                uvRect.x = -xScale;
+                uvRect.xMax = 0;
+            }
+            if (_nativeTexture != null)
+                _originalSize = new Vector2(_nativeTexture.width, _nativeTexture.height);
             _region = new Rect(0, 0, _originalSize.x, _originalSize.y);
         }
 
@@ -215,6 +232,7 @@ namespace FairyGUI
         public Vector2 offset
         {
             get { return _offset; }
+            set { _offset = value; }
         }
 
         /// <summary>
@@ -223,6 +241,7 @@ namespace FairyGUI
         public Vector2 originalSize
         {
             get { return _originalSize; }
+            set { _originalSize = value; }
         }
 
         /// <summary>
@@ -300,50 +319,30 @@ namespace FairyGUI
             get { return _root != null ? _root._alphaTexture : null; }
         }
 
-        static uint _gCounter;
-
         /// <summary>
         /// 
         /// </summary>
-        public MaterialManager GetMaterialManager(string shaderName, string[] keywords)
+        public MaterialManager GetMaterialManager(string shaderName)
         {
             if (_root != this)
             {
                 if (_root == null)
                     return null;
                 else
-                    return _root.GetMaterialManager(shaderName, keywords);
+                    return _root.GetMaterialManager(shaderName);
             }
 
             if (_materialManagers == null)
                 _materialManagers = new Dictionary<string, MaterialManager>();
 
-            string key = shaderName;
-            if (keywords != null)
-            {
-                //对于带指定关键字的，目前的设计是不参加共享材质了，因为逻辑会变得更复杂
-                key = shaderName + "_" + _gCounter++;
-            }
-
             MaterialManager mm;
-            if (!_materialManagers.TryGetValue(key, out mm))
+            if (!_materialManagers.TryGetValue(shaderName, out mm))
             {
-                mm = new MaterialManager(this, ShaderConfig.GetShader(shaderName), keywords);
-                mm._managerKey = key;
-                _materialManagers.Add(key, mm);
+                mm = new MaterialManager(this, ShaderConfig.GetShader(shaderName));
+                _materialManagers.Add(shaderName, mm);
             }
 
             return mm;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="manager"></param>
-        public void DestroyMaterialManager(MaterialManager manager)
-        {
-            _materialManagers.Remove(manager._managerKey);
-            manager.DestroyMaterials();
         }
 
         /// <summary>
@@ -363,31 +362,11 @@ namespace FairyGUI
                 return;
 
             if (_root != this)
-                throw new System.Exception("Unload is not allow to call on none root NTexture.");
+                throw new Exception("Unload is not allow to call on none root NTexture.");
 
             if (_nativeTexture != null)
             {
-                if (destroyMethod == DestroyMethod.Destroy)
-                {
-                    Object.DestroyImmediate(_nativeTexture, true);
-                    if (_alphaTexture != null)
-                        Object.DestroyImmediate(_alphaTexture, true);
-                }
-                else if (destroyMethod == DestroyMethod.Unload)
-                {
-                    Resources.UnloadAsset(_nativeTexture);
-                    if (_alphaTexture != null)
-                        Resources.UnloadAsset(_alphaTexture);
-                }
-                else if (destroyMethod == DestroyMethod.ReleaseTemp)
-                {
-                    RenderTexture.ReleaseTemporary((RenderTexture)_nativeTexture);
-                    if (_alphaTexture is RenderTexture)
-                        RenderTexture.ReleaseTemporary((RenderTexture)_alphaTexture);
-                }
-
-                _nativeTexture = null;
-                _alphaTexture = null;
+                DestroyTexture();
 
                 if (destroyMaterials)
                     DestroyMaterials();
@@ -406,10 +385,48 @@ namespace FairyGUI
             if (_root != this)
                 throw new System.Exception("Reload is not allow to call on none root NTexture.");
 
+            if (_nativeTexture != null && _nativeTexture != nativeTexture)
+                DestroyTexture();
+
             _nativeTexture = nativeTexture;
             _alphaTexture = alphaTexture;
 
+            Vector2 lastSize = _originalSize;
+            if (_nativeTexture != null)
+                _originalSize = new Vector2(_nativeTexture.width, _nativeTexture.height);
+            else
+                _originalSize = Vector2.zero;
+            _region = new Rect(0, 0, _originalSize.x, _originalSize.y);
+
             RefreshMaterials();
+
+            if (onSizeChanged != null && lastSize != _originalSize)
+                onSizeChanged();
+        }
+
+        void DestroyTexture()
+        {
+            if (destroyMethod == DestroyMethod.Destroy)
+            {
+                Object.DestroyImmediate(_nativeTexture, true);
+                if (_alphaTexture != null)
+                    Object.DestroyImmediate(_alphaTexture, true);
+            }
+            else if (destroyMethod == DestroyMethod.Unload)
+            {
+                Resources.UnloadAsset(_nativeTexture);
+                if (_alphaTexture != null)
+                    Resources.UnloadAsset(_alphaTexture);
+            }
+            else if (destroyMethod == DestroyMethod.ReleaseTemp)
+            {
+                RenderTexture.ReleaseTemporary((RenderTexture)_nativeTexture);
+                if (_alphaTexture is RenderTexture)
+                    RenderTexture.ReleaseTemporary((RenderTexture)_alphaTexture);
+            }
+
+            _nativeTexture = null;
+            _alphaTexture = null;
         }
 
         void RefreshMaterials()
@@ -445,6 +462,7 @@ namespace FairyGUI
             if (_root == this)
                 Unload(true);
             _root = null;
+            onSizeChanged = null;
         }
     }
 }

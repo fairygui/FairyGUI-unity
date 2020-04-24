@@ -40,7 +40,7 @@ namespace FairyGUI.Utils
             return new Color(((value >> 16) & 0xFF) / 255f, ((value >> 8) & 0xFF) / 255f, (value & 0xFF) / 255f, 1);
         }
 
-        public static Color ColorFromRGBA(int value)
+        public static Color ColorFromRGBA(uint value)
         {
             return new Color(((value >> 16) & 0xFF) / 255f, ((value >> 8) & 0xFF) / 255f, (value & 0xFF) / 255f, ((value >> 24) & 0xFF) / 255f);
         }
@@ -84,24 +84,6 @@ namespace FairyGUI.Utils
             float x = Mathf.Min(rect1.x, rect2.x);
             float y = Mathf.Min(rect1.y, rect2.y);
             return new Rect(x, y, Mathf.Max(rect1.xMax, rect2.xMax) - x, Mathf.Max(rect1.yMax, rect2.yMax) - y);
-        }
-
-        public static void SetParent(Transform t, Transform parent)
-        {
-            if ((object)t.parent == (object)parent)
-                return;
-
-#if (UNITY_4_6 || UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
-            t.SetParent(parent, false);
-#else
-            Vector3 p = t.localPosition;
-            Vector3 s = t.localScale;
-            Quaternion q = t.localRotation;
-            t.parent = parent;
-            t.localPosition = p;
-            t.localScale = s;
-            t.localRotation = q;
-#endif
         }
 
         public static void SkewMatrix(ref Matrix4x4 matrix, float skewX, float skewY)

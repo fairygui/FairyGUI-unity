@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
-using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -53,7 +51,7 @@ namespace FairyGUI
         [NonSerialized]
         RenderTexture _texture;
 
-        EventCallback0 _captureDelegate;
+        Action _captureDelegate;
 
         void OnEnable()
         {
@@ -121,7 +119,6 @@ namespace FairyGUI
             this.container.renderCamera = renderCamera;
             this.container.touchable = !touchDisabled;
             this.container.fairyBatching = fairyBatching;
-            this.container._isPanel = true;
             this.container._panelOrder = sortingOrder;
             this.container.hitArea = new MeshColliderHitTest(this.gameObject.GetComponent<MeshCollider>());
             SetSortingOrder(this.sortingOrder, true);
@@ -186,7 +183,7 @@ namespace FairyGUI
                     _captureDelegate = Capture;
                     if (_renderer.sharedMaterial.renderQueue == 3000) //Set in transpare queue only
                     {
-                        this.container.onUpdate = () =>
+                        this.container.onUpdate += () =>
                         {
                             UpdateContext.OnEnd += _captureDelegate;
                         };
@@ -199,7 +196,7 @@ namespace FairyGUI
 
         void Capture()
         {
-            CaptureCamera.Capture(this.container, _texture, Vector2.zero);
+            CaptureCamera.Capture(this.container, _texture, this.container.size.y, Vector2.zero);
             if (_renderer != null)
                 _renderer.sortingOrder = container.renderingOrder;
         }
@@ -228,7 +225,7 @@ namespace FairyGUI
 
             _captured = true;
 
-            DisplayOptions.SetEditModeHideFlags();
+            DisplayObject.hideFlags = HideFlags.DontSaveInEditor;
             GComponent view = (GComponent)UIPackage.CreateObject(packageName, componentName);
 
             if (view != null)
@@ -239,7 +236,6 @@ namespace FairyGUI
 
                 Container root = (Container)view.displayObject;
                 root.layer = CaptureCamera.layer;
-                root.SetChildrenLayer(CaptureCamera.layer);
                 root.gameObject.hideFlags = HideFlags.None;
                 root.gameObject.SetActive(true);
 

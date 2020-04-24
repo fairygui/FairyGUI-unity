@@ -16,7 +16,6 @@ class BookPage : GComponent
         _pageNumber = GetChild("pn");
 
         _modelWrapper = new GoWrapper();
-        _modelWrapper.supportStencil = true;
         GetChild("model").asGraph.SetNativeObject(_modelWrapper);
     }
 

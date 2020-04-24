@@ -26,6 +26,11 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public Vector2 textureSize;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public readonly List<Vector3> vertices;
 
         /// <summary>
@@ -36,11 +41,12 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-#if UNITY_5_2 || UNITY_5_3_OR_NEWER
-        public readonly List<Vector4> uv0;
-#else
-        public readonly List<Vector2> uv0;
-#endif
+        public readonly List<Vector2> uvs;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public readonly List<Vector2> uvs2;
 
         /// <summary>
         /// 
@@ -84,6 +90,7 @@ namespace FairyGUI
             vb.contentRect = source.contentRect;
             vb.uvRect = source.uvRect;
             vb.vertexColor = source.vertexColor;
+            vb.textureSize = source.textureSize;
 
             return vb;
         }
@@ -92,11 +99,8 @@ namespace FairyGUI
         {
             vertices = new List<Vector3>();
             colors = new List<Color32>();
-#if UNITY_5_2 || UNITY_5_3_OR_NEWER
-            uv0 = new List<Vector4>();
-#else
-            uv0 = new List<Vector2>();
-#endif
+            uvs = new List<Vector2>();
+            uvs2 = new List<Vector2>();
             triangles = new List<int>();
         }
 
@@ -115,7 +119,8 @@ namespace FairyGUI
         {
             vertices.Clear();
             colors.Clear();
-            uv0.Clear();
+            uvs.Clear();
+            uvs2.Clear();
             triangles.Clear();
 
             _isArbitraryQuad = false;
@@ -144,10 +149,9 @@ namespace FairyGUI
             colors.Add(vertexColor);
             if (vertexColor.a != 255)
                 _alphaInVertexColor = true;
-            uv0.Add(new Vector4(
+            uvs.Add(new Vector2(
                     Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
-                    Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height),
-                    0, 1));
+                    Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height)));
         }
 
         /// <summary>
@@ -162,10 +166,9 @@ namespace FairyGUI
             colors.Add(color);
             if (color.a != 255)
                 _alphaInVertexColor = true;
-            uv0.Add(new Vector4(
+            uvs.Add(new Vector2(
                     Mathf.Lerp(uvRect.xMin, uvRect.xMax, (position.x - contentRect.xMin) / contentRect.width),
-                    Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height),
-                    0, 1));
+                    Mathf.Lerp(uvRect.yMax, uvRect.yMin, (-position.y - contentRect.yMin) / contentRect.height)));
         }
 
         /// <summary>
@@ -178,7 +181,7 @@ namespace FairyGUI
         {
             position.y = -position.y;
             vertices.Add(position);
-            uv0.Add(new Vector4(uv.x, uv.y, 0, 1));
+            uvs.Add(new Vector2(uv.x, uv.y));
             colors.Add(color);
             if (color.a != 255)
                 _alphaInVertexColor = true;
@@ -225,10 +228,10 @@ namespace FairyGUI
             vertices.Add(new Vector3(vertRect.xMax, -vertRect.yMin, 0f));
             vertices.Add(new Vector3(vertRect.xMax, -vertRect.yMax, 0f));
 
-            uv0.Add(new Vector4(uvRect.xMin, uvRect.yMin, 0, 1));
-            uv0.Add(new Vector4(uvRect.xMin, uvRect.yMax, 0, 1));
-            uv0.Add(new Vector4(uvRect.xMax, uvRect.yMax, 0, 1));
-            uv0.Add(new Vector4(uvRect.xMax, uvRect.yMin, 0, 1));
+            uvs.Add(new Vector2(uvRect.xMin, uvRect.yMin));
+            uvs.Add(new Vector2(uvRect.xMin, uvRect.yMax));
+            uvs.Add(new Vector2(uvRect.xMax, uvRect.yMax));
+            uvs.Add(new Vector2(uvRect.xMax, uvRect.yMin));
 
             colors.Add(color);
             colors.Add(color);
@@ -239,11 +242,8 @@ namespace FairyGUI
                 _alphaInVertexColor = true;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startVertexIndex"></param>
-        internal void FixUVForArbitraryQuad()
+        static List<Vector4> helperV4List = new List<Vector4>(4) { Vector4.zero, Vector4.zero, Vector4.zero, Vector4.zero };
+        internal List<Vector4> FixUVForArbitraryQuad()
         {
             //ref1 http://www.reedbeta.com/blog/quadrilateral-interpolation-part-1/
             //ref2 https://bitlush.com/blog/arbitrary-quadrilaterals-in-opengl-es-2-0
@@ -272,13 +272,15 @@ namespace FairyGUI
 
             for (int i = 0; i < 4; i++)
             {
-                Vector4 v = uv0[i];
+                Vector4 v = uvs[i];
                 float q = qq[i];
                 v.x *= q;
                 v.y *= q;
                 v.w = q;
-                uv0[i] = v;
+                helperV4List[i] = v;
             }
+
+            return helperV4List;
         }
 
         /// <summary>
@@ -397,7 +399,8 @@ namespace FairyGUI
         {
             int len = vertices.Count;
             vertices.AddRange(vb.vertices);
-            uv0.AddRange(vb.uv0);
+            uvs.AddRange(vb.uvs);
+            uvs2.AddRange(vb.uvs2);
             colors.AddRange(vb.colors);
             if (len != 0)
             {
@@ -419,7 +422,8 @@ namespace FairyGUI
         public void Insert(VertexBuffer vb)
         {
             vertices.InsertRange(0, vb.vertices);
-            uv0.InsertRange(0, vb.uv0);
+            uvs.InsertRange(0, vb.uvs);
+            uvs2.InsertRange(0, vb.uvs2);
             colors.InsertRange(0, vb.colors);
             int len = triangles.Count;
             if (len != 0)

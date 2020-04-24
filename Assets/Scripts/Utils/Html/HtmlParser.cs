@@ -94,12 +94,21 @@ namespace FairyGUI.Utils
                             PopTextFormat();
                         break;
 
+                    case "strike":
+                        if (XMLIterator.tagType == XMLTagType.Start)
+                        {
+                            PushTextFormat();
+                            _format.strikethrough = true;
+                        }
+                        else
+                            PopTextFormat();
+                        break;
+
                     case "sub":
                         {
                             if (XMLIterator.tagType == XMLTagType.Start)
                             {
                                 PushTextFormat();
-                                _format.size = Mathf.CeilToInt(_format.size * 0.58f);
                                 _format.specialStyle = TextFormat.SpecialStyle.Subscript;
                             }
                             else
@@ -112,7 +121,6 @@ namespace FairyGUI.Utils
                             if (XMLIterator.tagType == XMLTagType.Start)
                             {
                                 PushTextFormat();
-                                _format.size = Mathf.CeilToInt(_format.size * 0.58f);
                                 _format.specialStyle = TextFormat.SpecialStyle.Superscript;
                             }
                             else

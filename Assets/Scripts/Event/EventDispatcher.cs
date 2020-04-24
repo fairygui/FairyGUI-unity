@@ -24,19 +24,7 @@ namespace FairyGUI
         /// <param name="callback"></param>
         public void AddEventListener(string strType, EventCallback1 callback)
         {
-            if (strType == null)
-                throw new Exception("event type cant be null");
-
-            if (_dic == null)
-                _dic = new Dictionary<string, EventBridge>();
-
-            EventBridge bridge = null;
-            if (!_dic.TryGetValue(strType, out bridge))
-            {
-                bridge = new EventBridge(this);
-                _dic[strType] = bridge;
-            }
-            bridge.Add(callback);
+            GetBridge(strType).Add(callback);
         }
 
         /// <summary>
@@ -46,19 +34,7 @@ namespace FairyGUI
         /// <param name="callback"></param>
         public void AddEventListener(string strType, EventCallback0 callback)
         {
-            if (strType == null)
-                throw new Exception("event type cant be null");
-
-            if (_dic == null)
-                _dic = new Dictionary<string, EventBridge>();
-
-            EventBridge bridge = null;
-            if (!_dic.TryGetValue(strType, out bridge))
-            {
-                bridge = new EventBridge(this);
-                _dic[strType] = bridge;
-            }
-            bridge.Add(callback);
+            GetBridge(strType).Add(callback);
         }
 
         /// <summary>
@@ -89,6 +65,31 @@ namespace FairyGUI
             EventBridge bridge = null;
             if (_dic.TryGetValue(strType, out bridge))
                 bridge.Remove(callback);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strType"></param>
+        /// <param name="callback"></param>
+        public void AddCapture(string strType, EventCallback1 callback)
+        {
+            GetBridge(strType).AddCapture(callback);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="strType"></param>
+        /// <param name="callback"></param>
+        public void RemoveCapture(string strType, EventCallback1 callback)
+        {
+            if (_dic == null)
+                return;
+
+            EventBridge bridge = null;
+            if (_dic.TryGetValue(strType, out bridge))
+                bridge.RemoveCapture(callback);
         }
 
         /// <summary>
@@ -391,6 +392,24 @@ namespace FairyGUI
             context.sender = null;
             context.data = null;
             return context._defaultPrevented;
+        }
+
+        EventBridge GetBridge(string strType)
+        {
+            if (strType == null)
+                throw new Exception("event type cant be null");
+
+            if (_dic == null)
+                _dic = new Dictionary<string, EventBridge>();
+
+            EventBridge bridge = null;
+            if (!_dic.TryGetValue(strType, out bridge))
+            {
+                bridge = new EventBridge(this);
+                _dic[strType] = bridge;
+            }
+
+            return bridge;
         }
 
         static void GetChildEventBridges(string strType, Container container, List<EventBridge> bridges)

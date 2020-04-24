@@ -14,10 +14,6 @@ public class BasicsMain : MonoBehaviour
 
     void Awake()
     {
-#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
-        CopyPastePatch.Apply();
-#endif
-
 #if (UNITY_5 || UNITY_5_3_OR_NEWER)
         //Use the font names directly
         UIConfig.defaultFont = "Microsoft YaHei";
@@ -315,7 +311,7 @@ public class BasicsMain : MonoBehaviour
         GComponent obj = _demoObjects["Popup"];
         obj.GetChild("n0").onClick.Add((EventContext context) =>
         {
-            _pm.Show((GObject)context.sender, true);
+            _pm.Show((GObject)context.sender, PopupDirection.Down);
         });
 
         obj.GetChild("n1").onClick.Add(() =>

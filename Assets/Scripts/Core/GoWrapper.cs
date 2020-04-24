@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using FairyGUI.Utils;
 
 namespace FairyGUI
 {
@@ -10,35 +10,46 @@ namespace FairyGUI
     /// </summary>
     public class GoWrapper : DisplayObject
     {
-        /// <summary>
-        /// 被包装对象的材质是否支持Stencil。如果支持，则会自动设置这些材质的stecnil相关参数，从而实现对包装对象的遮罩
-        /// </summary>
+        [Obsolete("No need to manually set this flag anymore, coz it will be handled automatically.")]
         public bool supportStencil;
 
         protected GameObject _wrapTarget;
-        protected List<Renderer> _renderers;
-        protected List<Material> _materialsBackup;
-        protected List<Material> _materials;
-        protected List<int> _sortingOrders;
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+        protected List<RendererInfo> _renderers;
+        protected Dictionary<Material, Material> _materialsBackup;
         protected Canvas _canvas;
-#endif
         protected bool _cloneMaterial;
+        protected bool _shouldCloneMaterial;
+        protected bool _supportMask;
+
+        protected struct RendererInfo
+        {
+            public Renderer renderer;
+            public Material[] materials;
+            public int sortingOrder;
+        }
+
+        class HelperMB : MonoBehaviour
+        {
+            private void OnWillRenderObject()
+            {
+                Debug.Log("a");
+            }
+        }
+
+        protected static List<Transform> helperTransformList = new List<Transform>();
 
         /// <summary>
         /// 
         /// </summary>
         public GoWrapper()
         {
-            _skipInFairyBatching = true;
+            _flags |= Flags.SkipBatching;
 
-            _materialsBackup = new List<Material>();
-            _materials = new List<Material>();
-            _renderers = new List<Renderer>();
-            _sortingOrders = new List<int>();
-            _cloneMaterial = false;
+            _renderers = new List<RendererInfo>();
+            _materialsBackup = new Dictionary<Material, Material>();
 
             CreateGameObject("GoWrapper");
+            gameObject.AddComponent<HelperMB>();
         }
 
         /// <summary>
@@ -77,20 +88,17 @@ namespace FairyGUI
 
             _cloneMaterial = cloneMaterial;
             if (_wrapTarget != null)
-                ToolSet.SetParent(_wrapTarget.transform, null);
+                _wrapTarget.transform.SetParent(null, false);
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
             _canvas = null;
-#endif
             _wrapTarget = target;
+            _supportMask = false;
+            _shouldCloneMaterial = false;
             _renderers.Clear();
-            _sortingOrders.Clear();
-            _materials.Clear();
 
             if (_wrapTarget != null)
             {
-                ToolSet.SetParent(_wrapTarget.transform, this.cachedTransform);
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+                _wrapTarget.transform.SetParent(this.cachedTransform, false);
                 _canvas = _wrapTarget.GetComponent<Canvas>();
                 if (_canvas != null)
                 {
@@ -104,18 +112,12 @@ namespace FairyGUI
                     this.SetSize(rt.rect.width, rt.rect.height);
                 }
                 else
-#endif
                 {
                     CacheRenderers();
                     this.SetSize(0, 0);
                 }
 
-                Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
-                int lv = this.layer;
-                foreach (Transform t in transforms)
-                {
-                    t.gameObject.layer = lv;
-                }
+                SetGoLayers(this.layer);
             }
         }
 
@@ -127,30 +129,49 @@ namespace FairyGUI
         /// </summary>
         public void CacheRenderers()
         {
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
             if (_canvas != null)
                 return;
-#endif
+
             RecoverMaterials();
-
             _renderers.Clear();
-            _sortingOrders.Clear();
-            _materials.Clear();
 
-            _wrapTarget.GetComponentsInChildren<Renderer>(true, _renderers);
+            Renderer[] items = _wrapTarget.GetComponentsInChildren<Renderer>(true);
+
+            int cnt = items.Length;
+            _renderers.Capacity = cnt;
+            for (int i = 0; i < cnt; i++)
+            {
+                Renderer r = items[i];
+                Material[] mats = r.sharedMaterials;
+                RendererInfo ri = new RendererInfo()
+                {
+                    renderer = r,
+                    materials = mats,
+                    sortingOrder = r.sortingOrder
+                };
+                _renderers.Add(ri);
+            }
+            _renderers.Sort((RendererInfo c1, RendererInfo c2) =>
+            {
+                return c1.sortingOrder - c2.sortingOrder;
+            });
+
+            _shouldCloneMaterial = true;
+        }
+
+        void CloneMaterials()
+        {
+            _shouldCloneMaterial = false;
 
             int cnt = _renderers.Count;
             for (int i = 0; i < cnt; i++)
             {
-                Renderer r = _renderers[i];
-                if (r == null)
+                RendererInfo ri = _renderers[i];
+                Material[] mats = ri.materials;
+                if (mats == null)
                     continue;
 
-                bool shouldSetRenderQueue = (r is SkinnedMeshRenderer) || (r is MeshRenderer);
-
-                Material[] mats = r.sharedMaterials;
-                if (mats == null || mats.Length == 0)
-                    continue;
+                bool shouldSetRQ = (ri.renderer is SkinnedMeshRenderer) || (ri.renderer is MeshRenderer);
 
                 int mcnt = mats.Length;
                 for (int j = 0; j < mcnt; j++)
@@ -159,46 +180,26 @@ namespace FairyGUI
                     if (mat == null)
                         continue;
 
-                    //确保相同的材质不会复制两次
-                    int k = _materialsBackup.IndexOf(mat);
-                    if (k == -1) //未备份
-                    {
-                        _materialsBackup.Add(mat);
-                        if (_cloneMaterial)
-                        {
-                            mat = new Material(mat);
-                            mats[j] = mat;
-                            _materials.Add(mat); //保存新创建的材质
-                        }
-                        else
-                            _materials.Add(mat); //直接使用已有材质
-                    }
-                    else if (_cloneMaterial)
-                    {
-                        mat = _materials[k];
-                        mats[j] = mat;
-                    }
-
-                    if (shouldSetRenderQueue) //Set the object rendering in Transparent Queue as UI objects
+                    if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
                         mat.renderQueue = 3000;
+
+                    if (mat.HasProperty(ShaderConfig.ID_Stencil) || mat.HasProperty(ShaderConfig.ID_Stencil2)
+                        || mat.HasProperty(ShaderConfig.ID_ClipBox))
+                        _supportMask = true;
+
+                    //确保相同的材质不会复制两次
+                    Material newMat;
+                    if (!_materialsBackup.TryGetValue(mat, out newMat))
+                    {
+                        newMat = new Material(mat);
+                        _materialsBackup[mat] = newMat;
+                    }
+                    mats[j] = newMat;
                 }
 
-                if (_cloneMaterial)
-                    r.sharedMaterials = mats;
+                if (ri.renderer != null)
+                    ri.renderer.sharedMaterials = mats;
             }
-
-            if (!_cloneMaterial)
-                _materialsBackup.Clear();
-
-            _renderers.Sort(CompareSortingOrder);
-            _sortingOrders.Capacity = cnt;
-            for (int i = 0; i < cnt; i++)
-                _sortingOrders.Add(_renderers[i].sortingOrder);
-        }
-
-        static int CompareSortingOrder(Renderer c1, Renderer c2)
-        {
-            return c1.sortingOrder - c2.sortingOrder;
         }
 
         void RecoverMaterials()
@@ -209,12 +210,12 @@ namespace FairyGUI
             int cnt = _renderers.Count;
             for (int i = 0; i < cnt; i++)
             {
-                Renderer r = _renderers[i];
-                if (r == null)
+                RendererInfo ri = _renderers[i];
+                if (ri.renderer == null)
                     continue;
 
-                Material[] mats = r.sharedMaterials;
-                if (mats == null || mats.Length == 0)
+                Material[] mats = ri.materials;
+                if (mats == null)
                     continue;
 
                 int mcnt = mats.Length;
@@ -222,17 +223,17 @@ namespace FairyGUI
                 {
                     Material mat = mats[j];
 
-                    int k = _materials.IndexOf(mat);
-                    if (k != -1)
-                        mats[j] = _materialsBackup[k];
+                    foreach (KeyValuePair<Material, Material> kv in _materialsBackup)
+                    {
+                        if (kv.Value == mat)
+                            mats[j] = kv.Key;
+                    }
                 }
-
-                r.sharedMaterials = mats;
+                ri.renderer.sharedMaterials = mats;
             }
 
-            cnt = _materials.Count;
-            for (int i = 0; i < cnt; i++)
-                Material.DestroyImmediate(_materials[i]);
+            foreach (KeyValuePair<Material, Material> kv in _materialsBackup)
+                Material.DestroyImmediate(kv.Value);
 
             _materialsBackup.Clear();
         }
@@ -247,71 +248,73 @@ namespace FairyGUI
             {
                 base.renderingOrder = value;
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
                 if (_canvas != null)
                     _canvas.sortingOrder = value;
-#endif
-                int cnt = _renderers.Count;
-                for (int i = 0; i < cnt; i++)
+                else
                 {
-                    Renderer r = _renderers[i];
-                    if (r != null)
+                    int cnt = _renderers.Count;
+                    for (int i = 0; i < cnt; i++)
                     {
-                        if (i != 0 && _sortingOrders[i] != _sortingOrders[i - 1])
-                            value = UpdateContext.current.renderingOrder++;
-                        r.sortingOrder = value;
+                        RendererInfo ri = _renderers[i];
+                        if (ri.renderer != null)
+                        {
+                            if (i != 0 && _renderers[i].sortingOrder != _renderers[i - 1].sortingOrder)
+                                value = UpdateContext.current.renderingOrder++;
+                            ri.renderer.sortingOrder = value;
+                        }
                     }
                 }
             }
         }
 
-        public override int layer
+        override protected bool SetLayer(int value, bool fromParent)
         {
-            get
+            if (base.SetLayer(value, fromParent))
             {
-                return base.layer;
+                SetGoLayers(value);
+                return true;
             }
-            set
-            {
-                base.layer = value;
+            else
+                return false;
+        }
 
-                if (_wrapTarget)
-                {
-                    Transform[] transforms = _wrapTarget.GetComponentsInChildren<Transform>(true);
-                    foreach (Transform t in transforms)
-                    {
-                        t.gameObject.layer = value;
-                    }
-                }
-            }
+        protected void SetGoLayers(int layer)
+        {
+            if (_wrapTarget == null)
+                return;
+
+            _wrapTarget.GetComponentsInChildren<Transform>(true, helperTransformList);
+            int cnt = helperTransformList.Count;
+            for (int i = 0; i < cnt; i++)
+                helperTransformList[i].gameObject.layer = layer;
+            helperTransformList.Clear();
         }
 
         override public void Update(UpdateContext context)
         {
-            if (supportStencil)
+            if (_shouldCloneMaterial)
+                CloneMaterials();
+
+            if (_supportMask)
             {
-                int cnt = _materials.Count;
+                int cnt = _renderers.Count;
                 for (int i = 0; i < cnt; i++)
                 {
-                    Material mat = _materials[i];
-                    if (mat != null)
+                    RendererInfo ri = _renderers[i];
+                    Material[] mats = ri.materials;
+                    if (mats != null)
                     {
-                        if (context.clipped && context.stencilReferenceValue > 0)
+                        int cnt2 = mats.Length;
+                        for (int j = 0; j < cnt2; j++)
                         {
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
-                            mat.SetFloat(ShaderConfig._properyIDs._Stencil, context.stencilCompareValue);
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilReadMask, context.stencilReferenceValue | (context.stencilReferenceValue - 1));
-                            mat.SetFloat(ShaderConfig._properyIDs._ColorMask, 15);
+                            Material mat = mats[j];
+                            if (mat != null)
+                                context.ApplyClippingProperties(mat, false);
                         }
-                        else
-                        {
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
-                            mat.SetFloat(ShaderConfig._properyIDs._Stencil, 0);
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
-                            mat.SetFloat(ShaderConfig._properyIDs._StencilReadMask, 255);
-                            mat.SetFloat(ShaderConfig._properyIDs._ColorMask, 15);
-                        }
+
+                        if (cnt2 > 0 && _cloneMaterial && ri.renderer != null
+                             && !Material.ReferenceEquals(ri.renderer.sharedMaterial, mats[0]))
+                            ri.renderer.sharedMaterials = mats;
                     }
                 }
             }
@@ -321,7 +324,7 @@ namespace FairyGUI
 
         public override void Dispose()
         {
-            if (_disposed)
+            if ((_flags & Flags.Disposed) != 0)
                 return;
 
             if (_wrapTarget != null)
@@ -331,18 +334,15 @@ namespace FairyGUI
 
                 if (_materialsBackup.Count > 0)
                 { //如果有备份，说明材质是复制出来的，应该删除
-                    int cnt = _materials.Count;
-                    for (int i = 0; i < cnt; i++)
-                        Material.DestroyImmediate(_materials[i]);
+                    foreach (KeyValuePair<Material, Material> kv in _materialsBackup)
+                        Material.DestroyImmediate(kv.Value);
                 }
             }
 
             _renderers = null;
-            _materials = null;
             _materialsBackup = null;
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
             _canvas = null;
-#endif
+
             base.Dispose();
         }
     }

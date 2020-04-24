@@ -87,6 +87,11 @@ namespace FairyGUI.Utils
             return null;
         }
 
+        public void RemoveAll(string selector)
+        {
+            rawList.RemoveAll(xml => xml.name == selector);
+        }
+
         public struct Enumerator
         {
             List<XML> _source;
@@ -122,6 +127,12 @@ namespace FairyGUI.Utils
                 }
 
                 return false;
+            }
+
+            public void Erase()
+            {
+                _source.RemoveAt(_index);
+                _total--;
             }
 
             public void Reset()

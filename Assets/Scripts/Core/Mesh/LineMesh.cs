@@ -12,7 +12,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public readonly GPath path;
+        public GPath path;
 
         /// <summary>
         /// 
@@ -49,6 +49,11 @@ namespace FairyGUI
         /// </summary>
         public float pointDensity;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool repeatFill;
+
         static List<Vector3> points = new List<Vector3>();
         static List<float> ts = new List<float>();
 
@@ -65,6 +70,7 @@ namespace FairyGUI
         {
             Vector2 uvMin = vb.uvRect.position;
             Vector2 uvMax = new Vector2(vb.uvRect.xMax, vb.uvRect.yMax);
+            float uvRatio = path.length / vb.textureSize.x;
 
             int segCount = path.segmentCount;
             float t = 0;
@@ -110,7 +116,10 @@ namespace FairyGUI
 
                     if (i == 1)
                     {
-                        u = Mathf.Lerp(uvMin.x, uvMax.x, t + ratio * ts[i - 1]);
+                        if (repeatFill)
+                            u = tc * uvRatio * uvMax.x;
+                        else
+                            u = Mathf.Lerp(uvMin.x, uvMax.x, t + ratio * ts[i - 1]);
                         vb.AddVert(p0 - widthVector * lw * 0.5f, c0, new Vector2(u, uvMax.y));
                         vb.AddVert(p0 + widthVector * lw * 0.5f, c0, new Vector2(u, uvMin.y));
 
@@ -126,7 +135,10 @@ namespace FairyGUI
                     if (lineWidthCurve != null)
                         lw = lineWidthCurve.Evaluate(tc);
 
-                    u = Mathf.Lerp(uvMin.x, uvMax.x, tc);
+                    if (repeatFill)
+                        u = tc * uvRatio * uvMax.x;
+                    else
+                        u = Mathf.Lerp(uvMin.x, uvMax.x, tc);
                     vb.AddVert(p1 - widthVector * lw * 0.5f, c1, new Vector2(u, uvMax.y));
                     vb.AddVert(p1 + widthVector * lw * 0.5f, c1, new Vector2(u, uvMin.y));
 

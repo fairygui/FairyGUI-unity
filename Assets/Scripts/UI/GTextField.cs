@@ -246,7 +246,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public int stroke
+        public float stroke
         {
             get { return _textField.stroke; }
             set { _textField.stroke = value; }
@@ -306,7 +306,10 @@ namespace FairyGUI
                     if (value == AutoSizeType.Height)
                     {
                         if (!underConstruct)
+                        {
+                            displayObject.width = this.width;
                             this.height = _textField.textHeight;
+                        }
                     }
                     else
                         displayObject.SetSize(this.width, this.height);
@@ -394,20 +397,32 @@ namespace FairyGUI
             this.singleLine = buffer.ReadBool();
             if (buffer.ReadBool())
             {
-                this.strokeColor = buffer.ReadColor();
-                this.stroke = (int)buffer.ReadFloat();
+                tf.outlineColor = buffer.ReadColor();
+                tf.outline = buffer.ReadFloat();
             }
 
             if (buffer.ReadBool())
             {
-                this.strokeColor = buffer.ReadColor();
+                tf.shadowColor = buffer.ReadColor();
                 float f1 = buffer.ReadFloat();
                 float f2 = buffer.ReadFloat();
-                this.shadowOffset = new Vector2(f1, f2);
+                tf.shadowOffset = new Vector2(f1, f2);
             }
 
             if (buffer.ReadBool())
                 _templateVars = new Dictionary<string, string>();
+
+            if (buffer.version >= 3)
+            {
+                tf.strikethrough = buffer.ReadBool();
+#if FAIRYGUI_TMPRO
+                tf.faceDilate = buffer.ReadFloat();
+                tf.outlineSoftness = buffer.ReadFloat();
+                tf.underlaySoftness = buffer.ReadFloat();
+#else
+                buffer.Skip(12);
+#endif
+            }
 
             _textField.textFormat = tf;
         }

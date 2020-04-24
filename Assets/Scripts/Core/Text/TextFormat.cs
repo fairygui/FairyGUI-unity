@@ -5,7 +5,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class TextFormat
+    public partial class TextFormat
     {
         public enum SpecialStyle
         {
@@ -57,6 +57,11 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public bool strikethrough;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Color32[] gradientColor;
 
         /// <summary>
@@ -69,11 +74,32 @@ namespace FairyGUI
         /// </summary>
         public SpecialStyle specialStyle;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public float outline;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color outlineColor;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Vector2 shadowOffset;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color shadowColor;
+
         public TextFormat()
         {
             color = Color.black;
             size = 12;
             lineSpacing = 3;
+            outlineColor = shadowColor = Color.black;
         }
 
         /// <summary>
@@ -101,13 +127,14 @@ namespace FairyGUI
             return size == aFormat.size && color == aFormat.color
                 && bold == aFormat.bold && underline == aFormat.underline
                 && italic == aFormat.italic
+                && strikethrough == aFormat.strikethrough
                 && gradientColor == aFormat.gradientColor
                 && align == aFormat.align
                 && specialStyle == aFormat.specialStyle;
         }
 
         /// <summary>
-        /// 
+        /// Only base NOT all formats will be copied
         /// </summary>
         /// <param name="source"></param>
         public void CopyFrom(TextFormat source)
@@ -120,6 +147,7 @@ namespace FairyGUI
             this.bold = source.bold;
             this.underline = source.underline;
             this.italic = source.italic;
+            this.strikethrough = source.strikethrough;
             if (source.gradientColor != null)
             {
                 this.gradientColor = new Color32[4];
@@ -129,6 +157,19 @@ namespace FairyGUI
                 this.gradientColor = null;
             this.align = source.align;
             this.specialStyle = source.specialStyle;
+        }
+
+        public void FillVertexColors(Color32[] vertexColors)
+        {
+            if (gradientColor == null)
+                vertexColors[0] = vertexColors[1] = vertexColors[2] = vertexColors[3] = color;
+            else
+            {
+                vertexColors[0] = gradientColor[1];
+                vertexColors[1] = gradientColor[0];
+                vertexColors[2] = gradientColor[2];
+                vertexColors[3] = gradientColor[3];
+            }
         }
     }
 }

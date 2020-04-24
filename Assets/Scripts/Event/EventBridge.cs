@@ -1,4 +1,3 @@
-using System;
 #if FAIRYGUI_TOLUA
 using LuaInterface;
 #endif

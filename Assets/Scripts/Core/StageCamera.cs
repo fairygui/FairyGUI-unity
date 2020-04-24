@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -14,39 +15,43 @@ namespace FairyGUI
         /// </summary>
         public bool constantSize = true;
 
-        [System.NonSerialized]
+        /// <summary>
+        /// 
+        /// </summary>
+        [NonSerialized]
+        public float unitsPerPixel = 0.02f;
+
+        [NonSerialized]
         public Transform cachedTransform;
-        [System.NonSerialized]
+        [NonSerialized]
         public Camera cachedCamera;
 
-        [System.NonSerialized]
+        [NonSerialized]
         int screenWidth;
-        [System.NonSerialized]
+        [NonSerialized]
         int screenHeight;
-        [System.NonSerialized]
+        [NonSerialized]
         bool isMain;
-#pragma warning disable 0649
-        [System.NonSerialized]
+        [NonSerialized]
         Display _display;
-#pragma warning restore 0649
 
         /// <summary>
         /// 
         /// </summary>
-        [System.NonSerialized]
+        [NonSerialized]
         public static Camera main;
 
         /// <summary>
         /// 
         /// </summary>
-        [System.NonSerialized]
+        [NonSerialized]
         public static int screenSizeVer = 1;
 
         public const string Name = "Stage Camera";
         public const string LayerName = "UI";
 
         public static float DefaultCameraSize = 5;
-        public static float UnitsPerPixel = 0.02f;
+        public static float DefaultUnitsPerPixel = 0.02f;
 
         void OnEnable()
         {
@@ -57,10 +62,10 @@ namespace FairyGUI
                 main = cachedCamera;
                 isMain = true;
             }
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
+
             if (Display.displays.Length > 1 && cachedCamera.targetDisplay != 0 && cachedCamera.targetDisplay < Display.displays.Length)
                 _display = Display.displays[cachedCamera.targetDisplay];
-#endif
+
             if (_display == null)
                 OnScreenSizeChanged(Screen.width, Screen.height);
             else
@@ -89,25 +94,23 @@ namespace FairyGUI
             screenWidth = newWidth;
             screenHeight = newHeight;
 
-            float upp;
             if (constantSize)
             {
                 cachedCamera.orthographicSize = DefaultCameraSize;
-                upp = cachedCamera.orthographicSize * 2 / screenHeight;
+                unitsPerPixel = cachedCamera.orthographicSize * 2 / screenHeight;
             }
             else
             {
-                upp = 0.02f;
-                cachedCamera.orthographicSize = screenHeight / 2 * UnitsPerPixel;
+                unitsPerPixel = DefaultUnitsPerPixel;
+                cachedCamera.orthographicSize = screenHeight / 2 * unitsPerPixel;
             }
             cachedTransform.localPosition = new Vector3(cachedCamera.orthographicSize * screenWidth / screenHeight, -cachedCamera.orthographicSize);
 
             if (isMain)
             {
-                UnitsPerPixel = upp;
                 screenSizeVer++;
                 if (Application.isPlaying)
-                    Stage.inst.HandleScreenSizeChanged();
+                    Stage.inst.HandleScreenSizeChanged(screenWidth, screenHeight, unitsPerPixel);
                 else
                 {
                     UIContentScaler scaler = GameObject.FindObjectOfType<UIContentScaler>();

@@ -13,17 +13,12 @@ namespace FairyGUI
 
         DisplayObject _target;
         float[] _matrix;
-        Matrix4x4 _shaderMatrix;
-        Vector4 _offset;
-        Material _material;
-        Material _savedMaterial;
 
         const float LUMA_R = 0.299f;
         const float LUMA_G = 0.587f;
         const float LUMA_B = 0.114f;
 
         static float[] IDENTITY = new float[] { 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 };
-        static string[] FILTER_KEY = new string[] { "COLOR_FILTER" };
         static float[] tmp = new float[20];
 
         public ColorFilter()
@@ -41,20 +36,14 @@ namespace FairyGUI
 
                 //这里做一个优化，如果对象是图片或者动画，则通过直接修改目标的材质完成滤镜功能
                 if ((_target is Image) || (_target is MovieClip))
-                    _target.graphics.materialKeywords = FILTER_KEY;
+                    _target.graphics.ToggleKeyword("COLOR_FILTER", true);
                 else //否则通过绘画模式，需要建立一张RT，所以会有一定消耗
                 {
-                    if (_material == null)
-                    {
-                        _material = new Material(ShaderConfig.GetShader(ShaderConfig.imageShader));
-                        _material.hideFlags = DisplayOptions.hideFlags;
-                        _material.EnableKeyword(FILTER_KEY[0]);
-                    }
-
                     _target.EnterPaintingMode(1, null);
-                    _savedMaterial = _target.paintingGraphics.material; //保存原来的材质
-                    _target.paintingGraphics.material = _material; //设置后材质的所有权已转移到paintingGraphics
+                    _target.paintingGraphics.ToggleKeyword("COLOR_FILTER", true);
                 }
+
+                UpdateMatrix();
             }
         }
 
@@ -63,35 +52,19 @@ namespace FairyGUI
             if (!_target.isDisposed)
             {
                 if ((_target is Image) || (_target is MovieClip))
-                    _target.graphics.materialKeywords = null;
+                    _target.graphics.ToggleKeyword("COLOR_FILTER", false);
                 else
                 {
-                    //恢复原来的材质
-                    _target.paintingGraphics.material = _savedMaterial;
+                    _target.paintingGraphics.ToggleKeyword("COLOR_FILTER", false);
                     _target.LeavePaintingMode(1);
                 }
             }
 
-            if (_material != null)
-                Material.Destroy(_material);
-
-            _savedMaterial = null;
-            _material = null;
             _target = null;
         }
 
         public void Update()
         {
-            Material mat;
-            if ((_target is Image) || (_target is MovieClip))
-                mat = _target.graphics.material;
-            else
-                mat = _material;
-            if ((object)mat != null)
-            {
-                mat.SetMatrix(ShaderConfig._properyIDs._ColorMatrix, _shaderMatrix);
-                mat.SetVector(ShaderConfig._properyIDs._ColorOffset, _offset);
-            }
         }
 
         public void Invert()
@@ -241,12 +214,25 @@ namespace FairyGUI
 
         void UpdateMatrix()
         {
-            _shaderMatrix.SetRow(0, new Vector4(_matrix[0], _matrix[1], _matrix[2], _matrix[3]));
-            _shaderMatrix.SetRow(1, new Vector4(_matrix[5], _matrix[6], _matrix[7], _matrix[8]));
-            _shaderMatrix.SetRow(2, new Vector4(_matrix[10], _matrix[11], _matrix[12], _matrix[13]));
-            _shaderMatrix.SetRow(3, new Vector4(_matrix[15], _matrix[16], _matrix[17], _matrix[18]));
-            _offset = new Vector4(_matrix[4], _matrix[9], _matrix[14], _matrix[19]);
-        }
+            if (_target == null)
+                return;
 
+            Matrix4x4 matrix = new Matrix4x4();
+            matrix.SetRow(0, new Vector4(_matrix[0], _matrix[1], _matrix[2], _matrix[3]));
+            matrix.SetRow(1, new Vector4(_matrix[5], _matrix[6], _matrix[7], _matrix[8]));
+            matrix.SetRow(2, new Vector4(_matrix[10], _matrix[11], _matrix[12], _matrix[13]));
+            matrix.SetRow(3, new Vector4(_matrix[15], _matrix[16], _matrix[17], _matrix[18]));
+
+            Vector4 offset = new Vector4(_matrix[4], _matrix[9], _matrix[14], _matrix[19]);
+
+            MaterialPropertyBlock block;
+            if ((_target is Image) || (_target is MovieClip))
+                block = _target.graphics.materialPropertyBlock;
+            else
+                block = _target.paintingGraphics.materialPropertyBlock;
+
+            block.SetMatrix(ShaderConfig.ID_ColorMatrix, matrix);
+            block.SetVector(ShaderConfig.ID_ColorOffset, offset);
+        }
     }
 }
