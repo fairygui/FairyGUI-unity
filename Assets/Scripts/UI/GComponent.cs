@@ -671,6 +671,7 @@ namespace FairyGUI
 
                 _children[i] = obj;
             }
+            BuildNativeDisplayList();
             SetBoundsChangedFlag();
         }
 
