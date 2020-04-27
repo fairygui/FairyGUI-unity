@@ -207,11 +207,6 @@ namespace FairyGUI
             inputTextField.text = _text;
         }
 
-        override protected void GetTextFieldText()
-        {
-            _text = inputTextField.text;
-        }
-
         override protected void CreateDisplayObject()
         {
             inputTextField = new InputTextField();

@@ -46,7 +46,8 @@ namespace FairyGUI
         {
             get
             {
-                GetTextFieldText();
+                if (this is GTextInput)
+                    _text = _textField.text;
                 return _text;
             }
             set
@@ -71,10 +72,6 @@ namespace FairyGUI
                 _textField.htmlText = UBBParser.inst.Parse(XMLUtils.EncodeString(str));
             else
                 _textField.text = str;
-        }
-
-        virtual protected void GetTextFieldText()
-        {
         }
 
         /// <summary>
