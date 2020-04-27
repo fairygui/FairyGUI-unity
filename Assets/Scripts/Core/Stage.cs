@@ -31,6 +31,7 @@ namespace FairyGUI
         DisplayObject _touchTarget;
         DisplayObject _focused;
         InputTextField _lastInput;
+        bool _IMEComposite;
         UpdateContext _updateContext;
         List<DisplayObject> _rollOutChain;
         List<DisplayObject> _rollOverChain;
@@ -49,7 +50,6 @@ namespace FairyGUI
         List<DisplayObject> _focusInChain;
         List<Container> _focusHistory;
         Container _nextFocus;
-
         class CursorDef
         {
             public Texture2D texture;
@@ -850,6 +850,13 @@ namespace FairyGUI
         {
             if (evt.rawType == EventType.KeyDown)
             {
+                if (_IMEComposite && Input.compositionString.Length == 0)
+                {
+                    //eat one key on IME closing
+                    _IMEComposite = false;
+                    return;
+                }
+
                 TouchInfo touch = _touches[0];
                 touch.keyCode = evt.keyCode;
                 touch.modifiers = evt.modifiers;
@@ -946,6 +953,8 @@ namespace FairyGUI
 
         void HandleTextInput()
         {
+            _IMEComposite = Input.compositionString.Length > 0;
+
             InputTextField textField = (InputTextField)_focused;
             if (!textField.editable)
                 return;

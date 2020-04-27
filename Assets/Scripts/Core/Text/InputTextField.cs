@@ -795,19 +795,8 @@ namespace FairyGUI
                 {
                     if (firstInLine == -1)
                         firstInLine = i;
-                    if (v.offsetX > location.x)
-                    {
-                        if (i > firstInLine)
-                        {
-                            //最后一个字符有点难点
-                            if (v.offsetX - location.x < 2)
-                                return v;
-                            else
-                                return textField.charPositions[i - 1];
-                        }
-                        else
-                            return textField.charPositions[firstInLine];
-                    }
+                    if (v.offsetX + v.width * 0.5f > location.x)
+                        return v;
                 }
                 else if (firstInLine != -1)
                     break;
@@ -1426,6 +1415,7 @@ namespace FairyGUI
         string _currentText;
         InputTextField _textField;
         bool _lock;
+        int _changedFrame;
 
         public const int maxHistoryLength = 5;
 
@@ -1442,6 +1432,7 @@ namespace FairyGUI
             _textField = textField;
             _lock = false;
             _currentText = textField.text;
+            _changedFrame = 0;
         }
 
         public void MarkChanged(InputTextField textField)
@@ -1456,10 +1447,19 @@ namespace FairyGUI
             if (_currentText == newText)
                 return;
 
-            _undoBuffer.Add(_currentText);
-            if (_undoBuffer.Count > maxHistoryLength)
-                _undoBuffer.RemoveAt(0);
-
+            if (_changedFrame != Time.frameCount)
+            {
+                _changedFrame = Time.frameCount;
+                _undoBuffer.Add(_currentText);
+                if (_undoBuffer.Count > maxHistoryLength)
+                    _undoBuffer.RemoveAt(0);
+            }
+            else
+            {
+                int cnt = _undoBuffer.Count;
+                if (cnt > 0 && newText == _undoBuffer[cnt - 1])
+                    _undoBuffer.RemoveAt(cnt - 1);
+            }
             _currentText = newText;
         }
 
@@ -1486,7 +1486,11 @@ namespace FairyGUI
             _undoBuffer.RemoveAt(_undoBuffer.Count - 1);
             _redoBuffer.Add(_currentText);
             _lock = true;
+            int caretPos = _textField.caretPosition;
             _textField.text = text;
+            int dlen = text.Length - _currentText.Length;
+            if (dlen < 0)
+                _textField.caretPosition = caretPos + dlen;
             _currentText = text;
             _lock = false;
         }
@@ -1503,10 +1507,11 @@ namespace FairyGUI
             _redoBuffer.RemoveAt(_redoBuffer.Count - 1);
             _undoBuffer.Add(_currentText);
             _lock = true;
+            int caretPos = _textField.caretPosition;
             _textField.text = text;
             int dlen = text.Length - _currentText.Length;
             if (dlen > 0)
-                _textField.caretPosition += dlen;
+                _textField.caretPosition = caretPos + dlen;
             _currentText = text;
             _lock = false;
         }

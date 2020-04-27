@@ -1266,6 +1266,7 @@ namespace FairyGUI
                                     cp.charIndex = _charPositions.Count;
                                     cp.imgIndex = (short)(elementIndex + 1);
                                     cp.offsetX = posx;
+                                    cp.width = (short)htmlObj.width;
                                     _charPositions.Add(cp);
                                 }
 
@@ -1330,6 +1331,7 @@ namespace FairyGUI
                             cp.charIndex = _charPositions.Count;
                             cp.vertCount = vertCount;
                             cp.offsetX = posx;
+                            cp.width = (short)glyphWidth;
                             _charPositions.Add(cp);
                         }
 
@@ -1651,6 +1653,11 @@ namespace FairyGUI
             /// 字符占用的顶点数量。
             /// </summary>
             public short vertCount;
+
+            /// <summary>
+            /// 字符的宽度
+            /// </summary>
+            public short width;
 
             /// <summary>
             /// 大于0表示图片索引。
