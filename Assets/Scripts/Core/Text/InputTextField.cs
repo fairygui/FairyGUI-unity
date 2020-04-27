@@ -1112,8 +1112,17 @@ namespace FairyGUI
             {
                 case KeyCode.Backspace:
                     {
-                        if (_selectionStart == _caretPosition && _caretPosition > 0)
-                            _selectionStart = _caretPosition - 1;
+                        if (evt.command)
+                        {
+                            //for mac:CMD+Backspace=Delete
+                            if (_selectionStart == _caretPosition && _caretPosition < textField.charPositions.Count - 1)
+                                _selectionStart = _caretPosition + 1;
+                        }
+                        else
+                        {
+                            if (_selectionStart == _caretPosition && _caretPosition > 0)
+                                _selectionStart = _caretPosition - 1;
+                        }
                         ReplaceSelection(null);
                         break;
                     }
