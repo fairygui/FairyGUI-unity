@@ -237,8 +237,8 @@ namespace FairyGUI
                             && texture.nativeTexture.wrapMode == TextureWrapMode.Repeat)
                 {
                     Rect uvRect = vb.uvRect;
-                    uvRect.width *= vb.contentRect.width / texture.width;
-                    uvRect.height *= vb.contentRect.height / texture.height;
+                    uvRect.width *= vb.contentRect.width / texture.width * _textureScale.x;
+                    uvRect.height *= vb.contentRect.height / texture.height * _textureScale.y;
 
                     vb.AddQuad(vb.contentRect, vb.vertexColor, uvRect);
                     vb.AddTriangles();

@@ -1252,7 +1252,13 @@ namespace FairyGUI
         {
             AtlasSprite sprite;
             if (_sprites.TryGetValue(item.id, out sprite))
-                item.texture = new NTexture((NTexture)GetItemAsset(sprite.atlas), sprite.rect, sprite.rotated, sprite.originalSize, sprite.offset);
+            {
+                NTexture atlas = (NTexture)GetItemAsset(sprite.atlas);
+                if (atlas.width == sprite.rect.width && atlas.height == sprite.rect.height)
+                    item.texture = atlas;
+                else
+                    item.texture = new NTexture(atlas, sprite.rect, sprite.rotated, sprite.originalSize, sprite.offset);
+            }
             else
                 item.texture = NTexture.Empty;
         }
