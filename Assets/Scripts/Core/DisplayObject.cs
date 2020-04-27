@@ -976,7 +976,7 @@ namespace FairyGUI
             {
                 _cursor = value;
                 if (Application.isPlaying
-                    && this == Stage.inst.touchTarget || (this is Container) && ((Container)this).IsAncestorOf(Stage.inst.touchTarget))
+                    && (this == Stage.inst.touchTarget || (this is Container) && ((Container)this).IsAncestorOf(Stage.inst.touchTarget)))
                 {
                     Stage.inst._ChangeCursor(_cursor);
                 }
