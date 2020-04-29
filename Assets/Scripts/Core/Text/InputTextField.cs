@@ -661,10 +661,18 @@ namespace FairyGUI
 
                 Vector2 cursorPos = _caret.LocalToWorld(new Vector2(0, _caret.height));
                 cursorPos = StageCamera.main.WorldToScreenPoint(cursorPos);
-                cursorPos.y = Screen.height - cursorPos.y;
-                cursorPos = cursorPos / Stage.devicePixelRatio;
-
-                Input.compositionCursorPos = cursorPos + new Vector2(0, 20);
+#if !UNITY_2019_OR_NEWER
+                if (Stage.devicePixelRatio == 1)
+                {
+#endif
+                    cursorPos.y = Screen.height - cursorPos.y;
+                    cursorPos = cursorPos / Stage.devicePixelRatio;
+                    Input.compositionCursorPos = cursorPos + new Vector2(0, 20);
+#if !UNITY_2019_OR_NEWER
+                }
+                else
+                    Input.compositionCursorPos = cursorPos - new Vector2(0, 20);
+#endif
 
                 _nextBlink = Time.time + 0.5f;
                 _caret.graphics.enabled = true;
@@ -1296,16 +1304,20 @@ namespace FairyGUI
 
                 case KeyCode.Z:
                     {
-                        if (evt.shift)
-                            TextInputHistory.inst.Redo(this);
-                        else
-                            TextInputHistory.inst.Undo(this);
+                        if (evt.ctrlOrCmd)
+                        {
+                            if (evt.shift)
+                                TextInputHistory.inst.Redo(this);
+                            else
+                                TextInputHistory.inst.Undo(this);
+                        }
                         break;
                     }
 
                 case KeyCode.Y:
                     {
-                        TextInputHistory.inst.Redo(this);
+                        if (evt.ctrlOrCmd)
+                            TextInputHistory.inst.Redo(this);
                         break;
                     }
 
