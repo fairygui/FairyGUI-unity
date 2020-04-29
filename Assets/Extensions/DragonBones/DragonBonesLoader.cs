@@ -1,3 +1,4 @@
+#if FAIRYGUI_DRAGONBONES
 
 using UnityEngine;
 using DragonBones;
@@ -78,3 +79,5 @@ namespace FairyGUI
         }
     }
 }
+
+#endif

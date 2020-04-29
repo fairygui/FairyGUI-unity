@@ -1,3 +1,5 @@
+#if FAIRYGUI_TMPRO
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -528,3 +530,5 @@ namespace FairyGUI
         }
     }
 }
+
+#endif

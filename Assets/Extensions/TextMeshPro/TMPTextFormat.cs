@@ -1,4 +1,4 @@
-using UnityEngine;
+#if FAIRYGUI_TMPRO
 
 namespace FairyGUI
 {
@@ -12,3 +12,5 @@ namespace FairyGUI
         public float underlaySoftness;
     }
 }
+
+#endif

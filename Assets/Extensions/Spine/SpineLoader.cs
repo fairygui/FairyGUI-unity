@@ -1,3 +1,5 @@
+#if FAIRYGUI_SPINE
+
 using UnityEngine;
 using Spine.Unity;
 
@@ -31,10 +33,11 @@ namespace FairyGUI
                 FreeSpine();
 
             _spineAnimation = SkeletonRenderer.NewSpineGameObject<SkeletonAnimation>(asset);
+            _spineAnimation.gameObject.name = asset.name;
             Spine.SkeletonData dat = asset.GetSkeletonData(false);
             _spineAnimation.gameObject.transform.localScale = new Vector3(100, 100, 1);
             _spineAnimation.gameObject.transform.localPosition = new Vector3(anchor.x, -anchor.y, 0);
-            SetWrapTarget(_spineAnimation.gameObject, false, width, height);
+            SetWrapTarget(_spineAnimation.gameObject, true, width, height);
 
             OnChangeSpine(null);
         }
@@ -98,3 +101,5 @@ namespace FairyGUI
         }
     }
 }
+
+#endif
