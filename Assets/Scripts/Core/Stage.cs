@@ -852,9 +852,10 @@ namespace FairyGUI
             {
                 if (_IMEComposite && Input.compositionString.Length == 0)
                 {
-                    //eat one key on IME closing
                     _IMEComposite = false;
-                    return;
+                    //eat one key on IME closing
+                    if (evt.keyCode != KeyCode.None)
+                        return;
                 }
 
                 TouchInfo touch = _touches[0];
