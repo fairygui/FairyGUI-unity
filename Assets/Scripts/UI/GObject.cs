@@ -783,7 +783,7 @@ namespace FairyGUI
                 _pivotAsAnchor = asAnchor;
                 if (displayObject != null)
                     displayObject.pivot = new Vector2(_pivotX, _pivotY);
-                if (_pivotAsAnchor) //displayObject的轴心参考宽高与GObject的参看宽高不一样的情况下，需要调整displayObject的位置
+                if (!_pivotAsAnchor) //displayObject的轴心参考宽高与GObject的参看宽高不一样的情况下，需要调整displayObject的位置
                     HandlePositionChanged();
             }
         }
