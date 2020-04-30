@@ -198,11 +198,15 @@ namespace FairyGUI
             float ar = int.MinValue, ab = int.MinValue;
             float tmp;
             bool empty = true;
+            bool skipInvisibles = _layout != GroupLayoutType.None && _excludeInvisibles;
 
             for (i = 0; i < cnt; i++)
             {
                 child = parent.GetChildAt(i);
                 if (child.group != this)
+                    continue;
+
+                if (skipInvisibles && !child.internalVisible3)
                     continue;
 
                 tmp = child.xMin;
