@@ -106,8 +106,17 @@ namespace FairyGUI
         {
             if (!_font.GetCharacterInfo(ch, out _char, _size, _style))
             {
-                width = height = baseline = 0;
-                return false;
+                if (ch == ' ')
+                {
+                    //space may not be prepared, try again
+                    _font.RequestCharactersInTexture(" ", _size, _style);
+                    _font.GetCharacterInfo(ch, out _char, _size, _style);
+                }
+                else
+                {
+                    width = height = baseline = 0;
+                    return false;
+                }
             }
 
             width = _char.advance;
