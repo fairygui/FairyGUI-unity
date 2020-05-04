@@ -296,6 +296,7 @@ namespace FairyGUI
         public void SetWrapTarget(GameObject gameObject, bool cloneMaterial, int width, int height)
         {
             _content.SetWrapTarget(gameObject, cloneMaterial);
+            _content.SetSize(width, height);
             sourceWidth = width;
             sourceHeight = height;
 
