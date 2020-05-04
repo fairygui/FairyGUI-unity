@@ -1018,7 +1018,16 @@ namespace FairyGUI
         public void RequestFocus()
         {
             if (displayObject != null)
-                Stage.inst.SetFous(displayObject, true);
+                Stage.inst.SetFous(displayObject, false);
+        }
+
+        /// <summary>
+        /// Request focus on this object.
+        /// </summary>
+        public void RequestFocus(bool byKey)
+        {
+            if (displayObject != null)
+                Stage.inst.SetFous(displayObject, byKey);
         }
 
         /// <summary>
