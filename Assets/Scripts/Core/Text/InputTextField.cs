@@ -68,6 +68,7 @@ namespace FairyGUI
         int _corner;
         Color _borderColor;
         Color _backgroundColor;
+        bool _editable;
 
         bool _editing;
         int _caretPosition;
@@ -92,7 +93,7 @@ namespace FairyGUI
 
             _text = string.Empty;
             maxLength = 0;
-            editable = true;
+            _editable = true;
             _composing = 0;
             keyboardInput = Stage.keyboardInput;
             _borderColor = Color.black;
@@ -253,8 +254,8 @@ namespace FairyGUI
         /// </summary>
         public bool editable
         {
-            get { return this.focusable; }
-            set { this.focusable = value; }
+            get { return _editable; }
+            set { _editable = value; }
         }
 
         /// <summary>
@@ -359,9 +360,6 @@ namespace FairyGUI
         /// <param name="value"></param>
         public void ReplaceSelection(string value)
         {
-            if (!editable)
-                throw new Exception("InputTextField is not editable.");
-
             if (keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
             {
                 this.text = _text + value;
@@ -1021,7 +1019,7 @@ namespace FairyGUI
 
         void __focusIn(EventContext context)
         {
-            if (!editable || !Application.isPlaying)
+            if (!Application.isPlaying)
                 return;
 
             _editing = true;
@@ -1131,7 +1129,8 @@ namespace FairyGUI
                             if (_selectionStart == _caretPosition && _caretPosition > 0)
                                 _selectionStart = _caretPosition - 1;
                         }
-                        ReplaceSelection(null);
+                        if (_editable)
+                            ReplaceSelection(null);
                         break;
                     }
 
@@ -1139,7 +1138,8 @@ namespace FairyGUI
                     {
                         if (_selectionStart == _caretPosition && _caretPosition < textField.charPositions.Count - 1)
                             _selectionStart = _caretPosition + 1;
-                        ReplaceSelection(null);
+                        if (_editable)
+                            ReplaceSelection(null);
                         break;
                     }
 
@@ -1282,7 +1282,7 @@ namespace FairyGUI
                 //Paste
                 case KeyCode.V:
                     {
-                        if (evt.ctrlOrCmd)
+                        if (evt.ctrlOrCmd && _editable)
                             DoPaste();
                         break;
                     }
@@ -1296,7 +1296,8 @@ namespace FairyGUI
                             if (!string.IsNullOrEmpty(s))
                             {
                                 DoCopy(s);
-                                ReplaceSelection(null);
+                                if (_editable)
+                                    ReplaceSelection(null);
                             }
                         }
                         break;
@@ -1304,7 +1305,7 @@ namespace FairyGUI
 
                 case KeyCode.Z:
                     {
-                        if (evt.ctrlOrCmd)
+                        if (evt.ctrlOrCmd && _editable)
                         {
                             if (evt.shift)
                                 TextInputHistory.inst.Redo(this);
@@ -1316,7 +1317,7 @@ namespace FairyGUI
 
                 case KeyCode.Y:
                     {
-                        if (evt.ctrlOrCmd)
+                        if (evt.ctrlOrCmd && _editable)
                             TextInputHistory.inst.Redo(this);
                         break;
                     }
@@ -1376,16 +1377,19 @@ namespace FairyGUI
                     return true;
                 }
 
-                if (char.IsLowSurrogate(c))
-                    ReplaceSelection(char.ConvertFromUtf32(((int)c & 0x03FF) + ((((int)_highSurrogateChar & 0x03FF) + 0x40) << 10)));
-                else
-                    ReplaceSelection(c.ToString());
+                if (_editable)
+                {
+                    if (char.IsLowSurrogate(c))
+                        ReplaceSelection(char.ConvertFromUtf32(((int)c & 0x03FF) + ((((int)_highSurrogateChar & 0x03FF) + 0x40) << 10)));
+                    else
+                        ReplaceSelection(c.ToString());
+                }
 
                 return true;
             }
             else
             {
-                if (Input.compositionString.Length > 0)
+                if (Input.compositionString.Length > 0 && _editable)
                     UpdateText();
 
                 return keyCodeHandled;
