@@ -36,6 +36,7 @@ namespace FairyGUI
         bool _inertiaDisabled;
         bool _maskDisabled;
         bool _floating;
+        bool _dontClipMargin;
 
         float _xPos;
         float _yPos;
@@ -154,6 +155,7 @@ namespace FairyGUI
             _inertiaDisabled = (flags & 256) != 0;
             _maskDisabled = (flags & 512) != 0;
             _floating = (flags & 1024) != 0;
+            _dontClipMargin = (flags & 2048) != 0;
 
             if (scrollBarDisplay == ScrollBarDisplayType.Default)
             {
@@ -229,12 +231,6 @@ namespace FairyGUI
 
                 if (_header != null || _footer != null)
                     _refreshBarAxis = (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical) ? 1 : 0;
-            }
-
-            if (!_maskDisabled && (_vtScrollBar != null || _hzScrollBar != null))
-            {
-                //当有滚动条对象时，为了避免滚动条变化时触发重新合批，这里给rootContainer也加上剪裁。但这可能会增加额外dc。
-                _owner.rootContainer.clipRect = new Rect(0, 0, _owner.width, _owner.height);
             }
 
             SetSize(owner.width, owner.height);
@@ -1233,6 +1229,13 @@ namespace FairyGUI
                     rect.width += _vtScrollBar.width;
                 if (_hScrollNone && _hzScrollBar != null)
                     rect.height += _hzScrollBar.height;
+                if (_dontClipMargin)
+                {
+                    rect.x -= _owner.margin.left;
+                    rect.width += (_owner.margin.left + _owner.margin.right);
+                    rect.y -= _owner.margin.top;
+                    rect.height += (_owner.margin.top + _owner.margin.bottom);
+                }
 
                 _maskContainer.clipRect = rect;
             }
