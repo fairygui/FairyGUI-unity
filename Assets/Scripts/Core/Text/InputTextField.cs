@@ -842,8 +842,8 @@ namespace FairyGUI
 
             if (_editing)
             {
-                SetChildIndex(_selectionShape, this.numChildren - 1);
-                SetChildIndex(_caret, this.numChildren - 2);
+                SetChildIndex(_selectionShape, 0);
+                SetChildIndex(_caret, this.numChildren - 1);
             }
 
             int cnt = textField.charPositions.Count;
@@ -1042,7 +1042,7 @@ namespace FairyGUI
             AddChild(_caret);
 
             _selectionShape.Clear();
-            AddChild(_selectionShape);
+            AddChildAt(_selectionShape, 0);
 
             if (!textField.Redraw())
             {
