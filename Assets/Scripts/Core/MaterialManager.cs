@@ -29,6 +29,7 @@ namespace FairyGUI
         Shader _shader;
         List<string> _addKeywords;
         Dictionary<int, List<MaterialRef>> _materials;
+        bool _combineTexture;
 
         class MaterialRef
         {
@@ -51,6 +52,7 @@ namespace FairyGUI
             _texture = texture;
             _shader = shader;
             _materials = new Dictionary<int, List<MaterialRef>>();
+            _combineTexture = texture.alphaTexture != null;
         }
 
         /// <summary>
@@ -116,6 +118,10 @@ namespace FairyGUI
                     }
                     else
                         firstMaterialInFrame = false;
+
+                    if (_combineTexture)
+                        item.material.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
+
                     return item.material;
                 }
                 else if (result == null && (item.frame > frameId || item.frame < frameId - 1)) //collect materials if it is unused in last frame
@@ -127,7 +133,7 @@ namespace FairyGUI
                 result = new MaterialRef() { material = CreateMaterial(flags) };
                 items.Add(result);
             }
-            else if (_texture.alphaTexture != null)
+            else if (_combineTexture)
                 result.material.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
 
             if (result.blendMode != blendMode)
@@ -214,7 +220,7 @@ namespace FairyGUI
         /// </summary>
         public void RefreshMaterials()
         {
-            bool hasAlphaTexture = _texture.alphaTexture != null;
+            _combineTexture = _texture.alphaTexture != null;
             var iter = _materials.GetEnumerator();
             while (iter.MoveNext())
             {
@@ -224,7 +230,7 @@ namespace FairyGUI
                 {
                     Material mat = items[j].material;
                     mat.mainTexture = _texture.nativeTexture;
-                    if (hasAlphaTexture)
+                    if (_combineTexture)
                     {
                         mat.EnableKeyword("COMBINED");
                         mat.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
