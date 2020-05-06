@@ -127,6 +127,8 @@ namespace FairyGUI
                 result = new MaterialRef() { material = CreateMaterial(flags) };
                 items.Add(result);
             }
+            else if (_texture.alphaTexture != null)
+                result.material.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
 
             if (result.blendMode != blendMode)
             {
