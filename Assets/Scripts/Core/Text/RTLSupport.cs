@@ -36,7 +36,11 @@ namespace FairyGUI
             NEUTRAL,
         }
 
+#if RTL_TEXT_SUPPORT
         public static DirectionType BaseDirection = DirectionType.RTL;    // 主体语言是否是RTL的语言
+#else
+        public static DirectionType BaseDirection = DirectionType.UNKNOW;
+#endif
         private static bool isCharsInitialized = false;
         private static Dictionary<int, char[]> mapping = new Dictionary<int, char[]>();
 
@@ -51,12 +55,12 @@ namespace FairyGUI
         {
             if (ch >= 0x600 && ch <= 0x6ff)
             {
-                if ((ch >= 0x660 && ch <= 0x66D) || (ch >= 0x6f0 && ch<= 0x6f9)) // 标准阿拉伯语数字和东阿拉伯语数字 [2019/3/1/ 17:45:18 by aq_1000]
+                if ((ch >= 0x660 && ch <= 0x66D) || (ch >= 0x6f0 && ch <= 0x6f9)) // 标准阿拉伯语数字和东阿拉伯语数字 [2019/3/1/ 17:45:18 by aq_1000]
                 {
                     return false;
                 }
                 return true;
-            }                
+            }
             else if (ch >= 0x750 && ch <= 0x77f)
                 return true;
             else if (ch >= 0xfb50 && ch <= 0xfc3f)
@@ -74,9 +78,9 @@ namespace FairyGUI
                 int un = ch;
                 if (un == 0x66c || ch == ',')   // 去掉逗号
                     continue;
-                else if(un == 0x660 || un == 0x6f0)
+                else if (un == 0x660 || un == 0x6f0)
                     sbRep.Append('0');
-                else if(un == 0x661 || un == 0x6f1)
+                else if (un == 0x661 || un == 0x6f1)
                     sbRep.Append('1');
                 else if (un == 0x662 || un == 0x6f2)
                     sbRep.Append('2');
@@ -150,27 +154,27 @@ namespace FairyGUI
         {
             if (!IsArabicLetter(input))
             {
-                return true;   
+                return true;
             }
             else
             {
                 return (input == '،') || (input == '?') || (input == '؟');
             }
 
-//             if ((input != ' ') && (input != '\t') && (input != '!') && (input != '.') && 
-//                 (input != '،') && (input != '?') && (input != '؟') && 
-//                 !_IsBracket(input) &&   // 括号也算 [2018/8/1/ 15:12:20 by aq_1000]
-//                 !_IsNeutrality(input))
-//             {
-//                 return false;
-//             }
-//             return true;
+            //             if ((input != ' ') && (input != '\t') && (input != '!') && (input != '.') && 
+            //                 (input != '،') && (input != '?') && (input != '؟') && 
+            //                 !_IsBracket(input) &&   // 括号也算 [2018/8/1/ 15:12:20 by aq_1000]
+            //                 !_IsNeutrality(input))
+            //             {
+            //                 return false;
+            //             }
+            //             return true;
         }
 
         private static bool CheckSpecific(char input)
         {
             int num = input;
-            if ((num != 0x622) && (num != 0x623) && (num != 0x627) && (num != 0x62f) && (num != 0x625) && 
+            if ((num != 0x622) && (num != 0x623) && (num != 0x627) && (num != 0x62f) && (num != 0x625) &&
                 (num != 0x630) && (num != 0x631) && (num != 0x632) && (num != 0x698) && (num != 0x648) &&
                 !_CheckSoundmark(input))
             {
@@ -351,7 +355,7 @@ namespace FairyGUI
                     }
                     sbN.Length = 0;
 
-//                    item = _ProcessBracket(item);       // 文本主方向为LTR的话，括号不需要翻转 [2018/12/20/ 17:03:23 by aq_1000]
+                    //                    item = _ProcessBracket(item);       // 文本主方向为LTR的话，括号不需要翻转 [2018/12/20/ 17:03:23 by aq_1000]
                     listFinal.Add(item);
                 }
                 else
@@ -523,32 +527,32 @@ namespace FairyGUI
 
 
         private static string _Reverse(string source)
-		{
-			sbReverse.Length = 0;
-			int len = source.Length;
-			int i = len - 1;
-			while (i >= 0)
-			{
-				char ch = source[i];
-				if (ch == '\r' && i != len - 1 && source[i + 1] == '\n')
-				{
-					i--;
-					continue;
-				}
+        {
+            sbReverse.Length = 0;
+            int len = source.Length;
+            int i = len - 1;
+            while (i >= 0)
+            {
+                char ch = source[i];
+                if (ch == '\r' && i != len - 1 && source[i + 1] == '\n')
+                {
+                    i--;
+                    continue;
+                }
 
-				if (char.IsLowSurrogate(ch)) //不要反向高低代理对
-				{
-					sbReverse.Append(source[i - 1]);
-					sbReverse.Append(ch);
-					i--;
-				}
-				else
-					sbReverse.Append(ch);
-				i--;
-			}
+                if (char.IsLowSurrogate(ch)) //不要反向高低代理对
+                {
+                    sbReverse.Append(source[i - 1]);
+                    sbReverse.Append(ch);
+                    i--;
+                }
+                else
+                    sbReverse.Append(ch);
+                i--;
+            }
 
-			return sbReverse.ToString();
-		}
+            return sbReverse.ToString();
+        }
 
         private static void InitChars()
         {
@@ -597,7 +601,7 @@ namespace FairyGUI
 
             mapping.Add(0x6BE, new char[4] { (char)0xFEE9, (char)0xFEEA, (char)0xFEEB, (char)0xFEEC });
             mapping.Add(0x6CC, new char[4] { (char)0xFBFC, (char)0xFBFD, (char)0xFBFE, (char)0xFBFF });
-        }               
+        }
 
         // 是否中立方向字符
         private static bool _IsNeutrality(char uc)
@@ -648,7 +652,7 @@ namespace FairyGUI
                         eCType = BaseDirection;
                     }
                     else
-                    eCType = DirectionType.NEUTRAL;
+                        eCType = DirectionType.NEUTRAL;
                 }
                 else
                     eCType = ePre;
@@ -659,13 +663,13 @@ namespace FairyGUI
             return eCType;
         }
 
-	    // 是否括号
+        // 是否括号
         private static bool _IsBracket(char uc)
         {
             return (uc == ')' || uc == '(' || uc == '）' || uc == '（' ||
                     uc == ']' || uc == '[' || uc == '】' || uc == '【' ||
-                    uc == '}' || uc == '{' || 
- //                   uc == '≥' || uc == '≤' || uc == '>' || uc == '<' || 
+                    uc == '}' || uc == '{' ||
+                    //                   uc == '≥' || uc == '≤' || uc == '>' || uc == '<' || 
                     uc == '》' || uc == '《' || uc == '“' || uc == '”' || uc == '"');
         }
 
