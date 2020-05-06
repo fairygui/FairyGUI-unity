@@ -281,8 +281,10 @@ namespace FairyGUI.Utils
         }
 
         static Stack<XML> sNodeStack = new Stack<XML>();
-        void Parse(string aSource)
+        public void Parse(string aSource)
         {
+            Reset();
+            
             XML lastOpenNode = null;
             sNodeStack.Clear();
 
@@ -298,7 +300,7 @@ namespace FairyGUI.Utils
                     {
                         if (this.name != null)
                         {
-                            Cleanup();
+                            Reset();
                             throw new Exception("Invalid xml format - no root node.");
                         }
                         childNode = this;
@@ -322,7 +324,7 @@ namespace FairyGUI.Utils
                 {
                     if (lastOpenNode == null || lastOpenNode.name != XMLIterator.tagName)
                     {
-                        Cleanup();
+                        Reset();
                         throw new Exception("Invalid xml format - <" + XMLIterator.tagName + "> dismatched.");
                     }
 
@@ -339,9 +341,8 @@ namespace FairyGUI.Utils
             }
         }
 
-        void Cleanup()
+        public void Reset()
         {
-            this.name = null;
             if (_attributes != null)
                 _attributes.Clear();
             if (_children != null)
@@ -418,7 +419,7 @@ namespace FairyGUI.Utils
                     if (tabs > 0)
                         sb.Append(' ', tabs * 2);
                 }
-                
+
                 sb.Append("</").Append(name).Append(">");
             }
         }
