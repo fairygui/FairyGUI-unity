@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -230,14 +231,16 @@ namespace FairyGUI
             gameObject = new GameObject(gameObjectName);
             cachedTransform = gameObject.transform;
             if (Application.isPlaying)
+            {
                 UnityEngine.Object.DontDestroyOnLoad(gameObject);
+
+                DisplayObjectInfo info = gameObject.AddComponent<DisplayObjectInfo>();
+                info.displayObject = this;
+            }
             gameObject.hideFlags = DisplayObject.hideFlags;
             gameObject.SetActive(false);
 
-#if FAIRYGUI_TEST
-            DisplayObjectInfo info = gameObject.AddComponent<DisplayObjectInfo>();
-            info.displayObject = this;
-#endif
+
         }
 
         protected void SetGameObject(GameObject gameObject)
@@ -245,7 +248,7 @@ namespace FairyGUI
             this.gameObject = gameObject;
             this.cachedTransform = gameObject.transform;
             _rotation = cachedTransform.localEulerAngles;
-
+            
             _flags |= Flags.UserGameObject;
         }
 
@@ -313,10 +316,7 @@ namespace FairyGUI
             get { return cachedTransform.localPosition.x; }
             set
             {
-                Vector3 v = cachedTransform.localPosition;
-                v.x = value;
-                cachedTransform.localPosition = v;
-                _flags |= Flags.OutlineChanged;
+                SetPosition(value, -cachedTransform.localPosition.y, cachedTransform.localPosition.z);
             }
         }
 
@@ -328,10 +328,7 @@ namespace FairyGUI
             get { return -cachedTransform.localPosition.y; }
             set
             {
-                Vector3 v = cachedTransform.localPosition;
-                v.y = -value;
-                cachedTransform.localPosition = v;
-                _flags |= Flags.OutlineChanged;
+                SetPosition(cachedTransform.localPosition.x, value, cachedTransform.localPosition.z);
             }
         }
 
@@ -343,10 +340,7 @@ namespace FairyGUI
             get { return cachedTransform.localPosition.z; }
             set
             {
-                Vector3 v = cachedTransform.localPosition;
-                v.z = value;
-                cachedTransform.localPosition = v;
-                _flags |= Flags.OutlineChanged;
+                SetPosition(cachedTransform.localPosition.x, -cachedTransform.localPosition.y, value);
             }
         }
 
@@ -885,6 +879,12 @@ namespace FairyGUI
             }
             set
             {
+                if ((_flags & Flags.GameObjectDisposed) != 0)
+                {
+                    DisplayDisposedWarning();
+                    return;
+                }
+
                 _renderingOrder = value;
                 if (graphics != null)
                     graphics.sortingOrder = value;
@@ -1800,6 +1800,29 @@ namespace FairyGUI
             DestroyGameObject();
         }
 
+        internal void DisplayDisposedWarning()
+        {
+            if ((_flags & Flags.DisposedWarning) == 0)
+            {
+                _flags |= Flags.DisposedWarning;
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append("DisplayObject is still in use but GameObject was disposed. (");
+                if (gOwner != null)
+                {
+                    sb.Append("type=").Append(gOwner.GetType().Name).Append(", x=").Append(gOwner.x).Append(", y=").Append(gOwner.y).Append(", name=").Append(gOwner.name);
+                    if (gOwner.packageItem != null)
+                        sb.Append(", res=" + gOwner.packageItem.name);
+                }
+                else
+                {
+                    sb.Append("type=").Append(this.GetType().Name).Append(", name=").Append(name);
+                }
+                sb.Append(")");
+                Debug.LogError(sb.ToString());
+            }
+        }
+
         protected internal class PaintingInfo
         {
             public Action captureDelegate; //缓存这个delegate，可以防止Capture状态下每帧104B的GC
@@ -1815,20 +1838,22 @@ namespace FairyGUI
             UserGameObject = 2,
             TouchDisabled = 4,
             OutlineChanged = 8,
-            UpdatingSize = 16,
-            WidthChanged = 32,
-            HeightChanged = 64,
-            PixelPerfect = 128,
-            LayerSet = 256,
-            LayerFromParent = 512,
-            NotFocusable = 1024,
-            TabStop = 2048,
-            TabStopChildren = 4096,
-            FairyBatching = 8192,
-            BatchingRequested = 16384,
-            BatchingRoot = 32768,
-            SkipBatching = 65536,
-            CacheAsBitmap = 131072
+            UpdatingSize = 0x10,
+            WidthChanged = 0x20,
+            HeightChanged = 0x40,
+            PixelPerfect = 0x80,
+            LayerSet = 0x100,
+            LayerFromParent = 0x200,
+            NotFocusable = 0x400,
+            TabStop = 0x800,
+            TabStopChildren = 0x1000,
+            FairyBatching = 0x2000,
+            BatchingRequested = 0x4000,
+            BatchingRoot = 0x8000,
+            SkipBatching = 0x10000,
+            CacheAsBitmap = 0x20000,
+            GameObjectDisposed = 0x40000,
+            DisposedWarning = 0x80000
         }
     }
 
@@ -1839,8 +1864,14 @@ namespace FairyGUI
     {
         /// <summary>
         /// 
-        /// </summary>
+        /// /// </summary>
         [System.NonSerialized]
         public DisplayObject displayObject;
+
+        private void OnDestroy()
+        {
+            if (displayObject != null)
+                displayObject._flags |= DisplayObject.Flags.GameObjectDisposed;
+        }
     }
 }
