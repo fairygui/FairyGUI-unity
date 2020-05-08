@@ -535,12 +535,6 @@ namespace FairyGUI
 
         override protected DisplayObject HitTest()
         {
-            if ((_flags & Flags.GameObjectDisposed) != 0)
-            {
-                DisplayDisposedWarning();
-                return null;
-            }
-
             if ((_flags & Flags.UserGameObject) != 0 && !gameObject.activeInHierarchy)
                 return null;
 
@@ -624,6 +618,12 @@ namespace FairyGUI
                 for (int i = count - 1; i >= 0; --i) // front to back!
                 {
                     DisplayObject child = _children[i];
+                    if ((child._flags & Flags.GameObjectDisposed) != 0)
+                    {
+                        child.DisplayDisposedWarning();
+                        continue;
+                    }
+
                     if (child == _mask || (child._flags & Flags.TouchDisabled) != 0)
                         continue;
 
@@ -781,7 +781,6 @@ namespace FairyGUI
                 for (int i = 0; i < cnt; i++)
                 {
                     DisplayObject child = _children[i];
-
                     if ((child._flags & Flags.GameObjectDisposed) != 0)
                     {
                         child.DisplayDisposedWarning();
@@ -801,14 +800,14 @@ namespace FairyGUI
                 for (int i = 0; i < cnt; i++)
                 {
                     DisplayObject child = _children[i];
+                    if ((child._flags & Flags.GameObjectDisposed) != 0)
+                    {
+                        child.DisplayDisposedWarning();
+                        continue;
+                    }
+
                     if (child.visible)
                     {
-                        if ((child._flags & Flags.GameObjectDisposed) != 0)
-                        {
-                            child.DisplayDisposedWarning();
-                            continue;
-                        }
-
                         if (!(child.graphics != null && child.graphics._maskFlag == 1)) //if not a mask
                             child.renderingOrder = context.renderingOrder++;
 

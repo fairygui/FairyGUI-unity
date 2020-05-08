@@ -196,7 +196,7 @@ namespace FairyGUI
         {
             if (UIConfig.globalModalWaiting != null)
             {
-                if (_modalWaitPane == null)
+                if (_modalWaitPane == null || _modalWaitPane.isDisposed)
                 {
                     _modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.globalModalWaiting);
                     _modalWaitPane.SetHome(this);
@@ -269,7 +269,7 @@ namespace FairyGUI
         {
             get
             {
-                if (_modalLayer == null)
+                if (_modalLayer == null || _modalLayer.isDisposed)
                     CreateModalLayer();
 
                 return _modalLayer;
@@ -334,7 +334,7 @@ namespace FairyGUI
 
         private void AdjustModalLayer()
         {
-            if (_modalLayer == null)
+            if (_modalLayer == null || _modalLayer.isDisposed)
                 CreateModalLayer();
 
             int cnt = this.numChildren;
@@ -623,7 +623,7 @@ namespace FairyGUI
         /// <param name="msg"></param>
         public void ShowTooltips(string msg)
         {
-            if (_defaultTooltipWin == null)
+            if (_defaultTooltipWin == null || _defaultTooltipWin.isDisposed)
             {
                 string resourceURL = UIConfig.tooltipsWin;
                 if (string.IsNullOrEmpty(resourceURL))

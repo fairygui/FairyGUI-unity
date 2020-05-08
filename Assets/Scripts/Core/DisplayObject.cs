@@ -248,7 +248,7 @@ namespace FairyGUI
             this.gameObject = gameObject;
             this.cachedTransform = gameObject.transform;
             _rotation = cachedTransform.localEulerAngles;
-            
+
             _flags |= Flags.UserGameObject;
         }
 
@@ -1685,6 +1685,9 @@ namespace FairyGUI
 
         void UpdateHierarchy()
         {
+            if ((_flags & Flags.GameObjectDisposed) != 0)
+                return;
+
             if ((_flags & Flags.UserGameObject) != 0)
             {
                 //we dont change transform parent of this object
@@ -1816,7 +1819,7 @@ namespace FairyGUI
                 }
                 else
                 {
-                    sb.Append("type=").Append(this.GetType().Name).Append(", name=").Append(name);
+                    sb.Append("id=").Append(id).Append(", type=").Append(this.GetType().Name).Append(", name=").Append(name);
                 }
                 sb.Append(")");
                 Debug.LogError(sb.ToString());
