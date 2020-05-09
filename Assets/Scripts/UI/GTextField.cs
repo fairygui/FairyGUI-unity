@@ -47,7 +47,7 @@ namespace FairyGUI
             get
             {
                 if (this is GTextInput)
-                    _text = _textField.text;
+                    _text = ((GTextInput)this).inputTextField.text;
                 return _text;
             }
             set
