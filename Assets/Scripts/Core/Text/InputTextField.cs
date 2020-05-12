@@ -541,27 +541,27 @@ namespace FairyGUI
 
         void UpdateText()
         {
-            int composing = _composing;
-            _composing = 0;
-
             if (!_editing && _text.Length == 0 && !string.IsNullOrEmpty(_decodedPromptText))
+            {
                 textField.htmlText = _decodedPromptText;
-            else if (_displayAsPassword)
+                return;
+            }
+
+            if (_displayAsPassword)
                 textField.text = EncodePasswordText(_text);
-            else if (Input.compositionString.Length > 0)
+            else
+                textField.text = _text;
+
+            _composing = Input.compositionString.Length;
+            if (_composing > 0)
             {
                 StringBuilder buffer = new StringBuilder();
                 GetPartialText(0, _caretPosition, buffer);
                 buffer.Append(Input.compositionString);
-                GetPartialText(_caretPosition + composing, -1, buffer);
+                GetPartialText(_caretPosition, -1, buffer);
 
-                _composing = Input.compositionString.Length;
-
-                string newText = buffer.ToString();
-                textField.text = newText;
+                textField.text = buffer.ToString();
             }
-            else
-                textField.text = _text;
         }
 
         string EncodePasswordText(string value)
@@ -1071,7 +1071,7 @@ namespace FairyGUI
             }
             else
             {
-                if (!disableIME)
+                if (!disableIME && !_displayAsPassword)
                     Input.imeCompositionMode = IMECompositionMode.On;
                 else
                     Input.imeCompositionMode = IMECompositionMode.Off;
@@ -1399,7 +1399,17 @@ namespace FairyGUI
             else
             {
                 if (Input.compositionString.Length > 0 && _editable)
-                    UpdateText();
+                {
+                    int composing = _composing;
+                    _composing = Input.compositionString.Length;
+
+                    StringBuilder buffer = new StringBuilder();
+                    GetPartialText(0, _caretPosition, buffer);
+                    buffer.Append(Input.compositionString);
+                    GetPartialText(_caretPosition + composing, -1, buffer);
+
+                    textField.text = buffer.ToString();
+                }
 
                 return keyCodeHandled;
             }

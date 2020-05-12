@@ -551,7 +551,7 @@ namespace FairyGUI
                 {
                     if (_maskFlag == 1)
                     {
-                        _material = _manager.GetMaterial((int)MaterialFlags.AlphaMask + _materialFlags, BlendMode.Normal, context.clipInfo.clipId);
+                        _material = _manager.GetMaterial((int)MaterialFlags.AlphaMask | _materialFlags, BlendMode.Normal, context.clipInfo.clipId);
                         context.ApplyAlphaMaskProperties(_material, false);
                     }
                     else
@@ -620,7 +620,7 @@ namespace FairyGUI
             if (_manager != null)
             {
                 //这里使用maskId而不是clipInfo.clipId，是因为遮罩有两个用途，一个是写入遮罩，一个是擦除，两个不能用同一个材质
-                Material mat = _manager.GetMaterial((int)MaterialFlags.AlphaMask + _materialFlags, BlendMode.Normal, maskId);
+                Material mat = _manager.GetMaterial((int)MaterialFlags.AlphaMask | _materialFlags, BlendMode.Normal, maskId);
                 if (!Material.ReferenceEquals(mat, _stencilEraser.meshRenderer.sharedMaterial))
                     _stencilEraser.meshRenderer.sharedMaterial = mat;
 
