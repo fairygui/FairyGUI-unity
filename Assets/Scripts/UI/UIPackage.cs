@@ -9,6 +9,13 @@ using UnityEditor;
 
 namespace FairyGUI
 {
+
+    public interface IAsyncResource
+    {
+        void LoadResource(string assetName, Action<bool, object> action);
+        void ReleaseResource(object obj);
+    }
+    
     /// <summary>
     /// A UI Package contains a description file and some texture,sound assets.
     /// </summary>
@@ -336,6 +343,52 @@ namespace FairyGUI
             return pkg;
         }
 
+        private static IAsyncResource _asyncLoadResource;
+
+        public static IAsyncResource AsyncLoadResource => _asyncLoadResource;
+
+        public static void SetAsyncLoadResource(IAsyncResource asyncLoadResource)
+        {
+            _asyncLoadResource = asyncLoadResource;
+        }
+
+        public static void AddPackageAsync(string assetPath, Action<UIPackage> calbback)
+        {
+            _asyncLoadResource.LoadResource(assetPath + "_fui.bytes", (ok, asset) =>
+            {
+                if (ok)
+                {
+                    TextAsset textAsset = (TextAsset) asset;
+                    if (textAsset == null)
+                    {
+                        if (Application.isPlaying)
+                            throw new Exception("FairyGUI: Cannot load ui package in '" + assetPath + "'");
+                        else
+                            Debug.LogWarning("FairyGUI: Cannot load ui package in '" + assetPath + "'");
+                    }
+                    
+                    ByteBuffer buffer = new ByteBuffer(textAsset.bytes);
+                    UIPackage pkg = new UIPackage {_assetPath = assetPath};
+                    pkg.LoadPackageAsync(buffer, assetPath, assetPath, package =>
+                    {
+                        if (package != null)
+                        {
+                            _packageInstById[package.id] = package;
+                            _packageInstByName[package.name] = package;
+                            _packageInstById[assetPath] = package;
+                            _packageList.Add(package);
+
+                            calbback?.Invoke(package);
+                        }
+                    });
+                }
+                else
+                {
+                    calbback?.Invoke(null);
+                }
+            });
+        }
+
         /// <summary>
         /// Remove a package. All resources in this package will be disposed.
         /// </summary>
@@ -622,6 +675,64 @@ namespace FairyGUI
         public Dictionary<string, string>[] dependencies
         {
             get { return _dependencies; }
+        }
+
+        Dictionary<string, object> _resources = new Dictionary<string, object>();
+        List<string> _loadlist = new List<string>();
+
+        object GetAsset(string name, string extension, System.Type type, out DestroyMethod destroyMethod)
+        {
+            destroyMethod = DestroyMethod.AsyncResource;
+            string assetName = name + extension;
+            _resources.TryGetValue(assetName, out var o);
+            return o;
+        }
+
+        void LoadPackageAsync(ByteBuffer buffer, string packageSource, string assetNamePrefix, Action<UIPackage> callback)
+        {
+            if (!LoadPackage(buffer, packageSource, assetNamePrefix))
+            {
+                callback?.Invoke(null);
+                return;
+            }
+
+            this._loadFunc = GetAsset;
+            _loadlist.Clear();
+            _resources.Clear();
+            foreach (PackageItem packageItem in _items)
+            {
+                if (string.IsNullOrEmpty(packageItem.file))
+                    continue;
+                
+                _loadlist.Add(packageItem.file);
+                if (packageItem.type == PackageItemType.Atlas)
+                {
+                    string ext = Path.GetExtension(packageItem.file);
+                    if (packageItem.file != null)
+                    {
+                        string fileName = packageItem.file.Substring(0, packageItem.file.Length - ext.Length);
+                        string assetName = fileName += "!a" + ext;
+                        _loadlist.Add(assetName);
+                    }
+                }
+            }
+
+            for (int i = 0; i < _loadlist.Count; ++i)
+            {
+                string assetName = _loadlist[i];
+                _asyncLoadResource.LoadResource(assetName, (ok, o) =>
+                {
+                    _loadlist.Remove(assetName);
+                    if (ok)
+                    {
+                        _resources.Add(assetName, o);    
+                    }
+                    if (_loadlist.Count <= 0)
+                    {
+                        callback(this);
+                    }
+                });
+            }
         }
 
         bool LoadPackage(ByteBuffer buffer, string assetNamePrefix)
