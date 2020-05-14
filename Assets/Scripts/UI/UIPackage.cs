@@ -369,7 +369,7 @@ namespace FairyGUI
                     
                     ByteBuffer buffer = new ByteBuffer(textAsset.bytes);
                     UIPackage pkg = new UIPackage {_assetPath = assetPath};
-                    pkg.LoadPackageAsync(buffer, assetPath, assetPath, package =>
+                    pkg.LoadPackageAsync(buffer, assetPath, package =>
                     {
                         if (package != null)
                         {
@@ -688,9 +688,9 @@ namespace FairyGUI
             return o;
         }
 
-        void LoadPackageAsync(ByteBuffer buffer, string packageSource, string assetNamePrefix, Action<UIPackage> callback)
+        void LoadPackageAsync(ByteBuffer buffer, string assetNamePrefix, Action<UIPackage> callback)
         {
-            if (!LoadPackage(buffer, packageSource, assetNamePrefix))
+            if (!LoadPackage(buffer, assetNamePrefix))
             {
                 callback?.Invoke(null);
                 return;
