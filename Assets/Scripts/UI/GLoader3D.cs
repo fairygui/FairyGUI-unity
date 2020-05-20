@@ -269,6 +269,8 @@ namespace FairyGUI
             set { _content.shader = value; }
         }
 
+        private Color _color = Color.white;
+#if !FAIRYGUI_SPINE
         /// <summary>
         /// Not implemented.
         /// </summary>
@@ -277,6 +279,7 @@ namespace FairyGUI
             get;
             set;
         }
+#endif // FAIRYGUI_SPINE
 
         /// <summary>
         /// 
@@ -519,7 +522,7 @@ namespace FairyGUI
             _loop = buffer.ReadBool();
 
             if (buffer.ReadBool())
-                buffer.ReadColor(); //color
+                _color = buffer.ReadColor(); //color
 
             if (!string.IsNullOrEmpty(_url))
                 LoadContent();
