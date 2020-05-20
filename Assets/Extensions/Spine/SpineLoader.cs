@@ -21,6 +21,29 @@ namespace FairyGUI
             get { return _spineAnimation; }
         }
 
+        public Color color
+        {
+            get => this._color;
+            set
+            {
+                this._color = value;
+                if (this._spineAnimation == null || this._spineAnimation.skeleton == null)
+                    return;
+                this._spineAnimation.skeleton.R = this.color.r;
+                this._spineAnimation.skeleton.G = this.color.g;
+                this._spineAnimation.skeleton.B = this.color.b;
+            }
+        }
+        
+        protected override void HandleAlphaChanged()
+        {
+            base.HandleAlphaChanged();
+            if (this._spineAnimation != null && this._spineAnimation.skeleton != null)
+            {
+                this._spineAnimation.skeleton.A = this.alpha;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -87,6 +110,10 @@ namespace FairyGUI
                 _spineAnimation.skeleton.SetSkin(skin);
                 _spineAnimation.skeleton.SetSlotsToSetupPose();
             }
+            
+            // change color and alpha
+            color = _color;
+            HandleAlphaChanged();
         }
 
         protected void FreeSpine()
