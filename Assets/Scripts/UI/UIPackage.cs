@@ -1019,9 +1019,8 @@ namespace FairyGUI
                     if (pi.skeletonAsset != null)
                     {
                         UnityEngine.Object.DestroyImmediate((UnityEngine.Object)pi.skeletonAsset);
+                        pi.skeletonAsset = null;
                     }
-
-                    pi.skeletonAsset = null;
                 }
             }
             _items.Clear();
