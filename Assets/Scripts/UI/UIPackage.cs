@@ -1014,6 +1014,15 @@ namespace FairyGUI
                         pi.audioClip = null;
                     }
                 }
+                else if (pi.type == PackageItemType.Spine || pi.type == PackageItemType.DragoneBones)
+                {
+                    if (pi.skeletonAsset != null)
+                    {
+                        UnityEngine.Object.DestroyImmediate((UnityEngine.Object)pi.skeletonAsset);
+                    }
+
+                    pi.skeletonAsset = null;
+                }
             }
             _items.Clear();
 
