@@ -144,6 +144,9 @@ namespace FairyGUI
             get { return _fillMesh != null ? _fillMesh.amount : 0; }
             set
             {
+                if (_fillMesh == null)
+                    _fillMesh = new FillMesh();
+
                 if (_fillMesh.amount != value)
                 {
                     _fillMesh.amount = value;

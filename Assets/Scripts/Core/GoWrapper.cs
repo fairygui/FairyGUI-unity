@@ -28,14 +28,6 @@ namespace FairyGUI
             public int sortingOrder;
         }
 
-        class HelperMB : MonoBehaviour
-        {
-            private void OnWillRenderObject()
-            {
-                Debug.Log("a");
-            }
-        }
-
         protected static List<Transform> helperTransformList = new List<Transform>();
 
         /// <summary>
@@ -49,7 +41,6 @@ namespace FairyGUI
             _materialsBackup = new Dictionary<Material, Material>();
 
             CreateGameObject("GoWrapper");
-            gameObject.AddComponent<HelperMB>();
         }
 
         /// <summary>
