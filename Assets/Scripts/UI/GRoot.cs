@@ -623,6 +623,16 @@ namespace FairyGUI
         /// <param name="msg"></param>
         public void ShowTooltips(string msg)
         {
+            ShowTooltips(msg, 0.1f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="delay"></param>
+        public void ShowTooltips(string msg, float delay)
+        {
             if (_defaultTooltipWin == null || _defaultTooltipWin.isDisposed)
             {
                 string resourceURL = UIConfig.tooltipsWin;
@@ -638,7 +648,7 @@ namespace FairyGUI
             }
 
             _defaultTooltipWin.text = msg;
-            ShowTooltipsWin(_defaultTooltipWin);
+            ShowTooltipsWin(_defaultTooltipWin, delay);
         }
 
         /// <summary>
@@ -647,10 +657,20 @@ namespace FairyGUI
         /// <param name="tooltipWin"></param>
         public void ShowTooltipsWin(GObject tooltipWin)
         {
+            ShowTooltipsWin(tooltipWin, 0.1f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tooltipWin"></param>
+        /// <param name="delay"></param>
+        public void ShowTooltipsWin(GObject tooltipWin, float delay)
+        {
             HideTooltips();
 
             _tooltipWin = tooltipWin;
-            Timers.inst.Add(0.1f, 1, __showTooltipsWin);
+            Timers.inst.Add(delay, 1, __showTooltipsWin);
         }
 
         void __showTooltipsWin(object param)
