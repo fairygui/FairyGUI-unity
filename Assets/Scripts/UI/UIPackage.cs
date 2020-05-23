@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using FairyGUI.Utils;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1012,6 +1013,14 @@ namespace FairyGUI
                     {
                         pi.audioClip.Unload();
                         pi.audioClip = null;
+                    }
+                }
+                else if (pi.type == PackageItemType.DragoneBones || pi.type == PackageItemType.Spine)
+                {
+                    if (pi.skeletonAsset != null)
+                    {
+                        Object.DestroyImmediate((Object)pi.skeletonAsset, true);
+                        pi.skeletonAsset = null;
                     }
                 }
             }
