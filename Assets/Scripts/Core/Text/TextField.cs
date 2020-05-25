@@ -34,7 +34,6 @@ namespace FairyGUI
         float _fontSizeScale;
         float _renderScale;
         int _fontVersion;
-        Vector3 _lastPixelPerfectPos;
         string _parsedText;
 
         RichTextField _richTextField;
