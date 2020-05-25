@@ -248,8 +248,11 @@ namespace FairyGUI
             get { return _content.color; }
             set
             {
-                _content.color = value;
-                UpdateGear(4);
+                if (_content.color != value)
+                {
+                    _content.color = value;
+                    UpdateGear(4);
+                }
             }
         }
 

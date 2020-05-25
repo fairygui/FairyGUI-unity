@@ -20,6 +20,7 @@ namespace FairyGUI
         int _frame;
         bool _loop;
         bool _updatingLayout;
+        Color _color;
 
         protected PackageItem _contentItem;
         protected GoWrapper _content;
@@ -30,6 +31,7 @@ namespace FairyGUI
             _align = AlignType.Left;
             _verticalAlign = VertAlignType.Top;
             _playing = true;
+            _color = Color.white;
         }
 
         override protected void CreateDisplayObject()
@@ -269,17 +271,23 @@ namespace FairyGUI
             set { _content.shader = value; }
         }
 
-        private Color _color = Color.white;
-#if !FAIRYGUI_SPINE
         /// <summary>
-        /// Not implemented.
+        /// 
         /// </summary>
         public Color color
         {
-            get;
-            set;
+            get { return _color; }
+            set
+            {
+                if (_color != value)
+                {
+                    _color = value;
+                    UpdateGear(4);
+
+                    OnChange("color");
+                }
+            }
         }
-#endif // FAIRYGUI_SPINE
 
         /// <summary>
         /// 
@@ -503,6 +511,11 @@ namespace FairyGUI
                 UpdateLayout();
         }
 
+        protected override void HandleAlphaChanged()
+        {
+            OnChange("alpha");
+        }
+
         override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)
         {
             base.Setup_BeforeAdd(buffer, beginPos);
@@ -522,7 +535,7 @@ namespace FairyGUI
             _loop = buffer.ReadBool();
 
             if (buffer.ReadBool())
-                _color = buffer.ReadColor(); //color
+                this.color = buffer.ReadColor(); //color
 
             if (!string.IsNullOrEmpty(_url))
                 LoadContent();
