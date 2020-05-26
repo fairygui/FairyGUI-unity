@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -28,6 +29,7 @@ namespace FairyGUI
         GObject _modalWaitPane;
         List<GObject> _popupStack;
         List<GObject> _justClosedPopups;
+        HashSet<GObject> _specialPopups;
         GObject _tooltipWin;
         GObject _defaultTooltipWin;
 
@@ -50,8 +52,18 @@ namespace FairyGUI
 
             _popupStack = new List<GObject>();
             _justClosedPopups = new List<GObject>();
+            _specialPopups = new HashSet<GObject>();
 
             Stage.inst.onTouchBegin.AddCapture(__stageTouchBegin);
+            Stage.inst.onTouchEnd.AddCapture(__stageTouchEnd);
+        }
+
+        override public void Dispose()
+        {
+            base.Dispose();
+
+            Stage.inst.onTouchBegin.RemoveCapture(__stageTouchBegin);
+            Stage.inst.onTouchEnd.RemoveCapture(__stageTouchEnd);
         }
 
         /// <summary>
@@ -82,11 +94,24 @@ namespace FairyGUI
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="constantScaleFactor"></param>
+        public void SetContentScaleFactor(float constantScaleFactor)
+        {
+            UIContentScaler scaler = Stage.inst.gameObject.GetComponent<UIContentScaler>();
+            scaler.scaleMode = UIContentScaler.ScaleMode.ConstantPixelSize;
+            scaler.constantScaleFactor = constantScaleFactor;
+            scaler.ApplyChange();
+            ApplyContentScaleFactor();
+        }
+
+        /// <summary>
         /// This is called after screen size changed.
         /// </summary>
         public void ApplyContentScaleFactor()
         {
-            this.SetSize(Mathf.CeilToInt(Screen.width / UIContentScaler.scaleFactor), Mathf.CeilToInt(Screen.height / UIContentScaler.scaleFactor));
+            this.SetSize(Mathf.CeilToInt(Stage.inst.width / UIContentScaler.scaleFactor), Mathf.CeilToInt(Stage.inst.height / UIContentScaler.scaleFactor));
             this.SetScale(UIContentScaler.scaleFactor, UIContentScaler.scaleFactor);
         }
 
@@ -171,7 +196,7 @@ namespace FairyGUI
         {
             if (UIConfig.globalModalWaiting != null)
             {
-                if (_modalWaitPane == null)
+                if (_modalWaitPane == null || _modalWaitPane.isDisposed)
                 {
                     _modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.globalModalWaiting);
                     _modalWaitPane.SetHome(this);
@@ -244,7 +269,7 @@ namespace FairyGUI
         {
             get
             {
-                if (_modalLayer == null)
+                if (_modalLayer == null || _modalLayer.isDisposed)
                     CreateModalLayer();
 
                 return _modalLayer;
@@ -309,7 +334,7 @@ namespace FairyGUI
 
         private void AdjustModalLayer()
         {
-            if (_modalLayer == null)
+            if (_modalLayer == null || _modalLayer.isDisposed)
                 CreateModalLayer();
 
             int cnt = this.numChildren;
@@ -342,7 +367,7 @@ namespace FairyGUI
         /// <param name="popup"></param>
         public void ShowPopup(GObject popup)
         {
-            ShowPopup(popup, null, null);
+            ShowPopup(popup, null, PopupDirection.Auto, false);
         }
 
         /// <summary>
@@ -354,7 +379,15 @@ namespace FairyGUI
         /// <param name="target"></param>
         public void ShowPopup(GObject popup, GObject target)
         {
-            ShowPopup(popup, target, null);
+            ShowPopup(popup, target, PopupDirection.Auto, false);
+        }
+
+        [Obsolete]
+        public void ShowPopup(GObject popup, GObject target, object downward)
+        {
+            ShowPopup(popup, target,
+                downward == null ? PopupDirection.Auto : ((bool)downward == true ? PopupDirection.Down : PopupDirection.Up),
+                false);
         }
 
         /// <summary>
@@ -364,8 +397,23 @@ namespace FairyGUI
         /// </summary>
         /// <param name="popup"></param>
         /// <param name="target"></param>
-        /// <param name="downward">True to display downwards, false to display upwards, null to display automatically.</param>
-        public void ShowPopup(GObject popup, GObject target, object downward)
+        /// <param name="dir"></param>
+        public void ShowPopup(GObject popup, GObject target, PopupDirection dir)
+        {
+            ShowPopup(popup, target, dir, false);
+        }
+
+        /// <summary>
+        /// Show a popup object along with the specific target object.
+        /// 显示一个popup。将popup显示在指定对象的上方或者下方。
+        /// popup的特点是点击popup对象外的区域，popup对象将自动消失。
+        /// 默认情况下，popup在touchEnd事件中关闭；特别设置closeUntilUpEvent=true则可使该popup在touchEnd中才关闭。
+        /// </summary>
+        /// <param name="popup"></param>
+        /// <param name="target"></param>
+        /// <param name="dir"></param>
+        /// <param name="closeUntilUpEvent"></param>
+        public void ShowPopup(GObject popup, GObject target, PopupDirection dir, bool closeUntilUpEvent)
         {
             if (_popupStack.Count > 0)
             {
@@ -375,12 +423,16 @@ namespace FairyGUI
                     for (int i = _popupStack.Count - 1; i >= k; i--)
                     {
                         int last = _popupStack.Count - 1;
-                        ClosePopup(_popupStack[last]);
+                        GObject obj = _popupStack[last];
+                        ClosePopup(obj);
                         _popupStack.RemoveAt(last);
+                        _specialPopups.Remove(obj);
                     }
                 }
             }
             _popupStack.Add(popup);
+            if (closeUntilUpEvent)
+                _specialPopups.Add(popup);
 
             if (target != null)
             {
@@ -402,11 +454,18 @@ namespace FairyGUI
             AddChild(popup);
             AdjustModalLayer();
 
-            if ((popup is Window) && target == null && downward == null)
+            if ((popup is Window) && target == null && dir == PopupDirection.Auto)
                 return;
 
-            Vector2 pos = GetPoupPosition(popup, target, downward);
+            Vector2 pos = GetPoupPosition(popup, target, dir);
             popup.xy = pos;
+        }
+
+        [Obsolete]
+        public Vector2 GetPoupPosition(GObject popup, GObject target, object downward)
+        {
+            return GetPoupPosition(popup, target,
+                downward == null ? PopupDirection.Auto : ((bool)downward == true ? PopupDirection.Down : PopupDirection.Up));
         }
 
         /// <summary>
@@ -414,9 +473,9 @@ namespace FairyGUI
         /// </summary>
         /// <param name="popup"></param>
         /// <param name="target"></param>
-        /// <param name="downward"></param>
+        /// <param name="dir"></param>
         /// <returns></returns>
-        public Vector2 GetPoupPosition(GObject popup, GObject target, object downward)
+        public Vector2 GetPoupPosition(GObject popup, GObject target, PopupDirection dir)
         {
             Vector2 pos;
             Vector2 size = Vector2.zero;
@@ -434,8 +493,8 @@ namespace FairyGUI
             if (xx + popup.width > this.width)
                 xx = xx + size.x - popup.width;
             yy = pos.y + size.y;
-            if ((downward == null && yy + popup.height > this.height)
-                || downward != null && (bool)downward == false)
+            if ((dir == PopupDirection.Auto && yy + popup.height > this.height)
+                || dir == PopupDirection.Up)
             {
                 yy = pos.y - popup.height - 1;
                 if (yy < 0)
@@ -454,7 +513,7 @@ namespace FairyGUI
         /// <param name="popup"></param>
         public void TogglePopup(GObject popup)
         {
-            TogglePopup(popup, null, null);
+            TogglePopup(popup, null, PopupDirection.Auto, false);
         }
 
         /// <summary>
@@ -464,7 +523,15 @@ namespace FairyGUI
         /// <param name="target"></param>
         public void TogglePopup(GObject popup, GObject target)
         {
-            TogglePopup(popup, target, null);
+            TogglePopup(popup, target, PopupDirection.Auto, false);
+        }
+
+        [Obsolete]
+        public void TogglePopup(GObject popup, GObject target, object downward)
+        {
+            TogglePopup(popup, target,
+                downward == null ? PopupDirection.Auto : ((bool)downward == true ? PopupDirection.Down : PopupDirection.Up),
+                false);
         }
 
         /// <summary>
@@ -472,13 +539,25 @@ namespace FairyGUI
         /// </summary>
         /// <param name="popup"></param>
         /// <param name="target"></param>
-        /// <param name="downward"></param>
-        public void TogglePopup(GObject popup, GObject target, object downward)
+        /// <param name="dir"></param>
+        public void TogglePopup(GObject popup, GObject target, PopupDirection dir)
+        {
+            TogglePopup(popup, target, dir, false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="popup"></param>
+        /// <param name="target"></param>
+        /// <param name="dir"></param>
+        /// <param name="closeUntilUpEvent"></param>
+        public void TogglePopup(GObject popup, GObject target, PopupDirection dir, bool closeUntilUpEvent)
         {
             if (_justClosedPopups.IndexOf(popup) != -1)
                 return;
 
-            ShowPopup(popup, target, downward);
+            ShowPopup(popup, target, dir, closeUntilUpEvent);
         }
 
         /// <summary>
@@ -503,8 +582,10 @@ namespace FairyGUI
                     for (int i = _popupStack.Count - 1; i >= k; i--)
                     {
                         int last = _popupStack.Count - 1;
-                        ClosePopup(_popupStack[last]);
+                        GObject obj = _popupStack[last];
+                        ClosePopup(obj);
                         _popupStack.RemoveAt(last);
+                        _specialPopups.Remove(obj);
                     }
                 }
             }
@@ -513,6 +594,7 @@ namespace FairyGUI
                 foreach (GObject obj in _popupStack)
                     ClosePopup(obj);
                 _popupStack.Clear();
+                _specialPopups.Clear();
             }
         }
 
@@ -541,7 +623,17 @@ namespace FairyGUI
         /// <param name="msg"></param>
         public void ShowTooltips(string msg)
         {
-            if (_defaultTooltipWin == null)
+            ShowTooltips(msg, 0.1f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="delay"></param>
+        public void ShowTooltips(string msg, float delay)
+        {
+            if (_defaultTooltipWin == null || _defaultTooltipWin.isDisposed)
             {
                 string resourceURL = UIConfig.tooltipsWin;
                 if (string.IsNullOrEmpty(resourceURL))
@@ -556,7 +648,7 @@ namespace FairyGUI
             }
 
             _defaultTooltipWin.text = msg;
-            ShowTooltipsWin(_defaultTooltipWin);
+            ShowTooltipsWin(_defaultTooltipWin, delay);
         }
 
         /// <summary>
@@ -565,10 +657,20 @@ namespace FairyGUI
         /// <param name="tooltipWin"></param>
         public void ShowTooltipsWin(GObject tooltipWin)
         {
+            ShowTooltipsWin(tooltipWin, 0.1f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tooltipWin"></param>
+        /// <param name="delay"></param>
+        public void ShowTooltipsWin(GObject tooltipWin, float delay)
+        {
             HideTooltips();
 
             _tooltipWin = tooltipWin;
-            Timers.inst.Add(0.1f, 1, __showTooltipsWin);
+            Timers.inst.Add(delay, 1, __showTooltipsWin);
         }
 
         void __showTooltipsWin(object param)
@@ -617,29 +719,15 @@ namespace FairyGUI
         {
             get
             {
-                GObject result = null;
-                DisplayObject mc = Stage.inst.focus;
-                while (mc != Stage.inst && mc != null)
-                {
-                    GObject gg = mc.gOwner;
-                    if (gg != null && gg.touchable && gg.focusable)
-                    {
-                        result = gg;
-                        break;
-                    }
-                    mc = mc.parent;
-                }
-                return result;
+                GObject obj = DisplayObjectToGObject(Stage.inst.focus);
+                if (obj != null && !IsAncestorOf(obj))
+                    return null;
+                else
+                    return obj;
             }
 
             set
             {
-                if (value != null && (!value.focusable || !value.onStage))
-                {
-                    Debug.LogError("invalid focus target");
-                    return;
-                }
-
                 if (value == null)
                     Stage.inst.focus = null;
                 else
@@ -652,12 +740,19 @@ namespace FairyGUI
             if (_tooltipWin != null)
                 HideTooltips();
 
-            CheckPopups();
+            CheckPopups(true);
         }
 
-        void CheckPopups()
+        void __stageTouchEnd(EventContext context)
         {
-            _justClosedPopups.Clear();
+            CheckPopups(false);
+        }
+
+        void CheckPopups(bool touchBegin)
+        {
+            if (touchBegin)
+                _justClosedPopups.Clear();
+
             if (_popupStack.Count > 0)
             {
                 DisplayObject mc = Stage.inst.touchTarget as DisplayObject;
@@ -673,9 +768,13 @@ namespace FairyGUI
                             {
                                 int last = _popupStack.Count - 1;
                                 GObject popup = _popupStack[last];
+                                if (touchBegin == _specialPopups.Contains(popup))
+                                    continue;
+
                                 ClosePopup(popup);
                                 _justClosedPopups.Add(popup);
                                 _popupStack.RemoveAt(last);
+                                _specialPopups.Remove(popup);
                             }
                             handled = true;
                             break;
@@ -689,10 +788,14 @@ namespace FairyGUI
                     for (int i = _popupStack.Count - 1; i >= 0; i--)
                     {
                         GObject popup = _popupStack[i];
+                        if (touchBegin == _specialPopups.Contains(popup))
+                            continue;
+
                         ClosePopup(popup);
                         _justClosedPopups.Add(popup);
+                        _popupStack.RemoveAt(i);
+                        _specialPopups.Remove(popup);
                     }
-                    _popupStack.Clear();
                 }
             }
         }

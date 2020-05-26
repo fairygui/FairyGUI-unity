@@ -1,148 +1,192 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FairyGUI
 {
+    [Flags]
+    public enum MaterialFlags
+    {
+        Clipped = 1,
+        SoftClipped = 2,
+        StencilTest = 4,
+        AlphaMask = 8,
+        Grayed = 16,
+        ColorFilter = 32
+    }
+
     /// <summary>
-    /// Every texture and shader combination has a MaterialManager.
+    /// Every texture-shader combination has a MaterialManager.
     /// </summary>
     public class MaterialManager
     {
+        public event Action<Material> onCreateNewMaterial;
+
+        public bool firstMaterialInFrame;
+
         NTexture _texture;
         Shader _shader;
-        string[] _keywords;
-        List<NMaterial>[] _materials;
+        List<string> _addKeywords;
+        Dictionary<int, List<MaterialRef>> _materials;
+        bool _combineTexture;
 
-        internal string _managerKey;
+        class MaterialRef
+        {
+            public Material material;
+            public int frame;
+            public BlendMode blendMode;
+            public uint group;
+        }
 
-        static string[][] internalKeywords = {
-            null,
-            new string[] { "GRAYED" },
-            new string[] { "CLIPPED" },
-            new string[] { "CLIPPED", "GRAYED" },
-            new string[] { "SOFT_CLIPPED" },
-            new string[] { "SOFT_CLIPPED", "GRAYED" },
-            new string[] { "ALPHA_MASK" }
-        };
-        const int internalKeywordCount = 7;
+        const int internalKeywordsCount = 6;
+        static string[] internalKeywords = new[] { "CLIPPED", "SOFT_CLIPPED", null, "ALPHA_MASK", "GRAYED", "COLOR_FILTER" };
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="texture"></param>
-        internal MaterialManager(NTexture texture, Shader shader, string[] keywords)
+        /// <param name="shader"></param>
+        internal MaterialManager(NTexture texture, Shader shader)
         {
             _texture = texture;
             _shader = shader;
-            _keywords = keywords;
-            _materials = new List<NMaterial>[internalKeywordCount * 2];
+            _materials = new Dictionary<int, List<MaterialRef>>();
+            _combineTexture = texture.alphaTexture != null;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="materialType"></param>
-        /// <param name="blendMode"></param>
-        /// <param name="clipId"></param>
+        /// <param name="keywords"></param>
         /// <returns></returns>
-        public NMaterial GetMaterial(int materialType, BlendMode blendMode, uint clipId)
+        public int GetFlagsByKeywords(IList<string> keywords)
         {
-            uint frameId = UpdateContext.frameId;
-            List<NMaterial> items;
+            if (_addKeywords == null)
+                _addKeywords = new List<string>();
 
-            if (blendMode == BlendMode.Normal)
+            int flags = 0;
+            for (int i = 0; i < keywords.Count; i++)
             {
-                items = _materials[materialType];
-                if (items == null)
+                string s = keywords[i];
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                int j = _addKeywords.IndexOf(s);
+                if (j == -1)
                 {
-                    items = new List<NMaterial>();
-                    _materials[materialType] = items;
+                    j = _addKeywords.Count;
+                    _addKeywords.Add(s);
                 }
-            }
-            else
-            {
-                items = _materials[internalKeywordCount + materialType];
-                if (items == null)
-                {
-                    items = new List<NMaterial>();
-                    _materials[internalKeywordCount + materialType] = items;
-                }
+                flags += (1 << (j + internalKeywordsCount));
             }
 
+            return flags;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <param name="blendMode"></param>
+        /// <param name="group"></param>
+        /// <returns></returns>
+        public Material GetMaterial(int flags, BlendMode blendMode, uint group)
+        {
+            if (blendMode != BlendMode.Normal && BlendModeUtils.Factors[(int)blendMode].pma)
+                flags |= (int)MaterialFlags.ColorFilter;
+
+            List<MaterialRef> items;
+            if (!_materials.TryGetValue(flags, out items))
+            {
+                items = new List<MaterialRef>();
+                _materials[flags] = items;
+            }
+
+            int frameId = Time.frameCount;
             int cnt = items.Count;
-            NMaterial result = null;
+            MaterialRef result = null;
             for (int i = 0; i < cnt; i++)
             {
-                NMaterial mat = items[i];
-                if (mat.frameId == frameId)
+                MaterialRef item = items[i];
+
+                if (item.group == group && item.blendMode == blendMode)
                 {
-                    if (materialType != 6 && mat.clipId == clipId && mat.blendMode == blendMode)
+                    if (item.frame != frameId)
                     {
-                        mat._firstInstance = false;
-                        return mat;
+                        firstMaterialInFrame = true;
+                        item.frame = frameId;
                     }
+                    else
+                        firstMaterialInFrame = false;
+
+                    if (_combineTexture)
+                        item.material.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
+
+                    return item.material;
                 }
-                else
-                {
-                    result = mat;
-                    break;
-                }
+                else if (result == null && (item.frame > frameId || item.frame < frameId - 1)) //collect materials if it is unused in last frame
+                    result = item;
             }
 
-            if (result != null)
+            if (result == null)
             {
-                result.frameId = frameId;
-                result.clipId = clipId;
-                result.blendMode = blendMode;
-
-                if (result.combined)
-                    result.material.SetTexture(ShaderConfig._properyIDs._AlphaTex, _texture.alphaTexture);
-            }
-            else
-            {
-                result = CreateMaterial();
-                string[] keywords = internalKeywords[materialType];
-                if (keywords != null)
-                {
-                    cnt = keywords.Length;
-                    for (int i = 0; i < cnt; i++)
-                        result.material.EnableKeyword(keywords[i]);
-                }
-                result.frameId = frameId;
-                result.clipId = clipId;
-                result.blendMode = blendMode;
-                if (BlendModeUtils.Factors[(int)result.blendMode].pma)
-                    result.material.EnableKeyword("COLOR_FILTER");
+                result = new MaterialRef() { material = CreateMaterial(flags) };
                 items.Add(result);
             }
+            else if (_combineTexture)
+                result.material.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
 
-            result._firstInstance = true;
-            return result;
+            if (result.blendMode != blendMode)
+            {
+                BlendModeUtils.Apply(result.material, blendMode);
+                result.blendMode = blendMode;
+            }
+
+            result.group = group;
+            result.frame = frameId;
+            firstMaterialInFrame = true;
+            return result.material;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        NMaterial CreateMaterial()
+        Material CreateMaterial(int flags)
         {
-            NMaterial nm = new NMaterial(_shader);
-            nm.material.mainTexture = _texture.nativeTexture;
+            Material mat = new Material(_shader);
+
+            mat.mainTexture = _texture.nativeTexture;
             if (_texture.alphaTexture != null)
             {
-                nm.combined = true;
-                nm.material.EnableKeyword("COMBINED");
-                nm.material.SetTexture(ShaderConfig._properyIDs._AlphaTex, _texture.alphaTexture);
+                mat.EnableKeyword("COMBINED");
+                mat.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
             }
-            if (_keywords != null)
-            {
-                int cnt = _keywords.Length;
-                for (int i = 0; i < cnt; i++)
-                    nm.material.EnableKeyword(_keywords[i]);
-            }
-            nm.material.hideFlags = DisplayOptions.hideFlags;
 
-            return nm;
+            for (int i = 0; i < internalKeywordsCount; i++)
+            {
+                if ((flags & (1 << i)) != 0)
+                {
+                    string s = internalKeywords[i];
+                    if (s != null)
+                        mat.EnableKeyword(s);
+                }
+            }
+            if (_addKeywords != null)
+            {
+                int keywordCnt = _addKeywords.Count;
+                for (int i = 0; i < keywordCnt; i++)
+                {
+                    if ((flags & (1 << (i + internalKeywordsCount))) != 0)
+                        mat.EnableKeyword(_addKeywords[i]);
+                }
+            }
+
+            mat.hideFlags = DisplayObject.hideFlags;
+            if (onCreateNewMaterial != null)
+                onCreateNewMaterial(mat);
+
+            return mat;
         }
 
         /// <summary>
@@ -150,64 +194,49 @@ namespace FairyGUI
         /// </summary>
         public void DestroyMaterials()
         {
-            int cnt = _materials.Length;
-            for (int i = 0; i < cnt; i++)
+            var iter = _materials.GetEnumerator();
+            while (iter.MoveNext())
             {
-                List<NMaterial> items = _materials[i];
-                if (items != null)
+                List<MaterialRef> items = iter.Current.Value;
+                if (Application.isPlaying)
                 {
-                    if (Application.isPlaying)
-                    {
-                        int cnt2 = items.Count;
-                        for (int j = 0; j < cnt2; j++)
-                            Object.Destroy(items[j].material);
-                    }
-                    else
-                    {
-                        int cnt2 = items.Count;
-                        for (int j = 0; j < cnt2; j++)
-                            Object.DestroyImmediate(items[j].material);
-                    }
-                    items.Clear();
+                    int cnt = items.Count;
+                    for (int j = 0; j < cnt; j++)
+                        Object.Destroy(items[j].material);
                 }
-            }
-        }
-
-        public void RefreshMaterials()
-        {
-            int cnt = _materials.Length;
-            bool hasAlphaTexture = _texture.alphaTexture != null;
-            for (int i = 0; i < cnt; i++)
-            {
-                List<NMaterial> items = _materials[i];
-                if (items != null)
+                else
                 {
-                    int cnt2 = items.Count;
-                    for (int j = 0; j < cnt2; j++)
-                    {
-                        NMaterial nm = items[j];
-                        nm.material.mainTexture = _texture.nativeTexture;
-                        if (hasAlphaTexture)
-                        {
-                            if (!nm.combined)
-                            {
-                                nm.combined = true;
-                                nm.material.EnableKeyword("COMBINED");
-                            }
-                            nm.material.SetTexture(ShaderConfig._properyIDs._AlphaTex, _texture.alphaTexture);
-                        }
-                    }
+                    int cnt = items.Count;
+                    for (int j = 0; j < cnt; j++)
+                        Object.DestroyImmediate(items[j].material);
                 }
+                items.Clear();
             }
+            iter.Dispose();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void Release()
+        public void RefreshMaterials()
         {
-            if (_keywords != null)
-                _texture.DestroyMaterialManager(this);
+            _combineTexture = _texture.alphaTexture != null;
+            var iter = _materials.GetEnumerator();
+            while (iter.MoveNext())
+            {
+                List<MaterialRef> items = iter.Current.Value;
+                int cnt = items.Count;
+                for (int j = 0; j < cnt; j++)
+                {
+                    Material mat = items[j].material;
+                    mat.mainTexture = _texture.nativeTexture;
+                    if (_combineTexture)
+                    {
+                        mat.EnableKeyword("COMBINED");
+                        mat.SetTexture(ShaderConfig.ID_AlphaTex, _texture.alphaTexture);
+                    }
+                }
+            }
         }
     }
 }

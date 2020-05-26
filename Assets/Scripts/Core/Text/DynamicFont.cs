@@ -9,48 +9,29 @@ namespace FairyGUI
     /// </summary>
     public class DynamicFont : BaseFont
     {
-        protected Font _font;
-        protected class RenderInfo
-        {
-            public int yIndent;//越大，字显示越偏下
-            public int height;
-        }
-        protected Dictionary<int, RenderInfo> _renderInfo;
-
-        RenderInfo _lastRenderInfo;
-        int _lastFontSize;
+        Font _font;
         int _size;
+        float _ascent;
+        float _lineHeight;
+        float _scale;
+        TextFormat _format;
         FontStyle _style;
-        bool _bold;
+        bool _boldVertice;
+        CharacterInfo _char;
+        CharacterInfo _lineChar;
+        bool _gotLineChar;
 
-        static CharacterInfo sTempChar;
-
-        internal static bool textRebuildFlag;
-
-        public DynamicFont(string name) : this(name, null)
+        public DynamicFont()
         {
-        }
-
-        public DynamicFont(string name, Font font)
-        {
-            this.name = name;
             this.canTint = true;
             this.keepCrisp = true;
+            this.customOutline = true;
             this.shader = ShaderConfig.textShader;
-            _lastFontSize = -1;
+        }
 
-            //The fonts in mobile platform have no default bold effect.
-            if (name.ToLower().IndexOf("bold") == -1)
-                this.customBold = Application.isMobilePlatform;
-
-            _renderInfo = new Dictionary<int, RenderInfo>();
-
-            if (font == null)
-                LoadFont();
-            else
-                _font = font;
-
-            this.nativeFont = _font;
+        override public void Dispose()
+        {
+            Font.textureRebuilt -= textureRebuildCallback;
         }
 
         public Font nativeFont
@@ -59,95 +40,40 @@ namespace FairyGUI
             set
             {
                 if (_font != null)
-                {
-#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
                     Font.textureRebuilt -= textureRebuildCallback;
-#else
-                    _font.textureRebuildCallback -= textureRebuildCallback;
-#endif
-                }
+
                 _font = value;
-#if (UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER)
                 Font.textureRebuilt += textureRebuildCallback;
-#else
-                _font.textureRebuildCallback += textureRebuildCallback;
-#endif
+                _font.hideFlags = DisplayObject.hideFlags;
+                _font.material.hideFlags = DisplayObject.hideFlags;
+                _font.material.mainTexture.hideFlags = DisplayObject.hideFlags;
+
                 if (mainTexture != null)
                     mainTexture.Dispose();
                 mainTexture = new NTexture(_font.material.mainTexture);
                 mainTexture.destroyMethod = DestroyMethod.None;
 
-                _renderInfo.Clear();
-            }
-        }
-
-        void LoadFont()
-        {
-            //Try to load name.ttf in Resources
-            _font = (Font)Resources.Load(name, typeof(Font));
-
-            //Try to load name.ttf in Resources/Fonts/
-            if (_font == null)
-                _font = (Font)Resources.Load("Fonts/" + name, typeof(Font));
-
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-            //Try to use new API in Uinty5 to load
-            if (_font == null)
-            {
-                if (name.IndexOf(",") != -1)
-                {
-                    string[] arr = name.Split(',');
-                    int cnt = arr.Length;
-                    for (int i = 0; i < cnt; i++)
-                        arr[i] = arr[i].Trim();
-                    _font = Font.CreateDynamicFontFromOSFont(arr, 16);
-                }
-                else
-                    _font = Font.CreateDynamicFontFromOSFont(name, 16);
-            }
-#endif
-            if (_font == null)
-            {
-                if (name != UIConfig.defaultFont)
-                {
-                    DynamicFont bf = FontManager.GetFont(UIConfig.defaultFont) as DynamicFont;
-                    if (bf != null)
-                        _font = bf._font;
-                }
-
-                //Try to use Unity builtin resource
-                if (_font == null)
-                    _font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
-
-                if (_font == null)
-                    throw new Exception("Cant load font '" + name + "'");
-            }
-            else
-            {
-                _font.hideFlags = DisplayOptions.hideFlags;
-                _font.material.hideFlags = DisplayOptions.hideFlags;
-                _font.material.mainTexture.hideFlags = DisplayOptions.hideFlags;
+                // _ascent = _font.ascent;
+                // _lineHeight = _font.lineHeight;
+                _ascent = _font.fontSize;
+                _lineHeight = _font.fontSize * 1.25f;
             }
         }
 
         override public void SetFormat(TextFormat format, float fontSizeScale)
         {
+            _format = format;
+            float size = format.size * fontSizeScale;
             if (keepCrisp)
-            {
-                _size = Mathf.FloorToInt((float)format.size * fontSizeScale * UIContentScaler.scaleFactor);
-            }
-            else
-            {
-                if (fontSizeScale == 1)
-                    _size = format.size;
-                else
-                    _size = Mathf.FloorToInt((float)format.size * fontSizeScale);
-            }
+                size *= UIContentScaler.scaleFactor;
+            if (_format.specialStyle == TextFormat.SpecialStyle.Subscript || _format.specialStyle == TextFormat.SpecialStyle.Superscript)
+                size *= SupScale;
+            _size = Mathf.FloorToInt(size);
             if (_size == 0)
                 _size = 1;
+            _scale = (float)_size / _font.fontSize;
 
-            _bold = format.bold;
-            if (_bold && !customBold)
+            if (format.bold && !customBold)
             {
                 if (format.italic)
                 {
@@ -166,6 +92,9 @@ namespace FairyGUI
                 else
                     _style = FontStyle.Normal;
             }
+
+            _boldVertice = format.bold && (customBold || (format.italic && customBoldAndItalic));
+            format.FillVertexColors(vertexColors);
         }
 
         override public void PrepareCharacters(string text)
@@ -173,112 +102,241 @@ namespace FairyGUI
             _font.RequestCharactersInTexture(text, _size, _style);
         }
 
-        override public bool GetGlyphSize(char ch, out float width, out float height)
+        override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
         {
-            if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
+            if (!_font.GetCharacterInfo(ch, out _char, _size, _style))
             {
-                RenderInfo ri;
-                if (_lastFontSize == _size)
-                    ri = _lastRenderInfo;
+                if (ch == ' ')
+                {
+                    //space may not be prepared, try again
+                    _font.RequestCharactersInTexture(" ", _size, _style);
+                    _font.GetCharacterInfo(ch, out _char, _size, _style);
+                }
                 else
                 {
-                    _lastFontSize = _size;
-                    ri = _lastRenderInfo = GetRenderInfo(_size);
+                    width = height = baseline = 0;
+                    return false;
                 }
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-                width = sTempChar.advance;
-#else
-                width = Mathf.CeilToInt(sTempChar.width);
-#endif
-                height = ri.height;
-                if (_bold && customBold)
-                    width++;
-
-                if (keepCrisp)
-                {
-                    width /= UIContentScaler.scaleFactor;
-                    height /= UIContentScaler.scaleFactor;
-                }
-
-                return true;
             }
-            else
+
+            width = _char.advance;
+            height = _lineHeight * _scale;
+            baseline = _ascent * _scale;
+            if (_boldVertice)
+                width++;
+
+            if (_format.specialStyle == TextFormat.SpecialStyle.Subscript)
             {
-                width = 0;
-                height = 0;
-                return false;
+                height /= SupScale;
+                baseline /= SupScale;
             }
+            else if (_format.specialStyle == TextFormat.SpecialStyle.Superscript)
+            {
+                height = height / SupScale + baseline * SupOffset;
+                baseline *= (SupOffset + 1 / SupScale);
+            }
+
+            height = Mathf.RoundToInt(height);
+            baseline = Mathf.RoundToInt(baseline);
+
+            if (keepCrisp)
+            {
+                width /= UIContentScaler.scaleFactor;
+                height /= UIContentScaler.scaleFactor;
+                baseline /= UIContentScaler.scaleFactor;
+            }
+
+            return true;
         }
 
-        override public bool GetGlyph(char ch, ref GlyphInfo glyph)
+        static Vector3 bottomLeft;
+        static Vector3 topLeft;
+        static Vector3 topRight;
+        static Vector3 bottomRight;
+
+        static Vector2 uvBottomLeft;
+        static Vector2 uvTopLeft;
+        static Vector2 uvTopRight;
+        static Vector2 uvBottomRight;
+
+        static Color32[] vertexColors = new Color32[4];
+
+        static Vector3[] BOLD_OFFSET = new Vector3[]
         {
-            if (_font.GetCharacterInfo(ch, out sTempChar, _size, _style))
+            new Vector3(-0.5f, 0f, 0f),
+            new Vector3(0.5f, 0f, 0f),
+            new Vector3(0f, -0.5f, 0f),
+            new Vector3(0f, 0.5f, 0f)
+        };
+
+        override public int DrawGlyph(float x, float y,
+            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        {
+            topLeft.x = _char.minX;
+            topLeft.y = _char.maxY;
+            bottomRight.x = _char.maxX;
+            if (_char.glyphWidth == 0) //zero width, space etc
+                bottomRight.x = topLeft.x + _size / 2;
+            bottomRight.y = _char.minY;
+
+            if (keepCrisp)
             {
-                RenderInfo ri;
-                if (_lastFontSize == _size) //避免一次查表
-                    ri = _lastRenderInfo;
-                else
+                topLeft /= UIContentScaler.scaleFactor;
+                bottomRight /= UIContentScaler.scaleFactor;
+            }
+
+            if (_format.specialStyle == TextFormat.SpecialStyle.Subscript)
+                y = y - Mathf.RoundToInt(_ascent * _scale * SupOffset);
+            else if (_format.specialStyle == TextFormat.SpecialStyle.Superscript)
+                y = y + Mathf.RoundToInt(_ascent * _scale * (1 / SupScale - 1 + SupOffset));
+
+            topLeft.x += x;
+            topLeft.y += y;
+            bottomRight.x += x;
+            bottomRight.y += y;
+
+            topRight.x = bottomRight.x;
+            topRight.y = topLeft.y;
+            bottomLeft.x = topLeft.x;
+            bottomLeft.y = bottomRight.y;
+
+            vertList.Add(bottomLeft);
+            vertList.Add(topLeft);
+            vertList.Add(topRight);
+            vertList.Add(bottomRight);
+
+            uvBottomLeft = _char.uvBottomLeft;
+            uvTopLeft = _char.uvTopLeft;
+            uvTopRight = _char.uvTopRight;
+            uvBottomRight = _char.uvBottomRight;
+
+            uvList.Add(uvBottomLeft);
+            uvList.Add(uvTopLeft);
+            uvList.Add(uvTopRight);
+            uvList.Add(uvBottomRight);
+
+            colList.Add(vertexColors[0]);
+            colList.Add(vertexColors[1]);
+            colList.Add(vertexColors[2]);
+            colList.Add(vertexColors[3]);
+
+            if (_boldVertice)
+            {
+                for (int b = 0; b < 4; b++)
                 {
-                    _lastFontSize = _size;
-                    ri = _lastRenderInfo = GetRenderInfo(_size);
-                }
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-                glyph.vertMin.x = sTempChar.minX;
-                glyph.vertMin.y = ri.yIndent - sTempChar.maxY;
-                glyph.vertMax.x = sTempChar.maxX;
-                if (sTempChar.glyphWidth == 0) //zero width, space etc
-                    glyph.vertMax.x = glyph.vertMin.x + _size / 2;
-                glyph.vertMax.y = ri.yIndent - sTempChar.minY;
+                    Vector3 boldOffset = BOLD_OFFSET[b];
 
-                glyph.uvBottomLeft = sTempChar.uvBottomLeft;
-                glyph.uvTopLeft = sTempChar.uvTopLeft;
-                glyph.uvTopRight = sTempChar.uvTopRight;
-                glyph.uvBottomRight = sTempChar.uvBottomRight;
+                    vertList.Add(bottomLeft + boldOffset);
+                    vertList.Add(topLeft + boldOffset);
+                    vertList.Add(topRight + boldOffset);
+                    vertList.Add(bottomRight + boldOffset);
 
-                glyph.width = sTempChar.advance;
-                glyph.height = ri.height;
-                if (_bold && customBold)
-                    glyph.width++;
-#else
-                glyph.vertMin.x = sTempChar.vert.xMin;
-                glyph.vertMin.y = ri.yIndent - sTempChar.vert.yMin;
-                glyph.vertMax.x = sTempChar.vert.xMax;
-                if (sTempChar.vert.width == 0) //zero width, space etc
-                    glyph.vertMax.x = glyph.vertMax.x + _size / 2;
-                glyph.vertMax.y = ri.yIndent - sTempChar.vert.yMax;
+                    uvList.Add(uvBottomLeft);
+                    uvList.Add(uvTopLeft);
+                    uvList.Add(uvTopRight);
+                    uvList.Add(uvBottomRight);
 
-                if (!sTempChar.flipped)
-                {
-                    glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-                    glyph.uvTopLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
-                    glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-                    glyph.uvBottomRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
-                }
-                else
-                {
-                    glyph.uvBottomLeft = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMin);
-                    glyph.uvTopLeft = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMin);
-                    glyph.uvTopRight = new Vector2(sTempChar.uv.xMax, sTempChar.uv.yMax);
-                    glyph.uvBottomRight = new Vector2(sTempChar.uv.xMin, sTempChar.uv.yMax);
+                    colList.Add(vertexColors[0]);
+                    colList.Add(vertexColors[1]);
+                    colList.Add(vertexColors[2]);
+                    colList.Add(vertexColors[3]);
                 }
 
-                glyph.width = Mathf.CeilToInt(sTempChar.width);
-                glyph.height = sTempChar.size;
-                if (_bold && customBold)
-                    glyph.width++;
-#endif
-                if (keepCrisp)
-                {
-                    glyph.vertMin /= UIContentScaler.scaleFactor;
-                    glyph.vertMax /= UIContentScaler.scaleFactor;
-                    glyph.width /= UIContentScaler.scaleFactor;
-                    glyph.height /= UIContentScaler.scaleFactor;
-                }
-
-                return true;
+                return 20;
             }
             else
-                return false;
+                return 4;
+        }
+
+        override public int DrawLine(float x, float y, float width, int fontSize, int type,
+            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        {
+            if (!_gotLineChar)
+            {
+                _gotLineChar = true;
+                _font.RequestCharactersInTexture("_", 50, FontStyle.Normal);
+                _font.GetCharacterInfo('_', out _lineChar, 50, FontStyle.Normal);
+            }
+
+            float thickness;
+            float offset;
+
+            thickness = Mathf.Max(1, fontSize / 16f); //guest underline size
+            if (type == 0)
+                offset = Mathf.RoundToInt(_lineChar.minY * (float)fontSize / 50 + thickness);
+            else
+                offset = Mathf.RoundToInt(_ascent * 0.4f * fontSize / _font.fontSize);
+            if (thickness < 1)
+                thickness = 1;
+
+            topLeft.x = x;
+            topLeft.y = y + offset;
+            bottomRight.x = x + width;
+            bottomRight.y = topLeft.y - thickness;
+
+            topRight.x = bottomRight.x;
+            topRight.y = topLeft.y;
+            bottomLeft.x = topLeft.x;
+            bottomLeft.y = bottomRight.y;
+
+            vertList.Add(bottomLeft);
+            vertList.Add(topLeft);
+            vertList.Add(topRight);
+            vertList.Add(bottomRight);
+
+            uvBottomLeft = _lineChar.uvBottomLeft;
+            uvTopLeft = _lineChar.uvTopLeft;
+            uvTopRight = _lineChar.uvTopRight;
+            uvBottomRight = _lineChar.uvBottomRight;
+
+            //取中点的UV
+            Vector2 u0;
+            if (_lineChar.uvBottomLeft.x != _lineChar.uvBottomRight.x)
+                u0.x = (_lineChar.uvBottomLeft.x + _lineChar.uvBottomRight.x) * 0.5f;
+            else
+                u0.x = (_lineChar.uvBottomLeft.x + _lineChar.uvTopLeft.x) * 0.5f;
+
+            if (_lineChar.uvBottomLeft.y != _lineChar.uvTopLeft.y)
+                u0.y = (_lineChar.uvBottomLeft.y + _lineChar.uvTopLeft.y) * 0.5f;
+            else
+                u0.y = (_lineChar.uvBottomLeft.y + _lineChar.uvBottomRight.y) * 0.5f;
+
+            uvList.Add(u0);
+            uvList.Add(u0);
+            uvList.Add(u0);
+            uvList.Add(u0);
+
+            colList.Add(vertexColors[0]);
+            colList.Add(vertexColors[1]);
+            colList.Add(vertexColors[2]);
+            colList.Add(vertexColors[3]);
+
+            if (_boldVertice)
+            {
+                for (int b = 0; b < 4; b++)
+                {
+                    Vector3 boldOffset = BOLD_OFFSET[b];
+
+                    vertList.Add(bottomLeft + boldOffset);
+                    vertList.Add(topLeft + boldOffset);
+                    vertList.Add(topRight + boldOffset);
+                    vertList.Add(bottomRight + boldOffset);
+
+                    uvList.Add(u0);
+                    uvList.Add(u0);
+                    uvList.Add(u0);
+                    uvList.Add(u0);
+
+                    colList.Add(vertexColors[0]);
+                    colList.Add(vertexColors[1]);
+                    colList.Add(vertexColors[2]);
+                    colList.Add(vertexColors[3]);
+                }
+
+                return 20;
+            }
+            else
+                return 4;
         }
 
         override public bool HasCharacter(char ch)
@@ -286,77 +344,30 @@ namespace FairyGUI
             return _font.HasCharacter(ch);
         }
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER || UNITY_4_7)
+        override public int GetLineHeight(int size)
+        {
+            return Mathf.RoundToInt(_lineHeight * size / _font.fontSize);
+        }
+
         void textureRebuildCallback(Font targetFont)
         {
             if (_font != targetFont)
                 return;
 
-            if (mainTexture != null)
-                mainTexture.Dispose();
-            mainTexture = new NTexture(_font.material.mainTexture);
-            mainTexture.destroyMethod = DestroyMethod.None;
-
-            textRebuildFlag = true;
-
-            //Debug.Log("Font texture rebuild: " + name + "," + mainTexture.width + "," + mainTexture.height);
-        }
-#else
-        void textureRebuildCallback()
-        {
-            if (mainTexture != null)
-                mainTexture.Dispose();
-            mainTexture = new NTexture(_font.material.mainTexture);
-            mainTexture.destroyMethod = DestroyMethod.None;
-
-            textRebuildFlag = true;
-
-            //Debug.Log("Font texture rebuild: " + name + "," + mainTexture.width + "," + mainTexture.height);
-        }
-#endif
-
-        const string TEST_STRING = "fj|_我案愛爱";
-        RenderInfo GetRenderInfo(int size)
-        {
-            RenderInfo result;
-            if (!_renderInfo.TryGetValue(size, out result))
+            if (mainTexture == null || !Application.isPlaying)
             {
-                result = new RenderInfo();
-
-                CharacterInfo charInfo;
-                _font.RequestCharactersInTexture(TEST_STRING, size, FontStyle.Normal);
-
-                float y0 = float.MinValue;
-                float y1 = float.MaxValue;
-                int glyphHeight = size;
-                int cnt = TEST_STRING.Length;
-
-                for (int i = 0; i < cnt; i++)
-                {
-                    char ch = TEST_STRING[i];
-                    if (_font.GetCharacterInfo(ch, out charInfo, size, FontStyle.Normal))
-                    {
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
-                        y0 = Mathf.Max(y0, charInfo.maxY);
-                        y1 = Mathf.Min(y1, charInfo.minY);
-                        glyphHeight = Math.Max(glyphHeight, charInfo.glyphHeight);
-#else
-                        y0 = Mathf.Max(y0, charInfo.vert.yMin);
-                        y1 = Mathf.Min(y1, charInfo.vert.yMax);
-#endif
-                    }
-                }
-
-                int displayHeight = (int)(y0 - y1);
-                result.height = Math.Max(glyphHeight, displayHeight);
-                result.yIndent = (int)y0;
-                if (displayHeight < glyphHeight)
-                    result.yIndent++;
-
-                _renderInfo.Add(size, result);
+                mainTexture = new NTexture(_font.material.mainTexture);
+                mainTexture.destroyMethod = DestroyMethod.None;
             }
+            else
+                mainTexture.Reload(_font.material.mainTexture, null);
 
-            return result;
+            _gotLineChar = false;
+
+            textRebuildFlag = true;
+            version++;
+
+            //Debug.Log("Font texture rebuild: " + name + "," + mainTexture.width + "," + mainTexture.height);
         }
     }
 }

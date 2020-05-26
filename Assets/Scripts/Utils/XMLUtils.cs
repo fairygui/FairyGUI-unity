@@ -96,12 +96,34 @@ namespace FairyGUI.Utils
             return sb.ToString();
         }
 
-        public static string EncodeString(string str)
+        private static string[] ESCAPES = new string[] {
+            "&", "&amp;",
+            "<", "&lt;",
+            ">", "&gt;",
+            "'", "&apos;",
+            "\"", "&quot;"
+        };
+        public static void EncodeString(StringBuilder sb, int start, bool encodeQuotes = false)
         {
-            if (str == null || str.Length == 0)
+            int count;
+            int len = encodeQuotes ? ESCAPES.Length : ESCAPES.Length - 4;
+            for (int i = 0; i < len; i += 2)
+            {
+                count = sb.Length - start;
+                sb.Replace(ESCAPES[i], ESCAPES[i + 1], start, count);
+            }
+        }
+
+        public static string EncodeString(string str, bool encodeQuotes = false)
+        {
+            if (string.IsNullOrEmpty(str))
                 return "";
             else
-                return str.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("'", "&apos;");
+            {
+                StringBuilder sb = new StringBuilder(str);
+                EncodeString(sb, 0);
+                return sb.ToString();
+            }
         }
     }
 }

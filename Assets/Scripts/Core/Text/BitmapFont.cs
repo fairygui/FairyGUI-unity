@@ -15,8 +15,8 @@ namespace FairyGUI
         {
             public float x;
             public float y;
-            public float xMax;
-            public float yMax;
+            public float width;
+            public float height;
             public int advance;
             public int lineHeight;
             public Vector2[] uv = new Vector2[4];
@@ -38,19 +38,19 @@ namespace FairyGUI
         /// </summary>
         public bool hasChannel;
 
-        Dictionary<int, BMGlyph> _dict;
-        float scale;
+        protected Dictionary<int, BMGlyph> _dict;
+        protected BMGlyph _glyph;
+        float _scale;
 
-        public BitmapFont(PackageItem item)
+        public BitmapFont()
         {
-            this.packageItem = item;
-            this.name = UIPackage.URL_PREFIX + packageItem.owner.id + packageItem.id;
             this.canTint = true;
             this.hasChannel = false;
+            this.customOutline = true;
             this.shader = ShaderConfig.bmFontShader;
 
             _dict = new Dictionary<int, BMGlyph>();
-            this.scale = 1;
+            _scale = 1;
         }
 
         public void AddChar(char ch, BMGlyph glyph)
@@ -61,68 +61,117 @@ namespace FairyGUI
         override public void SetFormat(TextFormat format, float fontSizeScale)
         {
             if (resizable)
-                this.scale = (float)format.size / size * fontSizeScale;
+                _scale = (float)format.size / size * fontSizeScale;
             else
-                this.scale = fontSizeScale;
+                _scale = fontSizeScale;
+
+            if (canTint)
+                format.FillVertexColors(vertexColors);
         }
 
-        override public bool GetGlyphSize(char ch, out float width, out float height)
+        override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
         {
-            BMGlyph bg;
             if (ch == ' ')
             {
-                width = Mathf.CeilToInt(size * scale / 2);
-                height = Mathf.CeilToInt(size * scale);
+                width = Mathf.RoundToInt(size * _scale / 2);
+                height = Mathf.RoundToInt(size * _scale);
+                baseline = height;
+                _glyph = null;
                 return true;
             }
-            else if (_dict.TryGetValue((int)ch, out bg))
+            else if (_dict.TryGetValue((int)ch, out _glyph))
             {
-                width = Mathf.CeilToInt(bg.advance * scale);
-                height = Mathf.CeilToInt(bg.lineHeight * scale);
+                width = Mathf.RoundToInt(_glyph.advance * _scale);
+                height = Mathf.RoundToInt(_glyph.lineHeight * _scale);
+                baseline = height;
                 return true;
             }
             else
             {
                 width = 0;
                 height = 0;
+                baseline = 0;
                 return false;
             }
         }
 
-        override public bool GetGlyph(char ch, ref GlyphInfo glyph)
+        static Vector3 bottomLeft;
+        static Vector3 topLeft;
+        static Vector3 topRight;
+        static Vector3 bottomRight;
+
+        static Color32[] vertexColors = new Color32[4];
+
+        override public int DrawGlyph(float x, float y,
+            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
         {
-            BMGlyph bg;
-            if (ch == ' ')
+            if (_glyph == null) //space
+                return 0;
+
+            topLeft.x = x + _glyph.x * _scale;
+            topLeft.y = y + (_glyph.lineHeight - _glyph.y) * _scale;
+            bottomRight.x = x + (_glyph.x + _glyph.width) * _scale;
+            bottomRight.y = topLeft.y - _glyph.height * _scale;
+
+            topRight.x = bottomRight.x;
+            topRight.y = topLeft.y;
+            bottomLeft.x = topLeft.x;
+            bottomLeft.y = bottomRight.y;
+
+            vertList.Add(bottomLeft);
+            vertList.Add(topLeft);
+            vertList.Add(topRight);
+            vertList.Add(bottomRight);
+
+            uvList.AddRange(_glyph.uv);
+
+            if (hasChannel)
             {
-                glyph.width = Mathf.CeilToInt(size * scale / 2);
-                glyph.height = Mathf.CeilToInt(size * scale);
-                glyph.vertMin = Vector2.zero;
-                glyph.vertMax = Vector2.zero;
-                glyph.uvBottomLeft = glyph.uvBottomRight = glyph.uvTopLeft = glyph.uvTopRight = Vector3.zero;
-                return true;
+                Vector2 channel = new Vector2(_glyph.channel, 0);
+                uv2List.Add(channel);
+                uv2List.Add(channel);
+                uv2List.Add(channel);
+                uv2List.Add(channel);
             }
-            else if (_dict.TryGetValue((int)ch, out bg))
+
+            if (canTint)
             {
-                glyph.width = Mathf.CeilToInt(bg.advance * scale);
-                glyph.height = Mathf.CeilToInt(bg.lineHeight * scale);
-                glyph.vertMin.x = bg.x * scale;
-                glyph.vertMin.y = bg.y * scale;
-                glyph.vertMax.x = bg.xMax * scale;
-                glyph.vertMax.y = bg.yMax * scale;
-                glyph.uvBottomLeft = bg.uv[0];
-                glyph.uvTopLeft = bg.uv[1];
-                glyph.uvTopRight = bg.uv[2];
-                glyph.uvBottomRight = bg.uv[3];
-                glyph.uvBottomLeft.z = glyph.uvTopLeft.z = glyph.uvTopRight.z = glyph.uvBottomRight.z = bg.channel;
-                return true;
+                colList.Add(vertexColors[0]);
+                colList.Add(vertexColors[1]);
+                colList.Add(vertexColors[2]);
+                colList.Add(vertexColors[3]);
             }
             else
-                return false;
+            {
+                colList.Add(Color.white);
+                colList.Add(Color.white);
+                colList.Add(Color.white);
+                colList.Add(Color.white);
+            }
+
+            return 4;
         }
 
         override public bool HasCharacter(char ch)
         {
             return ch == ' ' || _dict.ContainsKey((int)ch);
+        }
+
+        override public int GetLineHeight(int size)
+        {
+            if (_dict.Count > 0)
+            {
+                using (var et = _dict.GetEnumerator())
+                {
+                    et.MoveNext();
+                    if (resizable)
+                        return Mathf.RoundToInt((float)et.Current.Value.lineHeight * size / this.size);
+                    else
+                        return et.Current.Value.lineHeight;
+                }
+            }
+            else
+                return 0;
         }
     }
 }

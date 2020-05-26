@@ -80,6 +80,13 @@ namespace FairyGUI.Utils
         public byte[] buffer
         {
             get { return _data; }
+            set
+            {
+                _data = value;
+                _pointer = 0;
+                _offset = 0;
+                _length = _data.Length;
+            }
         }
 
         /// <summary>

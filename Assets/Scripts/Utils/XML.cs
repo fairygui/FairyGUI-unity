@@ -10,19 +10,36 @@ namespace FairyGUI.Utils
     /// </summary>
     public class XML
     {
-        public string name { get; private set; }
-        public string text { get; private set; }
+        public string name;
+        public string text;
 
         Dictionary<string, string> _attributes;
         XMLList _children;
 
-        public XML(string text)
+        public static XML Create(string tag)
         {
-            Parse(text);
+            XML xml = new XML();
+            xml.name = tag;
+            return xml;
+        }
+
+        public XML(string XmlString)
+        {
+            Parse(XmlString);
         }
 
         private XML()
         {
+        }
+
+        public Dictionary<string, string> attributes
+        {
+            get
+            {
+                if (_attributes == null)
+                    _attributes = new Dictionary<string, string>();
+                return _attributes;
+            }
         }
 
         public bool HasAttribute(string attrName)
@@ -161,12 +178,52 @@ namespace FairyGUI.Utils
             _attributes[attrName] = attrValue;
         }
 
+        public void SetAttribute(string attrName, bool attrValue)
+        {
+            if (_attributes == null)
+                _attributes = new Dictionary<string, string>();
+
+            _attributes[attrName] = attrValue ? "true" : "false";
+        }
+
+        public void SetAttribute(string attrName, int attrValue)
+        {
+            if (_attributes == null)
+                _attributes = new Dictionary<string, string>();
+
+            _attributes[attrName] = attrValue.ToString();
+        }
+
+        public void SetAttribute(string attrName, float attrValue)
+        {
+            if (_attributes == null)
+                _attributes = new Dictionary<string, string>();
+
+            _attributes[attrName] = string.Format("{0:#.####}", attrValue);
+        }
+
+        public void RemoveAttribute(string attrName)
+        {
+            if (_attributes != null)
+                _attributes.Remove(attrName);
+        }
+
         public XML GetNode(string selector)
         {
             if (_children == null)
                 return null;
             else
                 return _children.Find(selector);
+        }
+
+        public XMLList elements
+        {
+            get
+            {
+                if (_children == null)
+                    _children = new XMLList();
+                return _children;
+            }
         }
 
         public XMLList Elements()
@@ -199,9 +256,35 @@ namespace FairyGUI.Utils
                 return new XMLList.Enumerator(_children.rawList, selector);
         }
 
-        static Stack<XML> sNodeStack = new Stack<XML>();
-        void Parse(string aSource)
+        public void AppendChild(XML child)
         {
+            this.elements.Add(child);
+        }
+
+        public void RemoveChild(XML child)
+        {
+            if (_children == null)
+                return;
+
+            this._children.rawList.Remove(child);
+        }
+
+        public void RemoveChildren(string selector)
+        {
+            if (_children == null)
+                return;
+
+            if (string.IsNullOrEmpty(selector))
+                _children.Clear();
+            else
+                _children.RemoveAll(selector);
+        }
+
+        static Stack<XML> sNodeStack = new Stack<XML>();
+        public void Parse(string aSource)
+        {
+            Reset();
+            
             XML lastOpenNode = null;
             sNodeStack.Clear();
 
@@ -217,7 +300,7 @@ namespace FairyGUI.Utils
                     {
                         if (this.name != null)
                         {
-                            Cleanup();
+                            Reset();
                             throw new Exception("Invalid xml format - no root node.");
                         }
                         childNode = this;
@@ -241,7 +324,7 @@ namespace FairyGUI.Utils
                 {
                     if (lastOpenNode == null || lastOpenNode.name != XMLIterator.tagName)
                     {
-                        Cleanup();
+                        Reset();
                         throw new Exception("Invalid xml format - <" + XMLIterator.tagName + "> dismatched.");
                     }
 
@@ -258,14 +341,87 @@ namespace FairyGUI.Utils
             }
         }
 
-        void Cleanup()
+        public void Reset()
         {
-            this.name = null;
             if (_attributes != null)
                 _attributes.Clear();
             if (_children != null)
                 _children.Clear();
             this.text = null;
+        }
+
+        public string ToXMLString(bool includeHeader)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (includeHeader)
+                sb.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+            ToXMLString(sb, 0);
+            return sb.ToString();
+        }
+
+        void ToXMLString(StringBuilder sb, int tabs)
+        {
+            if (tabs > 0)
+                sb.Append(' ', tabs * 2);
+
+            if (name == "!")
+            {
+                sb.Append("<!--");
+                if (text != null)
+                {
+                    int c = sb.Length;
+                    sb.Append(text);
+                    XMLUtils.EncodeString(sb, c);
+                }
+                sb.Append("-->");
+                return;
+            }
+
+            sb.Append('<').Append(name);
+            if (_attributes != null)
+            {
+                foreach (KeyValuePair<string, string> kv in _attributes)
+                {
+                    sb.Append(' ');
+                    sb.Append(kv.Key).Append('=').Append('\"');
+                    int c = sb.Length;
+                    sb.Append(kv.Value);
+                    XMLUtils.EncodeString(sb, c, true);
+                    sb.Append("\"");
+                }
+            }
+
+            int numChildren = _children != null ? _children.Count : 0;
+
+            if (string.IsNullOrEmpty(text) && numChildren == 0)
+                sb.Append("/>");
+            else
+            {
+                sb.Append('>');
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    int c = sb.Length;
+                    sb.Append(text);
+                    XMLUtils.EncodeString(sb, c);
+                }
+
+                if (numChildren > 0)
+                {
+                    sb.Append('\n');
+                    int ctabs = tabs + 1;
+                    for (int i = 0; i < numChildren; i++)
+                    {
+                        _children[i].ToXMLString(sb, ctabs);
+                        sb.Append('\n');
+                    }
+
+                    if (tabs > 0)
+                        sb.Append(' ', tabs * 2);
+                }
+
+                sb.Append("</").Append(name).Append(">");
+            }
         }
     }
 }

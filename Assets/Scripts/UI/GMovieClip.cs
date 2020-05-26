@@ -156,6 +156,8 @@ namespace FairyGUI
 
         override public void ConstructFromResource()
         {
+            this.gameObjectName = packageItem.name;
+            
             PackageItem contentItem = packageItem.getBranch();
             sourceWidth = contentItem.width;
             sourceHeight = contentItem.height;

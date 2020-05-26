@@ -130,6 +130,8 @@ namespace FairyGUI
 
         override public void ConstructFromResource()
         {
+            this.gameObjectName = packageItem.name;
+            
             PackageItem contentItem = packageItem.getBranch();
             sourceWidth = contentItem.width;
             sourceHeight = contentItem.height;
@@ -142,6 +144,7 @@ namespace FairyGUI
             _content.scaleByTile = contentItem.scaleByTile;
             _content.tileGridIndice = contentItem.tileGridIndice;
             _content.texture = contentItem.texture;
+            _content.textureScale = new Vector2(contentItem.width / (float)sourceWidth, contentItem.height / (float)sourceHeight);
 
             SetSize(sourceWidth, sourceHeight);
         }

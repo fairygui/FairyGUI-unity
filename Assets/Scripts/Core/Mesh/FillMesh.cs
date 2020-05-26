@@ -30,6 +30,7 @@ namespace FairyGUI
         public FillMesh()
         {
             clockwise = true;
+            amount = 1;
         }
 
         public void OnPopulateMesh(VertexBuffer vb)

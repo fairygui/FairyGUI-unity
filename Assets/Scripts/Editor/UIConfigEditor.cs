@@ -10,9 +10,7 @@ namespace FairyGUIEditor
     [CustomEditor(typeof(UIConfig))]
     public class UIConfigEditor : Editor
     {
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
         string[] propertyToExclude;
-#endif
         bool itemsFoldout;
         bool packagesFoldOut;
         int errorState;
@@ -21,9 +19,8 @@ namespace FairyGUIEditor
 
         void OnEnable()
         {
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
             propertyToExclude = new string[] { "m_Script", "Items", "PreloadPackages" };
-#endif
+
             itemsFoldout = EditorPrefs.GetBool("itemsFoldOut");
             packagesFoldOut = EditorPrefs.GetBool("packagesFoldOut");
             errorState = 0;
@@ -33,10 +30,8 @@ namespace FairyGUIEditor
         {
             serializedObject.Update();
 
-#if (UNITY_5 || UNITY_5_3_OR_NEWER)
             DrawPropertiesExcluding(serializedObject, propertyToExclude);
-#endif
-
+            
             UIConfig config = (UIConfig)target;
 
             EditorGUILayout.BeginHorizontal();
@@ -131,13 +126,6 @@ namespace FairyGUIEditor
                             value.b = EditorGUILayout.Toggle(value.b);
                             break;
 
-                        case UIConfig.ConfigKey.EnhancedTextOutlineEffect:
-                            EditorGUI.BeginChangeCheck();
-                            value.b = EditorGUILayout.Toggle(value.b);
-                            if (EditorGUI.EndChangeCheck())
-                                modified = true;
-                            break;
-
                         case UIConfig.ConfigKey.ButtonSoundVolumeScale:
                             value.f = EditorGUILayout.Slider(value.f, 0, 1);
                             break;
@@ -145,13 +133,6 @@ namespace FairyGUIEditor
                         case UIConfig.ConfigKey.ModalLayerColor:
                         case UIConfig.ConfigKey.InputHighlightColor:
                             value.c = EditorGUILayout.ColorField(value.c);
-                            break;
-
-                        case UIConfig.ConfigKey.RichTextRowVerticalAlign:
-                            EditorGUI.BeginChangeCheck();
-                            value.i = EditorGUILayout.EnumPopup((VertAlignType)value.i).GetHashCode();
-                            if (EditorGUI.EndChangeCheck())
-                                modified = true;
                             break;
 
                         case UIConfig.ConfigKey.Branch:

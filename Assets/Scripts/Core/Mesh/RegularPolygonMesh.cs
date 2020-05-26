@@ -55,9 +55,9 @@ namespace FairyGUI
 
         public void OnPopulateMesh(VertexBuffer vb)
         {
-            if (distances != null && distances.Length != sides)
+            if (distances != null && distances.Length < sides)
             {
-                Debug.LogError("distances.Length!=sides");
+                Debug.LogError("distances.Length<sides");
                 return;
             }
 

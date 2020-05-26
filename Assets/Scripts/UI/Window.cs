@@ -39,7 +39,7 @@ namespace FairyGUI
             : base()
         {
             _uiSources = new List<IUISource>();
-            this.focusable = true;
+            this.tabStopChildren = true;
             bringToFontOnClick = UIConfig.bringWindowToFrontOnClick;
 
             displayObject.onAddedToStage.Add(__onShown);
@@ -468,7 +468,7 @@ namespace FairyGUI
             base.Dispose();
         }
 
-        protected void closeEventHandler()
+        virtual protected void closeEventHandler(EventContext context)
         {
             Hide();
         }

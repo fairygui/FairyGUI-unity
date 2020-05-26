@@ -41,11 +41,6 @@ namespace FairyGUI
                 richTextField.htmlText = str;
         }
 
-        override protected void GetTextFieldText()
-        {
-            _text = richTextField.text;
-        }
-
         /// <summary>
         /// 
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FairyGUI.Utils;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -13,33 +14,13 @@ namespace FairyGUI
         /// </summary>
         public InputTextField inputTextField { get; private set; }
 
-        EventListener _onFocusIn;
-        EventListener _onFocusOut;
         EventListener _onChanged;
         EventListener _onSubmit;
 
         public GTextInput()
         {
-            this.focusable = true;
             _textField.autoSize = AutoSizeType.None;
             _textField.wordWrap = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public EventListener onFocusIn
-        {
-            get { return _onFocusIn ?? (_onFocusIn = new EventListener(this, "onFocusIn")); }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public EventListener onFocusOut
-        {
-            get { return _onFocusOut ?? (_onFocusOut = new EventListener(this, "onFocusOut")); }
-
         }
 
         /// <summary>
@@ -142,10 +123,64 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public bool disableIME
+        {
+            get { return inputTextField.disableIME; }
+            set { inputTextField.disableIME = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<uint, Emoji> emojies
         {
             get { return inputTextField.emojies; }
             set { inputTextField.emojies = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int border
+        {
+            get { return inputTextField.border; }
+            set { inputTextField.border = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int corner
+        {
+            get { return inputTextField.corner; }
+            set { inputTextField.corner = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color borderColor
+        {
+            get { return inputTextField.borderColor; }
+            set { inputTextField.borderColor = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Color backgroundColor
+        {
+            get { return inputTextField.backgroundColor; }
+            set { inputTextField.backgroundColor = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool mouseWheelEnabled
+        {
+            get { return inputTextField.mouseWheelEnabled; }
+            set { inputTextField.mouseWheelEnabled = value; }
         }
 
         /// <summary>
@@ -170,11 +205,6 @@ namespace FairyGUI
         override protected void SetTextFieldText()
         {
             inputTextField.text = _text;
-        }
-
-        override protected void GetTextFieldText()
-        {
-            _text = inputTextField.text;
         }
 
         override protected void CreateDisplayObject()

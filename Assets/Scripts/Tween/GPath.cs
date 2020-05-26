@@ -32,6 +32,11 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        public bool smooth;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public enum CurveType
         {
             CRSpline,
@@ -50,6 +55,7 @@ namespace FairyGUI
             this.control1 = Vector3.zero;
             this.control2 = Vector3.zero;
             this.curveType = CurveType.CRSpline;
+            this.smooth = true;
         }
 
         /// <summary>
@@ -63,6 +69,7 @@ namespace FairyGUI
             this.control1 = control;
             this.control2 = Vector3.zero;
             this.curveType = CurveType.Bezier;
+            this.smooth = true;
         }
 
         /// <summary>
@@ -77,6 +84,7 @@ namespace FairyGUI
             this.control1 = control1;
             this.control2 = control2;
             this.curveType = CurveType.CubicBezier;
+            this.smooth = true;
         }
 
         /// <summary>
@@ -90,6 +98,7 @@ namespace FairyGUI
             this.control1 = Vector3.zero;
             this.control2 = Vector3.zero;
             this.curveType = curveType;
+            this.smooth = true;
         }
     }
 
@@ -98,7 +107,7 @@ namespace FairyGUI
     /// </summary>
     public class GPath
     {
-        struct Segment
+        protected struct Segment
         {
             public GPathPoint.CurveType type;
             public float length;
@@ -106,9 +115,9 @@ namespace FairyGUI
             public int ptCount;
         }
 
-        List<Segment> _segments;
-        List<Vector3> _points;
-        float _fullLength;
+        protected List<Segment> _segments;
+        protected List<Vector3> _points;
+        protected float _fullLength;
 
         static List<GPathPoint> helperList = new List<GPathPoint>();
         static List<Vector3> splinePoints = new List<Vector3>();

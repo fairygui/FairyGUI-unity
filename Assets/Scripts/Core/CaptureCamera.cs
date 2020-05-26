@@ -57,7 +57,8 @@ namespace FairyGUI
             Camera camera = cameraObject.AddComponent<Camera>();
             camera.depth = 0;
             camera.cullingMask = 1 << layer;
-            camera.clearFlags = CameraClearFlags.Depth;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.clear;
             camera.orthographic = true;
             camera.orthographicSize = 5;
             camera.nearClipPlane = -30;
@@ -131,7 +132,7 @@ namespace FairyGUI
             texture.anisoLevel = 0;
             texture.useMipMap = false;
             texture.wrapMode = TextureWrapMode.Clamp;
-            texture.hideFlags = DisplayOptions.hideFlags;
+            texture.hideFlags = DisplayObject.hideFlags;
             return texture;
         }
 
@@ -140,13 +141,15 @@ namespace FairyGUI
         /// </summary>
         /// <param name="target"></param>
         /// <param name="texture"></param>
+        /// <param name="contentHeight"></param>
         /// <param name="offset"></param>
-        public static void Capture(DisplayObject target, RenderTexture texture, Vector2 offset)
+        public static void Capture(DisplayObject target, RenderTexture texture, float contentHeight, Vector2 offset)
         {
             CheckMain();
 
             Matrix4x4 matrix = target.cachedTransform.localToWorldMatrix;
-            float unitsPerPixel = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
+            float scaleX = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
+            float scaleY = new Vector4(matrix.m01, matrix.m11, matrix.m21, matrix.m31).magnitude;
 
             Vector3 forward;
             forward.x = matrix.m02;
@@ -158,12 +161,14 @@ namespace FairyGUI
             upwards.y = matrix.m11;
             upwards.z = matrix.m21;
 
-            float halfHeight = (float)texture.height / 2;
+            float halfHeight = contentHeight * 0.5f;
 
             Camera camera = _main.cachedCamera;
             camera.targetTexture = texture;
-            camera.orthographicSize = halfHeight * unitsPerPixel;
-            _main.cachedTransform.localPosition = target.cachedTransform.TransformPoint(halfHeight * camera.aspect - offset.x, -halfHeight + offset.y, 0);
+            float aspect = (float)texture.width / texture.height;
+            camera.aspect = aspect * scaleX / scaleY;
+            camera.orthographicSize = halfHeight * scaleY;
+            _main.cachedTransform.localPosition = target.cachedTransform.TransformPoint(halfHeight * aspect - offset.x, -halfHeight + offset.y, 0);
             _main.cachedTransform.localRotation = Quaternion.LookRotation(forward, upwards);
 
             int oldLayer = 0;

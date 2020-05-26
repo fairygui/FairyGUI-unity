@@ -151,7 +151,7 @@ Shader "FairyGUI/Image"
 
                     #ifdef CLIPPED
                     float2 factor = abs(i.clipPos);
-                    if(max(factor.x, factor.y)>1) col.a = 0;
+                    col.a *= step(max(factor.x, factor.y), 1);
                     #endif
 
                     #ifdef COLOR_FILTER

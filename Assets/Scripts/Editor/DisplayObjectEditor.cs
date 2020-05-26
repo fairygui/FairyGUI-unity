@@ -17,6 +17,8 @@ namespace FairyGUIEditor
         public override void OnInspectorGUI()
         {
             DisplayObject obj = (target as DisplayObjectInfo).displayObject;
+            if (obj == null)
+                return;
 
             EditorGUILayout.LabelField(obj.GetType().Name + ": " + obj.id, (GUIStyle)"OL Title");
             EditorGUILayout.Separator();
@@ -24,7 +26,7 @@ namespace FairyGUIEditor
             string name = EditorGUILayout.TextField("Name", obj.name);
             if (EditorGUI.EndChangeCheck())
                 obj.name = name;
-            if(obj is Container)
+            if (obj is Container)
             {
                 EditorGUI.BeginChangeCheck();
                 bool fairyBatching = EditorGUILayout.Toggle("FairyBatching", ((Container)obj).fairyBatching);

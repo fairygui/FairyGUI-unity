@@ -35,7 +35,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        public int mouseWheelDelta { get; internal set; }
+        public float mouseWheelDelta { get; internal set; }
 
         /// <summary>
         /// 
@@ -47,8 +47,17 @@ namespace FairyGUI
         /// </summary>
         public int button { get; internal set; }
 
-        internal int clickCount; 
-        internal static bool shiftDown;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value></value>
+        public int clickCount { get; internal set; }
+
+        /// <summary>
+        /// Duraion of holding the button. You can read this in touchEnd or click event.
+        /// </summary>
+        /// <value></value>
+        public float holdTime { get; internal set; }
 
         public InputEvent()
         {
@@ -75,7 +84,19 @@ namespace FairyGUI
         /// </summary>
         public bool isDoubleClick
         {
-            get { return clickCount > 1; }
+            get { return clickCount > 1 && button == 0; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool ctrlOrCmd
+        {
+            get
+            {
+                return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+                    || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+            }
         }
 
         /// <summary>
@@ -83,16 +104,9 @@ namespace FairyGUI
         /// </summary>
         public bool ctrl
         {
-            get
+             get
             {
-                RuntimePlatform rp = Application.platform;
-                bool isMac = (
-                    rp == RuntimePlatform.OSXEditor ||
-                    rp == RuntimePlatform.OSXPlayer);
-
-                return isMac ?
-                    ((modifiers & EventModifiers.Command) != 0) :
-                    ((modifiers & EventModifiers.Control) != 0);
+                return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             }
         }
 
@@ -103,8 +117,7 @@ namespace FairyGUI
         {
             get
             {
-                //return (modifiers & EventModifiers.Shift) != 0;
-                return shiftDown;
+                return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             }
         }
 
@@ -115,7 +128,18 @@ namespace FairyGUI
         {
             get
             {
-                return (modifiers & EventModifiers.Alt) != 0;
+                return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool command
+        {
+            get
+            {
+                return Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
             }
         }
     }

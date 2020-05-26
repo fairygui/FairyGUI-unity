@@ -13,12 +13,13 @@ namespace FairyGUI.Utils
         string _text;
         int _readPos;
 
-        protected Dictionary<string, TagHandler> handlers;
+        public TagHandler defaultTagHandler;
+        public Dictionary<string, TagHandler> handlers;
 
         public int defaultImgWidth = 0;
         public int defaultImgHeight = 0;
 
-        protected delegate string TagHandler(string tagName, bool end, string attr);
+        public delegate string TagHandler(string tagName, bool end, string attr);
 
         public UBBParser()
         {
@@ -34,6 +35,7 @@ namespace FairyGUI.Utils
             handlers["font"] = onTag_FONT;
             handlers["size"] = onTag_SIZE;
             handlers["align"] = onTag_ALIGN;
+            handlers["strike"] = onTag_Simple;
         }
 
         protected string onTag_URL(string tagName, bool end, string attr)
@@ -106,7 +108,7 @@ namespace FairyGUI.Utils
                 return "</p>";
         }
 
-        protected string GetTagText(bool remove)
+        public string GetTagText(bool remove)
         {
             int pos1 = _readPos;
             int pos2;
@@ -190,6 +192,14 @@ namespace FairyGUI.Utils
                     repl = func(tag, end, attr);
                     if (repl != null)
                         buffer.Append(repl);
+                }
+                else if (defaultTagHandler != null)
+                {
+                    repl = defaultTagHandler(tag, end, attr);
+                    if (repl != null)
+                        buffer.Append(repl);
+                    else
+                        buffer.Append(_text, pos1, pos2 - pos1 + 1);
                 }
                 else
                 {

@@ -16,7 +16,6 @@ namespace FairyGUI
 
         ScrollType _scrollType;
         float _scrollStep;
-        float _mouseWheelStep;
         float _decelerationRate;
         Margin _scrollBarMargin;
         bool _bouncebackEffect;
@@ -37,6 +36,7 @@ namespace FairyGUI
         bool _inertiaDisabled;
         bool _maskDisabled;
         bool _floating;
+        bool _dontClipMargin;
 
         float _xPos;
         float _yPos;
@@ -65,7 +65,7 @@ namespace FairyGUI
         Vector2 _tweenTime;
         Vector2 _tweenDuration;
 
-        EventCallback0 _refreshDelegate;
+        Action _refreshDelegate;
         TimerCallback _tweenUpdateDelegate;
         GTweenCallback1 _hideScrollBarDelegate;
 
@@ -85,9 +85,9 @@ namespace FairyGUI
 
         static int _gestureFlag;
 
-        const float TWEEN_TIME_GO = 0.5f; //调用SetPos(ani)时使用的缓动时间
-        const float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
-        const float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+        public static float TWEEN_TIME_GO = 0.3f; //调用SetPos(ani)时使用的缓动时间
+        public static float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
+        public static float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
 
         public ScrollPane(GComponent owner)
         {
@@ -95,7 +95,6 @@ namespace FairyGUI
             _onScrollEnd = new EventListener(this, "onScrollEnd");
 
             _scrollStep = UIConfig.defaultScrollStep;
-            _mouseWheelStep = _scrollStep * 2;
             _softnessOnTopOrLeftSide = UIConfig.allowSoftnessOnTopOrLeftSide;
             _decelerationRate = UIConfig.defaultScrollDecelerationRate;
             _touchEffect = UIConfig.defaultScrollTouchEffect;
@@ -156,6 +155,7 @@ namespace FairyGUI
             _inertiaDisabled = (flags & 256) != 0;
             _maskDisabled = (flags & 512) != 0;
             _floating = (flags & 1024) != 0;
+            _dontClipMargin = (flags & 2048) != 0;
 
             if (scrollBarDisplay == ScrollBarDisplayType.Default)
             {
@@ -231,12 +231,6 @@ namespace FairyGUI
 
                 if (_header != null || _footer != null)
                     _refreshBarAxis = (_scrollType == ScrollType.Both || _scrollType == ScrollType.Vertical) ? 1 : 0;
-            }
-
-            if (!_maskDisabled && (_vtScrollBar != null || _hzScrollBar != null))
-            {
-                //当有滚动条对象时，为了避免滚动条变化时触发重新合批，这里给rootContainer也加上剪裁。但这可能会增加额外dc。
-                _owner.rootContainer.clipRect = new Rect(0, 0, _owner.width, _owner.height);
             }
 
             SetSize(owner.width, owner.height);
@@ -378,7 +372,6 @@ namespace FairyGUI
 
         /// <summary>
         /// 当调用ScrollPane.scrollUp/Down/Left/Right时，或者点击滚动条的上下箭头时，滑动的距离。
-        /// 鼠标滚轮触发一次滚动的距离设定为defaultScrollStep*2
         /// </summary>
         public float scrollStep
         {
@@ -388,7 +381,6 @@ namespace FairyGUI
                 _scrollStep = value;
                 if (_scrollStep == 0)
                     _scrollStep = UIConfig.defaultScrollStep;
-                _mouseWheelStep = _scrollStep * 2;
             }
         }
 
@@ -1237,6 +1229,13 @@ namespace FairyGUI
                     rect.width += _vtScrollBar.width;
                 if (_hScrollNone && _hzScrollBar != null)
                     rect.height += _hzScrollBar.height;
+                if (_dontClipMargin)
+                {
+                    rect.x -= _owner.margin.left;
+                    rect.width += (_owner.margin.left + _owner.margin.right);
+                    rect.y -= _owner.margin.top;
+                    rect.height += (_owner.margin.top + _owner.margin.bottom);
+                }
 
                 _maskContainer.clipRect = rect;
             }
@@ -1699,21 +1698,19 @@ namespace FairyGUI
                 return;
 
             InputEvent evt = context.inputEvent;
-            int delta = evt.mouseWheelDelta;
-            delta = Math.Sign(delta);
+            float delta = evt.mouseWheelDelta / Stage.devicePixelRatio;
+            if (_snapToItem && Mathf.Abs(delta) < 1)
+                delta = Mathf.Sign(delta);
+
             if (_overlapSize.x > 0 && _overlapSize.y == 0)
             {
-                if (_pageMode)
-                    SetPosX(_xPos + _pageSize.x * delta, false);
-                else
-                    SetPosX(_xPos + _mouseWheelStep * delta, false);
+                float step = _pageMode ? _pageSize.x : _scrollStep;
+                SetPosX(_xPos + step * delta, false);
             }
             else
             {
-                if (_pageMode)
-                    SetPosY(_yPos + _pageSize.y * delta, false);
-                else
-                    SetPosY(_yPos + _mouseWheelStep * delta, false);
+                float step = _pageMode ? _pageSize.y : _scrollStep;
+                SetPosY(_yPos + step * delta, false);
             }
         }
 

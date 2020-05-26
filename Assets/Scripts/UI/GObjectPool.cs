@@ -87,6 +87,9 @@ namespace FairyGUI
         /// <param name="obj"></param>
         public void ReturnObject(GObject obj)
         {
+            if (obj.displayObject.isDisposed)
+                return;
+
             string url = obj.resourceURL;
             Queue<GObject> arr;
             if (!_pool.TryGetValue(url, out arr))
@@ -95,7 +98,8 @@ namespace FairyGUI
                 _pool.Add(url, arr);
             }
 
-            ToolSet.SetParent(obj.displayObject.cachedTransform, _manager);
+            if (_manager != null)
+                obj.displayObject.cachedTransform.SetParent(_manager, false);
             arr.Enqueue(obj);
         }
     }
