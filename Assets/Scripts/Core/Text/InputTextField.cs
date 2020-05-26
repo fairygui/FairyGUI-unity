@@ -414,7 +414,12 @@ namespace FairyGUI
 
             string newText = buffer.ToString();
             if (maxLength > 0)
-                newText = TruncateText(newText, maxLength);
+            {
+                string newText2 = TruncateText(newText, maxLength);
+                if (newText2.Length != newText.Length)
+                    _caretPosition += (newText2.Length - newText.Length);
+                newText = newText2;
+            }
 
             this.text = newText;
             OnChanged();
