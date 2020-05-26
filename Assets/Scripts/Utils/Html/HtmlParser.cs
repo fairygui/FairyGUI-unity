@@ -190,7 +190,7 @@ namespace FairyGUI.Utils
                         {
                             PushTextFormat();
 
-                            _format.underline = _format.underline | parseOptions.linkUnderline;
+                            _format.underline = _format.underline || parseOptions.linkUnderline;
                             if (!_format.colorChanged && parseOptions.linkColor.a != 0)
                                 _format.color = parseOptions.linkColor;
 

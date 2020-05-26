@@ -31,7 +31,6 @@ namespace FairyGUI
             _align = AlignType.Left;
             _verticalAlign = VertAlignType.Top;
             _playing = true;
-            _color = Color.white;
         }
 
         override protected void CreateDisplayObject()
@@ -40,6 +39,7 @@ namespace FairyGUI
             displayObject.gOwner = this;
 
             _content = new GoWrapper();
+            _content.onUpdate += OnUpdateContent;
             ((Container)displayObject).AddChild(_content);
             ((Container)displayObject).opaque = true;
         }
@@ -363,20 +363,21 @@ namespace FairyGUI
 
         virtual protected void OnChange(string propertyName)
         {
-            if (_contentItem != null)
+            if (_contentItem == null)
+                return;
+
+
+            if (_contentItem.type == PackageItemType.Spine)
             {
-                if (_contentItem.type == PackageItemType.Spine)
-                {
 #if FAIRYGUI_SPINE
-                    OnChangeSpine(propertyName);
+                OnChangeSpine(propertyName);
 #endif
-                }
-                else if (_contentItem.type == PackageItemType.DragoneBones)
-                {
+            }
+            else if (_contentItem.type == PackageItemType.DragoneBones)
+            {
 #if FAIRYGUI_DRAGONBONES
-                    OnChangeDragonBones(propertyName);
+                OnChangeDragonBones(propertyName);
 #endif
-                }
             }
         }
 
@@ -503,17 +504,32 @@ namespace FairyGUI
             _contentItem = null;
         }
 
+        protected void OnUpdateContent(UpdateContext context)
+        {
+            if (_contentItem == null)
+                return;
+
+
+            if (_contentItem.type == PackageItemType.Spine)
+            {
+#if FAIRYGUI_SPINE
+                OnUpdateSpine(context);
+#endif
+            }
+            else if (_contentItem.type == PackageItemType.DragoneBones)
+            {
+#if FAIRYGUI_DRAGONBONES
+                OnUpdateDragonBones(context);
+#endif
+            }
+        }
+
         override protected void HandleSizeChanged()
         {
             base.HandleSizeChanged();
 
             if (!_updatingLayout)
                 UpdateLayout();
-        }
-
-        protected override void HandleAlphaChanged()
-        {
-            OnChange("alpha");
         }
 
         override public void Setup_BeforeAdd(ByteBuffer buffer, int beginPos)

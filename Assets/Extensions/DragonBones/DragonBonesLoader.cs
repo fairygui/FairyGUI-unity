@@ -77,6 +77,10 @@ namespace FairyGUI
                     GameObject.DestroyImmediate(_armatureComponent.gameObject);
             }
         }
+
+        protected void OnUpdateDragonBones(UpdateContext context)
+        {
+        }
     }
 }
 
