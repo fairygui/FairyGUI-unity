@@ -1019,7 +1019,7 @@ namespace FairyGUI
             {
                 context.StopPropagation();
 
-                TextField.CharPosition cp = GetCharPosition(Vector2.zero);
+                TextField.CharPosition cp = GetCharPosition(new Vector2(GUTTER_X, GUTTER_Y));
                 int vScroll = cp.lineIndex;
                 int hScroll = cp.charIndex - textField.lines[cp.lineIndex].charIndex;
                 if (context.inputEvent.mouseWheelDelta < 0)

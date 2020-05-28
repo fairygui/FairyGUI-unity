@@ -34,6 +34,7 @@ namespace FairyGUI
         float _fontSizeScale;
         float _renderScale;
         int _fontVersion;
+        Vector3 _lastPixelPerfectPos;
         string _parsedText;
 
         RichTextField _richTextField;
@@ -421,11 +422,7 @@ namespace FairyGUI
                     InvalidateBatchingState();
                 }
 
-                if (!_textChanged)
-                {
-                    RequestText();
-                    graphics.SetMeshDirty();
-                }
+                _textChanged = true;
             }
 
             if (_textChanged)
