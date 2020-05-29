@@ -29,6 +29,18 @@ namespace FairyGUI
             this.shader = ShaderConfig.textShader;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="font"></param>
+        /// <returns></returns>
+        public DynamicFont(string name, Font font) : this()
+        {
+            this.name = name;
+            this.nativeFont = font;
+        }
+
         override public void Dispose()
         {
             Font.textureRebuilt -= textureRebuildCallback;
