@@ -38,6 +38,10 @@ namespace FairyGUI
                 Resources.UnloadAsset(nativeClip);
             else if (destroyMethod == DestroyMethod.Destroy)
                 Object.DestroyImmediate(nativeClip, true);
+            else if (destroyMethod == DestroyMethod.AsyncResource)
+            {
+                UIPackage.AsyncLoadResource?.ReleaseResource(nativeClip);
+            }
 
             nativeClip = null;
         }
