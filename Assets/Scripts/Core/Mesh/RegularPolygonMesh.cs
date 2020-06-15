@@ -64,9 +64,8 @@ namespace FairyGUI
             Rect rect = drawRect != null ? (Rect)drawRect : vb.contentRect;
             Color32 color = fillColor != null ? (Color32)fillColor : vb.vertexColor;
 
-            rotation = rotation * Mathf.Deg2Rad;
             float angleDelta = 2 * Mathf.PI / sides;
-            float angle = rotation;
+            float angle = rotation * Mathf.Deg2Rad;
             float radius = Mathf.Min(rect.width / 2, rect.height / 2);
 
             float centerX = radius + rect.x;
