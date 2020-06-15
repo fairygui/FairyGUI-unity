@@ -762,10 +762,10 @@ namespace FairyGUI
             _colors = null;
 #endif
 #else
-            Vector3 vertices = new Vector3[vertCount];
-            Vector2 uv = new Vector2[vertCount];
+            Vector3[] vertices = new Vector3[vertCount];
+            Vector2[] uv = new Vector2[vertCount];
             _colors = new Color32[vertCount];
-            int triangles = new int[vb.triangles.Count];
+            int[] triangles = new int[vb.triangles.Count];
 
             vb.vertices.CopyTo(vertices);
             vb.uvs.CopyTo(uv);
