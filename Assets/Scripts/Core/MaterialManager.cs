@@ -237,6 +237,7 @@ namespace FairyGUI
                     }
                 }
             }
+            iter.Dispose();
         }
     }
 }
