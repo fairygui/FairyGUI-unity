@@ -13,7 +13,8 @@ namespace FairyGUI
         Destroy,
         Unload,
         None,
-        ReleaseTemp
+        ReleaseTemp,
+        Custom
     }
 
     /// <summary>
@@ -21,6 +22,8 @@ namespace FairyGUI
     /// </summary>
     public class NTexture
     {
+        public static Action<Texture> CustomDestroyMethod;
+
         /// <summary>
         /// 
         /// </summary>
@@ -146,8 +149,11 @@ namespace FairyGUI
             _nativeTexture = texture;
             _region = region;
             _originalSize = new Vector2(_region.width, _region.height);
-            uvRect = new Rect(region.x / _nativeTexture.width, 1 - region.yMax / _nativeTexture.height,
-                region.width / _nativeTexture.width, region.height / _nativeTexture.height);
+            if (_nativeTexture != null)
+                uvRect = new Rect(region.x / _nativeTexture.width, 1 - region.yMax / _nativeTexture.height,
+                    region.width / _nativeTexture.width, region.height / _nativeTexture.height);
+            else
+                uvRect.Set(0, 0, 1, 1);
         }
 
         /// <summary>
@@ -406,23 +412,33 @@ namespace FairyGUI
 
         void DestroyTexture()
         {
-            if (destroyMethod == DestroyMethod.Destroy)
+            switch (destroyMethod)
             {
-                Object.DestroyImmediate(_nativeTexture, true);
-                if (_alphaTexture != null)
-                    Object.DestroyImmediate(_alphaTexture, true);
-            }
-            else if (destroyMethod == DestroyMethod.Unload)
-            {
-                Resources.UnloadAsset(_nativeTexture);
-                if (_alphaTexture != null)
-                    Resources.UnloadAsset(_alphaTexture);
-            }
-            else if (destroyMethod == DestroyMethod.ReleaseTemp)
-            {
-                RenderTexture.ReleaseTemporary((RenderTexture)_nativeTexture);
-                if (_alphaTexture is RenderTexture)
-                    RenderTexture.ReleaseTemporary((RenderTexture)_alphaTexture);
+                case DestroyMethod.Destroy:
+                    Object.DestroyImmediate(_nativeTexture, true);
+                    if (_alphaTexture != null)
+                        Object.DestroyImmediate(_alphaTexture, true);
+                    break;
+                case DestroyMethod.Unload:
+                    Resources.UnloadAsset(_nativeTexture);
+                    if (_alphaTexture != null)
+                        Resources.UnloadAsset(_alphaTexture);
+                    break;
+                case DestroyMethod.ReleaseTemp:
+                    RenderTexture.ReleaseTemporary((RenderTexture)_nativeTexture);
+                    if (_alphaTexture is RenderTexture)
+                        RenderTexture.ReleaseTemporary((RenderTexture)_alphaTexture);
+                    break;
+                case DestroyMethod.Custom:
+                    if (CustomDestroyMethod == null)
+                        Debug.LogWarning("NTexture.CustomDestroyMethod must be set to handle DestroyMethod.Custom");
+                    else
+                    {
+                        CustomDestroyMethod(_nativeTexture);
+                        if (_alphaTexture != null)
+                            CustomDestroyMethod(_alphaTexture);
+                    }
+                    break;
             }
 
             _nativeTexture = null;

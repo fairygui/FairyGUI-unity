@@ -41,6 +41,16 @@ namespace FairyGUI
         public delegate object LoadResource(string name, string extension, System.Type type, out DestroyMethod destroyMethod);
 
         /// <summary>
+        /// A async load resource callback. After loaded, call item.owner.SetItemAsset.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="extension"></param>
+        /// <param name="type"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public delegate void LoadResourceAsync(string name, string extension, System.Type type, PackageItem item);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="result"></param>
@@ -57,6 +67,7 @@ namespace FairyGUI
         string _customId;
         bool _fromBundle;
         LoadResource _loadFunc;
+        LoadResourceAsync _loadAysncFunc;
 
         class AtlasSprite
         {
@@ -79,14 +90,14 @@ namespace FairyGUI
         public const string URL_PREFIX = "ui://";
 
 #if UNITY_EDITOR
-        static LoadResource _loadFromAssetsPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+        public static LoadResource _loadFromAssetsPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
             destroyMethod = DestroyMethod.Unload;
             return AssetDatabase.LoadAssetAtPath(name + extension, type);
         };
 #endif
 
-        static LoadResource _loadFromResourcesPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+        public static LoadResource _loadFromResourcesPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
             destroyMethod = DestroyMethod.Unload;
             return Resources.Load(name, type);
@@ -326,6 +337,29 @@ namespace FairyGUI
 
             UIPackage pkg = new UIPackage();
             pkg._loadFunc = loadFunc;
+            if (!pkg.LoadPackage(buffer, assetNamePrefix))
+                return null;
+
+            _packageInstById[pkg.id] = pkg;
+            _packageInstByName[pkg.name] = pkg;
+            _packageList.Add(pkg);
+
+            return pkg;
+        }
+
+        /// <summary>
+        /// 使用自定义的加载方式载入一个包。
+        /// </summary>
+        /// <param name="descData">描述文件数据。</param>
+        /// <param name="assetNamePrefix">资源文件名前缀。如果包含，则载入资源时名称将传入assetNamePrefix_resFileName这样格式。可以为空。</param>
+        /// <param name="loadFunc">载入函数</param>
+        /// <returns></returns>
+        public static UIPackage AddPackage(byte[] descData, string assetNamePrefix, LoadResourceAsync loadFunc)
+        {
+            ByteBuffer buffer = new ByteBuffer(descData);
+
+            UIPackage pkg = new UIPackage();
+            pkg._loadAysncFunc = loadFunc;
             if (!pkg.LoadPackage(buffer, assetNamePrefix))
                 return null;
 
@@ -1183,67 +1217,110 @@ namespace FairyGUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="asset"></param>
+        /// <param name="destroyMethod"></param>
+        public void SetItemAsset(PackageItem item, object asset, DestroyMethod destroyMethod)
+        {
+            switch (item.type)
+            {
+                case PackageItemType.Atlas:
+                    if (item.texture == null)
+                        item.texture = new NTexture(null, new Rect(0, 0, item.width, item.height));
+                    item.texture.Reload((Texture)asset, null);
+                    item.texture.destroyMethod = destroyMethod;
+                    break;
+
+                case PackageItemType.Sound:
+                    if (item.audioClip == null)
+                        item.audioClip = new NAudioClip(null);
+                    item.audioClip.Reload((AudioClip)asset);
+                    item.audioClip.destroyMethod = destroyMethod;
+                    break;
+
+                case PackageItemType.Spine:
+#if FAIRYGUI_SPINE
+                    item.skeletonAsset = (Spine.Unity.SkeletonDataAsset)asset;
+#endif
+                    break;
+
+                case PackageItemType.DragoneBones:
+#if FAIRYGUI_DRAGONBONES
+                    item.skeletonAsset = (DragonBones.UnityDragonBonesData)asset;
+#endif
+                    break;
+            }
+        }
+
         void LoadAtlas(PackageItem item)
         {
             string ext = Path.GetExtension(item.file);
             string fileName = item.file.Substring(0, item.file.Length - ext.Length);
 
-            Texture tex = null;
-            Texture alphaTex = null;
-            DestroyMethod dm;
-
-            if (_fromBundle)
+            if (_loadAysncFunc != null)
             {
-                if (_resBundle != null)
-                    tex = _resBundle.LoadAsset<Texture>(fileName);
-                else
-                    Debug.LogWarning("FairyGUI: bundle already unloaded.");
-
-                dm = DestroyMethod.None;
-            }
-            else
-                tex = (Texture)_loadFunc(fileName, ext, typeof(Texture), out dm);
-
-            if (tex == null)
-                Debug.LogWarning("FairyGUI: texture '" + item.file + "' not found in " + this.name);
-            else if (!(tex is Texture2D))
-            {
-                Debug.LogWarning("FairyGUI: settings for '" + item.file + "' is wrong! Correct values are: (Texture Type=Default, Texture Shape=2D)");
-                tex = null;
+                _loadAysncFunc(fileName, ext, typeof(Texture), item);
+                if (item.texture == null)
+                    item.texture = new NTexture(null, new Rect(0, 0, item.width, item.height));
+                item.texture.destroyMethod = DestroyMethod.None;
             }
             else
             {
-                if (((Texture2D)tex).mipmapCount > 1)
-                    Debug.LogWarning("FairyGUI: settings for '" + item.file + "' is wrong! Correct values are: (Generate Mip Maps=unchecked)");
-            }
+                Texture tex = null;
+                Texture alphaTex = null;
+                DestroyMethod dm;
 
-            if (tex != null)
-            {
-                fileName = fileName + "!a";
                 if (_fromBundle)
                 {
                     if (_resBundle != null)
-                        alphaTex = _resBundle.LoadAsset<Texture2D>(fileName);
+                        tex = _resBundle.LoadAsset<Texture>(fileName);
+                    else
+                        Debug.LogWarning("FairyGUI: bundle already unloaded.");
+
+                    dm = DestroyMethod.None;
                 }
                 else
-                    alphaTex = (Texture2D)_loadFunc(fileName, ext, typeof(Texture2D), out dm);
-            }
+                    tex = (Texture)_loadFunc(fileName, ext, typeof(Texture), out dm);
 
+                if (tex == null)
+                    Debug.LogWarning("FairyGUI: texture '" + item.file + "' not found in " + this.name);
 
-            if (tex == null)
-            {
-                tex = NTexture.CreateEmptyTexture();
-                dm = DestroyMethod.Destroy;
-            }
+                else if (!(tex is Texture2D))
+                {
+                    Debug.LogWarning("FairyGUI: settings for '" + item.file + "' is wrong! Correct values are: (Texture Type=Default, Texture Shape=2D)");
+                    tex = null;
+                }
+                else
+                {
+                    if (((Texture2D)tex).mipmapCount > 1)
+                        Debug.LogWarning("FairyGUI: settings for '" + item.file + "' is wrong! Correct values are: (Generate Mip Maps=unchecked)");
+                }
 
-            if (item.texture == null)
-            {
-                item.texture = new NTexture(tex, alphaTex, (float)tex.width / item.width, (float)tex.height / item.height);
-                item.texture.destroyMethod = dm;
-            }
-            else
-            {
-                item.texture.Reload(tex, alphaTex);
+                if (tex != null)
+                {
+                    fileName = fileName + "!a";
+                    if (_fromBundle)
+                    {
+                        if (_resBundle != null)
+                            alphaTex = _resBundle.LoadAsset<Texture2D>(fileName);
+                    }
+                    else
+                        alphaTex = (Texture2D)_loadFunc(fileName, ext, typeof(Texture2D), out dm);
+                }
+
+                if (tex == null)
+                {
+                    tex = NTexture.CreateEmptyTexture();
+                    dm = DestroyMethod.Destroy;
+                }
+
+                if (item.texture == null)
+                    item.texture = new NTexture(tex, alphaTex, (float)tex.width / item.width, (float)tex.height / item.height);
+                else
+                    item.texture.Reload(tex, alphaTex);
                 item.texture.destroyMethod = dm;
             }
         }
@@ -1268,24 +1345,35 @@ namespace FairyGUI
             string ext = Path.GetExtension(item.file);
             string fileName = item.file.Substring(0, item.file.Length - ext.Length);
 
-            AudioClip audioClip = null;
-            DestroyMethod dm;
-
-            if (_resBundle != null)
+            if (_loadAysncFunc != null)
             {
-                audioClip = _resBundle.LoadAsset<AudioClip>(fileName);
-                dm = DestroyMethod.None;
+                _loadAysncFunc(fileName, ext, typeof(AudioClip), item);
+                if (item.audioClip == null)
+                    item.audioClip = new NAudioClip(null);
+                item.audioClip.destroyMethod = DestroyMethod.None;
             }
             else
             {
-                audioClip = (AudioClip)_loadFunc(fileName, ext, typeof(AudioClip), out dm);
-            }
+                AudioClip audioClip = null;
+                DestroyMethod dm;
 
-            if (item.audioClip == null)
-                item.audioClip = new NAudioClip(audioClip);
-            else
-                item.audioClip.Reload(audioClip);
-            item.audioClip.destroyMethod = dm;
+                if (_fromBundle)
+                {
+                    if (_resBundle != null)
+                        audioClip = _resBundle.LoadAsset<AudioClip>(fileName);
+                    dm = DestroyMethod.None;
+                }
+                else
+                {
+                    audioClip = (AudioClip)_loadFunc(fileName, ext, typeof(AudioClip), out dm);
+                }
+
+                if (item.audioClip == null)
+                    item.audioClip = new NAudioClip(audioClip);
+                else
+                    item.audioClip.Reload(audioClip);
+                item.audioClip.destroyMethod = dm;
+            }
         }
 
         byte[] LoadBinary(PackageItem item)

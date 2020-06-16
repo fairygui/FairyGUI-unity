@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -7,6 +8,8 @@ namespace FairyGUI
     /// </summary>
     public class NAudioClip
     {
+        public static Action<AudioClip> CustomDestroyMethod;
+
         /// <summary>
         /// 
         /// </summary>
@@ -37,7 +40,14 @@ namespace FairyGUI
             if (destroyMethod == DestroyMethod.Unload)
                 Resources.UnloadAsset(nativeClip);
             else if (destroyMethod == DestroyMethod.Destroy)
-                Object.DestroyImmediate(nativeClip, true);
+                UnityEngine.Object.DestroyImmediate(nativeClip, true);
+            else if (destroyMethod == DestroyMethod.Custom)
+            {
+                if (CustomDestroyMethod == null)
+                    Debug.LogWarning("NAudioClip.CustomDestroyMethod must be set to handle DestroyMethod.Custom");
+                else
+                    CustomDestroyMethod(nativeClip);
+            }
 
             nativeClip = null;
         }
@@ -48,6 +58,9 @@ namespace FairyGUI
         /// <param name="audioClip"></param>
         public void Reload(AudioClip audioClip)
         {
+            if (nativeClip != null && nativeClip != audioClip)
+                Unload();
+
             nativeClip = audioClip;
         }
     }
