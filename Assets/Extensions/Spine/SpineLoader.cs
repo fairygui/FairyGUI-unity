@@ -27,7 +27,21 @@ namespace FairyGUI
         /// <param name="asset"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
+        /// <param name="anchor"></param>
         public void SetSpine(SkeletonDataAsset asset, int width, int height, Vector2 anchor)
+        {
+            SetSpine(asset, width, height, anchor, true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="asset"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="anchor"></param>
+        /// <param name="cloneMaterial"></param>
+        public void SetSpine(SkeletonDataAsset asset, int width, int height, Vector2 anchor, bool cloneMaterial)
         {
             if (_spineAnimation != null)
                 FreeSpine();
@@ -37,7 +51,7 @@ namespace FairyGUI
             Spine.SkeletonData dat = asset.GetSkeletonData(false);
             _spineAnimation.gameObject.transform.localScale = new Vector3(1 / asset.scale, 1 / asset.scale, 1);
             _spineAnimation.gameObject.transform.localPosition = new Vector3(anchor.x, -anchor.y, 0);
-            SetWrapTarget(_spineAnimation.gameObject, true, width, height);
+            SetWrapTarget(_spineAnimation.gameObject, cloneMaterial, width, height);
 
             _spineAnimation.skeleton.R = _color.r;
             _spineAnimation.skeleton.G = _color.g;
