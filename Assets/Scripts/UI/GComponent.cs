@@ -415,7 +415,7 @@ namespace FairyGUI
 
                 if (i != cnt - 1)
                 {
-                    if (!(gcom is GComponent))
+                    if (!(obj is GComponent))
                     {
                         obj = null;
                         break;
