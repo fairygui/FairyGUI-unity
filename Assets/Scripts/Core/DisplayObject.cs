@@ -239,8 +239,6 @@ namespace FairyGUI
             }
             gameObject.hideFlags = DisplayObject.hideFlags;
             gameObject.SetActive(false);
-
-
         }
 
         protected void SetGameObject(GameObject gameObject)

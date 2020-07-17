@@ -53,8 +53,15 @@ namespace FairyGUI
             {
                 if (_contentItem == null)
                 {
-                    image.texture.onSizeChanged -= _reloadDelegate;
-                    FreeExternal(image.texture);
+                    _content.texture.onSizeChanged -= _reloadDelegate;
+                    try
+                    {
+                        FreeExternal(_content.texture);
+                    }
+                    catch (Exception err)
+                    {
+                        Debug.LogWarning(err);
+                    }
                 }
             }
             if (_errorSign != null)
@@ -618,8 +625,8 @@ namespace FairyGUI
             {
                 if (_contentItem == null)
                 {
-                    image.texture.onSizeChanged -= _reloadDelegate;
-                    FreeExternal(image.texture);
+                    _content.texture.onSizeChanged -= _reloadDelegate;
+                    FreeExternal(_content.texture);
                 }
                 _content.texture = null;
             }
