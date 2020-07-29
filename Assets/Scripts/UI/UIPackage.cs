@@ -91,14 +91,14 @@ namespace FairyGUI
         public const string URL_PREFIX = "ui://";
 
 #if UNITY_EDITOR
-        public static LoadResource _loadFromAssetsPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+        static LoadResource _loadFromAssetsPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
             destroyMethod = DestroyMethod.Unload;
             return AssetDatabase.LoadAssetAtPath(name + extension, type);
         };
 #endif
 
-        public static LoadResource _loadFromResourcesPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+        static LoadResource _loadFromResourcesPath = (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
         {
             destroyMethod = DestroyMethod.Unload;
             return Resources.Load(name, type);
