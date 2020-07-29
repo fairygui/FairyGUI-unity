@@ -120,7 +120,7 @@ SubShader {
 
 		//#pragma multi_compile __ UNITY_UI_CLIP_RECT
 		//#pragma multi_compile __ UNITY_UI_ALPHACLIP
-        #pragma multi_compile NOT_CLIPPED CLIPPED
+		#pragma multi_compile NOT_CLIPPED CLIPPED
 
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
@@ -221,14 +221,19 @@ SubShader {
 			float2 outlineUV = TRANSFORM_TEX(textureUV, _OutlineTex);
 
 			output.position = vPosition;
+			#if !defined(UNITY_COLORSPACE_GAMMA) && (UNITY_VERSION >= 550)
+			output.color.rgb = GammaToLinearSpace(input.color.rgb);
+			output.color.a = input.color.a;
+			#else
 			output.color = input.color;
+			#endif
 			output.atlas =	input.texcoord0;
 			output.param =	float4(alphaClip, scale, bias, weight);
 			//output.mask = half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw, 0.25 / (0.25 * half2(_MaskSoftnessX, _MaskSoftnessY) + pixelSize.xy));
 			output.viewDir =	mul((float3x3)_EnvMatrix, _WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, vert).xyz);
 			#if (UNDERLAY_ON || UNDERLAY_INNER)
 			output.texcoord2 = float4(input.texcoord0 + bOffset, bScale, bBias);
-			output.underlayColor =	underlayColor;
+			output.underlayColor = underlayColor;
 			#endif
 			output.textures = float4(faceUV, outlineUV);
 	
