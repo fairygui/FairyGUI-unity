@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using FairyGUI.Utils;
 
 namespace FairyGUI
@@ -49,6 +50,7 @@ namespace FairyGUI
         //spine/dragonbones
         public Vector2 skeletonAnchor;
         public object skeletonAsset;
+        public HashSet<GLoader3D> skeletonLoaders;
 
         public object Load()
         {
