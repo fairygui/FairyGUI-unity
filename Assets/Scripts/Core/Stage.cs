@@ -510,6 +510,27 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="touchId"></param>
+        /// <returns></returns>
+        public DisplayObject GetTouchTarget(int touchId)
+        {
+            if (_frameGotHitTarget != Time.frameCount)
+                GetHitTarget();
+
+            for (int j = 0; j < 5; j++)
+            {
+                TouchInfo touch = _touches[j];
+                if (touch.touchId == touchId)
+                    return touch.target != this ? touch.target : null;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int touchCount
         {
             get { return _touchCount; }
