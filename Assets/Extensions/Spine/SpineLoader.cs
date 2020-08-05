@@ -1,5 +1,6 @@
 #if FAIRYGUI_SPINE
 
+using System;
 using UnityEngine;
 using Spine.Unity;
 
@@ -10,6 +11,8 @@ namespace FairyGUI
     /// </summary>
     public partial class GLoader3D : GObject
     {
+        public static Action<SkeletonAnimation> CustomSpineDestroyMethod;
+        
         SkeletonAnimation _spineAnimation;
 
         /// <summary>
@@ -19,6 +22,15 @@ namespace FairyGUI
         public SkeletonAnimation spineAnimation
         {
             get { return _spineAnimation; }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="asset"></param>
+        public void SetSpine(SkeletonDataAsset asset)
+        {
+            SetSpine(asset, _contentItem.width, _contentItem.height, _contentItem.skeletonAnchor);
         }
 
         /// <summary>
@@ -119,10 +131,17 @@ namespace FairyGUI
         {
             if (_spineAnimation != null)
             {
-                if (Application.isPlaying)
-                    GameObject.Destroy(_spineAnimation.gameObject);
+                if (CustomSpineDestroyMethod != null)
+                {
+                    CustomSpineDestroyMethod(_spineAnimation);
+                }
                 else
-                    GameObject.DestroyImmediate(_spineAnimation.gameObject);
+                {
+                    if (Application.isPlaying)
+                        GameObject.Destroy(_spineAnimation.gameObject);
+                    else
+                        GameObject.DestroyImmediate(_spineAnimation.gameObject);
+                }
             }
         }
 

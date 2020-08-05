@@ -844,6 +844,7 @@ namespace FairyGUI
                             pi.file = assetPath + pi.file;
                             pi.skeletonAnchor.x = buffer.ReadFloat();
                             pi.skeletonAnchor.y = buffer.ReadFloat();
+                            pi.skeletonLoaders = new HashSet<GLoader3D>();
                             break;
                         }
                 }
@@ -1245,6 +1246,10 @@ namespace FairyGUI
                 case PackageItemType.Spine:
 #if FAIRYGUI_SPINE
                     item.skeletonAsset = (Spine.Unity.SkeletonDataAsset)asset;
+                    foreach (var gLoader3D in item.skeletonLoaders)
+                    {
+                        gLoader3D.SetSpine((Spine.Unity.SkeletonDataAsset) item.skeletonAsset);
+                    }
 #endif
                     break;
 
@@ -1589,24 +1594,31 @@ namespace FairyGUI
 
         void LoadSpine(PackageItem item)
         {
-#if FAIRYGUI_SPINE
             string ext = Path.GetExtension(item.file);
             string fileName = item.file.Substring(0, item.file.Length - ext.Length);
             int index = fileName.LastIndexOf(".skel");
             if (index > 0)
                 fileName = fileName.Substring(0, index);
-
-            Spine.Unity.SkeletonDataAsset asset;
-            if (_resBundle != null)
-                asset = _resBundle.LoadAsset<Spine.Unity.SkeletonDataAsset>(fileName);
+            
+#if FAIRYGUI_SPINE
+            if (_loadAysncFunc != null)
+            {
+                _loadAysncFunc(fileName + "_SkeletonData", ".asset", typeof(Spine.Unity.SkeletonDataAsset), item);
+            }
             else
             {
-                DestroyMethod dm;
-                asset = (Spine.Unity.SkeletonDataAsset)_loadFunc(fileName + "_SkeletonData", ".asset", typeof(Spine.Unity.SkeletonDataAsset), out dm);
+                Spine.Unity.SkeletonDataAsset asset;
+                if (_resBundle != null)
+                    asset = _resBundle.LoadAsset<Spine.Unity.SkeletonDataAsset>(fileName);
+                else
+                {
+                    DestroyMethod dm;
+                    asset = (Spine.Unity.SkeletonDataAsset)_loadFunc(fileName + "_SkeletonData", ".asset", typeof(Spine.Unity.SkeletonDataAsset), out dm);
+                }
+                if (asset == null)
+                    Debug.LogWarning("FairyGUI: Failed to load " + fileName);
+                item.skeletonAsset = asset;
             }
-            if (asset == null)
-                Debug.LogWarning("FairyGUI: Failed to load " + fileName);
-            item.skeletonAsset = asset;
 #else
             Debug.LogWarning("To enable Spine support, add script define symbol: FAIRYGUI_SPINE");
 #endif
