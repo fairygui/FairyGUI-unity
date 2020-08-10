@@ -42,7 +42,7 @@ using UnityEngine;
 #pragma warning disable 1591
 namespace FairyGUI
 {
-    internal static class EaseManager
+    public static class EaseManager
     {
         const float _PiOver2 = Mathf.PI * 0.5f;
         const float _TwoPi = Mathf.PI * 2;
@@ -50,7 +50,10 @@ namespace FairyGUI
         /// <summary>
         /// Returns a value between 0 and 1 (inclusive) based on the elapsed time and ease selected
         /// </summary>
-        internal static float Evaluate(EaseType easeType, float time, float duration, float overshootOrAmplitude, float period)
+        public static float Evaluate(EaseType easeType, float time, float duration,
+            float overshootOrAmplitude = 1.70158f,
+            float period = 0,
+            CustomEase customEase = null)
         {
             if (duration <= 0)
                 return 1;
@@ -160,6 +163,9 @@ namespace FairyGUI
                     return Bounce.EaseOut(time, duration);
                 case EaseType.BounceInOut:
                     return Bounce.EaseInOut(time, duration);
+
+                case EaseType.Custom:
+                    return customEase != null ? customEase.Evaluate(time / duration) : (time / duration);
 
                 default:
                     return -(time /= duration) * (time - 2);
