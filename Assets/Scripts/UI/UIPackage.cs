@@ -1598,7 +1598,7 @@ namespace FairyGUI
 
             Spine.Unity.SkeletonDataAsset asset;
             if (_resBundle != null)
-                asset = _resBundle.LoadAsset<Spine.Unity.SkeletonDataAsset>(fileName);
+                asset = _resBundle.LoadAsset<Spine.Unity.SkeletonDataAsset>(fileName + "_SkeletonData");
             else
             {
                 DestroyMethod dm;
@@ -1626,7 +1626,7 @@ namespace FairyGUI
 
             DragonBones.UnityDragonBonesData asset;
             if (_resBundle != null)
-                asset = _resBundle.LoadAsset<DragonBones.UnityDragonBonesData>(fileName);
+                asset = _resBundle.LoadAsset<DragonBones.UnityDragonBonesData>(fileName + "_Data");
             else
             {
                 DestroyMethod dm;
