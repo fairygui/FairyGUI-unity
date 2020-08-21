@@ -314,7 +314,7 @@ namespace FairyGUI
             get
             {
                 if (_selectedIndex == -1)
-                    return null;
+                    return string.Empty;
                 else
                     return _pageIds[_selectedIndex];
             }
