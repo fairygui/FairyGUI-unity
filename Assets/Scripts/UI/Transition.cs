@@ -50,6 +50,7 @@ namespace FairyGUI
         float _startTime;
         float _endTime;
         GTweenCallback _delayedCallDelegate;
+        GTweenCallback _checkAllDelegate;
         GTweenCallback1 _delayedCallDelegate2;
 
         const int OPTION_IGNORE_DISPLAY_CONTROLLER = 1;
@@ -64,6 +65,7 @@ namespace FairyGUI
 
             _delayedCallDelegate = OnDelayedPlay;
             _delayedCallDelegate2 = OnDelayedPlayItem;
+            _checkAllDelegate = CheckAllComplete;
         }
 
         /// <summary>
@@ -779,7 +781,7 @@ namespace FairyGUI
             _ownerBaseX = _owner.x;
             _ownerBaseY = _owner.y;
 
-            _totalTasks = 0;
+            _totalTasks = 1; //prevent to complete inside the loop
 
             bool needSkipAnimations = false;
             int cnt = _items.Length;
@@ -814,6 +816,8 @@ namespace FairyGUI
 
             if (needSkipAnimations)
                 SkipAnimations();
+
+            _totalTasks--;
         }
 
         void PlayItem(TransitionItem item)
@@ -1175,12 +1179,18 @@ namespace FairyGUI
                 if (_totalTimes < 0)
                 {
                     InternalPlay();
+                    if (_totalTasks == 0)
+                        GTween.DelayedCall(0).SetTarget(this).OnComplete(_checkAllDelegate);
                 }
                 else
                 {
                     _totalTimes--;
                     if (_totalTimes > 0)
+                    {
                         InternalPlay();
+                        if (_totalTasks == 0)
+                            GTween.DelayedCall(0).SetTarget(this).OnComplete(_checkAllDelegate);
+                    }
                     else
                     {
                         _playing = false;
