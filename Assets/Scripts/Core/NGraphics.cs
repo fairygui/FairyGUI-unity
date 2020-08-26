@@ -183,6 +183,11 @@ namespace FairyGUI
             {
                 if (_texture != value)
                 {
+                    if (value != null)
+                        value.AddRef();
+                    if (_texture != null)
+                        _texture.ReleaseRef();
+
                     _texture = value;
                     if (_customMatarial != 0 && _material != null)
                         _material.mainTexture = _texture != null ? _texture.nativeTexture : null;
@@ -213,11 +218,10 @@ namespace FairyGUI
         public void SetShaderAndTexture(string shader, NTexture texture)
         {
             _shader = shader;
-            _texture = texture;
-            if (_customMatarial != 0 && _material != null)
-                _material.mainTexture = _texture != null ? _texture.nativeTexture : null;
-            _meshDirty = true;
-            UpdateManager();
+            if (_texture != texture)
+                this.texture = texture;
+            else
+                UpdateManager();
         }
 
         /// <summary>
@@ -507,6 +511,12 @@ namespace FairyGUI
             }
             if ((_customMatarial & 128) != 0 && _material != null)
                 Object.DestroyImmediate(_material);
+
+            if (_texture != null)
+            {
+                _texture.ReleaseRef();
+                _texture = null;
+            }
 
             _manager = null;
             _material = null;
