@@ -68,7 +68,7 @@ namespace FairyGUI
         string _customId;
         bool _fromBundle;
         LoadResource _loadFunc;
-        LoadResourceAsync _loadAysncFunc;
+        LoadResourceAsync _loadAsyncFunc;
 
         class AtlasSprite
         {
@@ -360,7 +360,7 @@ namespace FairyGUI
             ByteBuffer buffer = new ByteBuffer(descData);
 
             UIPackage pkg = new UIPackage();
-            pkg._loadAysncFunc = loadFunc;
+            pkg._loadAsyncFunc = loadFunc;
             if (!pkg.LoadPackage(buffer, assetNamePrefix))
                 return null;
 
@@ -1261,9 +1261,9 @@ namespace FairyGUI
             string ext = Path.GetExtension(item.file);
             string fileName = item.file.Substring(0, item.file.Length - ext.Length);
 
-            if (_loadAysncFunc != null)
+            if (_loadAsyncFunc != null)
             {
-                _loadAysncFunc(fileName, ext, typeof(Texture), item);
+                _loadAsyncFunc(fileName, ext, typeof(Texture), item);
                 if (item.texture == null)
                     item.texture = new NTexture(null, new Rect(0, 0, item.width, item.height));
                 item.texture.destroyMethod = DestroyMethod.None;
@@ -1346,9 +1346,9 @@ namespace FairyGUI
             string ext = Path.GetExtension(item.file);
             string fileName = item.file.Substring(0, item.file.Length - ext.Length);
 
-            if (_loadAysncFunc != null)
+            if (_loadAsyncFunc != null)
             {
-                _loadAysncFunc(fileName, ext, typeof(AudioClip), item);
+                _loadAsyncFunc(fileName, ext, typeof(AudioClip), item);
                 if (item.audioClip == null)
                     item.audioClip = new NAudioClip(null);
                 item.audioClip.destroyMethod = DestroyMethod.None;
