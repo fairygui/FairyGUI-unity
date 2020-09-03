@@ -22,7 +22,10 @@ namespace FairyGUI
     /// </summary>
     public class NTexture
     {
-        public static Action<Texture> CustomDestroyMethod;
+        /// <summary>
+        /// This event will trigger when a texture is destroying if its destroyMethod is Custom
+        /// </summary>
+        public static event Action<Texture> CustomDestroyMethod;
 
         /// <summary>
         /// 
@@ -50,9 +53,14 @@ namespace FairyGUI
         public DestroyMethod destroyMethod;
 
         /// <summary>
-        /// 
+        /// This event will trigger when texture reloaded and size changed.
         /// </summary>
-        public event Action onSizeChanged;
+        public event Action<NTexture> onSizeChanged;
+
+        /// <summary>
+        /// This event will trigger when ref count is zero.
+        /// </summary>
+        public event Action<NTexture> onRelease;
 
         Texture _nativeTexture;
         Texture _alphaTexture;
@@ -407,7 +415,7 @@ namespace FairyGUI
             RefreshMaterials();
 
             if (onSizeChanged != null && lastSize != _originalSize)
-                onSizeChanged();
+                onSizeChanged(this);
         }
 
         void DestroyTexture()
@@ -467,6 +475,34 @@ namespace FairyGUI
             }
         }
 
+        public void AddRef()
+        {
+            if (_root == null) //disposed
+                return;
+
+            if (_root != this && refCount == 0)
+                _root.AddRef();
+
+            refCount++;
+        }
+
+        public void ReleaseRef()
+        {
+            if (_root == null) //disposed
+                return;
+
+            refCount--;
+
+            if (refCount == 0)
+            {
+                if (_root != this)
+                    _root.ReleaseRef();
+
+                if (onRelease != null)
+                    onRelease(this);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -479,6 +515,7 @@ namespace FairyGUI
                 Unload(true);
             _root = null;
             onSizeChanged = null;
+            onRelease = null;
         }
     }
 }

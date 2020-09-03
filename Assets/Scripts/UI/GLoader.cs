@@ -23,7 +23,7 @@ namespace FairyGUI
         bool _shrinkOnly;
         bool _updatingLayout;
         PackageItem _contentItem;
-        Action _reloadDelegate;
+        Action<NTexture> _reloadDelegate;
 
         MovieClip _content;
         GObject _errorSign;
@@ -471,10 +471,10 @@ namespace FairyGUI
             SetErrorState();
         }
 
-        void OnExternalReload()
+        void OnExternalReload(NTexture texture)
         {
-            sourceWidth = _content.texture.width;
-            sourceHeight = _content.texture.height;
+            sourceWidth = texture.width;
+            sourceHeight = texture.height;
             UpdateLayout();
         }
 
