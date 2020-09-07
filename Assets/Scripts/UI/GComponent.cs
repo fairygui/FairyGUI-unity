@@ -1569,9 +1569,8 @@ namespace FairyGUI
             CallLua("ctor");
 #endif
 #if FAIRYGUI_PUERTS
-            if (scriptInstance != null) {
-                scriptInstance.Call("OnConstruct");
-            }
+            if (scriptInstance != null)
+                scriptInstance.Call("onConstruct");
 #endif
         }
 
