@@ -390,9 +390,8 @@ namespace FairyGUI
             CallLua("OnInit");
 #endif
 #if FAIRYGUI_PUERTS
-            if (scriptInstance != null) {
-                scriptInstance.Call("OnInit");
-            }
+            if (scriptInstance != null)
+                scriptInstance.Call("onInit");
 #endif
         }
 
@@ -405,9 +404,8 @@ namespace FairyGUI
             CallLua("OnShown");
 #endif
 #if FAIRYGUI_PUERTS
-            if (scriptInstance != null) {
-                scriptInstance.Call("OnShown");
-            }
+            if (scriptInstance != null)
+                scriptInstance.Call("onShown");
 #endif
         }
 
@@ -420,9 +418,8 @@ namespace FairyGUI
             CallLua("OnHide");
 #endif
 #if FAIRYGUI_PUERTS
-            if (scriptInstance != null) {
-                scriptInstance.Call("OnHide");
-            }
+            if (scriptInstance != null)
+                scriptInstance.Call("onHide");
 #endif
         }
 
@@ -435,9 +432,8 @@ namespace FairyGUI
             if (!CallLua("DoShowAnimation"))
                 OnShown();
 #elif FAIRYGUI_PUERTS
-            if (scriptInstance == null || !scriptInstance.Call("DoShowAnimation")) {
+            if (scriptInstance == null || !scriptInstance.Call("doShowAnimation"))
                 OnShown();
-            }
 #else
             OnShown();
 #endif
@@ -452,9 +448,8 @@ namespace FairyGUI
             if (!CallLua("DoHideAnimation"))
                 HideImmediately();
 #elif FAIRYGUI_PUERTS
-            if (scriptInstance == null || !scriptInstance.Call("DoHideAnimation")) {
+            if (scriptInstance == null || !scriptInstance.Call("doHideAnimation"))
                 HideImmediately();
-            }
 #else
             HideImmediately();
 #endif
