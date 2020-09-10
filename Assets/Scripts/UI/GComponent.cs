@@ -44,10 +44,6 @@ namespace FairyGUI
         Controller _applyingController;
 
         EventListener _onDrop;
-        
-#if FAIRYGUI_PUERTS
-        public Utils.VirualClassObject scriptInstance;
-#endif
 
         public GComponent()
         {
@@ -103,6 +99,13 @@ namespace FairyGUI
                 _peerTable.Dispose();
                 _peerTable = null;
             }
+#endif
+
+#if FAIRYGUI_PUERTS
+            if (__onDispose != null)
+                __onDispose();
+            __onConstruct = null;
+            __onDispose = null;
 #endif
         }
 
@@ -1569,8 +1572,8 @@ namespace FairyGUI
             CallLua("ctor");
 #endif
 #if FAIRYGUI_PUERTS
-            if (scriptInstance != null)
-                scriptInstance.Call("onConstruct");
+            if (__onConstruct != null)
+                __onConstruct();
 #endif
         }
 
@@ -1671,6 +1674,11 @@ namespace FairyGUI
 
             return false;
         }
+#endif
+
+#if FAIRYGUI_PUERTS
+        public Action __onConstruct;
+        public Action __onDispose;
 #endif
     }
 }
