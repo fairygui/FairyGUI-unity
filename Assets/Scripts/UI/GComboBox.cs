@@ -545,6 +545,8 @@ namespace FairyGUI
         {
             dropdown.displayObject.onRemovedFromStage.Remove(__popupWinClosed);
             SetCurrentState();
+
+            RequestFocus();
         }
 
         private void __clickItem(EventContext context)
