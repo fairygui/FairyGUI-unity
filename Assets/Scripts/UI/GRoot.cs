@@ -169,7 +169,7 @@ namespace FairyGUI
         {
             int cnt = this.numChildren;
             int i;
-            if (_modalLayer.parent != null && !win.modal)
+            if (_modalLayer != null && _modalLayer.parent != null && !win.modal)
                 i = GetChildIndex(_modalLayer) - 1;
             else
                 i = cnt - 1;
