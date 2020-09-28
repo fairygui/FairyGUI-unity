@@ -1031,6 +1031,7 @@ namespace FairyGUI
                                 imageElement.text = source.Substring(j, 2);
                             else
                                 imageElement.text = source.Substring(j, 1);
+                            imageElement.format.align = _textFormat.align;
                             _elements.Insert(++elementIndex, imageElement);
 
                             buffer.Append(source, appendPos, j - appendPos);
