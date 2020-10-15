@@ -12,6 +12,8 @@ In terms of functionality, FairyGUI has good built-in support for traditional UI
 
 FairyGUI also fully encapsulates all input methods. Whether mouse, single touch, multi-touch, or VR handle input, developers can use the same code to handle interaction.<br>
 
+The library was designed to work with Unity 5.6 and above, but is currently only tested with Unity 2018 and above.
+
 ![](images/2015-11-10_000547.png)
 
 ![](images/2015-11-10_001320.png)
