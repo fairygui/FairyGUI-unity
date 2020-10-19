@@ -275,6 +275,23 @@ namespace FairyGUI
             if (buffer.version >= 2)
                 _min = buffer.ReadInt();
 
+            if (buffer.version >= 5)
+            {
+                string sound = buffer.ReadS();
+                if (!string.IsNullOrEmpty(sound))
+                {
+                    float volumeScale = buffer.ReadFloat();
+                    displayObject.onClick.Add(() =>
+                    {
+                        NAudioClip audioClip = UIPackage.GetItemAssetByURL(sound) as NAudioClip;
+                        if (audioClip != null && audioClip.nativeClip != null)
+                            Stage.inst.PlayOneShotSound(audioClip.nativeClip, volumeScale);
+                    });
+                }
+                else
+                    buffer.Skip(4);
+            }
+
             Update(_value);
         }
 
