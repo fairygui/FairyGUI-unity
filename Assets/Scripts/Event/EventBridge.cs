@@ -58,7 +58,11 @@ namespace FairyGUI
 #if FAIRYGUI_TOLUA
         public void Add(LuaFunction func, LuaTable self)
         {
-            EventCallback1 callback = (EventCallback1)DelegateTraits<EventCallback1>.Create(func, self);
+            EventCallback1 callback;
+            if(self != null)
+                callback = (EventCallback1)DelegateTraits<EventCallback1>.Create(func, self);
+            else
+                callback = (EventCallback1)DelegateTraits<EventCallback1>.Create(func);
             _callback1 -= callback;
             _callback1 += callback;
         }
