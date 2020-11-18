@@ -1586,8 +1586,8 @@ namespace FairyGUI
                     }
 
                     bg.lineHeight = bgY < 0 ? bgHeight : (bgY + bgHeight);
-                    if (bg.lineHeight < font.size)
-                        bg.lineHeight = font.size;
+                    if (bg.lineHeight < fontSize)
+                        bg.lineHeight = fontSize;
                 }
 
                 buffer.position = nextPos;
