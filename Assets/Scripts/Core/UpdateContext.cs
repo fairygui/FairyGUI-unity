@@ -228,6 +228,7 @@ namespace FairyGUI
             {
                 mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Equal);
                 mat.SetInt(ShaderConfig.ID_Stencil, stencilCompareValue);
+                mat.SetInt(ShaderConfig.ID_Stencil2, stencilCompareValue);
                 mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
                 mat.SetInt(ShaderConfig.ID_StencilReadMask, stencilReferenceValue | (stencilReferenceValue - 1));
                 mat.SetInt(ShaderConfig.ID_ColorMask, 15);
@@ -236,6 +237,7 @@ namespace FairyGUI
             {
                 mat.SetInt(ShaderConfig.ID_StencilComp, (int)UnityEngine.Rendering.CompareFunction.Always);
                 mat.SetInt(ShaderConfig.ID_Stencil, 0);
+                mat.SetInt(ShaderConfig.ID_Stencil2, 0);
                 mat.SetInt(ShaderConfig.ID_StencilOp, (int)UnityEngine.Rendering.StencilOp.Keep);
                 mat.SetInt(ShaderConfig.ID_StencilReadMask, 255);
                 mat.SetInt(ShaderConfig.ID_ColorMask, 15);

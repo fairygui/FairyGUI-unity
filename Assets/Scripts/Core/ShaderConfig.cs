@@ -53,7 +53,6 @@ namespace FairyGUI
         public static int ID_BlendDstFactor;
         public static int ID_ColorOption;
 
-        public static int ID_StencilComp2;
         public static int ID_Stencil2;
 
         static ShaderConfig()
@@ -73,7 +72,6 @@ namespace FairyGUI
             ID_ColorOption = Shader.PropertyToID("_ColorOption");
 
             ID_Stencil2 = Shader.PropertyToID("_StencilRef");
-            ID_StencilComp2 = Shader.PropertyToID("_StencilComp");
         }
 
         /// <summary>
