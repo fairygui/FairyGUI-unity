@@ -297,7 +297,11 @@ namespace FairyGUI
             int cnt = _renderers.Count;
             for (int i = 0; i < cnt; i++)
             {
-                _renderers[i].renderer.GetMaterials(helperMaterials);
+                Renderer renderer = _renderers[i].renderer;
+                if (renderer == null)
+                    continue;
+
+                renderer.GetMaterials(helperMaterials);
 
                 int cnt2 = helperMaterials.Count;
                 for (int j = 0; j < cnt2; j++)
@@ -313,17 +317,16 @@ namespace FairyGUI
             int cnt = _renderers.Count;
             for (int i = 0; i < cnt; i++)
             {
-                RendererInfo ri = _renderers[i];
-                Material[] mats = ri.materials;
-                if (mats != null)
+                Material[] mats = _renderers[i].materials;
+                if (mats == null)
+                    continue;
+                
+                int cnt2 = mats.Length;
+                for (int j = 0; j < cnt2; j++)
                 {
-                    int cnt2 = mats.Length;
-                    for (int j = 0; j < cnt2; j++)
-                    {
-                        Material mat = mats[j];
-                        if (mat != null)
-                            context.ApplyClippingProperties(mat, false);
-                    }
+                    Material mat = mats[j];
+                    if (mat != null)
+                        context.ApplyClippingProperties(mat, false);
                 }
             }
 #endif
