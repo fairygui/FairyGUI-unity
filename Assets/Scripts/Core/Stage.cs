@@ -1547,15 +1547,11 @@ namespace FairyGUI
             holdTime = 0;
 
             downTargets.Clear();
-            if (target != null)
+            var obj = target;
+            while (obj != null)
             {
-                downTargets.Add(target);
-                DisplayObject obj = target;
-                while (obj != null)
-                {
-                    downTargets.Add(obj);
-                    obj = obj.parent;
-                }
+                downTargets.Add(obj);
+                obj = obj.parent;
             }
         }
 
