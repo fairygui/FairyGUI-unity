@@ -1,0 +1,19 @@
+<component size="1136,640">
+  <displayList>
+    <graph id="n1" name="n1" xy="0,200" size="1136,154" type="rect" lineSize="0" fillColor="#681c0000">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <image id="n3" name="n3" src="gkq08" xy="389,88" pivot="0.5,0" size="358,367" aspect="true">
+      <relation target="" sidePair="center-center"/>
+    </image>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Sound" value="ui://zgmoraj4gkq03"/>
+    <item time="0" type="XY" target="n3" tween="true" startValue="-,-398" endValue="-,88" duration="12" ease="Back.Out"/>
+    <item time="12" type="Rotation" target="n3" tween="true" startValue="0" endValue="8" duration="6"/>
+    <item time="18" type="Rotation" target="n3" tween="true" startValue="8" endValue="-8" duration="6" ease="Back.Out"/>
+    <item time="24" type="Rotation" target="n3" tween="true" startValue="-8" endValue="5" duration="6" ease="Back.Out"/>
+    <item time="30" type="Rotation" target="n3" tween="true" startValue="5" endValue="-5" duration="6" ease="Back.Out"/>
+    <item time="36" type="Rotation" target="n3" tween="true" startValue="-5" endValue="0" duration="6" ease="Back.Out"/>
+  </transition>
+</component>

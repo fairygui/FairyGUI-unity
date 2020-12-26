@@ -1,0 +1,7 @@
+<component size="56,57" extention="Button">
+  <Button/>
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver"/>
+  <displayList>
+    <image id="n1" src="srct6" name="n1" xy="0,0"/>
+  </displayList>
+</component>

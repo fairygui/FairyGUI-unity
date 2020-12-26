@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="i1i2ucwo" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="113wo0" name="Main.xml" path="/" exported="true"/>
+    <component id="113wo2" name="item.xml" path="/"/>
+    <image id="113wo3" name="n1.png" path="/" exported="true"/>
+    <image id="113wo4" name="n2.png" path="/" exported="true"/>
+    <image id="113wo5" name="n3.png" path="/" exported="true"/>
+    <image id="113wo6" name="n4.png" path="/" exported="true"/>
+    <image id="113wo7" name="n5.png" path="/" exported="true"/>
+  </resources>
+  <publish name="Curve"/>
+</packageDescription>

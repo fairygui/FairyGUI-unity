@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <component id="n0" name="a" src="gx2b79" xy="61,49">
+      <Button title="A" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+    <component id="n1" name="b" src="gx2b79" xy="67,270">
+      <Button title="B" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+    <component id="n2" name="c" src="gx2b79" xy="447,268">
+      <Button title="C"/>
+    </component>
+    <text id="n3" name="n3" xy="49,19" size="291,26" fontSize="22" text="'A' can be dragged freely."/>
+    <text id="n4" name="n4" xy="53,178" size="478,51" fontSize="22" text="Try drag B to C. B's icon will assign to C.&#xA;拖动B到C的位置可以将B的图标赋予C"/>
+    <text id="n6" name="n6" xy="612,26" size="368,26" fontSize="22" text="'D' can be dragged inside bounds."/>
+    <graph id="n7" name="n7" xy="640,76" size="440,413" type="rect" lineSize="3" fillColor="#00ffffff"/>
+    <component id="n5" name="d" src="gx2b79" xy="819,231">
+      <Button title="D" icon="ui://9leh0eyfwa8u2t"/>
+    </component>
+  </displayList>
+</component>

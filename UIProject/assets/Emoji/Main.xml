@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n5" name="n5" src="fymi17" xy="90,9" size="936,405"/>
+    <list id="n10" name="list" xy="104,21" size="910,376" overflow="scroll" scrollBarFlags="4" defaultItem="ui://y768eypakfcb1j" autoItemSize="false">
+      <item url="ui://y768eypakfcb1h"/>
+      <item/>
+    </list>
+    <image id="n6" name="n6" src="fymi18" xy="93,455" size="660,59" group="n11"/>
+    <text id="n7" name="input1" xy="104,460" size="637,48" group="n11" input="true" fontSize="26" vAlign="middle" autoSize="none" singleLine="true" text=""/>
+    <component id="n8" name="btnSend1" src="fymi1b" xy="869,448" group="n11">
+      <Button title="Send"/>
+    </component>
+    <component id="n9" name="btnEmoji1" src="fymi19" xy="771,444" group="n11"/>
+    <group id="n11" name="n11" xy="93,444" size="939,84"/>
+    <image id="n12_mwdy" name="n12" src="fymi18" xy="95,557" size="660,77" group="n16_mwdy"/>
+    <text id="n13_mwdy" name="input2" xy="106,562" size="637,66" group="n16_mwdy" input="true" fontSize="26" vAlign="middle" autoSize="none" singleLine="true" text=""/>
+    <component id="n14_mwdy" name="btnSend2" src="fymi1b" xy="871,550" group="n16_mwdy">
+      <Button title="Send"/>
+    </component>
+    <component id="n15_mwdy" name="btnEmoji2" src="fymi19" xy="773,546" group="n16_mwdy"/>
+    <group id="n16_mwdy" name="n16" xy="95,546" size="939,88"/>
+    <text id="n17_mwdy" name="n17" xy="31,522" size="773,27" fontSize="23" color="#ffffff" text="Case 2: Support to input emoji by using the native IOS keyboard."/>
+    <text id="n18_mwdy" name="n18" xy="32,419" size="593,27" fontSize="23" color="#ffffff" text="Case 1: Support to input emoji by using UBB code."/>
+  </displayList>
+</component>

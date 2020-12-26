@@ -1,0 +1,13 @@
+info creator=UIBuilder
+common lineHeight=0
+char id=43 img=nra4r xoffset=0 yoffset=0 xadvance=25
+char id=57 img=nra4s xoffset=0 yoffset=0 xadvance=25
+char id=56 img=nra4t xoffset=0 yoffset=0 xadvance=25
+char id=55 img=nra4u xoffset=0 yoffset=0 xadvance=25
+char id=54 img=nra4v xoffset=0 yoffset=0 xadvance=25
+char id=53 img=nra4w xoffset=0 yoffset=0 xadvance=25
+char id=52 img=nra4x xoffset=0 yoffset=0 xadvance=25
+char id=51 img=nra4y xoffset=0 yoffset=0 xadvance=25
+char id=50 img=nra4z xoffset=0 yoffset=0 xadvance=25
+char id=49 img=nra410 xoffset=-2 yoffset=0 xadvance=20
+char id=48 img=nra411 xoffset=0 yoffset=0 xadvance=25

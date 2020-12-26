@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="100,100" extention="Button">
+  <displayList>
+    <image id="n13" name="n13" src="kpev61" xy="5,4"/>
+    <loader id="n4" name="icon" xy="6,6" size="88,88" align="center" vAlign="middle" fill="scale"/>
+    <image id="n12" name="n12" src="kpev62" xy="0,0"/>
+    <text id="n6" name="title" xy="9,66" size="84,30" fontSize="22" color="#ff0000" align="right" vAlign="middle" autoSize="none" text=""/>
+  </displayList>
+  <Button/>
+</component>

@@ -1,0 +1,28 @@
+<component size="380,125" extention="Button">
+  <controller name="IsRead" pages="0,未读,1,已读" selected="0"/>
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <controller name="c1" pages="0,未领,1,已领" selected="1"/>
+  <displayList>
+    <image id="n10" name="n10" src="mn71e" xy="3,2" size="375,122"/>
+    <image id="n13" name="n13" src="mn71f" xy="-2,-3" size="386,131">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+    <image id="n14" name="n14" src="mn71g" xy="30,26"/>
+    <image id="n15" name="n15" src="mn71h" xy="40,29">
+      <gearDisplay controller="IsRead" pages="1"/>
+    </image>
+    <image id="n16" name="n16" src="mn71i" xy="40,42">
+      <gearDisplay controller="IsRead" pages="0"/>
+    </image>
+    <text id="n4" name="timeText" xy="113,67" size="239,39" fontSize="20" color="#075747" vAlign="middle" leading="0" autoSize="none" text=""/>
+    <text id="n9" name="title" xy="114,28" size="240,28" fontSize="22" color="#3333ff" vAlign="middle" autoSize="none" text=""/>
+    <image id="n17" name="n17" src="mn71j" xy="234,2">
+      <gearDisplay controller="c1" pages="1"/>
+    </image>
+  </displayList>
+  <Button mode="Radio"/>
+  <transition name="t0">
+    <item time="0" type="Visible" value="true"/>
+    <item time="0" type="XY" tween="true" startValue="391,-" endValue="0,0" duration="9"/>
+  </transition>
+</component>

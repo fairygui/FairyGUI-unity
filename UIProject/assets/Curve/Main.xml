@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1320,500">
+  <displayList>
+    <graph id="n4" name="n4" xy="0,0" size="1320,500" type="rect" lineSize="0" fillColor="#69000000"/>
+    <list id="n2" name="list" xy="0,39" size="1320,460" layout="row" overflow="scroll" scroll="horizontal" scrollBarFlags="2" scrollBar="hidden" margin="0,0,0,0" clipSoftness="20,0" colGap="20" defaultItem="ui://i1i2ucwo113wo2">
+      <item icon="ui://i1i2ucwo113wo3"/>
+      <item icon="ui://i1i2ucwo113wo4"/>
+      <item icon="ui://i1i2ucwo113wo5"/>
+      <item icon="ui://i1i2ucwo113wo6"/>
+      <item icon="ui://i1i2ucwo113wo7"/>
+    </list>
+    <text id="n3" name="n3" xy="0,14" size="1320,40" fontSize="36" color="#ffffff" align="center" autoSize="none" text="You can attach UI to any 3D model, with fully interactive."/>
+  </displayList>
+</component>

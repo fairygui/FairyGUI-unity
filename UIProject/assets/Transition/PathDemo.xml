@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <image id="n3_ujnc" name="n3" src="ujnc1k" fileName="glz.jpg" xy="85,0"/>
+    <image id="n2_ujnc" name="n2" src="ujnc1j" fileName="r1.png" xy="152,574" pivot="0.5,0.5" anchor="true" size="66,68"/>
+    <image id="n4_ujnc" name="n4" src="ujnc1j" fileName="r1.png" xy="802,103" pivot="0.5,0.5" anchor="true"/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Transition" value="t1"/>
+    <item time="0" type="XY" target="n2_ujnc" tween="true" startValue="166,577.5" endValue="220,205.5" duration="120" ease="Linear" repeat="-1" path="2,0,0,12,48,-37.72471024986493,-39.25088999407748,1,2,-17.549999999999955,-85,2.4098176530136186,-130.26180957230767,46.57205291308698,-112.714729226271,1,2,90.35000000000002,-138.60000000000002,135.50521366705695,-165.2996287033929,205.06733535639967,-198.08185613135998,1,2,280.5,-225.64999999999998,250.2463155228188,-247.27863511341855,240.8432655822097,-254.857979870787,0,2,220.95000000000005,-268.85,215.40449181619368,-314.0100452535792,129,-342,0,2,54,-372,-582.6000691394213,-626.6400276557686,0,0,1"/>
+    <item time="0" type="XY" target="n4_ujnc" tween="true" startValue="802,104" endValue="802,103" duration="96" ease="Linear" repeat="-1" path="2,0,0,104,-5,154.28433798184315,47.82762820713789,1,2,156.14999999999998,144.15,157.50785245484752,214.25464260021278,105.79697972482026,292.2223518401492,1,2,10.25,292.4,-78.73432634674877,292.56544637911725,-134.90212532397348,216.33034016434195,1,2,-135.60000000000002,141.89999999999998,-136.2369015530618,73.97261866056849,-101,-1,1,2,0,-1,70.72481884034768,-1,0,0,1"/>
+  </transition>
+  <transition name="t1">
+    <item time="0" type="ColorFilter" target="n2_ujnc" tween="true" startValue="0.38,0.00,0.00,0.00" endValue="0.00,0.00,0.00,0.00" duration="9" repeat="-1" yoyo="true"/>
+    <item time="0" type="Scale" target="n2_ujnc" tween="true" startValue="0.8,0.8" endValue="1.1,1.1" duration="9" repeat="-1" yoyo="true"/>
+  </transition>
+</component>

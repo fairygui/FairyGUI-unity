@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <component id="n0" name="n0" src="poiq7e" xy="60,48" size="158,48">
+      <Button title="Popup Menu"/>
+    </component>
+    <component id="n1" name="n1" src="poiq7e" xy="342,48" size="158,48">
+      <Button title="Popup Any"/>
+    </component>
+  </displayList>
+</component>

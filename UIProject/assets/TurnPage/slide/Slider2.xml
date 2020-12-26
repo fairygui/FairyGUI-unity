@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="361,23" extention="Slider">
+  <displayList>
+    <image id="n1" name="n1" src="jva6w" fileName="slide/background.png" xy="0,0" size="361,23">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n2" name="bar" src="jva6x" fileName="slide/full bar.png" xy="0,1" size="362,21"/>
+    <component id="n3" name="grip" src="jva6y" fileName="slide/Slider2_grip.xml" xy="328,-13">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider titleType="valueAndmax"/>
+</component>
