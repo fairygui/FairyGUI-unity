@@ -301,7 +301,7 @@ namespace FairyGUI
                 if (renderer == null)
                     continue;
 
-                renderer.GetMaterials(helperMaterials);
+                renderer.GetSharedMaterials(helperMaterials);
 
                 int cnt2 = helperMaterials.Count;
                 for (int j = 0; j < cnt2; j++)
