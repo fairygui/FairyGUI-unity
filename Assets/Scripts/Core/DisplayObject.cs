@@ -956,7 +956,7 @@ namespace FairyGUI
                 && ((_flags & Flags.TabStop) != 0 || (_flags & Flags.TabStopChildren) != 0)
                 && (_flags & Flags.NotFocusable) == 0)
             {
-                Stage.inst.SetFous(this, true);
+                Stage.inst.SetFocus(this, true);
                 return true;
             }
             else
