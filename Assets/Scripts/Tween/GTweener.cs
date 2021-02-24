@@ -64,6 +64,7 @@ namespace FairyGUI
         bool _snapping;
         object _userData;
         GPath _path;
+        CustomEase _customEase;
 
         GTweenCallback _onUpdate;
         GTweenCallback _onStart;
@@ -150,6 +151,19 @@ namespace FairyGUI
         public GTweener SetEase(EaseType value)
         {
             _easeType = value;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="customEase"></param>
+        /// <returns></returns>
+        public GTweener SetEase(EaseType value, CustomEase customEase)
+        {
+            _easeType = value;
+            _customEase = customEase;
             return this;
         }
 
@@ -587,6 +601,7 @@ namespace FairyGUI
             _normalizedTime = 0;
             _ended = 0;
             _path = null;
+            _customEase = null;
             _smoothStart = Time.frameCount == 1 ? 3 : 1;//刚启动时会有多帧的超时
         }
 
@@ -691,7 +706,7 @@ namespace FairyGUI
             }
 
             _normalizedTime = EaseManager.Evaluate(_easeType, reversed ? (_duration - tt) : tt, _duration,
-                _easeOvershootOrAmplitude, _easePeriod);
+                _easeOvershootOrAmplitude, _easePeriod, _customEase);
 
             _value.SetZero();
             _deltaValue.SetZero();

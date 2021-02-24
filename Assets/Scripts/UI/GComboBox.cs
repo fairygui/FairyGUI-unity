@@ -20,6 +20,16 @@ namespace FairyGUI
         /// </summary>
         public GComponent dropdown;
 
+        /// <summary>
+        /// Play sound when button is clicked.
+        /// </summary>
+        public NAudioClip sound;
+
+        /// <summary>
+        /// Volume of the click sound. (0-1)
+        /// </summary>
+        public float soundVolumeScale;
+
         protected GObject _titleObject;
         protected GObject _iconObject;
         protected GList _list;
@@ -47,6 +57,7 @@ namespace FairyGUI
             _items = new List<string>();
             _values = new List<string>();
             _popupDirection = PopupDirection.Auto;
+            soundVolumeScale = 1;
         }
 
         /// <summary>
@@ -440,6 +451,7 @@ namespace FairyGUI
             displayObject.onRollOut.Add(__rollout);
             displayObject.onTouchBegin.Add(__touchBegin);
             displayObject.onTouchEnd.Add(__touchEnd);
+            displayObject.onClick.Add(__click);
         }
 
         override public void Setup_AfterAdd(ByteBuffer buffer, int beginPos)
@@ -500,6 +512,14 @@ namespace FairyGUI
             iv = buffer.ReadShort();
             if (iv >= 0)
                 _selectionController = parent.GetControllerAt(iv);
+
+            if (buffer.version >= 5)
+            {
+                str = buffer.ReadS();
+                if (str != null)
+                    sound = UIPackage.GetItemAssetByURL(str) as NAudioClip;
+                soundVolumeScale = buffer.ReadFloat();
+            }
         }
 
         public void UpdateDropdownList()
@@ -545,6 +565,8 @@ namespace FairyGUI
         {
             dropdown.displayObject.onRemovedFromStage.Remove(__popupWinClosed);
             SetCurrentState();
+
+            RequestFocus();
         }
 
         private void __clickItem(EventContext context)
@@ -596,6 +618,12 @@ namespace FairyGUI
                 if (dropdown != null && dropdown.parent != null)
                     SetCurrentState();
             }
+        }
+
+        private void __click()
+        {
+            if (sound != null && sound.nativeClip != null)
+                Stage.inst.PlayOneShotSound(sound.nativeClip, soundVolumeScale);
         }
     }
 }

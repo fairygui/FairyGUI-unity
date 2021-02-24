@@ -90,7 +90,7 @@ namespace FairyGUI
 
                     _tweenConfig._tweener = GTween.To(((IColorGear)_owner).color, gv.color, _tweenConfig.duration)
                         .SetDelay(_tweenConfig.delay)
-                        .SetEase(_tweenConfig.easeType)
+                        .SetEase(_tweenConfig.easeType, _tweenConfig.customEase)
                         .SetTarget(this)
                         .SetListener(this);
                 }

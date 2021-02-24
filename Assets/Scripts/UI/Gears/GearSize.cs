@@ -87,7 +87,7 @@ namespace FairyGUI
                     _tweenConfig._tweener = GTween.To(new Vector4(_owner.width, _owner.height, _owner.scaleX, _owner.scaleY),
                         new Vector4(gv.width, gv.height, gv.scaleX, gv.scaleY), _tweenConfig.duration)
                         .SetDelay(_tweenConfig.delay)
-                        .SetEase(_tweenConfig.easeType)
+                        .SetEase(_tweenConfig.easeType, _tweenConfig.customEase)
                         .SetUserData((a ? 1 : 0) + (b ? 2 : 0))
                         .SetTarget(this)
                         .SetListener(this);

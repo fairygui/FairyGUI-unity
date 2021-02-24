@@ -21,7 +21,6 @@ namespace FairyGUI
         protected Canvas _canvas;
         protected bool _cloneMaterial;
         protected bool _shouldCloneMaterial;
-        protected bool _supportMask;
 
         protected struct RendererInfo
         {
@@ -85,7 +84,6 @@ namespace FairyGUI
 
             _canvas = null;
             _wrapTarget = target;
-            _supportMask = false;
             _shouldCloneMaterial = false;
             _renderers.Clear();
 
@@ -175,10 +173,6 @@ namespace FairyGUI
 
                     if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
                         mat.renderQueue = 3000;
-
-                    if (mat.HasProperty(ShaderConfig.ID_Stencil) || mat.HasProperty(ShaderConfig.ID_Stencil2)
-                        || mat.HasProperty(ShaderConfig.ID_ClipBox))
-                        _supportMask = true;
 
                     //确保相同的材质不会复制两次
                     Material newMat;
@@ -291,31 +285,51 @@ namespace FairyGUI
             if (_shouldCloneMaterial)
                 CloneMaterials();
 
-            if (_supportMask)
-            {
-                int cnt = _renderers.Count;
-                for (int i = 0; i < cnt; i++)
-                {
-                    RendererInfo ri = _renderers[i];
-                    Material[] mats = ri.materials;
-                    if (mats != null)
-                    {
-                        int cnt2 = mats.Length;
-                        for (int j = 0; j < cnt2; j++)
-                        {
-                            Material mat = mats[j];
-                            if (mat != null)
-                                context.ApplyClippingProperties(mat, false);
-                        }
-
-                        if (cnt2 > 0 && _cloneMaterial && ri.renderer != null
-                             && !Material.ReferenceEquals(ri.renderer.sharedMaterial, mats[0]))
-                            ri.renderer.sharedMaterials = mats;
-                    }
-                }
-            }
+            ApplyClipping(context);
 
             base.Update(context);
+        }
+
+        private List<Material> helperMaterials = new List<Material>();
+        virtual protected void ApplyClipping(UpdateContext context)
+        {
+#if UNITY_2018_2_OR_NEWER
+            int cnt = _renderers.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                Renderer renderer = _renderers[i].renderer;
+                if (renderer == null)
+                    continue;
+
+                renderer.GetSharedMaterials(helperMaterials);
+
+                int cnt2 = helperMaterials.Count;
+                for (int j = 0; j < cnt2; j++)
+                {
+                    Material mat = helperMaterials[j];
+                    if (mat != null)
+                        context.ApplyClippingProperties(mat, false);
+                }
+
+                helperMaterials.Clear();
+            }
+#else
+            int cnt = _renderers.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                Material[] mats = _renderers[i].materials;
+                if (mats == null)
+                    continue;
+                
+                int cnt2 = mats.Length;
+                for (int j = 0; j < cnt2; j++)
+                {
+                    Material mat = mats[j];
+                    if (mat != null)
+                        context.ApplyClippingProperties(mat, false);
+                }
+            }
+#endif
         }
 
         public override void Dispose()

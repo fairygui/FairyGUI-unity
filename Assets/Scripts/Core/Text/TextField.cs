@@ -453,6 +453,7 @@ namespace FairyGUI
         {
             LineInfo line1 = _lines[startLine];
             LineInfo line2 = _lines[endLine];
+            bool leftAlign = _textFormat.align == AlignType.Left;
             if (startLine == endLine)
             {
                 Rect r = Rect.MinMaxRect(startCharX, line1.y, endCharX, line1.y + line1.height);
@@ -463,7 +464,7 @@ namespace FairyGUI
             }
             else if (startLine == endLine - 1)
             {
-                Rect r = Rect.MinMaxRect(startCharX, line1.y, GUTTER_X + line1.width, line1.y + line1.height);
+                Rect r = Rect.MinMaxRect(startCharX, line1.y, leftAlign ? (GUTTER_X + line1.width) : _contentRect.xMax, line1.y + line1.height);
                 if (clipped)
                     resultRects.Add(ToolSet.Intersection(ref r, ref _contentRect));
                 else
@@ -476,7 +477,7 @@ namespace FairyGUI
             }
             else
             {
-                Rect r = Rect.MinMaxRect(startCharX, line1.y, GUTTER_X + line1.width, line1.y + line1.height);
+                Rect r = Rect.MinMaxRect(startCharX, line1.y, leftAlign ? (GUTTER_X + line1.width) : _contentRect.xMax, line1.y + line1.height);
                 if (clipped)
                     resultRects.Add(ToolSet.Intersection(ref r, ref _contentRect));
                 else
@@ -484,7 +485,7 @@ namespace FairyGUI
                 for (int i = startLine + 1; i < endLine; i++)
                 {
                     LineInfo line = _lines[i];
-                    r = Rect.MinMaxRect(GUTTER_X, r.yMax, GUTTER_X + line.width, line.y + line.height);
+                    r = Rect.MinMaxRect(GUTTER_X, r.yMax, leftAlign ? (GUTTER_X + line.width) : _contentRect.xMax, line.y + line.height);
                     if (clipped)
                         resultRects.Add(ToolSet.Intersection(ref r, ref _contentRect));
                     else
@@ -854,13 +855,17 @@ namespace FairyGUI
                     int toMoveChars;
 
                     if (wordPossible && wordLen < 20 && lineCharCount > 2) //if word had broken, move word to new line
+                    {
                         toMoveChars = wordLen;
-                    else if (lineCharCount != 1) //only one char here, we cant move it to new line
-                        toMoveChars = 1;
+                        //we caculate the line width WITHOUT the tailing space
+                        UpdateLineInfo(line, letterSpacing, lineCharCount - (toMoveChars + 1));
+                        line.charCount++; //but keep it in this line.
+                    }
                     else
-                        toMoveChars = 0;
-
-                    UpdateLineInfo(line, letterSpacing, lineCharCount - toMoveChars);
+                    {
+                        toMoveChars = lineCharCount > 1 ? 1 : 0; //if only one char here, we cant move it to new line
+                        UpdateLineInfo(line, letterSpacing, lineCharCount - toMoveChars);
+                    }
 
                     LineInfo newLine = LineInfo.Borrow();
                     _lines.Add(newLine);
@@ -1026,6 +1031,7 @@ namespace FairyGUI
                                 imageElement.text = source.Substring(j, 2);
                             else
                                 imageElement.text = source.Substring(j, 1);
+                            imageElement.format.align = _textFormat.align;
                             _elements.Insert(++elementIndex, imageElement);
 
                             buffer.Append(source, appendPos, j - appendPos);

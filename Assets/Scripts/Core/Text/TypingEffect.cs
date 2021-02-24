@@ -197,6 +197,7 @@ namespace FairyGUI
 
             _started = false;
             _textField.graphics.meshModifier -= OnMeshModified;
+            _textField.graphics.SetMeshDirty();
         }
 
         /// <summary>

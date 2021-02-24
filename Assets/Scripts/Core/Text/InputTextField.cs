@@ -818,7 +818,7 @@ namespace FairyGUI
                         return v;
                 }
                 else if (firstInLine != -1)
-                    break;
+                    return v;
             }
 
             return textField.charPositions[i - 1];

@@ -1017,7 +1017,7 @@ namespace FairyGUI
         public void RequestFocus()
         {
             if (displayObject != null)
-                Stage.inst.SetFous(displayObject, false);
+                Stage.inst.SetFocus(displayObject, false);
         }
 
         /// <summary>
@@ -1026,7 +1026,7 @@ namespace FairyGUI
         public void RequestFocus(bool byKey)
         {
             if (displayObject != null)
-                Stage.inst.SetFous(displayObject, byKey);
+                Stage.inst.SetFocus(displayObject, byKey);
         }
 
         /// <summary>
@@ -2016,6 +2016,9 @@ namespace FairyGUI
 
         private void DragBegin(int touchId)
         {
+            if (DispatchEvent("onDragStart", touchId))
+                return;
+
             if (draggingObject != null)
             {
                 GObject tmp = draggingObject;
@@ -2074,8 +2077,7 @@ namespace FairyGUI
                     return;
 
                 _dragTesting = false;
-                if (!DispatchEvent("onDragStart", evt.touchId))
-                    DragBegin(evt.touchId);
+                DragBegin(evt.touchId);
             }
 
             if (draggingObject == this)

@@ -31,6 +31,7 @@ namespace FairyGUI
             _align = AlignType.Left;
             _verticalAlign = VertAlignType.Top;
             _playing = true;
+            _color = Color.white;
         }
 
         override protected void CreateDisplayObject()

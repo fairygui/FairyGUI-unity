@@ -104,9 +104,7 @@ namespace FairyGUI
             _ascent = _fontAsset.faceInfo.pointSize;
             _lineHeight = _fontAsset.faceInfo.pointSize * 1.25f;
 
-            bool isAlternativeTypeface;
-            TMP_FontAsset actualAsset;
-            _lineChar = TMP_FontAssetUtilities.GetCharacterFromFontAsset('_', _fontAsset, true, FontStyles.Normal, _fontWeight, out isAlternativeTypeface, out actualAsset);
+            _lineChar = GetCharacterFromFontAsset('_', FontStyles.Normal);
         }
 
         void OnCreateNewMaterial(Material mat)
@@ -236,9 +234,7 @@ namespace FairyGUI
 
         override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
         {
-            bool isAlternativeTypeface;
-            TMP_FontAsset actualAsset;
-            _char = TMP_FontAssetUtilities.GetCharacterFromFontAsset(ch, _fontAsset, true, _style, _fontWeight, out isAlternativeTypeface, out actualAsset);
+            _char = GetCharacterFromFontAsset(ch, _style);
             if (_char != null)
             {
                 width = _char.glyph.metrics.horizontalAdvance * _boldMultiplier * _scale;
@@ -268,6 +264,18 @@ namespace FairyGUI
                 baseline = 0;
                 return false;
             }
+        }
+
+        TMP_Character GetCharacterFromFontAsset(uint unicode, FontStyles fontStyle)
+        {
+            bool isAlternativeTypeface;
+#pragma warning disable
+            TMP_FontAsset actualAsset;
+#pragma warning restore
+            return TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, true, fontStyle, _fontWeight, 
+                out isAlternativeTypeface
+                //,out actualAsset //old TMP version need this line
+            );
         }
 
         static Vector3 bottomLeft;

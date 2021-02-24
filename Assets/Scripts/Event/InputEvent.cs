@@ -94,8 +94,7 @@ namespace FairyGUI
         {
             get
             {
-                return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
-                    || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+                return ctrl || command;
             }
         }
 
@@ -104,7 +103,7 @@ namespace FairyGUI
         /// </summary>
         public bool ctrl
         {
-             get
+            get
             {
                 return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             }
@@ -139,7 +138,11 @@ namespace FairyGUI
         {
             get
             {
-                return Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+                //In win, as long as the win key and other keys are pressed at the same time, the getKey will continue to return true. So it can only be shielded.
+                if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                    return Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+                else
+                    return false;
             }
         }
     }
