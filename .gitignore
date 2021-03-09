@@ -31,3 +31,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 .DS_Store
+.idea/.idea.FairyGUI-unity90/.idea/workspace.xml
