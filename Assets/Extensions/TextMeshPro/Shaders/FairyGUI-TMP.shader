@@ -160,9 +160,11 @@ SubShader {
 		float4 _FaceTex_ST;
 		float4 _OutlineTex_ST;
 
+		CBUFFER_START(UnityPerMaterial)
 		#ifdef CLIPPED
 		float4 _ClipBox = float4(-2, -2, 0, 0);
 		#endif
+		CBUFFER_END
 
 		pixel_t VertShader(vertex_t input)
 		{
