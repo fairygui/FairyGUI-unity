@@ -79,6 +79,7 @@ namespace FairyGUI
             // set Flags.SkipBatching only target not null
             if (target == null) _flags &= ~Flags.SkipBatching;
             else _flags |= Flags.SkipBatching;
+            InvalidateBatchingState();
 
             RecoverMaterials();
 
