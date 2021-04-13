@@ -922,6 +922,9 @@ namespace FairyGUI
                 _textWidth += GUTTER_X * 2;
             _textHeight = line.y + line.height + GUTTER_Y;
 
+            if (checkEdge && _textWidth <= _contentRect.width && _textHeight <= _contentRect.height + GUTTER_Y)
+                _ellipsisCharIndex = -1;
+
             _textWidth = Mathf.RoundToInt(_textWidth);
             _textHeight = Mathf.RoundToInt(_textHeight);
         }
