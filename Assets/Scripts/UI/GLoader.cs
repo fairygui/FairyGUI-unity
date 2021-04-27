@@ -49,6 +49,9 @@ namespace FairyGUI
 
         override public void Dispose()
         {
+            if (_disposed) return;
+            _disposed = true;
+
             if (_content.texture != null)
             {
                 if (_contentItem == null)
