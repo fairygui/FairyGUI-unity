@@ -1933,7 +1933,14 @@ namespace FairyGUI
             {
                 float tmpX = -pos.x;
                 float tmpY = -pos.y;
-                _owner.GetSnappingPosition(ref tmpX, ref tmpY);
+                float xDir = 0;
+                float yDir = 0;
+                if (inertialScrolling)
+                {
+                    xDir = pos.x - _containerPos.x;
+                    yDir = pos.y - _containerPos.y;
+                }
+                _owner.GetSnappingPositionWithDir(ref tmpX, ref tmpY, xDir, yDir);
                 if (pos.x < 0 && pos.x > -_overlapSize.x)
                     pos.x = -tmpX;
                 if (pos.y < 0 && pos.y > -_overlapSize.y)
@@ -1971,7 +1978,7 @@ namespace FairyGUI
                 }
                 else //否则只需要页面的1/3，当然，需要考虑到左移和右移的情况
                 {
-                    if (delta > testPageSize * (change < 0 ? 0.3f : 0.7f))
+                    if (delta > testPageSize * (change < 0 ? UIConfig.defaultScrollPagingThreshold : (1 - UIConfig.defaultScrollPagingThreshold)))
                         page++;
                 }
 

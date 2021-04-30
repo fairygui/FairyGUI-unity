@@ -2478,7 +2478,7 @@ namespace FairyGUI
             }
         }
 
-        override protected internal void GetSnappingPosition(ref float xValue, ref float yValue)
+        override public void GetSnappingPositionWithDir(ref float xValue, ref float yValue, float xDir, float yDir)
         {
             if (_virtual)
             {
@@ -2486,26 +2486,38 @@ namespace FairyGUI
                 {
                     float saved = yValue;
                     int index = GetIndexOnPos1(ref yValue, false);
-                    if (index < _virtualItems.Count && saved - yValue > _virtualItems[index].size.y / 2 && index < _realNumItems)
-                        yValue += _virtualItems[index].size.y + _lineGap;
+                    if (index < _virtualItems.Count && index < _realNumItems)
+                    {
+                        float size = _virtualItems[index].size.y;
+                        if (ShouldSnapToNext(yDir, saved - yValue, size))
+                            yValue += size + _lineGap;
+                    }
                 }
                 else if (_layout == ListLayoutType.SingleRow || _layout == ListLayoutType.FlowVertical)
                 {
                     float saved = xValue;
                     int index = GetIndexOnPos2(ref xValue, false);
-                    if (index < _virtualItems.Count && saved - xValue > _virtualItems[index].size.x / 2 && index < _realNumItems)
-                        xValue += _virtualItems[index].size.x + _columnGap;
+                    if (index < _virtualItems.Count && index < _realNumItems)
+                    {
+                        float size = _virtualItems[index].size.x;
+                        if (ShouldSnapToNext(xDir, saved - xValue, size))
+                            xValue += size + _columnGap;
+                    }
                 }
                 else
                 {
                     float saved = xValue;
                     int index = GetIndexOnPos3(ref xValue, false);
-                    if (index < _virtualItems.Count && saved - xValue > _virtualItems[index].size.x / 2 && index < _realNumItems)
-                        xValue += _virtualItems[index].size.x + _columnGap;
+                    if (index < _virtualItems.Count && index < _realNumItems)
+                    {
+                        float size = _virtualItems[index].size.x;
+                        if (ShouldSnapToNext(xDir, saved - xValue, size))
+                            xValue += size + _columnGap;
+                    }
                 }
             }
             else
-                base.GetSnappingPosition(ref xValue, ref yValue);
+                base.GetSnappingPositionWithDir(ref xValue, ref yValue, xDir, yDir);
         }
 
         private void HandleAlign(float contentWidth, float contentHeight)
