@@ -1025,6 +1025,7 @@ namespace FairyGUI
                     _touchCount = 1;
                     touch.Begin();
                     touch.button = 0;
+                    touch.touchId = 0;
                     SetFocus(touch.target);
 
                     touch.UpdateEvent();
