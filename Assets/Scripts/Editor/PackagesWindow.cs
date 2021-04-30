@@ -159,11 +159,17 @@ namespace FairyGUIEditor
                 UIPackage selectedPkg = pkgs[selectedPackage];
                 string tmp = selectedPkg.assetPath.ToLower();
                 string packagePath;
-                int pos = tmp.LastIndexOf("resources/");
+                int pos = tmp.LastIndexOf("/resources/");
                 if (pos != -1)
-                    packagePath = selectedPkg.assetPath.Substring(pos + 10);
+                    packagePath = selectedPkg.assetPath.Substring(pos + 11);
                 else
-                    packagePath = selectedPkg.assetPath;
+                {
+                    pos = tmp.IndexOf("resources/");
+                    if (pos == 0)
+                        packagePath = selectedPkg.assetPath.Substring(pos + 10);
+                    else
+                        packagePath = selectedPkg.assetPath;
+                }
                 if (Selection.activeGameObject != null)
                 {
 #if UNITY_2018_3_OR_NEWER
