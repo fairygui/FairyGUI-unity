@@ -26,5 +26,11 @@ namespace FairyGUI
         /// </summary>
         /// <param name="callback"></param>
         void Load(UILoadCallback callback);
+
+        /// <summary>
+        /// 取消加载
+        /// </summary>
+        void Cancel();
+        
     }
 }
