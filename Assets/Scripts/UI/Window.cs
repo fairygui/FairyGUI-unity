@@ -498,7 +498,7 @@ namespace FairyGUI
 
 
             //正在加载资源的异步过程中发生意外关闭 应该取消正在加载的load
-            if (!_inited)
+            if (_loading)
             {
                 for (int i = 0; i < _uiSources.Count; ++i)
                 {
