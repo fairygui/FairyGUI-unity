@@ -152,7 +152,7 @@ namespace FairyGUI
                 return c1.sortingOrder - c2.sortingOrder;
             });
 
-            _shouldCloneMaterial = true;
+            _shouldCloneMaterial = _cloneMaterial;
         }
 
         void CloneMaterials()
@@ -176,9 +176,6 @@ namespace FairyGUI
                     if (mat == null)
                         continue;
 
-                    if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
-                        mat.renderQueue = 3000;
-
                     //确保相同的材质不会复制两次
                     Material newMat;
                     if (!_materialsBackup.TryGetValue(mat, out newMat))
@@ -187,6 +184,9 @@ namespace FairyGUI
                         _materialsBackup[mat] = newMat;
                     }
                     mats[j] = newMat;
+
+                    if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
+                        newMat.renderQueue = 3000;
                 }
 
                 if (ri.renderer != null)
