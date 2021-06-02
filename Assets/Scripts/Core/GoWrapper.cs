@@ -14,6 +14,8 @@ namespace FairyGUI
         public bool supportStencil;
 
         public event Action<UpdateContext> onUpdate;
+        public Action<Dictionary<Material, Material>> customCloneMaterials;
+        public Action customRecoverMaterials;
 
         protected GameObject _wrapTarget;
         protected List<RendererInfo> _renderers;
@@ -189,7 +191,9 @@ namespace FairyGUI
                         newMat.renderQueue = 3000;
                 }
 
-                if (ri.renderer != null)
+                if (customCloneMaterials != null)
+                    customCloneMaterials.Invoke(_materialsBackup);
+                else if (ri.renderer != null)
                     ri.renderer.sharedMaterials = mats;
             }
         }
@@ -221,7 +225,11 @@ namespace FairyGUI
                             mats[j] = kv.Key;
                     }
                 }
-                ri.renderer.sharedMaterials = mats;
+
+                if (customRecoverMaterials != null)
+                    customRecoverMaterials.Invoke();
+                else
+                    ri.renderer.sharedMaterials = mats;
             }
 
             foreach (KeyValuePair<Material, Material> kv in _materialsBackup)
@@ -306,7 +314,10 @@ namespace FairyGUI
                 if (renderer == null)
                     continue;
 
-                renderer.GetSharedMaterials(helperMaterials);
+                if (customCloneMaterials != null)
+                    helperMaterials.AddRange(_materialsBackup.Values);
+                else
+                    renderer.GetSharedMaterials(helperMaterials);
 
                 int cnt2 = helperMaterials.Count;
                 for (int j = 0; j < cnt2; j++)
@@ -357,6 +368,8 @@ namespace FairyGUI
             _renderers = null;
             _materialsBackup = null;
             _canvas = null;
+            customCloneMaterials = null;
+            customRecoverMaterials = null;
 
             base.Dispose();
         }
