@@ -100,13 +100,17 @@ namespace FairyGUI.Utils
             "&", "&amp;",
             "<", "&lt;",
             ">", "&gt;",
+
             "'", "&apos;",
-            "\"", "&quot;"
+            "\"", "&quot;",
+            "\t", "&#x9;",
+            "\n", "&#xA;",
+            "\r", "&#xD;"
         };
-        public static void EncodeString(StringBuilder sb, int start, bool encodeQuotes = false)
+        public static void EncodeString(StringBuilder sb, int start, bool isAttribute = false)
         {
             int count;
-            int len = encodeQuotes ? ESCAPES.Length : ESCAPES.Length - 4;
+            int len = isAttribute ? ESCAPES.Length : 6;
             for (int i = 0; i < len; i += 2)
             {
                 count = sb.Length - start;
@@ -114,7 +118,7 @@ namespace FairyGUI.Utils
             }
         }
 
-        public static string EncodeString(string str, bool encodeQuotes = false)
+        public static string EncodeString(string str, bool isAttribute = false)
         {
             if (string.IsNullOrEmpty(str))
                 return "";
