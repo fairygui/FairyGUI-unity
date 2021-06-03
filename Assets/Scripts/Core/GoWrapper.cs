@@ -148,6 +148,18 @@ namespace FairyGUI
                     sortingOrder = r.sortingOrder
                 };
                 _renderers.Add(ri);
+
+                if (!_cloneMaterial && mats != null
+                    && ((r is SkinnedMeshRenderer) || (r is MeshRenderer)))
+                {
+                    int mcnt = mats.Length;
+                    for (int j = 0; j < mcnt; j++)
+                    {
+                        Material mat = mats[j];
+                        if (mat != null && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
+                            mat.renderQueue = 3000;
+                    }
+                }
             }
             _renderers.Sort((RendererInfo c1, RendererInfo c2) =>
             {
