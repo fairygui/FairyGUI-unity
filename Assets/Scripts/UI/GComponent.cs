@@ -1437,7 +1437,7 @@ namespace FairyGUI
             int controllerCount = buffer.ReadShort();
             for (int i = 0; i < controllerCount; i++)
             {
-                int nextPos = buffer.ReadShort();
+                int nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 Controller controller = new Controller();
@@ -1504,7 +1504,7 @@ namespace FairyGUI
 
             for (int i = 0; i < childCount; i++)
             {
-                int nextPos = buffer.ReadShort();
+                int nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 buffer.Seek(buffer.position, 3);
@@ -1518,7 +1518,7 @@ namespace FairyGUI
 
             for (int i = 0; i < childCount; i++)
             {
-                int nextPos = buffer.ReadShort();
+                int nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 child = _children[i];
@@ -1574,7 +1574,7 @@ namespace FairyGUI
             int transitionCount = buffer.ReadShort();
             for (int i = 0; i < transitionCount; i++)
             {
-                int nextPos = buffer.ReadShort();
+                int nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 Transition trans = new Transition(this);

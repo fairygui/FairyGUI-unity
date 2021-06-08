@@ -414,7 +414,7 @@ namespace FairyGUI
 
                 for (int i = 0; i < cnt; i++)
                 {
-                    int nextPos = buffer.ReadShort();
+                    int nextPos = buffer.ReadUshort();
                     nextPos += buffer.position;
 
                     ControllerAction action = ControllerAction.CreateAction((ControllerAction.ActionType)buffer.ReadByte());
