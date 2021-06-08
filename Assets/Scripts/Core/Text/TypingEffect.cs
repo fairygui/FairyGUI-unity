@@ -49,6 +49,26 @@ namespace FairyGUI
         }
 
         /// <summary>
+        /// 总输出次数
+        /// </summary>
+        public int totalTimes
+        {
+            get
+            {
+                int times = 0;
+                List<TextField.CharPosition> charPositions = _textField.charPositions;
+                for (int i = 0; i < charPositions.Count - 1; i++)
+                {
+                    if (charPositions[i].imgIndex > 0) //这是一个图片
+                        times++;
+                    else if (!char.IsWhiteSpace(_textField.parsedText[i]))
+                        times++;
+                }
+                return times;
+            }
+        }
+
+        /// <summary>
         /// 开始打字效果。可以重复调用重复启动。
         /// </summary>
         public void Start()

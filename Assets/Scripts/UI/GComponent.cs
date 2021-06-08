@@ -779,6 +779,15 @@ namespace FairyGUI
             return null;
         }
 
+        /// <summary>
+        /// Returns transition list.
+        /// </summary>
+        /// <returns>Transition list</returns>
+        public List<Transition> Transitions
+        {
+            get { return _transitions; }
+        }
+
         internal void ChildStateChanged(GObject child)
         {
             if (_buildingDisplayList)
