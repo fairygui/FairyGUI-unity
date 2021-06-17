@@ -50,7 +50,6 @@ namespace FairyGUI
         override public void Dispose()
         {
             if (_disposed) return;
-            _disposed = true;
 
             if (_content.texture != null)
             {
@@ -72,6 +71,7 @@ namespace FairyGUI
             if (_content2 != null)
                 _content2.Dispose();
             _content.Dispose();
+
             base.Dispose();
         }
 
