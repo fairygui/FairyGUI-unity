@@ -531,7 +531,7 @@ namespace FairyGUI
         /// </summary>
         /// <param name="label"></param>
         /// <param name="callback"></param>
-        public void SetHook(string label, TransitionHook callback)
+        public void SetHook(string label, TransitionHook callback, bool isSetAllLabel = false)
         {
             int cnt = _items.Length;
             bool found = false;
@@ -542,13 +542,15 @@ namespace FairyGUI
                 {
                     item.hook = callback;
                     found = true;
-                    break;
+                    if (!isSetAllLabel)
+                        break;
                 }
                 else if (item.tweenConfig != null && item.tweenConfig.endLabel == label)
                 {
                     item.tweenConfig.endHook = callback;
                     found = true;
-                    break;
+                    if (!isSetAllLabel)
+                        break;
                 }
             }
             if (!found)
