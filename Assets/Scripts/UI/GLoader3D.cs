@@ -393,6 +393,9 @@ namespace FairyGUI
 
         protected void UpdateLayout()
         {
+            if (sourceWidth == 0 || sourceHeight == 0)
+                return;
+
             float contentWidth = sourceWidth;
             float contentHeight = sourceHeight;
 
