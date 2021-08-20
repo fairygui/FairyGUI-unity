@@ -237,6 +237,7 @@ namespace FairyGUI
             {
                 _animationName = value;
                 OnChange("animationName");
+                UpdateGear(5);
             }
         }
 
@@ -251,6 +252,7 @@ namespace FairyGUI
             {
                 _skinName = value;
                 OnChange("skinName");
+                UpdateGear(5);
             }
         }
 

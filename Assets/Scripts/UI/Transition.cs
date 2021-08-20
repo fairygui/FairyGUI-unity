@@ -408,7 +408,7 @@ namespace FairyGUI
         {
             get { return _totalDuration; }
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -472,6 +472,10 @@ namespace FairyGUI
                             tvalue.frame = Convert.ToInt32(aParams[0]);
                             if (aParams.Length > 1)
                                 tvalue.playing = Convert.ToBoolean(aParams[1]);
+                            if (aParams.Length > 2)
+                                tvalue.animationName = (string)aParams[2];
+                            if (aParams.Length > 3)
+                                tvalue.skinName = (string)aParams[3];
                         }
                         break;
 
@@ -1322,6 +1326,10 @@ namespace FairyGUI
                         ((IAnimationGear)item.target).playing = value.playing;
                         ((IAnimationGear)item.target).timeScale = _timeScale;
                         ((IAnimationGear)item.target).ignoreEngineTimeScale = _ignoreEngineTimeScale;
+                        if (value.animationName != null)
+                            ((GLoader3D)item.target).animationName = value.animationName;
+                        if (value.skinName != null)
+                            ((GLoader3D)item.target).skinName = value.skinName;
                     }
                     break;
 
@@ -1527,6 +1535,11 @@ namespace FairyGUI
                 case TransitionActionType.Animation:
                     ((TValue_Animation)value).playing = buffer.ReadBool();
                     ((TValue_Animation)value).frame = buffer.ReadInt();
+                    if (buffer.version >= 6)
+                    {
+                        ((TValue_Animation)value).animationName = buffer.ReadS();
+                        ((TValue_Animation)value).skinName = buffer.ReadS();
+                    }
                     break;
 
                 case TransitionActionType.Visible:
@@ -1662,6 +1675,8 @@ namespace FairyGUI
         public int frame;
         public bool playing;
         public bool flag;
+        public string animationName;
+        public string skinName;
     }
 
     class TValue_Sound

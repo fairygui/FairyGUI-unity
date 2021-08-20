@@ -124,6 +124,24 @@ namespace FairyGUI
                 _tweenConfig.customEase = new CustomEase();
                 _tweenConfig.customEase.Create(buffer.ReadPath());
             }
+
+            if (buffer.version >= 6)
+            {
+                if (this is GearAnimation)
+                {
+                    for (int i = 0; i < cnt; i++)
+                    {
+                        string page = buffer.ReadS();
+                        if (page == null)
+                            continue;
+
+                        ((GearAnimation)this).AddExtStatus(page, buffer);
+                    }
+
+                    if (buffer.ReadBool())
+                        ((GearAnimation)this).AddExtStatus(null, buffer);
+                }
+            }
         }
 
         virtual public void UpdateFromRelations(float dx, float dy)
