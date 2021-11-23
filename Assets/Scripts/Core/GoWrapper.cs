@@ -21,6 +21,8 @@ namespace FairyGUI
         protected List<RendererInfo> _renderers;
         protected Dictionary<Material, Material> _materialsBackup;
         protected Canvas _canvas;
+        protected List<Canvas> _subCanvas;
+        protected int _subCanvasIndex = 0;
         protected bool _cloneMaterial;
         protected bool _shouldCloneMaterial;
 
@@ -90,6 +92,7 @@ namespace FairyGUI
                 _wrapTarget.transform.SetParent(null, false);
 
             _canvas = null;
+            _subCanvas = null;
             _wrapTarget = target;
             _shouldCloneMaterial = false;
             _renderers.Clear();
@@ -108,6 +111,10 @@ namespace FairyGUI
                     rt.pivot = new Vector2(0, 1);
                     rt.position = new Vector3(0, 0, 0);
                     this.SetSize(rt.rect.width, rt.rect.height);
+
+                    _subCanvas = new List<Canvas>();
+                    SearchChildrenCanvas(_canvas.transform);
+                    ResortChildrenCanvas();
                 }
                 else
                 {
@@ -116,6 +123,42 @@ namespace FairyGUI
                 }
 
                 SetGoLayers(this.layer);
+            }
+        }
+
+
+        private void SearchChildrenCanvas(Transform rootTransform)
+        {
+            for (int i = 0; i < rootTransform.childCount; i++)
+            {
+                var transform = rootTransform.GetChild(i);
+                var canvas = transform.GetComponent<Canvas>();
+                if (canvas != null)
+                {
+                    if (canvas.overrideSorting)
+                    {
+                        _subCanvas.Add(canvas);
+                    }
+                }
+                SearchChildrenCanvas(transform);
+            }
+        }
+
+
+        private void ResortChildrenCanvas()
+        {
+            _subCanvas.Sort((canvas, canvas1) => canvas.sortingOrder - canvas1.sortingOrder);
+            _subCanvasIndex = 0;
+            
+            for (int i = 0; i < _subCanvas.Count; i++)
+            {
+                if (_subCanvas[i].sortingOrder >= _canvas.sortingOrder)
+                {
+                    _subCanvasIndex = i;
+                    break;
+                }
+
+                _subCanvasIndex++;
             }
         }
 
@@ -261,7 +304,27 @@ namespace FairyGUI
                 base.renderingOrder = value;
 
                 if (_canvas != null)
-                    _canvas.sortingOrder = value;
+                {
+                    
+                    if (_subCanvas != null && _subCanvas.Count>0)
+                    {
+                        for (int i = 0; i < _subCanvas.Count; i++)
+                        {
+                            if (i == _subCanvasIndex)
+                            {
+                                _canvas.sortingOrder = value;
+                                value++;
+                            }
+                            _subCanvas[i].sortingOrder = value;
+                            value++;
+                        }
+                        UpdateContext.current.renderingOrder = value;
+                    }
+                    else
+                    {
+                        _canvas.sortingOrder = value;
+                    }
+                }
                 else
                 {
                     int cnt = _renderers.Count;
