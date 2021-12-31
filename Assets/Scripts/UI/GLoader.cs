@@ -29,6 +29,11 @@ namespace FairyGUI
         GObject _errorSign;
         GComponent _content2;
 
+#if FAIRYGUI_PUERTS
+        public Action __loadExternal;
+        public Action<NTexture> __freeExternal;
+#endif
+
         public GLoader()
         {
             _url = string.Empty;
@@ -447,6 +452,12 @@ namespace FairyGUI
 
         virtual protected void LoadExternal()
         {
+#if FAIRYGUI_PUERTS
+            if (__loadExternal != null) {
+                __loadExternal();
+                return;
+            }
+#endif
             Texture2D tex = (Texture2D)Resources.Load(_url, typeof(Texture2D));
             if (tex != null)
                 onExternalLoadSuccess(new NTexture(tex));
@@ -456,9 +467,15 @@ namespace FairyGUI
 
         virtual protected void FreeExternal(NTexture texture)
         {
+#if FAIRYGUI_PUERTS
+            if (__freeExternal != null) {
+                __freeExternal(texture);
+                return;
+            }
+#endif
         }
 
-        protected void onExternalLoadSuccess(NTexture texture)
+        public void onExternalLoadSuccess(NTexture texture)
         {
             _content.texture = texture;
             sourceWidth = texture.width;
@@ -469,7 +486,7 @@ namespace FairyGUI
             UpdateLayout();
         }
 
-        protected void onExternalLoadFailed()
+        public void onExternalLoadFailed()
         {
             SetErrorState();
         }
