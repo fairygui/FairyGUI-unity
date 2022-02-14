@@ -2604,8 +2604,6 @@ namespace FairyGUI
                             continue;
 
                         child.SetSize(viewWidth, child.height, true);
-                        if (child.width > maxWidth)
-                            maxWidth = child.width;
                     }
                 }
                 cw = Mathf.CeilToInt(maxWidth);
@@ -2624,8 +2622,6 @@ namespace FairyGUI
                     if (_autoResizeItem)
                         child.SetSize(child.width, viewHeight, true);
                     curX += Mathf.CeilToInt(child.width);
-                    if (child.height > maxHeight)
-                        maxHeight = child.height;
                 }
 
                 cw = curX;

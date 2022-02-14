@@ -885,19 +885,22 @@ namespace FairyGUI
                 float bottom = _yPos + _viewSize.y;
                 if (setFirst || rect.y <= _yPos || rect.height >= _viewSize.y)
                 {
+                    if (rect.yMax >= bottom) //if an item size is large than viewSize, dont scroll
+                        return;
+
                     if (_pageMode)
                         this.SetPosY(Mathf.Floor(rect.y / _pageSize.y) * _pageSize.y, ani);
                     else
                         SetPosY(rect.y, ani);
                 }
-                else if (rect.y + rect.height > bottom)
+                else if (rect.yMax > bottom)
                 {
                     if (_pageMode)
                         this.SetPosY(Mathf.Floor(rect.y / _pageSize.y) * _pageSize.y, ani);
                     else if (rect.height <= _viewSize.y / 2)
                         SetPosY(rect.y + rect.height * 2 - _viewSize.y, ani);
                     else
-                        SetPosY(rect.y + rect.height - _viewSize.y, ani);
+                        SetPosY(rect.y + Mathf.Min(rect.height - _viewSize.y, 0), ani);
                 }
             }
             if (_overlapSize.x > 0)
@@ -905,18 +908,21 @@ namespace FairyGUI
                 float right = _xPos + _viewSize.x;
                 if (setFirst || rect.x <= _xPos || rect.width >= _viewSize.x)
                 {
+                    if (rect.xMax >= right) //if an item size is large than viewSize, dont scroll
+                        return;
+
                     if (_pageMode)
                         this.SetPosX(Mathf.Floor(rect.x / _pageSize.x) * _pageSize.x, ani);
                     SetPosX(rect.x, ani);
                 }
-                else if (rect.x + rect.width > right)
+                else if (rect.xMax > right)
                 {
                     if (_pageMode)
                         this.SetPosX(Mathf.Floor(rect.x / _pageSize.x) * _pageSize.x, ani);
                     else if (rect.width <= _viewSize.x / 2)
                         SetPosX(rect.x + rect.width * 2 - _viewSize.x, ani);
                     else
-                        SetPosX(rect.x + rect.width - _viewSize.x, ani);
+                        SetPosX(rect.x + Mathf.Min(rect.width - _viewSize.x, 0), ani);
                 }
             }
 
@@ -1203,6 +1209,19 @@ namespace FairyGUI
             {
                 _vScrollNone = _contentSize.y <= _viewSize.y;
                 _hScrollNone = _contentSize.x <= _viewSize.x;
+
+                if (_vtScrollBar != null && _hzScrollBar != null)
+                {
+                    if (!_hScrollNone)
+                        _vtScrollBar.height = _owner.height - _hzScrollBar.height - _scrollBarMargin.top - _scrollBarMargin.bottom;
+                    else
+                        _vtScrollBar.height = _owner.height - _scrollBarMargin.top - _scrollBarMargin.bottom;
+
+                    if (!_vScrollNone)
+                        _hzScrollBar.width = _owner.width - _vtScrollBar.width - _scrollBarMargin.left - _scrollBarMargin.right;
+                    else
+                        _hzScrollBar.width = _owner.width - _scrollBarMargin.left - _scrollBarMargin.right;
+                }
             }
 
             if (_vtScrollBar != null)
