@@ -119,6 +119,26 @@ namespace FairyGUI
             }
         }
 
+        override internal void _SetLayerDirect(int value)
+        {  
+            if (_paintingMode > 0)
+            {
+                paintingGraphics.gameObject.layer = value;
+                
+            }
+            else
+            {
+                gameObject.layer = value;
+                {
+                    _wrapTarget.layer = value;
+                    foreach (Transform tf in _wrapTarget.GetComponentInChildren<Transform>())
+                    {
+                        tf.gameObject.layer = value;
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// GoWrapper will cache all renderers of your gameobject on constructor. 
         /// If your gameobject change laterly, call this function to update the cache.
