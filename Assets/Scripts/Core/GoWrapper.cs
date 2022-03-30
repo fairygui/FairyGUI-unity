@@ -129,9 +129,10 @@ namespace FairyGUI
             else
             {
                 gameObject.layer = value;
+                if (_wrapTarget != null)//这个if是为了在GoWrapper里使用模糊效果
                 {
                     _wrapTarget.layer = value;
-                    foreach (Transform tf in _wrapTarget.GetComponentInChildren<Transform>())
+                    foreach (Transform tf in _wrapTarget.GetComponentsInChildren<Transform>(true))
                     {
                         tf.gameObject.layer = value;
                     }
