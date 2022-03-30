@@ -122,10 +122,7 @@ namespace FairyGUI
         override internal void _SetLayerDirect(int value)
         {  
             if (_paintingMode > 0)
-            {
                 paintingGraphics.gameObject.layer = value;
-                
-            }
             else
             {
                 gameObject.layer = value;
