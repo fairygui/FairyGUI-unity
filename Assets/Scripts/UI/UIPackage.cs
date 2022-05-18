@@ -252,7 +252,7 @@ namespace FairyGUI
             if (source == null)
                 throw new Exception("FairyGUI: no package found in this bundle.");
 
-            if (desc != res)
+            if (unloadBundleByFGUI && desc != res)
                 desc.Unload(true);
 
             ByteBuffer buffer = new ByteBuffer(source);
