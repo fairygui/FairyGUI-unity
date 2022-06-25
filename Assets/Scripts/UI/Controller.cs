@@ -139,11 +139,17 @@ namespace FairyGUI
             }
         }
 
+        [Obsolete("Use previousIndex")]
+        public int previsousIndex
+        {
+            get { return _previousIndex; }
+        }
+
         /// <summary>
         /// Previouse page index.
         /// 获得上次活动页面索引
         /// </summary>
-        public int previsousIndex
+        public int previousIndex
         {
             get { return _previousIndex; }
         }
