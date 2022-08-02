@@ -30,13 +30,6 @@ namespace FairyGUI
             Stage.inst.HandleGUIEvents(Event.current);
         }
 
-#if !UNITY_5_4_OR_NEWER
-        void OnLevelWasLoaded()
-        {
-            StageCamera.CheckMainCamera();
-        }
-#endif
-
         void OnApplicationQuit()
         {
             if (Application.isEditor)

@@ -74,10 +74,6 @@ namespace FairyGUI
         internal int _maskFlag;
         StencilEraser _stencilEraser;
 
-#if !UNITY_5_6_OR_NEWER
-        Color32[] _colors;
-#endif
-
         MaterialPropertyBlock _propertyBlock;
         bool _blockUpdated;
 
@@ -388,15 +384,9 @@ namespace FairyGUI
             if (vertCount == 0)
                 return;
 
-#if !UNITY_5_6_OR_NEWER
-            Color32[] colors = _colors;
-            if (colors == null)
-                colors = mesh.colors32;
-#else
             VertexBuffer vb = VertexBuffer.Begin();
             mesh.GetColors(vb.colors);
             List<Color32> colors = vb.colors;
-#endif
             for (int i = 0; i < vertCount; i++)
             {
                 Color32 col = _color;
@@ -404,12 +394,8 @@ namespace FairyGUI
                 colors[i] = col;
             }
 
-#if !UNITY_5_6_OR_NEWER
-            mesh.colors32 = colors;
-#else
             mesh.SetColors(vb.colors);
             vb.End();
-#endif
         }
 
         void ChangeAlpha(float value)
@@ -420,15 +406,9 @@ namespace FairyGUI
             if (vertCount == 0)
                 return;
 
-#if !UNITY_5_6_OR_NEWER
-            Color32[] colors = _colors;
-            if (colors == null)
-                colors = mesh.colors32;
-#else
             VertexBuffer vb = VertexBuffer.Begin();
             mesh.GetColors(vb.colors);
             List<Color32> colors = vb.colors;
-#endif
             for (int i = 0; i < vertCount; i++)
             {
                 Color32 col = colors[i];
@@ -436,12 +416,8 @@ namespace FairyGUI
                 colors[i] = col;
             }
 
-#if !UNITY_5_6_OR_NEWER
-            mesh.colors32 = colors;
-#else
             mesh.SetColors(vb.colors);
             vb.End();
-#endif
         }
 
         /// <summary>
@@ -756,8 +732,6 @@ namespace FairyGUI
             }
 
             mesh.Clear();
-
-#if UNITY_5_2 || UNITY_5_3_OR_NEWER
             mesh.SetVertices(vb.vertices);
             if (vb._isArbitraryQuad)
                 mesh.SetUVs(0, vb.FixUVForArbitraryQuad());
@@ -767,33 +741,6 @@ namespace FairyGUI
             mesh.SetTriangles(vb.triangles, 0);
             if (vb.uvs2.Count == vb.uvs.Count)
                 mesh.SetUVs(1, vb.uvs2);
-
-#if !UNITY_5_6_OR_NEWER
-            _colors = null;
-#endif
-#else
-            Vector3[] vertices = new Vector3[vertCount];
-            Vector2[] uv = new Vector2[vertCount];
-            _colors = new Color32[vertCount];
-            int[] triangles = new int[vb.triangles.Count];
-
-            vb.vertices.CopyTo(vertices);
-            vb.uvs.CopyTo(uv);
-            vb.colors.CopyTo(_colors);
-            vb.triangles.CopyTo(triangles);
-
-            mesh.vertices = vertices;
-            mesh.uv = uv;
-            mesh.triangles = triangles;
-            mesh.colors32 = _colors;
-
-            if(vb.uvs2.Count==uv.Length)
-            {
-                uv = new Vector2[vertCount];
-                vb.uvs2.CopyTo(uv);
-                mesh.uv2 = uv;
-            }
-#endif
             vb.End();
 
             if (meshModifier != null)

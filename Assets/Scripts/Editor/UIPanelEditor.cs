@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-#if UNITY_5_3_OR_NEWER
-using UnityEditor.SceneManagement;
-#endif
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 namespace FairyGUIEditor
 {
@@ -75,13 +73,7 @@ namespace FairyGUIEditor
 #endif
                 panel.SendMessage("OnUpdateSource", new object[] { null, null, null, !isPrefab });
 
-#if UNITY_5_3_OR_NEWER
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-#elif UNITY_5
-                EditorApplication.MarkSceneDirty();
-#else
-                EditorUtility.SetDirty(panel);
-#endif
             }
             EditorGUILayout.EndHorizontal();
 

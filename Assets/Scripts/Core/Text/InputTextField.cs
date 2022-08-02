@@ -1,9 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine;
+using System.Text;
 using FairyGUI.Utils;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace FairyGUI
 {
@@ -557,12 +561,12 @@ namespace FairyGUI
             else
                 textField.text = _text;
 
-            _composing = Input.compositionString.Length;
+            _composing = Stage.compositionString.Length;
             if (_composing > 0)
             {
                 StringBuilder buffer = new StringBuilder();
                 GetPartialText(0, _caretPosition, buffer);
-                buffer.Append(Input.compositionString);
+                buffer.Append(Stage.compositionString);
                 GetPartialText(_caretPosition, -1, buffer);
 
                 textField.text = buffer.ToString();
@@ -637,7 +641,7 @@ namespace FairyGUI
         {
             TextField.CharPosition cp;
             if (_editing)
-                cp = GetCharPosition(_caretPosition + Input.compositionString.Length);
+                cp = GetCharPosition(_caretPosition + Stage.compositionString.Length);
             else
                 cp = GetCharPosition(_caretPosition);
 
@@ -677,10 +681,16 @@ namespace FairyGUI
 #endif
                         cursorPos.y = Screen.height - cursorPos.y;
                         cursorPos = cursorPos / Stage.devicePixelRatio;
+#if ENABLE_INPUT_SYSTEM
+                        Keyboard keyboard = Keyboard.current;
+                        if (keyboard != null)
+                            keyboard.SetIMECursorPosition(cursorPos + new Vector2(0, 20));
+#else
                         Input.compositionCursorPos = cursorPos + new Vector2(0, 20);
+#endif
 #if !UNITY_2019_OR_NEWER
                     }
-                    else
+                    else// InputSystem 1.0 requires 2019.1+, not need to add input system symbol here.
                         Input.compositionCursorPos = cursorPos - new Vector2(0, 20);
 #endif
                 }
@@ -739,7 +749,7 @@ namespace FairyGUI
             }
 
             TextField.CharPosition start;
-            if (_editing && Input.compositionString.Length > 0)
+            if (_editing && Stage.compositionString.Length > 0)
             {
                 if (_selectionStart < _caretPosition)
                 {
@@ -747,7 +757,7 @@ namespace FairyGUI
                     start = GetCharPosition(_selectionStart);
                 }
                 else
-                    start = GetCharPosition(_selectionStart + Input.compositionString.Length);
+                    start = GetCharPosition(_selectionStart + Stage.compositionString.Length);
             }
             else
                 start = GetCharPosition(_selectionStart);
@@ -927,11 +937,7 @@ namespace FairyGUI
 
 #if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
             TextEditor textEditor = new TextEditor();
-#if UNITY_5_3_OR_NEWER
             textEditor.text = value;
-#else
-            textEditor.content = new GUIContent(value);
-#endif
             textEditor.OnFocus();
             textEditor.Copy();
 #endif
@@ -947,18 +953,10 @@ namespace FairyGUI
 
 #if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
             TextEditor textEditor = new TextEditor();
-#if UNITY_5_3_OR_NEWER
             textEditor.text = string.Empty;
-#else
-            textEditor.content = new GUIContent(string.Empty);
-#endif
             textEditor.multiline = !textField.singleLine;
             textEditor.Paste();
-#if UNITY_5_3_OR_NEWER
             string value = textEditor.text;
-#else
-            string value = textEditor.content.text;
-#endif
             if (!string.IsNullOrEmpty(value))
                 ReplaceSelection(value);
 #endif
@@ -1077,10 +1075,16 @@ namespace FairyGUI
             }
             else
             {
+#if ENABLE_INPUT_SYSTEM
+                Keyboard keyboard = Keyboard.current;
+                if (keyboard != null)
+                    keyboard.SetIMEEnabled(!disableIME && !_displayAsPassword);
+#else
                 if (!disableIME && !_displayAsPassword)
                     Input.imeCompositionMode = IMECompositionMode.On;
                 else
                     Input.imeCompositionMode = IMECompositionMode.Off;
+#endif
                 _composing = 0;
 
                 if ((string)context.data == "key") //select all if got focus by tab key
@@ -1103,7 +1107,13 @@ namespace FairyGUI
             }
             else
             {
+#if ENABLE_INPUT_SYSTEM
+                Keyboard keyboard = Keyboard.current;
+                if (keyboard != null)
+                    keyboard.SetIMEEnabled(true);
+#else
                 Input.imeCompositionMode = IMECompositionMode.Auto;
+#endif
                 TextInputHistory.inst.StopRecord(this);
             }
 
@@ -1404,14 +1414,14 @@ namespace FairyGUI
             }
             else
             {
-                if (Input.compositionString.Length > 0 && _editable)
+                if (Stage.compositionString.Length > 0 && _editable)
                 {
                     int composing = _composing;
-                    _composing = Input.compositionString.Length;
+                    _composing = Stage.compositionString.Length;
 
                     StringBuilder buffer = new StringBuilder();
                     GetPartialText(0, _caretPosition, buffer);
-                    buffer.Append(Input.compositionString);
+                    buffer.Append(Stage.compositionString);
                     GetPartialText(_caretPosition + composing, -1, buffer);
 
                     textField.text = buffer.ToString();
@@ -1423,7 +1433,7 @@ namespace FairyGUI
 
         internal void CheckComposition()
         {
-            if (_composing != 0 && Input.compositionString.Length == 0)
+            if (_composing != 0 && Stage.compositionString.Length == 0)
                 UpdateText();
         }
 
