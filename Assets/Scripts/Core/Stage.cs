@@ -1018,14 +1018,13 @@ namespace FairyGUI
                 else if (touchScreen)
                 {
 #if ENABLE_INPUT_SYSTEM
-                    foreach (Touch uTouch in Touch.activeTouches)
+                    if (Touch.activeTouches.Count > 0)
                     {
-                        _touchPosition = uTouch.screenPosition;
+                        _touchPosition = Touch.activeTouches[Touch.activeTouches.Count - 1].screenPosition;
 #else
-                    for (int i = 0; i < Input.touchCount; ++i)
+                    if (Input.touchCount > 0)
                     {
-                        Touch uTouch = Input.GetTouch(i);
-                        _touchPosition = uTouch.position;
+                        _touchPosition = Input.GetTouch(Input.touchCount - 1).position;
 #endif
                         _touchPosition.y = _contentRect.height - _touchPosition.y;
                     }
@@ -1052,6 +1051,7 @@ namespace FairyGUI
         void HandleTextInput()
         {
             _IMEComposite = compositionString.Length > 0;
+
             InputTextField textField = (InputTextField)_focused;
             if (!textField.editable)
                 return;
