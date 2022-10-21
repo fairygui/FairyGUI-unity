@@ -179,6 +179,14 @@ namespace FairyGUI
         /// </summary>
         public static bool makePixelPerfect = false;
 
+
+        /// <summary>
+        /// If disable DisplayObjectInfo. Developers will not be able to visually edit
+        /// DisplayObject properties in Editor mode, nor will they be able to connect to
+        /// the Poco SDK to get or set object properties
+        /// </summary>
+        public static bool disableDisplayObjectInfo = false;
+
         public enum ConfigKey
         {
             DefaultFont,
