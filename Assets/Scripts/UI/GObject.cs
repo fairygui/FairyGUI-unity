@@ -12,10 +12,20 @@ namespace FairyGUI
         /// </summary>
         public string id { get; private set; }
 
+        private string _name;
+
         /// <summary>
         /// Name of the object.
         /// </summary>
-        public string name;
+        public string name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                gameObjectName = _name;
+            }
+        }
 
         /// <summary>
         /// User defined data. 
