@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component size="320,480" mask="n28">
-  <displayList>
-    <image id="n27" name="n27" src="es4130" fileName="images/change.png" xy="0,0"/>
-    <graph id="n28" name="n28" xy="72,43" size="167,171" type="eclipse" lineSize="0"/>
-  </displayList>
-</component>

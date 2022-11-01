@@ -5,6 +5,5 @@
 	"unity": "2022.1",
 	"author": "谷主",
 	"description": "ui工具",
-	"dependencies": {
-	}
+	"dependencies": {}
 }

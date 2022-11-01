@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component size="277,32" extention="ProgressBar">
-  <displayList>
-    <image id="n0" name="n0" src="t9fj58" xy="0,0"/>
-    <component id="n2" name="bar" src="t9fj5h" xy="23,-1"/>
-  </displayList>
-  <ProgressBar titleType="valueAndmax" reverse="true"/>
-</component>

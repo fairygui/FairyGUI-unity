@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component size="2,376" extention="ScrollBar">
-  <displayList>
-    <graph id="n5" name="bar" xy="-7,0" size="9,376">
-      <relation target="" sidePair="height-height"/>
-    </graph>
-    <image id="n8" name="grip" src="kfcb1g" xy="-7,0" alpha="0.34"/>
-  </displayList>
-</component>

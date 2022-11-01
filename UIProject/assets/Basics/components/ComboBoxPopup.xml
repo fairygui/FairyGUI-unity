@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component size="158,58">
-  <displayList>
-    <image id="n0" name="n0" src="rt103z" xy="0,0">
-      <relation target="" sidePair="width-width,height-height"/>
-    </image>
-    <list id="n1" name="list" xy="0,1" size="157,56" overflow="scroll" scrollBarFlags="4" margin="0,0,0,0" defaultItem="ui://9leh0eyfrt1040"/>
-  </displayList>
-</component>

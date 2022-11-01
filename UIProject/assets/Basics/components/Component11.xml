@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component size="90,23" extention="ProgressBar">
-  <displayList>
-    <image id="n0" name="bar" src="fjqr7k" xy="0,0"/>
-  </displayList>
-  <ProgressBar/>
-</component>
