@@ -1,7 +1,9 @@
 ﻿{
   "name": "fairygui",
   "displayName": "fairygui unity",
-  "version": "2022-11-01",
+  "version": "1.0.0",
+  "unity": "2022.1",
   "description": "ui tookit for unity",
+  "keywords": ["ui","fui","fairygui"],
   "dependencies": {}
 }
