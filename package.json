@@ -6,9 +6,5 @@
 	"author": "谷主",
 	"description": "ui工具",
 	"dependencies": {
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/chiuan/FairyGUI-unity.git"
 	}
 }
