@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="g6qoonuh" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="gjh30" name="HeadBar.xml" path="/" exported="true"/>
+    <component id="gjh32" name="bloodbar.xml" path="/"/>
+    <image id="gjh33" name="0.png" path="/"/>
+    <image id="gjh34" name="1.png" path="/" scale="9grid" scale9grid="7,2,108,3"/>
+    <image id="gjh35" name="task.png" path="/" exported="true"/>
+    <component id="fuxf6" name="Main.xml" path="/" exported="true"/>
+    <movieclip id="rfrh7" name="fighting.jta" path="/" exported="true"/>
+    <movieclip id="rfrh8" name="cool.jta" path="/" exported="true"/>
+  </resources>
+  <publish name="HeadBar">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

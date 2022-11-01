@@ -1,0 +1,14 @@
+<component size="112,23" idnum="3" extention="Slider">
+  <displayList>
+    <image id="n0" name="n0" src="suiz4j" xy="0,0" aspect="true">
+      <relation target="" sidePair="width-width"/>
+    </image>
+    <image id="n2" name="bar" src="suiz4k" xy="5,9" size="100,6">
+      <relation target="n0" sidePair="width-width"/>
+    </image>
+    <component id="n1" name="grip" src="suiz4l" xy="101,2">
+      <relation target="n2" sidePair="right-right"/>
+    </component>
+  </displayList>
+  <Slider/>
+</component>

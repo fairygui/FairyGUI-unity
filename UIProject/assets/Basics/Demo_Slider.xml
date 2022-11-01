@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <component id="n1" name="n1" src="suiz4i" xy="84,63">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n2" name="n2" src="suiz4o" xy="281,50">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n3" name="n3" src="eut94u" xy="57,236">
+      <Slider value="50" max="100"/>
+    </component>
+    <component id="n4" name="n4" src="srct87" xy="114,389">
+      <Slider value="50" max="100"/>
+    </component>
+  </displayList>
+</component>

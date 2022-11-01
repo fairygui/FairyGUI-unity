@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="500,120">
+  <displayList>
+    <image id="n3" name="n3" src="nra4d" xy="4,38" group="n6"/>
+    <image id="n0" name="n0" src="nra4e" xy="9,36" group="n6"/>
+    <text id="n1" name="value" xy="187,43" size="172,50" group="n6" font="ui://zgmoraj4nra4f" fontSize="24" autoSize="none" text="1234567"/>
+    <text id="n2" name="add_value" xy="196,3" size="149,40" group="n6" font="ui://zgmoraj4nra4q" fontSize="24" text="+12345"/>
+    <jta id="n5" name="powEffect" src="nra412" xy="42,-13" group="n6" visible="false" playing="false"/>
+    <group id="n6" name="n6" xy="4,-13" size="462,146" advanced="true"/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Alpha" value="1.00"/>
+    <item time="0" type="XY" value="0,0"/>
+    <item time="0" type="XY" target="n6" tween="true" startValue="-471,-" endValue="56,-" duration="12" ease="Expo.Out"/>
+    <item time="12" type="XY" target="n6" label="play_num_now" tween="true" startValue="56,-" endValue="66,-" duration="15" ease="Linear"/>
+    <item time="21" type="Animation" target="n5" value="0,p"/>
+    <item time="21" type="Visible" target="n5" value="true"/>
+    <item time="30" type="Visible" target="n5" value="false"/>
+    <item time="36" type="Alpha" tween="true" startValue="1.00" endValue="0.00" duration="12"/>
+    <item time="36" type="XY" tween="true" startValue="0,0" endValue="-40,-400" duration="12" label2="end"/>
+  </transition>
+</component>

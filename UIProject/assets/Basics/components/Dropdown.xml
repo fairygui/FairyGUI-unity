@@ -1,0 +1,11 @@
+<component size="132,40" extention="ComboBox">
+  <displayList>
+    <component id="n0" name="button" src="zd9g42" xy="0,0">
+      <relation target="" sidePair="width-width,height-height"/>
+    </component>
+    <text id="n1" name="title" xy="5,8" size="87,25" fontSize="15" color="#ffcc00" align="center" autoSize="none" strokeColor="#000000" text="">
+      <relation target="" sidePair="width-width"/>
+    </text>
+  </displayList>
+  <ComboBox dropdown="ui://9leh0eyfzd9g47"/>
+</component>

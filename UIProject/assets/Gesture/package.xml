@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="lua1ugq6" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="t5or0" name="Main.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="Gesture"/>
+</packageDescription>

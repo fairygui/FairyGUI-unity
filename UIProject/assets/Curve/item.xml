@@ -1,0 +1,7 @@
+<component size="248,460" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <loader id="n0" name="icon" xy="0,41" size="248,378"/>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

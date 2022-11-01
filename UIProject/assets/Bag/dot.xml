@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="15,15" extention="Button">
+  <controller name="button" pages="0,up,1,down" selected="0"/>
+  <displayList>
+    <graph id="n23_osdo" name="n23" xy="0,0" size="15,15" type="eclipse" lineSize="0" fillColor="#ff3f5b5f"/>
+    <graph id="n22" name="n22" xy="0,0" size="15,15" type="eclipse" lineSize="0" fillColor="#ff849da4">
+      <gearDisplay controller="button" pages="1"/>
+    </graph>
+  </displayList>
+  <Button mode="Radio"/>
+</component>

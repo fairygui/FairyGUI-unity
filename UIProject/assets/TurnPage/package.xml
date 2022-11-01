@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="ynixt3ub" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="gawe0" name="Main.xml" path="/" exported="true"/>
+    <component id="gawe1" name="Page.xml" path="/"/>
+    <component id="jva6f" name="Pages.xml" path="/"/>
+    <image id="jva6h" name="shadow_soft.png" path="/" exported="true"/>
+    <component id="jva6j" name="Button3.xml" path="/"/>
+    <image id="jva6k" name="shadow_center.png" path="/"/>
+    <image id="jva6m" name="CoverImage.png" path="/" scale="" duplicatePadding="true"/>
+    <component id="jva6n" name="Book.xml" path="/"/>
+    <component id="jva6o" name="FrontCover.xml" path="/"/>
+    <component id="jva6p" name="BackCover.xml" path="/"/>
+    <image id="jva6r" name="Paper.jpg" path="/" scale="" duplicatePadding="true"/>
+    <image id="jva6s" name="p3.png" path="/"/>
+    <image id="jva6t" name="haibian.jpg" path="/"/>
+    <component id="jva6v" name="Slider2.xml" path="/slide/"/>
+    <image id="jva6w" name="background.png" path="/slide/" scale="9grid" scale9grid="24,6,319,13"/>
+    <image id="jva6x" name="full bar.png" path="/slide/" scale="9grid" scale9grid="15,6,109,12"/>
+    <component id="jva6y" name="Slider2_grip.xml" path="/slide/"/>
+    <image id="jva6z" name="back btn.png" path="/slide/"/>
+    <component id="jva614" name="Button1.xml" path="/"/>
+  </resources>
+  <publish name="TurnPage"/>
+</packageDescription>

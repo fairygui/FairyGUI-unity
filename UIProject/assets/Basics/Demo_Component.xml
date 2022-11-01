@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570" overflow="scroll" scrollBar="hidden">
+  <displayList>
+    <text id="n0" name="n0" xy="15,6" size="1025,51" fontSize="22" autoSize="height" text="Change the width or height of the component does not stretch the content by default.&#xA;改变组件的宽和高并不会直接拉伸组件内的内容"/>
+    <component id="n12" name="n12" src="t24n7g" xy="10,78"/>
+    <component id="n13" name="n13" src="t24n7g" xy="286,80" size="327,322"/>
+    <text id="n16" name="n16" xy="12,430" size="437,51" fontSize="22" autoSize="height" text="Use 'Relation' to adjust the content.&#xA;利用关联，可以使组件大小改变时调整内容"/>
+    <component id="n17" name="n17" src="qa477h" xy="18,501"/>
+    <component id="n20" name="n20" src="qa477h" xy="295,499" size="330,324"/>
+  </displayList>
+</component>

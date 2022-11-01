@@ -1,0 +1,23 @@
+<component size="1136,640">
+  <displayList>
+    <image id="n4" name="n4" src="gkq01" xy="279,103">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+    <image id="n5" name="n5" src="gkq02" xy="533,292">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Sound" value="ui://zgmoraj4gkq03"/>
+    <item time="0" type="XY" target="n4" tween="true" startValue="-275,-" endValue="279,-" duration="12" ease="Expo.Out"/>
+    <item time="0" type="XY" target="n3" tween="true" startValue="-,-398" endValue="-,88" duration="12" ease="Back.Out"/>
+    <item time="0" type="XY" target="n5" tween="true" startValue="1183,-" endValue="533,-" duration="12" ease="Expo.Out"/>
+    <item time="12" type="Rotation" target="n3" tween="true" startValue="0" endValue="8" duration="6"/>
+    <item time="18" type="Rotation" target="n3" tween="true" startValue="8" endValue="-8" duration="6" ease="Back.Out"/>
+    <item time="24" type="Rotation" target="n3" tween="true" startValue="-8" endValue="5" duration="6" ease="Back.Out"/>
+    <item time="30" type="Rotation" target="n3" tween="true" startValue="5" endValue="-5" duration="6" ease="Back.Out"/>
+    <item time="36" type="Rotation" target="n3" tween="true" startValue="-5" endValue="0" duration="6" ease="Back.Out"/>
+    <item time="36" type="XY" target="n4" tween="true" startValue="279,-" endValue="1132,-" duration="9" ease="Expo.Out"/>
+    <item time="36" type="XY" target="n5" tween="true" startValue="533,-" endValue="-399,-" duration="9" ease="Expo.Out"/>
+  </transition>
+</component>

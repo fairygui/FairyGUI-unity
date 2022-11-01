@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="720,88" scroll="horizontal" extention="Button">
+  <displayList>
+    <loader id="n0" name="icon" xy="7,8" size="64,64" url="ui://3u9795n0n3qdn" align="center" vAlign="middle" fill="scaleFree"/>
+    <image id="n3" name="n3" src="n3qdo" xy="0,86" size="720,2">
+      <relation target="" sidePair="width-width,bottom-bottom"/>
+    </image>
+    <text id="n4" name="title" xy="80,7" size="530,28" fontSize="24" autoSize="height" singleLine="true" text="Item">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <text id="n5" name="desc" xy="80,44" size="553,28" fontSize="24" color="#babcbf" autoSize="height" singleLine="true" text="Message">
+      <relation target="" sidePair="width-width"/>
+    </text>
+    <text id="n6" name="time" xy="626,7" size="83,28" fontSize="24" color="#babcbf" align="right" autoSize="none" singleLine="true" text="21:03">
+      <relation target="" sidePair="right-right"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>

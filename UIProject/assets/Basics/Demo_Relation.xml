@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570" designImageLayer="1">
+  <controller name="c1" pages="0,,1," selected="0"/>
+  <displayList>
+    <text id="n0" name="n0" xy="15,6" size="964,76" fontSize="22" autoSize="height" text="Relation is one of the key technologies of FairyGUI, which defines the position and size relation between the components&#xA;“关联”是FairyGUI核心特色功能之一。“关联”定义元件之间的位置和大小关系。"/>
+    <graph id="n2" name="n2" xy="181,219" size="100,100" type="rect" fillColor="#ff009900">
+      <relation target="n1" sidePair="left-left,top-top"/>
+    </graph>
+    <graph id="n1" name="n1" xy="45,219" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="45,219|336,224" default="40,212" tween="true"/>
+    </graph>
+    <component id="n5" name="n5" src="rpmb12" xy="37,108">
+      <Button controller="c1" page="1"/>
+    </component>
+    <graph id="n7" name="n7" xy="278,380" size="100,100" type="rect" fillColor="#ff009900">
+      <relation target="n8" sidePair="width-width,height-height"/>
+    </graph>
+    <graph id="n8" name="n8" xy="48,380" size="100,100" type="rect">
+      <gearSize controller="c1" pages="0,1" values="-|188,165,1.00,1.00" default="100,100,1.00,1.00" tween="true"/>
+    </graph>
+    <graph id="n9" name="n9" xy="945,219" size="99,100" type="rect" fillColor="#ff009900">
+      <relation target="n10" sidePair="leftext-right"/>
+    </graph>
+    <graph id="n10" name="n10" xy="816,219" size="100,100" type="rect">
+      <gearXY controller="c1" pages="0,1" values="816,219|635,224" default="153,546" tween="true"/>
+    </graph>
+    <graph id="n12" name="n12" xy="950,399" size="99,104" type="rect" fillColor="#ff009900">
+      <gearSize controller="c1" pages="0,1" values="-|285,104,1.00,1.00" default="99,104,1.00,1.00" tween="true"/>
+      <relation target="" sidePair="right-right"/>
+    </graph>
+  </displayList>
+</component>

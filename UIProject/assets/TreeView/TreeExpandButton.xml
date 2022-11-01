@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="38,31" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="1"/>
+  <displayList>
+    <image id="n1" name="n1" src="pmk34" xy="9,1" aspect="true">
+      <gearDisplay controller="button" pages="0,2"/>
+    </image>
+    <image id="n2" name="n2" src="pmk35" xy="3,5" aspect="true">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+  </displayList>
+  <Button mode="Check"/>
+</component>

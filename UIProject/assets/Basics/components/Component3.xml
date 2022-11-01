@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="348,62" extention="Label">
+  <displayList>
+    <graph id="n2" name="n2" xy="0,0" size="348,62" type="rect" fillColor="#ff003333">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <loader id="n0" name="icon" xy="6,5" size="54,50" align="center" vAlign="middle"/>
+    <text id="n1" name="title" xy="66,21" size="274,20" fontSize="16" color="#ffffff" autoSize="none" text="">
+      <relation target="" sidePair="width-width"/>
+    </text>
+  </displayList>
+</component>

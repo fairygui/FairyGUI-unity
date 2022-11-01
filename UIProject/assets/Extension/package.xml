@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="jou4kj6p" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="eeyy0" name="Main.xml" path="/" exported="true"/>
+    <image id="gsia1" name="1.png" path="/images/" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="gsia2" name="3.png" path="/images/" scale="9grid" scale9grid="110,16,33,32"/>
+    <image id="gsia3" name="4.png" path="/images/"/>
+    <component id="gsia7" name="mailItem.xml" path="/"/>
+    <image id="gsia8" name="2.png" path="/images/" scale="9grid" scale9grid="25,26,26,90"/>
+    <image id="gsia9" name="0.png" path="/images/" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="gsiac" name="7.png" path="/images/"/>
+    <image id="gsiad" name="9.png" path="/images/"/>
+    <image id="gsiae" name="6.png" path="/images/"/>
+    <image id="gsiaf" name="8.png" path="/images/"/>
+  </resources>
+  <publish name="Extension">
+    <atlas name="Default" index="0"/>
+  </publish>
+</packageDescription>

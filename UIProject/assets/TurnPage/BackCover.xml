@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="310,420">
+  <controller name="side" exported="true" pages="0,front,1,back" selected="1"/>
+  <displayList>
+    <image id="n2_jva6" name="n2" src="jva6m" fileName="CoverImage.png" xy="0,0" size="310,420" flip="hz">
+      <gearDisplay controller="side" pages="0"/>
+    </image>
+    <image id="n3_jva6" name="n3" src="jva6m" fileName="CoverImage.png" xy="0,0" size="310,420">
+      <gearDisplay controller="side" pages="1"/>
+    </image>
+    <image id="n5_jva6" name="n5" src="jva6r" fileName="Paper.jpg" xy="0,10" size="300,400" group="n6_jva6"/>
+    <image id="n4_jva6" name="n4" src="jva6k" fileName="shadow_center.png" xy="0,10" size="24,400" group="n6_jva6" alpha="0.8" flip="hz"/>
+    <group id="n6_jva6" name="n6" xy="0,10" size="300,400" advanced="true">
+      <gearDisplay controller="side" pages="1"/>
+    </group>
+  </displayList>
+</component>

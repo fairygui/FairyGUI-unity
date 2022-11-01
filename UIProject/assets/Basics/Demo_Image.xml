@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,570">
+  <displayList>
+    <image id="n6" name="n6" src="sner1h" fileName="images/pic.png" xy="28,42"/>
+    <image id="n7" name="n7" src="sner1h" fileName="images/pic.png" xy="206,42" color="#66ff00" flip="hz"/>
+    <image id="n8" name="n8" src="sner1h" fileName="images/pic.png" xy="747,63" size="179,223" alpha="0.62" color="#707070" flip="vt"/>
+    <image id="n9" name="n9" src="sner1h" fileName="images/pic.png" xy="462,158" size="130,142" rotation="-39" color="#5e5e5e"/>
+    <text id="n11" name="n11" xy="25,310" size="1088,39" fontSize="22" autoSize="none" text="9 Grid and tile scale mode supported.Double click the image in library panel to change the settings."/>
+    <image id="n12" name="n12" src="rt103m" fileName="images/6_png.png" xy="13,386" size="294,173"/>
+    <text id="n14" name="n14" xy="125,354" size="67,26" fontSize="22" text="9 Grid"/>
+    <image id="n15" name="n15" src="nz0z20" fileName="images/long_dead2_png.png" xy="646,386" size="209,165"/>
+    <text id="n16" name="n16" xy="724,352" size="37,26" fontSize="22" text="Tile"/>
+    <image id="n17" name="n17" src="nz0z20" fileName="images/long_dead2_png.png" xy="871,388" size="209,165" grayed="true" flip="both"/>
+    <image id="n18" name="n18" src="rt103m" fileName="images/6_png.png" xy="320,386" size="294,173" grayed="true" flip="vt"/>
+    <text id="n19" name="n19" xy="23,6" size="423,26" fontSize="22" text="Image  properties: Color, Brightness, Flip"/>
+  </displayList>
+</component>

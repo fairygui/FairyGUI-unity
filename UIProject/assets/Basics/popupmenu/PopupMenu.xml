@@ -1,0 +1,8 @@
+<component size="160,60" idnum="2">
+  <displayList>
+    <image id="n0" name="n0" src="l6f46y" xy="0,0" aspect="true">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <list id="n1" name="list" xy="1,1" size="156,56" defaultItem="ui://9leh0eyfl6f46z"/>
+  </displayList>
+</component>

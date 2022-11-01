@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="190,144" pivot="0.5,0.5" extention="Button" hitTest="n36_qz1h">
+  <controller name="button" pages="2,up,3,down,4,over,5,selectedOver" selected="3"/>
+  <displayList>
+    <image id="n35_qz1h" name="n35" src="g40j8" fileName="2.png" xy="0,0" color="#999999">
+      <gearColor controller="button" pages="4,5" values="#999999|#999999" default="#ffffff"/>
+    </image>
+    <graph id="n36_qz1h" name="n36" xy="2,4" size="185,137" visible="false" type="polygon" lineSize="0" fillColor="#57000000" points="35,45,0,27,34,0,90,10,87.5,23,43.5,25.5,65.5,41,125.5,15,185,22,160.5,49,127.5,60,165,96,184,129.5,151.5,137.5,109.5,89.5,70.5,93.5,83.5,117.5,52.5,106,33,82"/>
+  </displayList>
+  <Button downEffect="scale" downEffectValue="0.80"/>
+</component>

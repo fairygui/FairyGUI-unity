@@ -1,0 +1,332 @@
+fileFormatVersion: 2
+guid: 87d06d04f2d65d9428debc0b3b5bf4e2
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: BipU1NPC0040
+    100004: BipU1NPC0040 Footsteps
+    100006: BipU1NPC0040 Head
+    100008: BipU1NPC0040 HeadNub
+    100010: BipU1NPC0040 L Calf
+    100012: BipU1NPC0040 L Clavicle
+    100014: BipU1NPC0040 L Finger0
+    100016: BipU1NPC0040 L Finger01
+    100018: BipU1NPC0040 L Finger02
+    100020: BipU1NPC0040 L Finger0Nub
+    100022: BipU1NPC0040 L Finger1
+    100024: BipU1NPC0040 L Finger11
+    100026: BipU1NPC0040 L Finger12
+    100028: BipU1NPC0040 L Finger1Nub
+    100030: BipU1NPC0040 L Finger2
+    100032: BipU1NPC0040 L Finger21
+    100034: BipU1NPC0040 L Finger22
+    100036: BipU1NPC0040 L Finger2Nub
+    100038: BipU1NPC0040 L Finger3
+    100040: BipU1NPC0040 L Finger31
+    100042: BipU1NPC0040 L Finger32
+    100044: BipU1NPC0040 L Finger3Nub
+    100046: BipU1NPC0040 L Finger4
+    100048: BipU1NPC0040 L Finger41
+    100050: BipU1NPC0040 L Finger42
+    100052: BipU1NPC0040 L Finger4Nub
+    100054: BipU1NPC0040 L Foot
+    100056: BipU1NPC0040 L Forearm
+    100058: BipU1NPC0040 L Hand
+    100060: BipU1NPC0040 L Thigh
+    100062: BipU1NPC0040 L Toe0
+    100064: BipU1NPC0040 L Toe0Nub
+    100066: BipU1NPC0040 L UpperArm
+    100068: BipU1NPC0040 Neck
+    100070: BipU1NPC0040 Pelvis
+    100072: BipU1NPC0040 Prop1
+    100074: BipU1NPC0040 R Calf
+    100076: BipU1NPC0040 R Clavicle
+    100078: BipU1NPC0040 R Finger0
+    100080: BipU1NPC0040 R Finger01
+    100082: BipU1NPC0040 R Finger02
+    100084: BipU1NPC0040 R Finger0Nub
+    100086: BipU1NPC0040 R Finger1
+    100088: BipU1NPC0040 R Finger11
+    100090: BipU1NPC0040 R Finger12
+    100092: BipU1NPC0040 R Finger1Nub
+    100094: BipU1NPC0040 R Finger2
+    100096: BipU1NPC0040 R Finger21
+    100098: BipU1NPC0040 R Finger22
+    100100: BipU1NPC0040 R Finger2Nub
+    100102: BipU1NPC0040 R Finger3
+    100104: BipU1NPC0040 R Finger31
+    100106: BipU1NPC0040 R Finger32
+    100108: BipU1NPC0040 R Finger3Nub
+    100110: BipU1NPC0040 R Finger4
+    100112: BipU1NPC0040 R Finger41
+    100114: BipU1NPC0040 R Finger42
+    100116: BipU1NPC0040 R Finger4Nub
+    100118: BipU1NPC0040 R Foot
+    100120: BipU1NPC0040 R Forearm
+    100122: BipU1NPC0040 R Hand
+    100124: BipU1NPC0040 R Thigh
+    100126: BipU1NPC0040 R Toe0
+    100128: BipU1NPC0040 R Toe0Nub
+    100130: BipU1NPC0040 R UpperArm
+    100132: BipU1NPC0040 Spine
+    100134: BipU1NPC0040 Spine1
+    100136: BoneU1NPC0040_00
+    100138: BoneU1NPC0040_01
+    100140: BoneU1NPC0040_02
+    100142: BoneU1NPC0040_03
+    100144: BoneU1NPC0040_04
+    100146: BoneU1NPC0040_05
+    100148: BoneU1NPC0040_06
+    100150: BoneU1NPC0040_07
+    100152: BoneU1NPC0040_08
+    100154: BoneU1NPC0040_09
+    100156: BoneU1NPC0040_10
+    100158: BoneU1NPC0040_11
+    100160: BoneU1NPC0040_12
+    100162: BoneU1NPC0040_13
+    100164: BoneU1NPC0040_14
+    100166: BoneU1NPC0040_15
+    100168: BoneU1NPC0040_16
+    100170: BoneU1NPC0040_17
+    100172: BoneU1NPC0040_18
+    100174: BoneU1NPC0040_19
+    100176: Particle View 01 1
+    100178: Particle View 01
+    100180: U1NPC0040
+    400000: //RootNode
+    400002: BipU1NPC0040
+    400004: BipU1NPC0040 Footsteps
+    400006: BipU1NPC0040 Head
+    400008: BipU1NPC0040 HeadNub
+    400010: BipU1NPC0040 L Calf
+    400012: BipU1NPC0040 L Clavicle
+    400014: BipU1NPC0040 L Finger0
+    400016: BipU1NPC0040 L Finger01
+    400018: BipU1NPC0040 L Finger02
+    400020: BipU1NPC0040 L Finger0Nub
+    400022: BipU1NPC0040 L Finger1
+    400024: BipU1NPC0040 L Finger11
+    400026: BipU1NPC0040 L Finger12
+    400028: BipU1NPC0040 L Finger1Nub
+    400030: BipU1NPC0040 L Finger2
+    400032: BipU1NPC0040 L Finger21
+    400034: BipU1NPC0040 L Finger22
+    400036: BipU1NPC0040 L Finger2Nub
+    400038: BipU1NPC0040 L Finger3
+    400040: BipU1NPC0040 L Finger31
+    400042: BipU1NPC0040 L Finger32
+    400044: BipU1NPC0040 L Finger3Nub
+    400046: BipU1NPC0040 L Finger4
+    400048: BipU1NPC0040 L Finger41
+    400050: BipU1NPC0040 L Finger42
+    400052: BipU1NPC0040 L Finger4Nub
+    400054: BipU1NPC0040 L Foot
+    400056: BipU1NPC0040 L Forearm
+    400058: BipU1NPC0040 L Hand
+    400060: BipU1NPC0040 L Thigh
+    400062: BipU1NPC0040 L Toe0
+    400064: BipU1NPC0040 L Toe0Nub
+    400066: BipU1NPC0040 L UpperArm
+    400068: BipU1NPC0040 Neck
+    400070: BipU1NPC0040 Pelvis
+    400072: BipU1NPC0040 Prop1
+    400074: BipU1NPC0040 R Calf
+    400076: BipU1NPC0040 R Clavicle
+    400078: BipU1NPC0040 R Finger0
+    400080: BipU1NPC0040 R Finger01
+    400082: BipU1NPC0040 R Finger02
+    400084: BipU1NPC0040 R Finger0Nub
+    400086: BipU1NPC0040 R Finger1
+    400088: BipU1NPC0040 R Finger11
+    400090: BipU1NPC0040 R Finger12
+    400092: BipU1NPC0040 R Finger1Nub
+    400094: BipU1NPC0040 R Finger2
+    400096: BipU1NPC0040 R Finger21
+    400098: BipU1NPC0040 R Finger22
+    400100: BipU1NPC0040 R Finger2Nub
+    400102: BipU1NPC0040 R Finger3
+    400104: BipU1NPC0040 R Finger31
+    400106: BipU1NPC0040 R Finger32
+    400108: BipU1NPC0040 R Finger3Nub
+    400110: BipU1NPC0040 R Finger4
+    400112: BipU1NPC0040 R Finger41
+    400114: BipU1NPC0040 R Finger42
+    400116: BipU1NPC0040 R Finger4Nub
+    400118: BipU1NPC0040 R Foot
+    400120: BipU1NPC0040 R Forearm
+    400122: BipU1NPC0040 R Hand
+    400124: BipU1NPC0040 R Thigh
+    400126: BipU1NPC0040 R Toe0
+    400128: BipU1NPC0040 R Toe0Nub
+    400130: BipU1NPC0040 R UpperArm
+    400132: BipU1NPC0040 Spine
+    400134: BipU1NPC0040 Spine1
+    400136: BoneU1NPC0040_00
+    400138: BoneU1NPC0040_01
+    400140: BoneU1NPC0040_02
+    400142: BoneU1NPC0040_03
+    400144: BoneU1NPC0040_04
+    400146: BoneU1NPC0040_05
+    400148: BoneU1NPC0040_06
+    400150: BoneU1NPC0040_07
+    400152: BoneU1NPC0040_08
+    400154: BoneU1NPC0040_09
+    400156: BoneU1NPC0040_10
+    400158: BoneU1NPC0040_11
+    400160: BoneU1NPC0040_12
+    400162: BoneU1NPC0040_13
+    400164: BoneU1NPC0040_14
+    400166: BoneU1NPC0040_15
+    400168: BoneU1NPC0040_16
+    400170: BoneU1NPC0040_17
+    400172: BoneU1NPC0040_18
+    400174: BoneU1NPC0040_19
+    400176: Particle View 01 1
+    400178: Particle View 01
+    400180: U1NPC0040
+    4300000: U1NPC0040
+    7400000: base@idle_z1
+    7400002: base@idle_z2
+    11100000: //RootNode
+    13700000: //RootNode
+    13700002: U1NPC0040
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: U1NPC0040
+    second: {fileID: 2100000, guid: f610d32095a9f6f48b1ada37f0b76da2, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 2
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: base@idle_z1
+      takeName: 
+      firstFrame: 1
+      lastFrame: 61
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: base@idle_z2
+      takeName: 
+      firstFrame: 71
+      lastFrame: 135
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+    normalCalculationMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

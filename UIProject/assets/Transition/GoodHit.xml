@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="250,205">
+  <displayList>
+    <image id="n0" name="n0" src="nra414" xy="22,45"/>
+    <loader id="n2" name="word" xy="8,1" size="238,105" url="ui://zgmoraj4nra415" align="right" vAlign="bottom"/>
+    <text id="n3" name="t0" xy="85,112" size="47,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="height" text="8"/>
+    <text id="n4" name="t1" xy="121,102" size="52,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="none" text="5"/>
+    <text id="n5" name="t2" xy="158,93" size="52,54" font="ui://zgmoraj4fou916" fontSize="24" autoSize="none" text="8"/>
+  </displayList>
+  <transition name="t0">
+    <item time="0" type="Pivot" value="1,0"/>
+    <item time="0" type="Scale" tween="true" startValue="1.5,1.5" endValue="1,1" duration="7" ease="Bounce.Out"/>
+    <item time="7" type="Shake" value="3,0.5"/>
+  </transition>
+</component>

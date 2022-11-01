@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="47s7ydvu" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="jruo0" name="Main.xml" path="/" exported="true"/>
+    <movieclip id="jruo1" name="bz.jta" path="/" exported="true"/>
+    <movieclip id="jruo2" name="ch.jta" path="/" exported="true"/>
+    <movieclip id="jruo3" name="cool.jta" path="/" exported="true"/>
+    <image id="jruo4" name="1f608.png" path="/" exported="true"/>
+    <image id="jruo5" name="1f609.png" path="/" exported="true"/>
+  </resources>
+  <publish name="TypingEffect"/>
+</packageDescription>

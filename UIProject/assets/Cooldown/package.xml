@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="y768eypf" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="fvaib" name="Main.xml" path="/" exported="true"/>
+    <component id="ltiql" name="Button1.xml" path="/"/>
+    <image id="ltiqn" name="15.png" path="/images/" scale="9grid" scale9grid="10,10,20,20"/>
+    <image id="ltiqo" name="14.png" path="/images/" scale="9grid" scale9grid="10,10,20,20"/>
+    <component id="p3yap" name="Button2.xml" path="/"/>
+    <image id="p3yaq" name="11.png" path="/images/"/>
+    <image id="p3yar" name="13.png" path="/images/"/>
+    <image id="p3yau" name="12.png" path="/images/"/>
+    <font id="p3yav" name="cdtime.fnt" path="/" exported="true"/>
+    <image id="p3yaw" name="0(4)_png.png" path="/images/"/>
+    <image id="p3yax" name="1(4)_png.png" path="/images/"/>
+    <image id="p3yay" name="2(4)_png.png" path="/images/"/>
+    <image id="p3yaz" name="3(4)_png.png" path="/images/"/>
+    <image id="p3ya10" name="4(4)_png.png" path="/images/"/>
+    <image id="p3ya11" name="5(4)_png.png" path="/images/"/>
+    <image id="p3ya12" name="6(4)_png.png" path="/images/"/>
+    <image id="p3ya13" name="7(4)_png.png" path="/images/"/>
+    <image id="p3ya14" name="8(4)_png.png" path="/images/"/>
+    <image id="p3ya15" name="9(4)_png.png" path="/images/"/>
+    <image id="uo8117" name="mask0.png" path="/images/"/>
+    <image id="uo8118" name="mask1.png" path="/images/"/>
+  </resources>
+  <publish name="Cooldown">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

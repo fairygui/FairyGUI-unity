@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="qkteqwfp" jpegQuality="80" compressPNG="true">
+  <resources>
+    <component id="c8s20" name="Main.xml" path="/" exported="true"/>
+    <image id="c8s21" name="1.png" path="/" scale="9grid" scale9grid="10,15,28,32"/>
+    <image id="c8s22" name="3.png" path="/" scale="9grid" scale9grid="110,16,33,32"/>
+    <image id="c8s23" name="4.png" path="/"/>
+    <component id="c8s24" name="mailItem.xml" path="/"/>
+    <image id="c8s25" name="2.png" path="/" scale="9grid" scale9grid="25,26,26,90"/>
+    <image id="c8s26" name="0.png" path="/" scale="9grid" scale9grid="17,16,74,73"/>
+    <image id="c8s27" name="7.png" path="/"/>
+    <image id="c8s28" name="9.png" path="/"/>
+    <image id="c8s29" name="6.png" path="/"/>
+    <image id="c8s2a" name="8.png" path="/"/>
+    <component id="rpolb" name="Button1.xml" path="/"/>
+  </resources>
+  <publish name="VirtualList">
+    <atlas name="默认" index="0"/>
+  </publish>
+</packageDescription>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640" opaque="false">
+  <displayList>
+    <component id="n0" name="n0" src="fou97" xy="174,417" size="145,48">
+      <Button title="Scene1"/>
+    </component>
+    <component id="n1" name="n1" src="fou97" xy="386,421" size="145,48">
+      <Button title="Scene2"/>
+    </component>
+  </displayList>
+</component>
