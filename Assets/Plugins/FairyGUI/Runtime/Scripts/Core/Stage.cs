@@ -72,7 +72,7 @@ namespace FairyGUI
         {
             get
             {
-                if (_inst == null)
+                if (_inst == null || _inst.gameObject == null)
                     Instantiate();
 
                 return _inst;
@@ -84,7 +84,7 @@ namespace FairyGUI
         /// </summary>
         public static void Instantiate()
         {
-            if (_inst == null)
+            if (_inst == null || _inst.gameObject == null)
             {
                 _inst = new Stage();
                 GRoot._inst = new GRoot();
