@@ -35,6 +35,15 @@ namespace FairyGUI
             }
         }
 
+        public static void Destroy()
+        {
+            if (_inst?._engine != null)
+            {
+                GameObject.Destroy(_inst._engine.gameObject);
+                _inst = null;
+            }
+        }
+
         public Timers()
         {
             _inst = this;

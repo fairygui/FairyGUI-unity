@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -43,6 +44,12 @@ namespace FairyGUI
             {
                 beingQuit = true;
                 UIPackage.RemoveAllPackages();
+                
+                // * 确保编辑器就算不刷新domain也能清理掉. 
+                FontManager.Clear();
+                TweenManager.Destroy();
+                Timers.Destroy();
+                Destroy(gameObject);
             }
         }
     }

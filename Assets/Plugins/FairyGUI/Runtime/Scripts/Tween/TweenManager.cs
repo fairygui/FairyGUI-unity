@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FairyGUI
 {
@@ -169,8 +171,28 @@ namespace FairyGUI
             }
         }
 
+        public static void Destroy()
+        {
+            _inited = false;
+            Clean();
+            _activeTweens = new GTweener[30];
+            _totalActiveTweens = 0;
+
+            if (TweenEngine.instance != null)
+            {
+                GameObject.Destroy(TweenEngine.instance.gameObject);
+            }
+        }
+
         class TweenEngine : MonoBehaviour
         {
+            public static TweenEngine instance;
+
+            private void Awake()
+            {
+                instance = this;
+            }
+
             void Update()
             {
                 TweenManager.Update();
