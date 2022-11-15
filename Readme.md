@@ -4,6 +4,8 @@
 FairyGUI is a Cross Platform UI Editor & UI framework.
 [Get FairyGUI-Editor](https://en.fairygui.com/product.html)  
 
+- [Getting started](#getting-started)
+
 Compared with traditional Unity UI engines such as NGUI and UGUI, FairyGUI uses a way of thinking closer to the designer to redefine the production process of the UI, which greatly reduces the time the programmer needs to invest in making the UI.<br>
 
 In terms of running efficiency, FairyGUI uses the unique `FairyBatching` technology for DrawCall optimization, which is more efficient and easier to control than the traditional optimization techniques of NGUI and UGUI. <br>
@@ -30,6 +32,14 @@ Learn
 ====
 
 [Guide](https://en.fairygui.com/docs/guide/index.html)
+
+Getting started
+---
+Install the URL `add package from git url` under `Package Manager` window
+```
+https://github.com/fairygui/FairyGUI-unity.git?path=Assets/Plugins/FairyGUI
+```
+
 
 License
 ====
