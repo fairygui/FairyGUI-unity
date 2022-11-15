@@ -1,6 +1,3 @@
-Base path: 'D:/Program Files/Unity Hub/Editor/2022.1.20f1/Editor/Data', plugins path 'D:/Program Files/Unity Hub/Editor/2022.1.20f1/Editor/Data/PlaybackEngines'
+Base path: '/Users/chiuan/Downloads/unityinstall/2021.3.12f1c1/Unity.app/Contents', plugins path '/Users/chiuan/Downloads/unityinstall/2021.3.12f1c1/PlaybackEngines'
 Cmd: initializeCompiler
 
-Unhandled exception: Protocol error - failed to read magic number (error -2147483644, transferred 0/4)
-
-Quitting shader compiler process

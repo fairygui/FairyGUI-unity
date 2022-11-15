@@ -46,10 +46,9 @@ namespace FairyGUI
                 UIPackage.RemoveAllPackages();
                 
                 // * 确保编辑器就算不刷新domain也能清理掉. 
-                FontManager.Clear();
-                TweenManager.Destroy();
-                Timers.Destroy();
-                Destroy(gameObject);
+                // ! 有点难改先放弃修改了.
+                // FontManager.Clear();
+                // TweenManager.Destroy();
             }
         }
     }
