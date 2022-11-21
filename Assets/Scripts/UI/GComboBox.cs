@@ -536,7 +536,7 @@ namespace FairyGUI
         {
             UpdateDropdownList();
             if (_list.selectionMode == ListSelectionMode.Single)
-                _list.selectedIndex = -1;
+                _list.selectedIndex = -1; // fixme: 默认选中当前选中的对象 _list.selectedIndex = this.selectedIndex;
             dropdown.width = this.width;
             _list.EnsureBoundsCorrect(); //avoid flicker
 
