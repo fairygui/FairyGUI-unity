@@ -21,6 +21,8 @@ ExportedObj/
 *.booproj
 *.svd
 
+# Unity3D local file
+Packages/packages-lock.json
 
 # Unity3D generated meta files
 *.pidb.meta
