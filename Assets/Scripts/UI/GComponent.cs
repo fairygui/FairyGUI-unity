@@ -11,7 +11,7 @@ namespace FairyGUI
     /// <summary>
     /// Component
     /// </summary>
-    public class GComponent : GObject
+    public partial class GComponent : GObject
     {
         /// <summary>
         /// Root container.
