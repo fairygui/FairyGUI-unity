@@ -18,7 +18,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class Transition : ITweenListener
+    public partial class Transition : ITweenListener
     {
         /// <summary>
         /// 动效的名称。在编辑器里设定。
