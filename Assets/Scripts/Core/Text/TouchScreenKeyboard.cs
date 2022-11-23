@@ -5,7 +5,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class TouchScreenKeyboard : IKeyboard
+    public partial class TouchScreenKeyboard : IKeyboard
     {
         UnityEngine.TouchScreenKeyboard _keyboard;
 

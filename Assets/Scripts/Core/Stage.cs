@@ -12,7 +12,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class Stage : Container
+    public partial class Stage : Container
     {
         [Obsolete("Use size.y")]
         public int stageHeight { get { return (int)_contentRect.height; } }

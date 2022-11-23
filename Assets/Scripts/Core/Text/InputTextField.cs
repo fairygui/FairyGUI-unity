@@ -1069,8 +1069,8 @@ namespace FairyGUI
                 if (keyboardInput)
                 {
                     if (_editable)
-                        Stage.inst.OpenKeyboard(_text, false, _displayAsPassword ? false : !textField.singleLine,
-                            _displayAsPassword, false, null, keyboardType, hideInput);
+                        Stage.inst.OpenKeyboard(_text, keyboardType, false, _displayAsPassword ? false : !textField.singleLine,
+                            displayAsPassword, false, this.hideInput, null, this.maxLength); // custom, 增加keyboardType参数
 
                     SetSelection(0, -1);
                 }
