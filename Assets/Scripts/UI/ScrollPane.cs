@@ -31,6 +31,7 @@ namespace FairyGUI
         internal bool _displayInDemand;
         bool _mouseWheelEnabled;
         bool _softnessOnTopOrLeftSide;
+        bool _softnessOnBottomOrRightSide;
         bool _pageMode;
         Vector2 _pageSize;
         bool _inertiaDisabled;
@@ -368,6 +369,15 @@ namespace FairyGUI
         {
             get { return _softnessOnTopOrLeftSide; }
             set { _softnessOnTopOrLeftSide = value; }
+        }
+
+        /// <summary>
+        /// 是否允许再右/下边缘显示虚化效果
+        /// </summary>
+        public bool softnessOnBottomOrRightSide
+        {
+            get { return _softnessOnBottomOrRightSide; }
+            set { _softnessOnBottomOrRightSide = value; }
         }
 
         /// <summary>
@@ -1753,8 +1763,8 @@ namespace FairyGUI
                 _maskContainer.clipSoftness = new Vector4(
                     (_container.x >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.x,
                     (_container.y >= 0 || !_softnessOnTopOrLeftSide) ? 0 : softness.y,
-                    (-_container.x - _overlapSize.x >= 0) ? 0 : softness.x,
-                    (-_container.y - _overlapSize.y >= 0) ? 0 : softness.y);
+                    (-_container.x - _overlapSize.x >= 0 || !_softnessOnBottomOrRightSide) ? 0 : softness.x,
+                    (-_container.y - _overlapSize.y >= 0 || !_softnessOnBottomOrRightSide) ? 0 : softness.y);
             }
             else
                 _maskContainer.clipSoftness = null;
