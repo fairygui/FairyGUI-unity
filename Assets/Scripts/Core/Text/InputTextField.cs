@@ -1069,8 +1069,14 @@ namespace FairyGUI
                 if (keyboardInput)
                 {
                     if (_editable)
+                    {
+                        var limit = this.maxLength;
+#if UNITY_IOS//IOS上如果 limit >0 会在输入时就限制了输入，导致输入有问题。
+                        limit = 0;       
+#endif
                         Stage.inst.OpenKeyboard(_text, keyboardType, false, _displayAsPassword ? false : !textField.singleLine,
-                            displayAsPassword, false, this.hideInput, null, this.maxLength); // custom, 增加keyboardType参数
+                            displayAsPassword, false, this.hideInput, null, limit); // custom, 增加keyboardType参数
+                    }
 
                     SetSelection(0, -1);
                 }
