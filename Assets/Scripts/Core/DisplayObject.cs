@@ -370,6 +370,8 @@ namespace FairyGUI
         /// <param name="yv"></param>
         public void SetXY(float xv, float yv)
         {
+            if(cachedTransform == null) // ui被删除
+                return;
             SetPosition(xv, yv, cachedTransform.localPosition.z);
         }
 
