@@ -8,7 +8,7 @@
 
 namespace FairyGUI
 {
-    public class GObject
+    public partial class GObject
     {
         
     }
