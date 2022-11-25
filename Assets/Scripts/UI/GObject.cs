@@ -4,7 +4,7 @@ using FairyGUI.Utils;
 
 namespace FairyGUI
 {
-    public class GObject : EventDispatcher
+    public partial class GObject : EventDispatcher
     {
         /// <summary>
         /// GObject的id，仅作为内部使用。与name不同，id值是不会相同的。
@@ -950,7 +950,7 @@ namespace FairyGUI
             }
         }
 
-        internal bool internalVisible
+        public bool internalVisible //经过控制器控制后的结果,原来的visible不包含控制器的行为
         {
             get
             {
