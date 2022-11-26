@@ -1372,6 +1372,12 @@ namespace FairyGUI
                     }
                     else //if GetGlyph failed
                     {
+#if DEBUG
+                        if (ch != '\n')
+                        {
+                            Debug.LogWarning($"Text Field error  Name = {this.gOwner.name} Parant = {this.gOwner.parent},FontName = {_font.name} ch = {ch} not find !!");
+                        }
+#endif
                         if (_charPositions != null)
                         {
                             CharPosition cp = new CharPosition();
