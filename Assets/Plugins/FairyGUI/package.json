@@ -1,0 +1,8 @@
+﻿{
+  "name": "fairygui",
+  "displayName": "FairyGUI",
+  "version": "1.0.1",
+  "description": "FairyGUI is a Cross Platform UI Editor & UI framework.[https://github.com/fairygui/FairyGUI-unity]",
+  "keywords": ["ui","fui","fairygui"],
+  "dependencies": {}
+}
