@@ -106,7 +106,7 @@ SubShader {
 	Lighting Off
 	Fog { Mode Off }
 	ZTest [unity_GUIZTestMode]
-	Blend One OneMinusSrcAlpha
+	Blend SrcAlpha OneMinusSrcAlpha
 	ColorMask [_ColorMask]
 
 	Pass {
@@ -120,7 +120,7 @@ SubShader {
 
 		//#pragma multi_compile __ UNITY_UI_CLIP_RECT
 		//#pragma multi_compile __ UNITY_UI_ALPHACLIP
-		#pragma multi_compile NOT_CLIPPED CLIPPED
+		#pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED
 
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
@@ -163,6 +163,11 @@ SubShader {
 		CBUFFER_START(UnityPerMaterial)
 		#ifdef CLIPPED
 		float4 _ClipBox = float4(-2, -2, 0, 0);
+		#endif
+		
+		#ifdef SOFT_CLIPPED
+		float4 _ClipBox = float4(-2, -2, 0, 0);
+		float4 _ClipSoftness = float4(0, 0, 0, 0);
 		#endif
 		CBUFFER_END
 
@@ -244,7 +249,10 @@ SubShader {
 			#ifdef CLIPPED
 			output.mask = mul(unity_ObjectToWorld, input.position).xy * _ClipBox.zw + _ClipBox.xy;
 			#endif
-
+			
+			#ifdef SOFT_CLIPPED
+			output.mask = mul(unity_ObjectToWorld, input.position).xy * _ClipBox.zw + _ClipBox.xy;
+			#endif
 			return output;
 		}
 
@@ -326,7 +334,26 @@ SubShader {
 		clip(1-max(factor.x, factor.y));
 		#endif
 
-  		return faceColor * input.color.a;
+		#ifdef SOFT_CLIPPED
+		float2 factor = float2(0,0);
+		if(input.mask.x<0)
+		    factor.x = (1.0-abs(input.mask.x)) * _ClipSoftness.x;
+		else
+		    factor.x = (1.0-input.mask.x) * _ClipSoftness.z;
+		if(input.mask.y<0)
+		    factor.y = (1.0-abs(input.mask.y)) * _ClipSoftness.w;
+		else
+		    factor.y = (1.0-input.mask.y) * _ClipSoftness.y;
+		faceColor.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
+			// float2 factor = abs(input.mask);
+			// clip(1-max(factor.x, factor.y));	
+		#endif
+		
+		// we changed blend mode from (One OneMinusSrcAlpha) to (SrcAlpha OneMinusSrcAlpha)
+		// to keep same result we should divede by alpha
+		faceColor = faceColor * input.color.a;
+		faceColor.rgb = faceColor.rgb / faceColor.a;
+		return faceColor;
 		}
 
 		ENDCG
