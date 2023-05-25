@@ -18,7 +18,7 @@ namespace FairyGUI
 
         protected override void Init()
         {
-            _default = ((GTextField)_owner).textFormat.size;
+            _default = GetTextField().textFormat.size;
             _storage = new Dictionary<string, int>();
         }
 
@@ -38,16 +38,22 @@ namespace FairyGUI
             if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
                 cv = _default;
 
-            TextFormat tf = ((GTextField)_owner).textFormat;
+            TextFormat tf = GetTextField().textFormat;
             tf.size = cv;
-            ((GTextField)_owner).textFormat = tf;
+            GetTextField().textFormat = tf;
 
             _owner._gearLocked = false;
         }
 
         override public void UpdateState()
         {
-            _storage[_controller.selectedPageId] = ((GTextField)_owner).textFormat.size;
+            _storage[_controller.selectedPageId] = GetTextField().textFormat.size;
+        }
+        
+        private GTextField GetTextField()
+        {
+            if (_owner is GTextField tf) return tf;
+            return _owner.asLabel.GetTextField();
         }
     }
 }
