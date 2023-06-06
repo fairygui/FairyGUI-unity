@@ -885,7 +885,7 @@ namespace FairyGUI
                 float bottom = _yPos + _viewSize.y;
                 if (setFirst || rect.y <= _yPos || rect.height >= _viewSize.y)
                 {
-                    if (rect.yMax >= bottom) //if an item size is large than viewSize, dont scroll
+                    if (!setFirst && rect.yMax >= bottom) //if an item size is large than viewSize, dont scroll
                         return;
 
                     if (_pageMode)
@@ -908,7 +908,7 @@ namespace FairyGUI
                 float right = _xPos + _viewSize.x;
                 if (setFirst || rect.x <= _xPos || rect.width >= _viewSize.x)
                 {
-                    if (rect.xMax >= right) //if an item size is large than viewSize, dont scroll
+                    if (!setFirst && rect.xMax >= right) //if an item size is large than viewSize, dont scroll
                         return;
 
                     if (_pageMode)
