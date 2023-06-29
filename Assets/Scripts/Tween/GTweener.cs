@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 #if FAIRYGUI_TOLUA
 using LuaInterface;
@@ -46,6 +46,10 @@ namespace FairyGUI
     /// </summary>
     public class GTweener
     {
+        public static EaseType defaultEaseType = EaseType.QuadOut;
+        public static bool defaultIgnoreEngineTimeScale = false;
+        public static float defaultTimeScale = 1;
+
         internal object _target;
         internal TweenPropType _propType;
         internal bool _killed;
@@ -585,9 +589,9 @@ namespace FairyGUI
             _delay = 0;
             _duration = 0;
             _breakpoint = -1;
-            _easeType = EaseType.QuadOut;
-            _timeScale = 1;
-            _ignoreEngineTimeScale = false;
+            _easeType = defaultEaseType;
+            _timeScale = defaultTimeScale;
+            _ignoreEngineTimeScale = defaultIgnoreEngineTimeScale;
             _easePeriod = 0;
             _easeOvershootOrAmplitude = 1.70158f;
             _snapping = false;
