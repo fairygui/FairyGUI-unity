@@ -114,8 +114,9 @@ namespace FairyGUI
             _font.RequestCharactersInTexture(text, _size, _style);
         }
 
-        override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
+        override public bool GetGlyph(char ch, out float width, out float height, out float baseline, out bool isFallback)
         {
+            isFallback = false;
             if (!_font.GetCharacterInfo(ch, out _char, _size, _style))
             {
                 if (ch == ' ')

@@ -27,6 +27,7 @@ namespace FairyGUI
         FontWeight _fontWeight;
         TextFormat _format;
         TMP_Character _char;
+        public TMP_Character currentChar => _char;
         TMP_Character _lineChar;
         Material _material;
         MaterialManager _manager;
@@ -104,7 +105,7 @@ namespace FairyGUI
             _ascent = _fontAsset.faceInfo.pointSize;
             _lineHeight = _fontAsset.faceInfo.pointSize * 1.25f;
 
-            _lineChar = GetCharacterFromFontAsset('_', FontStyles.Normal);
+            _lineChar = GetCharacterFromFontAsset('_', FontStyles.Normal, true);
         }
 
         void OnCreateNewMaterial(Material mat)
@@ -232,9 +233,17 @@ namespace FairyGUI
             format.FillVertexColors(vertexColors);
         }
 
-        override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
+        override public bool GetGlyph(char ch, out float width, out float height, out float baseline, out bool isFallback)
         {
-            _char = GetCharacterFromFontAsset(ch, _style);
+            isFallback = false;
+            _char = GetCharacterFromFontAsset(ch, _style, false);
+            if (_char == null)
+            {
+                _char = GetCharacterFromFontAsset(ch, _style, true);
+                if (_char != null)
+                    isFallback = true;
+            }
+
             if (_char != null)
             {
                 width = _char.glyph.metrics.horizontalAdvance * _boldMultiplier * _scale;
@@ -266,13 +275,13 @@ namespace FairyGUI
             }
         }
 
-        TMP_Character GetCharacterFromFontAsset(uint unicode, FontStyles fontStyle)
+        TMP_Character GetCharacterFromFontAsset(uint unicode, FontStyles fontStyle, bool fallback = true)
         {
             bool isAlternativeTypeface;
 #pragma warning disable
             TMP_FontAsset actualAsset;
 #pragma warning restore
-            return TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, true, fontStyle, _fontWeight, 
+            return TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, fallback, fontStyle, _fontWeight, 
                 out isAlternativeTypeface
                 //,out actualAsset //old TMP version need this line
             );
@@ -298,8 +307,18 @@ namespace FairyGUI
         override public int DrawGlyph(float x, float y,
             List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
         {
-            GlyphMetrics metrics = _char.glyph.metrics;
-            GlyphRect rect = _char.glyph.glyphRect;
+            return DrawGlyph(_char, x, y, vertList, uvList, uv2List, colList);
+        }
+        
+        public int DrawGlyph(TMP_Character character, float x, float y,
+            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        {
+            GlyphMetrics metrics = character.glyph.metrics;
+            GlyphRect rect = character.glyph.glyphRect;
+            // 可能是fallback的character，从character中取出真正用于渲染的font
+            TMP_FontAsset realFontAsset = character.textAsset as TMP_FontAsset;
+            if (!realFontAsset)
+                realFontAsset = _fontAsset;
 
             if (_format.specialStyle == TextFormat.SpecialStyle.Subscript)
                 y = y - Mathf.RoundToInt(_ascent * _scale * SupOffset);
@@ -320,7 +339,7 @@ namespace FairyGUI
             if (((_style & FontStyles.Italic) == FontStyles.Italic))
             {
                 // Shift Top vertices forward by half (Shear Value * height of character) and Bottom vertices back by same amount. 
-                float shear_value = _fontAsset.italicStyle * 0.01f;
+                float shear_value = realFontAsset.italicStyle * 0.01f;
                 Vector3 topShear = new Vector3(shear_value * ((metrics.horizontalBearingY + _padding + _stylePadding) * _scale), 0, 0);
                 Vector3 bottomShear = new Vector3(shear_value * (((metrics.horizontalBearingY - metrics.height - _padding - _stylePadding)) * _scale), 0, 0);
 
@@ -336,10 +355,10 @@ namespace FairyGUI
             vertList.Add(topRight);
             vertList.Add(bottomRight);
 
-            float u = (rect.x - _padding - _stylePadding) / _fontAsset.atlasWidth;
-            float v = (rect.y - _padding - _stylePadding) / _fontAsset.atlasHeight;
-            float uw = (rect.width + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasWidth;
-            float vw = (rect.height + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasHeight;
+            float u = (rect.x - _padding - _stylePadding) / realFontAsset.atlasWidth;
+            float v = (rect.y - _padding - _stylePadding) / realFontAsset.atlasHeight;
+            float uw = (rect.width + _padding * 2 + _stylePadding * 2) / realFontAsset.atlasWidth;
+            float vw = (rect.height + _padding * 2 + _stylePadding * 2) / realFontAsset.atlasHeight;
 
             uvBottomLeft = new Vector2(u, v);
             uvTopLeft = new Vector2(u, v + vw);
@@ -529,7 +548,12 @@ namespace FairyGUI
 
         override public bool HasCharacter(char ch)
         {
-            return _fontAsset.HasCharacter(ch);
+            return HasCharacter(ch, true);
+        }
+        
+        public bool HasCharacter(char ch, bool searchFallbacks)
+        {
+            return _fontAsset.HasCharacter(ch, searchFallbacks);
         }
 
         override public int GetLineHeight(int size)

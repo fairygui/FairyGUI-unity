@@ -69,8 +69,9 @@ namespace FairyGUI
                 format.FillVertexColors(vertexColors);
         }
 
-        override public bool GetGlyph(char ch, out float width, out float height, out float baseline)
+        override public bool GetGlyph(char ch, out float width, out float height, out float baseline, out bool isFallback)
         {
+            isFallback = false;
             if (ch == ' ')
             {
                 width = Mathf.RoundToInt(size * _scale / 2);
