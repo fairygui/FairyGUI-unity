@@ -17,6 +17,7 @@ namespace FairyGUI
         protected List<int> _strokeLayerStartList = new List<int>();
         protected List<int> _vertIndexList = new List<int>();
         protected List<int> _mainLayerVertCountList = new List<int>();
+        protected int _printSubLineCount;
 #else
         protected Vector3[] _backupVerts;
         protected Vector3[] _vertices;
@@ -93,6 +94,7 @@ namespace FairyGUI
             _started = true;
 
 #if FAIRYGUI_TMPRO
+            _printSubLineCount = 0;
             int vertCount = 0;
             int meshVertCount = 0;
             _backupVertsList.Clear();
@@ -224,8 +226,16 @@ namespace FairyGUI
             {
                 cp = charPositions[_printIndex++];
 #if FAIRYGUI_TMPRO
+                // Next is underline or strikethrough, continue print.
+                bool continuePrint = _printIndex < listCnt - 1 && charPositions[_printIndex].drawLineBySub;
+                bool isPrintLine = false;
                 if (cp.vertCount > 0 || cp.subIndex > 0)
                 {
+                    if (cp.drawLineBySub)
+                    {
+                        isPrintLine = true;
+                        _printSubLineCount++;
+                    }
                     int vertCount = cp.subIndex > 0 ? _textField.GetSubTextField(cp.subIndex - 1).toRendererChars[cp.subCharIndex].vertCount : cp.vertCount;
                     if (vertCount > 0)
                         output(vertCount, cp.subIndex);
@@ -237,10 +247,19 @@ namespace FairyGUI
                 if (cp.imgIndex > 0) //这是一个图片
                 {
                     _textField.richTextField.ShowHtmlObject(cp.imgIndex - 1, true);
-                    return true;
+#if FAIRYGUI_TMPRO
+                    if (!continuePrint)
+#endif
+                        return true;
                 }
+#if FAIRYGUI_TMPRO
+                else if (isPrintLine || !char.IsWhiteSpace(_textField.parsedText[_printIndex - 1 - _printSubLineCount]))
+                    if (!continuePrint)
+                        return true;
+#else
                 else if (!char.IsWhiteSpace(_textField.parsedText[_printIndex - 1]))
                     return true;
+#endif
             }
 
             Cancel();

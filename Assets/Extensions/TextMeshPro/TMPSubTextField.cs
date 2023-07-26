@@ -7,9 +7,26 @@ namespace FairyGUI
 {
     public class TMPSubTextField : DisplayObject, IMeshFactory
     {
+        public enum SubMeshDrawType : byte
+        {
+            Char = 0,
+            Underline = 1,
+            Strikethrough = 2,
+        }
+        
         public struct CharInfo
         {
+            public SubMeshDrawType type;
+            /// <summary>
+            /// 绘制字符的信息
+            /// </summary>
             public TMP_Character character;
+            /// <summary>
+            /// 绘制line的信息
+            /// </summary>
+            public float width;
+            public int fontSize;
+
             public short lineIndex;
             public float px;
             public float py;
@@ -20,38 +37,26 @@ namespace FairyGUI
 
             public CharInfo(TMP_Character character, short lineIndex, float px, float py)
             {
+                type = SubMeshDrawType.Char;
                 this.character = character;
+                width = 0;
+                fontSize = 0;
                 this.lineIndex = lineIndex;
                 this.px = px;
                 this.py = py;
                 vertCount = 0;
             }
-        }
-        
-        public struct LineInfo
-        {
-            public short lineIndex;
-            public float px;
-            public float py;
-            public float width;
-            public int fontSize;
-
-            public LineInfo(short lineIndex, float px, float py, float width, int fontSize)
-            {
-                this.lineIndex = lineIndex;
-                this.px = px;
-                this.py = py;
-                this.width = width;
-                this.fontSize = fontSize;
-            }
             
-            public void Set(short lineIndex, float px, float py, float width, int fontSize)
+            public CharInfo(SubMeshDrawType type, short lineIndex, float px, float py, float width, int fontSize)
             {
+                this.type = type;
+                character = null;
+                this.width = width;
+                this.fontSize = fontSize;
                 this.lineIndex = lineIndex;
                 this.px = px;
                 this.py = py;
-                this.width = width;
-                this.fontSize = fontSize;
+                vertCount = 0;
             }
         }
 
@@ -70,8 +75,6 @@ namespace FairyGUI
 
         private List<CharInfo> _toRendererChars = new List<CharInfo>();
         public List<CharInfo> toRendererChars => _toRendererChars;
-        private List<LineInfo> _underlineInfos = new List<LineInfo>();
-        private List<LineInfo> _strikethroughInfos = new List<LineInfo>();
 
         public TMPSubTextField(TextField textField)
         {
@@ -97,35 +100,11 @@ namespace FairyGUI
             for (int i = 0, charCount = _toRendererChars.Count; i < charCount; i++)
             {
                 var charInfo = _toRendererChars[i];
-                charInfo.vertCount = (short)_font.DrawGlyph(charInfo.character, charInfo.px, charInfo.py, vertList, uvList, uv2List, colList);
-
-                // End of line
-                if (i == charCount - 1 || charInfo.lineIndex != _toRendererChars[i + 1].lineIndex)
-                {
-                    int lineVertCount = 0;
-                    for (int infoCount = _underlineInfos.Count; underlineIndex < infoCount; underlineIndex++)
-                    {
-                        var lineInfo = _underlineInfos[underlineIndex];
-                        if (lineInfo.lineIndex == charInfo.lineIndex)
-                        {
-                            lineVertCount += _font.DrawLine(lineInfo.px, lineInfo.py, lineInfo.width, lineInfo.fontSize, 0, vertList, uvList, uv2List, colList);
-                            underlineIndex++; // Move next
-                            break;
-                        }
-                    }
-                    for (int infoCount = _strikethroughInfos.Count; strikethroughIndex < infoCount; strikethroughIndex++)
-                    {
-                        var lineInfo = _strikethroughInfos[strikethroughIndex];
-                        if (lineInfo.lineIndex == charInfo.lineIndex)
-                        {
-                            lineVertCount += _font.DrawLine(lineInfo.px, lineInfo.py, lineInfo.width, lineInfo.fontSize, 1, vertList, uvList, uv2List, colList);
-                            strikethroughIndex++; // Move next
-                            break;
-                        }
-                    }
-                    if (lineVertCount > 0)
-                        charInfo.vertCount += (short) lineVertCount;
-                }
+                if (charInfo.type == SubMeshDrawType.Char)
+                    charInfo.vertCount = (short)_font.DrawGlyph(charInfo.character, charInfo.px, charInfo.py, vertList, uvList, uv2List, colList);
+                else
+                    charInfo.vertCount = (short)_font.DrawLine(charInfo.px, charInfo.py, charInfo.width, charInfo.fontSize,
+                        charInfo.type == SubMeshDrawType.Underline ? 0 : 1, vertList, uvList, uv2List, colList);
                 
                 _toRendererChars[i] = charInfo;
             }
@@ -152,14 +131,11 @@ namespace FairyGUI
             return index;
         }
 
-        public void AddUnderline(short lineIndex, float px, float py, float width, int fontSize)
+        public int AddToRendererLine(int lineType, short lineIndex, float px, float py, float width, int fontSize)
         {
-            _underlineInfos.Add(new LineInfo(lineIndex, px, py, width, fontSize));
-        }
-        
-        public void AddStrikethrough(short lineIndex, float px, float py, float width, int fontSize)
-        {
-            _strikethroughInfos.Add(new LineInfo(lineIndex, px, py, width, fontSize));
+            int index = _toRendererChars.Count;
+            _toRendererChars.Add(new CharInfo(lineType == 0 ? SubMeshDrawType.Underline : SubMeshDrawType.Strikethrough, lineIndex, px, py, width, fontSize));
+            return index;
         }
 
         public bool ForceUpdateMesh()
@@ -171,8 +147,6 @@ namespace FairyGUI
         public void CleanUp()
         {
             _toRendererChars.Clear();
-            _underlineInfos.Clear();
-            _strikethroughInfos.Clear();
         }
         
         public void Clear()
