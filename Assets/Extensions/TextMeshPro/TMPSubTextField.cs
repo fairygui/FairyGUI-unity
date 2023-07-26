@@ -99,7 +99,7 @@ namespace FairyGUI
                 var charInfo = _toRendererChars[i];
                 charInfo.vertCount = (short)_font.DrawGlyph(charInfo.character, charInfo.px, charInfo.py, vertList, uvList, uv2List, colList);
 
-                // end of line
+                // End of line
                 if (i == charCount - 1 || charInfo.lineIndex != _toRendererChars[i + 1].lineIndex)
                 {
                     int lineVertCount = 0;
@@ -109,6 +109,7 @@ namespace FairyGUI
                         if (lineInfo.lineIndex == charInfo.lineIndex)
                         {
                             lineVertCount += _font.DrawLine(lineInfo.px, lineInfo.py, lineInfo.width, lineInfo.fontSize, 0, vertList, uvList, uv2List, colList);
+                            underlineIndex++; // Move next
                             break;
                         }
                     }
@@ -118,6 +119,7 @@ namespace FairyGUI
                         if (lineInfo.lineIndex == charInfo.lineIndex)
                         {
                             lineVertCount += _font.DrawLine(lineInfo.px, lineInfo.py, lineInfo.width, lineInfo.fontSize, 1, vertList, uvList, uv2List, colList);
+                            strikethroughIndex++; // Move next
                             break;
                         }
                     }
