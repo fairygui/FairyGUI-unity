@@ -27,7 +27,6 @@ namespace FairyGUI
             public float width;
             public int fontSize;
 
-            public short lineIndex;
             public float px;
             public float py;
             /// <summary>
@@ -35,25 +34,23 @@ namespace FairyGUI
             /// </summary>
             public short vertCount;
 
-            public CharInfo(TMP_Character character, short lineIndex, float px, float py)
+            public CharInfo(TMP_Character character, float px, float py)
             {
                 type = SubMeshDrawType.Char;
                 this.character = character;
                 width = 0;
                 fontSize = 0;
-                this.lineIndex = lineIndex;
                 this.px = px;
                 this.py = py;
                 vertCount = 0;
             }
             
-            public CharInfo(SubMeshDrawType type, short lineIndex, float px, float py, float width, int fontSize)
+            public CharInfo(SubMeshDrawType type, float px, float py, float width, int fontSize)
             {
                 this.type = type;
                 character = null;
                 this.width = width;
                 this.fontSize = fontSize;
-                this.lineIndex = lineIndex;
                 this.px = px;
                 this.py = py;
                 vertCount = 0;
@@ -95,8 +92,6 @@ namespace FairyGUI
             List<Vector2> uv2List = vb.uvs2;
             List<Color32> colList = vb.colors;
 
-            int underlineIndex = 0;
-            int strikethroughIndex = 0;
             for (int i = 0, charCount = _toRendererChars.Count; i < charCount; i++)
             {
                 var charInfo = _toRendererChars[i];
@@ -124,17 +119,17 @@ namespace FairyGUI
             vb.AddTriangles();
         }
 
-        public int AddToRendererChar(TMP_Character ch, short lineIndex, float px, float py)
+        public int AddToRendererChar(TMP_Character ch, float px, float py)
         {
             int index = _toRendererChars.Count;
-            _toRendererChars.Add(new CharInfo(ch, lineIndex, px, py));
+            _toRendererChars.Add(new CharInfo(ch, px, py));
             return index;
         }
 
-        public int AddToRendererLine(int lineType, short lineIndex, float px, float py, float width, int fontSize)
+        public int AddToRendererLine(int lineType, float px, float py, float width, int fontSize)
         {
             int index = _toRendererChars.Count;
-            _toRendererChars.Add(new CharInfo(lineType == 0 ? SubMeshDrawType.Underline : SubMeshDrawType.Strikethrough, lineIndex, px, py, width, fontSize));
+            _toRendererChars.Add(new CharInfo(lineType == 0 ? SubMeshDrawType.Underline : SubMeshDrawType.Strikethrough, px, py, width, fontSize));
             return index;
         }
 

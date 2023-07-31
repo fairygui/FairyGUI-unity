@@ -12,12 +12,11 @@ namespace FairyGUI
         protected TextField _textField;
 #if FAIRYGUI_TMPRO
         protected List<Vector3[]> _backupVertsList = new List<Vector3[]>();
-        protected Vector3[][] _verticesList;
+        protected List<Vector3[]> _verticesList = new List<Vector3[]>();
         protected List<int> _mainLayerStartList = new List<int>();
         protected List<int> _strokeLayerStartList = new List<int>();
         protected List<int> _vertIndexList = new List<int>();
         protected List<int> _mainLayerVertCountList = new List<int>();
-        protected int _printSubLineCount;
 #else
         protected Vector3[] _backupVerts;
         protected Vector3[] _vertices;
@@ -94,7 +93,6 @@ namespace FairyGUI
             _started = true;
 
 #if FAIRYGUI_TMPRO
-            _printSubLineCount = 0;
             int vertCount = 0;
             int meshVertCount = 0;
             _backupVertsList.Clear();
@@ -102,8 +100,8 @@ namespace FairyGUI
             _strokeLayerStartList.Clear();
             _vertIndexList.Clear();
             _mainLayerVertCountList.Clear();
-            if (_verticesList == null || _verticesList.Length < _textField.activeSubMeshCount + 1)
-                _verticesList = new Vector3[_textField.activeSubMeshCount + 1][];
+            if (_verticesList.Capacity < _textField.activeSubMeshCount + 1)
+                _verticesList.Capacity = _textField.activeSubMeshCount + 1;
             for (int i = 0, count = _textField.activeSubMeshCount + 1; i < count; i++)
             {
                 _vertIndexList.Add(0);
@@ -112,11 +110,20 @@ namespace FairyGUI
                 vertCount += meshVertCount;
                 var backupVerts = displayObject.graphics.mesh.vertices;
                 _backupVertsList.Add(backupVerts);
-                Vector3[] vertices = _verticesList[i];
-                if (vertices == null || vertices.Length < meshVertCount)
+                Vector3[] vertices;
+                if (i < _verticesList.Count)
+                {
+                    vertices = _verticesList[i];
+                    if (vertices == null || vertices.Length != meshVertCount)
+                    {
+                        vertices = new Vector3[meshVertCount];
+                        _verticesList[i] = vertices;
+                    }
+                }
+                else
                 {
                     vertices = new Vector3[meshVertCount];
-                    _verticesList[i] = vertices;
+                    _verticesList.Add(vertices);
                 }
                 Vector3 zero = Vector3.zero;
                 for (int j = 0; j < meshVertCount; j++)
@@ -226,19 +233,23 @@ namespace FairyGUI
             {
                 cp = charPositions[_printIndex++];
 #if FAIRYGUI_TMPRO
-                // Next is underline or strikethrough, continue print.
-                bool continuePrint = _printIndex < listCnt - 1 && charPositions[_printIndex].drawLineBySub;
-                bool isPrintLine = false;
                 if (cp.vertCount > 0 || cp.subIndex > 0)
                 {
-                    if (cp.drawLineBySub)
-                    {
-                        isPrintLine = true;
-                        _printSubLineCount++;
-                    }
                     int vertCount = cp.subIndex > 0 ? _textField.GetSubTextField(cp.subIndex - 1).toRendererChars[cp.subCharIndex].vertCount : cp.vertCount;
                     if (vertCount > 0)
                         output(vertCount, cp.subIndex);
+                }
+                
+                // Draw lines
+                if (cp.drawLineSubIndex > 0)
+                {
+                    var toRendererChars = _textField.GetSubTextField(cp.drawLineSubIndex - 1).toRendererChars;
+                    for (byte i = 0, count = cp.drawLineCount; i < count; i++)
+                    {
+                        int vertCount = toRendererChars[cp.drawLineSubStartCharIndex + i].vertCount;
+                        if (vertCount > 0)
+                            output(vertCount, cp.drawLineSubIndex);
+                    }
                 }
 #else
                 if (cp.vertCount > 0)
@@ -247,19 +258,10 @@ namespace FairyGUI
                 if (cp.imgIndex > 0) //这是一个图片
                 {
                     _textField.richTextField.ShowHtmlObject(cp.imgIndex - 1, true);
-#if FAIRYGUI_TMPRO
-                    if (!continuePrint)
-#endif
-                        return true;
+                    return true;
                 }
-#if FAIRYGUI_TMPRO
-                else if (isPrintLine || !char.IsWhiteSpace(_textField.parsedText[_printIndex - 1 - _printSubLineCount]))
-                    if (!continuePrint)
-                        return true;
-#else
                 else if (!char.IsWhiteSpace(_textField.parsedText[_printIndex - 1]))
                     return true;
-#endif
             }
 
             Cancel();

@@ -1447,7 +1447,7 @@ namespace FairyGUI
                         {
                             vertCount = 0;
                             TMPSubTextField subTextField = _subTextFields[subTextIndex];
-                            subCharIndex = subTextField.AddToRendererChar(currentTmpFont.currentChar, (short)i, posx, -(line.y + line.baseline));
+                            subCharIndex = subTextField.AddToRendererChar(currentTmpFont.currentChar, posx, -(line.y + line.baseline));
                         }
                         else
                         {
@@ -1520,17 +1520,16 @@ namespace FairyGUI
                             }
                             else
                             {
-                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(0, (short)i, underlineStart < posx ? underlineStart : posx, -(line.y + line.baseline), lineWidth,
-                                    maxFontSize);
-                                // Add line
+                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(0,
+                                    underlineStart < posx ? underlineStart : posx, -(line.y + line.baseline), lineWidth, maxFontSize);
+                                // line
                                 if (_charPositions != null)
                                 {
-                                    CharPosition cp = new CharPosition();
-                                    cp.drawLineBySub = true;
-                                    cp.lineIndex = (short)i;
-                                    cp.subIndex = (short)(maxSubTextIndexInLine + 1);
-                                    cp.subCharIndex = charIndex;
-                                    _charPositions.Add(cp);
+                                    CharPosition cp = _charPositions[_charPositions.Count - 1];
+                                    cp.drawLineSubIndex = (short)(maxSubTextIndexInLine + 1);
+                                    cp.drawLineSubStartCharIndex = charIndex;
+                                    cp.drawLineCount = 1;
+                                    _charPositions[_charPositions.Count - 1] = cp;
                                 }
                             }
 #endif
@@ -1556,17 +1555,22 @@ namespace FairyGUI
                             }
                             else
                             {
-                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(1, (short)i, strikethroughStart < posx ? strikethroughStart : posx, -(line.y + line.baseline), lineWidth,
-                                    minFontSize);
-                                // Add line
+                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(1,
+                                    strikethroughStart < posx ? strikethroughStart : posx, -(line.y + line.baseline), lineWidth, minFontSize);
+                                // line
                                 if (_charPositions != null)
                                 {
-                                    CharPosition cp = new CharPosition();
-                                    cp.drawLineBySub = true;
-                                    cp.lineIndex = (short)i;
-                                    cp.subIndex = (short)(maxSubTextIndexInLine + 1);
-                                    cp.subCharIndex = charIndex;
-                                    _charPositions.Add(cp);
+                                    CharPosition cp = _charPositions[_charPositions.Count - 1];
+                                    if (cp.lineIndex == (short) i && cp.drawLineSubIndex == (short) (maxSubTextIndexInLine + 1) &&
+                                        cp.drawLineSubStartCharIndex == charIndex - cp.drawLineCount)
+                                        cp.drawLineCount++;
+                                    else
+                                    {
+                                        cp.drawLineSubIndex = (short)(maxSubTextIndexInLine + 1);
+                                        cp.drawLineSubStartCharIndex = charIndex;
+                                        cp.drawLineCount = 1;
+                                    }
+                                    _charPositions[_charPositions.Count - 1] = cp;
                                 }
                             }
 #endif
@@ -1903,11 +1907,6 @@ namespace FairyGUI
             
 #if FAIRYGUI_TMPRO
             /// <summary>
-            /// 是否使用submesh绘制line
-            /// </summary>
-            public bool drawLineBySub;
-            
-            /// <summary>
             /// 大于0表示使用submesh
             /// </summary>
             public short subIndex;
@@ -1916,6 +1915,22 @@ namespace FairyGUI
             /// submesh的字符索引
             /// </summary>
             public int subCharIndex;
+            
+                        
+            /// <summary>
+            /// 大于0表示使用submesh绘制line
+            /// </summary>
+            public short drawLineSubIndex;
+            
+            /// <summary>
+            /// 绘制line的submesh的line起始字符索引
+            /// </summary>
+            public int drawLineSubStartCharIndex;
+
+            /// <summary>
+            /// 绘制line的数量
+            /// </summary>
+            public byte drawLineCount;
 #endif
         }
     }
