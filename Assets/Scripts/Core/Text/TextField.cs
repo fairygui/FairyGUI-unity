@@ -432,6 +432,46 @@ namespace FairyGUI
             get { return _richTextField; }
         }
 
+#if FAIRYGUI_TMPRO
+        /// <summary>
+        /// 
+        /// </summary>
+        override public Material material
+        {
+            get
+            {
+                if (graphics != null)
+                    return graphics.material;
+                else
+                    return null;
+            }
+            set
+            {
+                if (graphics != null)
+                    graphics.material = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        override public string shader
+        {
+            get
+            {
+                if (graphics != null)
+                    return graphics.shader;
+                else
+                    return null;
+            }
+            set
+            {
+                if (graphics != null)
+                    graphics.shader = value;
+            }
+        }
+#endif
+        
         /// <summary>
         /// 
         /// </summary>
