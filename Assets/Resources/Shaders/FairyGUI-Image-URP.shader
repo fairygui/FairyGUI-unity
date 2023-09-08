@@ -69,6 +69,11 @@ Shader "FairyGUI/Image-URP"
                 // UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
+            half3 GammaToLinearSpace(half3 sRGB)
+            {
+                return sRGB * (sRGB * (sRGB * 0.305306011h + 0.682171111h) + 0.012522878h);
+            }
+
             struct v2f
             {
                 float4 vertex : SV_POSITION;
@@ -99,7 +104,7 @@ Shader "FairyGUI/Image-URP"
             CBUFFER_START(UnityPerMaterial)
             sampler2D _MainTex;
             CBUFFER_END
-            
+
             // UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
             // UNITY_DEFINE_INSTANCED_PROP(float4, _BaseMap_ST)
             // UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)

@@ -58,7 +58,12 @@ Shader "FairyGUI/Text-URP"
                 float4 texcoord : TEXCOORD0;
             };
 
-            
+            half3 GammaToLinearSpace(half3 sRGB)
+            {
+                return sRGB * (sRGB * (sRGB * 0.305306011h + 0.682171111h) + 0.012522878h);
+            }
+
+
             sampler2D _MainTex;
 
             v2f vert(appdata_t v)
@@ -70,7 +75,7 @@ Shader "FairyGUI/Text-URP"
                     o.color.rgb = GammaToLinearSpace(v.color.rgb);
                     o.color.a = v.color.a;
                 #else
-                    o.color = v.color;
+                o.color = v.color;
                 #endif
 
                 return o;
