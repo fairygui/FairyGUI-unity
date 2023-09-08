@@ -120,6 +120,17 @@ namespace FairyGUIEditor
                 string icon = EditorGUILayout.TextField("Icon", gObj.icon);
                 if (EditorGUI.EndChangeCheck())
                     gObj.icon = icon;
+
+                if (gObj.displayObject != null)
+                {
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.PrefixLabel("Rendering Order");
+                    EditorGUILayout.IntField(gObj.displayObject.renderingOrder);
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUI.EndDisabledGroup();
+                }
             }
         }
     }
