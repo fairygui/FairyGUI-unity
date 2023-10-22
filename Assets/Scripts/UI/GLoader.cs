@@ -537,6 +537,13 @@ namespace FairyGUI
                 return;
             }
 
+            if (_fill == FillType.Resize && _content2 != null)
+            {
+                sourceWidth = (int)width;
+                sourceHeight = (int)height;
+                _content2.SetSize(sourceWidth, sourceHeight);
+            }
+
             float contentWidth = sourceWidth;
             float contentHeight = sourceHeight;
 
