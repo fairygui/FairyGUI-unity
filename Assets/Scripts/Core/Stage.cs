@@ -168,7 +168,12 @@ namespace FairyGUI
 
         static void HandleOnIMECompositionChange(IMECompositionString imeCompositionString)
         {
-            inputSystemCompositionString = imeCompositionString.ToString();
+            // 如果这里赋值了还会导致输入重复的Bug, 因为应对不同输入法时InputSystem可能会返回完整的文字
+            // 此功能本身只是为了显示中途打字符号(例如打拼音时中途的英文), 不会影响最后输入, 而且严重依赖输入法, 故直接去除此功能
+            // 参考链接:
+            // https://github.com/Unity-Technologies/InputSystem/commit/6d8ff967aeff02a627668e878eda566b81fd7c40
+            // https://issuetracker.unity3d.com/issues/onimecompositionchange-does-not-return-an-empty-string-on-accept-when-using-microsoft-ime
+            // inputSystemCompositionString = imeCompositionString.ToString();
         }
 #endif
 
