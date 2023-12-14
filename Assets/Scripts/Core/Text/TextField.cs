@@ -55,6 +55,7 @@ namespace FairyGUI
         private List<TMPSubTextField> _subTextFields = new List<TMPSubTextField>();
         private Dictionary<int, int> _fallbackTextureIndexLookup = new Dictionary<int, int>(); //key: material instance id.  value: index
         public int activeSubMeshCount { private set; get; } = 0;
+        public Action<int, int> onActiveSubMeshCountChanged; //current count; last count
 
         public TMPSubTextField GetSubTextField(int index)
         {
@@ -1180,6 +1181,16 @@ namespace FairyGUI
                 if (_richTextField != null)
                     _richTextField.RefreshObjects();
 
+                int tmpLastCount = activeSubMeshCount;
+                activeSubMeshCount = 0;
+                foreach (var tmpSubTextField in _subTextFields)
+                {
+                    tmpSubTextField.Clear();
+                    tmpSubTextField.visible = false;
+                }
+            
+                if (activeSubMeshCount != tmpLastCount)
+                    onActiveSubMeshCountChanged?.Invoke(activeSubMeshCount, tmpLastCount);
                 return;
             }
 
@@ -1448,10 +1459,13 @@ namespace FairyGUI
                                         subTextField = _subTextFields[subTextIndex];
                                     
                                     // Set sub text fields
+                                    // Use original _textFormat to update graphics
                                     fallbackTmpFont.SetFormat(_textFormat, _fontSizeScale);
                                     fallbackTmpFont.UpdateGraphics(subTextField.graphics);
-                                    subTextField.font = fallbackTmpFont;
+                                    subTextField.Init(fallbackTmpFont);
                                 }
+                                // Use new format refresh again
+                                fallbackTmpFont.SetFormat(font.GetTextFormat(), _fontSizeScale);
                             }
                         }
 #endif
@@ -1486,8 +1500,7 @@ namespace FairyGUI
                         if (isFallback && subTextIndex >= 0)
                         {
                             vertCount = 0;
-                            TMPSubTextField subTextField = _subTextFields[subTextIndex];
-                            subCharIndex = subTextField.AddToRendererChar(currentTmpFont.currentChar, posx, -(line.y + line.baseline));
+                            subCharIndex = _subTextFields[subTextIndex].DrawGlyph(currentTmpFont.currentChar, posx, -(line.y + line.baseline));
                         }
                         else
                         {
@@ -1560,7 +1573,7 @@ namespace FairyGUI
                             }
                             else
                             {
-                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(0,
+                                int charIndex = _subTextFields[maxSubTextIndexInLine].DrawLine(0,
                                     underlineStart < posx ? underlineStart : posx, -(line.y + line.baseline), lineWidth, maxFontSize);
                                 // line
                                 if (_charPositions != null)
@@ -1595,7 +1608,7 @@ namespace FairyGUI
                             }
                             else
                             {
-                                int charIndex = _subTextFields[maxSubTextIndexInLine].AddToRendererLine(1,
+                                int charIndex = _subTextFields[maxSubTextIndexInLine].DrawLine(1,
                                     strikethroughStart < posx ? strikethroughStart : posx, -(line.y + line.baseline), lineWidth, minFontSize);
                                 // line
                                 if (_charPositions != null)
@@ -1722,11 +1735,11 @@ namespace FairyGUI
             
 #if FAIRYGUI_TMPRO
             int materialCount = _fallbackTextureIndexLookup.Count;
+            int lastCount = activeSubMeshCount;
             activeSubMeshCount = materialCount;
             for (int i = 0; i < materialCount; i++)
             {
                 var tmpSubTextField = _subTextFields[i];
-                tmpSubTextField.visible = true;
                 tmpSubTextField.ForceUpdateMesh();
             }
 
@@ -1736,6 +1749,9 @@ namespace FairyGUI
                 tmpSubTextField.Clear();
                 tmpSubTextField.visible = false;
             }
+            
+            if (activeSubMeshCount != lastCount)
+                onActiveSubMeshCountChanged?.Invoke(activeSubMeshCount, lastCount);
 #endif
         }
 

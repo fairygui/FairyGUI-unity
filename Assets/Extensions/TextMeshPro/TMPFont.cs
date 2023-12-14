@@ -232,6 +232,11 @@ namespace FairyGUI
 
             format.FillVertexColors(vertexColors);
         }
+        
+        public TextFormat GetTextFormat()
+        {
+            return _format;
+        }
 
         override public bool GetGlyph(char ch, out float width, out float height, out float baseline, out bool isFallback)
         {

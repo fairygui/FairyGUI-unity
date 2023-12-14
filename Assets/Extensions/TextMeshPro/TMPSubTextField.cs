@@ -7,56 +7,6 @@ namespace FairyGUI
 {
     public class TMPSubTextField : DisplayObject, IMeshFactory
     {
-        public enum SubMeshDrawType : byte
-        {
-            Char = 0,
-            Underline = 1,
-            Strikethrough = 2,
-        }
-        
-        public struct CharInfo
-        {
-            public SubMeshDrawType type;
-            /// <summary>
-            /// 绘制字符的信息
-            /// </summary>
-            public TMP_Character character;
-            /// <summary>
-            /// 绘制line的信息
-            /// </summary>
-            public float width;
-            public int fontSize;
-
-            public float px;
-            public float py;
-            /// <summary>
-            /// 字符占用的顶点数量。
-            /// </summary>
-            public short vertCount;
-
-            public CharInfo(TMP_Character character, float px, float py)
-            {
-                type = SubMeshDrawType.Char;
-                this.character = character;
-                width = 0;
-                fontSize = 0;
-                this.px = px;
-                this.py = py;
-                vertCount = 0;
-            }
-            
-            public CharInfo(SubMeshDrawType type, float px, float py, float width, int fontSize)
-            {
-                this.type = type;
-                character = null;
-                this.width = width;
-                this.fontSize = fontSize;
-                this.px = px;
-                this.py = py;
-                vertCount = 0;
-            }
-        }
-
         private TextField _textField;
         private TMPFont _font { set; get; }
         public TMPFont font
@@ -70,8 +20,10 @@ namespace FairyGUI
             }
         }
 
-        private List<CharInfo> _toRendererChars = new List<CharInfo>();
-        public List<CharInfo> toRendererChars => _toRendererChars;
+        private List<short> _verticesCount = new List<short>();
+        public List<short> VerticesCount => _verticesCount;
+
+        private VertexBuffer _preparedVertexBuffer;
 
         public TMPSubTextField(TextField textField)
         {
@@ -84,25 +36,41 @@ namespace FairyGUI
 
             gOwner = textField.gOwner;
         }
+
+        public void Init(TMPFont font)
+        {
+            visible = true;
+            this.font = font;
+            PrepareVertexBuffer();
+            _preparedVertexBuffer.Clear();
+        }
+
+        private void PrepareVertexBuffer()
+        {
+            if (_preparedVertexBuffer == null)
+                _preparedVertexBuffer = VertexBuffer.Begin();
+        }
+
+        private void DisposeVertexBuffer()
+        {
+            if (_preparedVertexBuffer == null) return;
+            _preparedVertexBuffer.End();
+            _preparedVertexBuffer = null;
+        }
         
         public void OnPopulateMesh(VertexBuffer vb)
         {
+            if (_preparedVertexBuffer == null) return;
             List<Vector3> vertList = vb.vertices;
             List<Vector2> uvList = vb.uvs;
             List<Vector2> uv2List = vb.uvs2;
             List<Color32> colList = vb.colors;
-
-            for (int i = 0, charCount = _toRendererChars.Count; i < charCount; i++)
-            {
-                var charInfo = _toRendererChars[i];
-                if (charInfo.type == SubMeshDrawType.Char)
-                    charInfo.vertCount = (short)_font.DrawGlyph(charInfo.character, charInfo.px, charInfo.py, vertList, uvList, uv2List, colList);
-                else
-                    charInfo.vertCount = (short)_font.DrawLine(charInfo.px, charInfo.py, charInfo.width, charInfo.fontSize,
-                        charInfo.type == SubMeshDrawType.Underline ? 0 : 1, vertList, uvList, uv2List, colList);
-                
-                _toRendererChars[i] = charInfo;
-            }
+            
+            vertList.AddRange(_preparedVertexBuffer.vertices);
+            uvList.AddRange(_preparedVertexBuffer.uvs);
+            uv2List.AddRange(_preparedVertexBuffer.uvs2);
+            colList.AddRange(_preparedVertexBuffer.colors);
+            DisposeVertexBuffer();
 
             int count = vertList.Count;
             if (count > 65000)
@@ -119,17 +87,27 @@ namespace FairyGUI
             vb.AddTriangles();
         }
 
-        public int AddToRendererChar(TMP_Character ch, float px, float py)
+        public int DrawGlyph(TMP_Character ch, float px, float py)
         {
-            int index = _toRendererChars.Count;
-            _toRendererChars.Add(new CharInfo(ch, px, py));
+            PrepareVertexBuffer();
+            List<Vector3> vertList = _preparedVertexBuffer.vertices;
+            List<Vector2> uvList = _preparedVertexBuffer.uvs;
+            List<Vector2> uv2List = _preparedVertexBuffer.uvs2;
+            List<Color32> colList = _preparedVertexBuffer.colors;
+            int index = _verticesCount.Count;
+            _verticesCount.Add((short)_font.DrawGlyph(ch, px, py, vertList, uvList, uv2List, colList));
             return index;
         }
 
-        public int AddToRendererLine(int lineType, float px, float py, float width, int fontSize)
+        public int DrawLine(int lineType, float px, float py, float width, int fontSize)
         {
-            int index = _toRendererChars.Count;
-            _toRendererChars.Add(new CharInfo(lineType == 0 ? SubMeshDrawType.Underline : SubMeshDrawType.Strikethrough, px, py, width, fontSize));
+            PrepareVertexBuffer();
+            List<Vector3> vertList = _preparedVertexBuffer.vertices;
+            List<Vector2> uvList = _preparedVertexBuffer.uvs;
+            List<Vector2> uv2List = _preparedVertexBuffer.uvs2;
+            List<Color32> colList = _preparedVertexBuffer.colors;
+            int index = _verticesCount.Count;
+            _verticesCount.Add((short)_font.DrawLine(px, py, width, fontSize, lineType, vertList, uvList, uv2List, colList));
             return index;
         }
 
@@ -141,7 +119,8 @@ namespace FairyGUI
         
         public void CleanUp()
         {
-            _toRendererChars.Clear();
+            DisposeVertexBuffer();
+            _verticesCount.Clear();
         }
         
         public void Clear()

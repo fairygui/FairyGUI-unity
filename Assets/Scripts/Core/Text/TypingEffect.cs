@@ -170,9 +170,9 @@ namespace FairyGUI
                 }
                 else
                 {
-                    var toRendererChars = _textField.GetSubTextField(i - 1).toRendererChars;
-                    for (int j = 0, count = toRendererChars.Count; j < count; j++)
-                        mainLayerVertCount  += toRendererChars[j].vertCount;
+                    var verticesCount = _textField.GetSubTextField(i - 1).VerticesCount;
+                    for (int j = 0, count = verticesCount.Count; j < count; j++)
+                        mainLayerVertCount  += verticesCount[j];
                 }
                 _mainLayerVertCountList.Add(mainLayerVertCount);
                 if (mainLayerVertCount < meshVertCount) //说明有描边或者阴影
@@ -235,7 +235,7 @@ namespace FairyGUI
 #if FAIRYGUI_TMPRO
                 if (cp.vertCount > 0 || cp.subIndex > 0)
                 {
-                    int vertCount = cp.subIndex > 0 ? _textField.GetSubTextField(cp.subIndex - 1).toRendererChars[cp.subCharIndex].vertCount : cp.vertCount;
+                    int vertCount = cp.subIndex > 0 ? _textField.GetSubTextField(cp.subIndex - 1).VerticesCount[cp.subCharIndex] : cp.vertCount;
                     if (vertCount > 0)
                         output(vertCount, cp.subIndex);
                 }
@@ -243,10 +243,10 @@ namespace FairyGUI
                 // Draw lines
                 if (cp.drawLineSubIndex > 0)
                 {
-                    var toRendererChars = _textField.GetSubTextField(cp.drawLineSubIndex - 1).toRendererChars;
+                    var verticesCount = _textField.GetSubTextField(cp.drawLineSubIndex - 1).VerticesCount;
                     for (byte i = 0, count = cp.drawLineCount; i < count; i++)
                     {
-                        int vertCount = toRendererChars[cp.drawLineSubStartCharIndex + i].vertCount;
+                        int vertCount = verticesCount[cp.drawLineSubStartCharIndex + i];
                         if (vertCount > 0)
                             output(vertCount, cp.drawLineSubIndex);
                     }
