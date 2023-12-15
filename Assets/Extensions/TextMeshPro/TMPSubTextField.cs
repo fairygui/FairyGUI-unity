@@ -70,7 +70,6 @@ namespace FairyGUI
             uvList.AddRange(_preparedVertexBuffer.uvs);
             uv2List.AddRange(_preparedVertexBuffer.uvs2);
             colList.AddRange(_preparedVertexBuffer.colors);
-            DisposeVertexBuffer();
 
             int count = vertList.Count;
             if (count > 65000)
@@ -114,7 +113,9 @@ namespace FairyGUI
         public bool ForceUpdateMesh()
         {
             graphics.SetMeshDirty();
-            return graphics.UpdateMesh();
+            bool update = graphics.UpdateMesh();
+            DisposeVertexBuffer();
+            return update;
         }
         
         public void CleanUp()
