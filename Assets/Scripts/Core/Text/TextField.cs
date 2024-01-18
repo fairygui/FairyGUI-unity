@@ -1181,6 +1181,7 @@ namespace FairyGUI
                 if (_richTextField != null)
                     _richTextField.RefreshObjects();
 
+#if FAIRYGUI_TMPRO
                 int tmpLastCount = activeSubMeshCount;
                 activeSubMeshCount = 0;
                 foreach (var tmpSubTextField in _subTextFields)
@@ -1191,6 +1192,7 @@ namespace FairyGUI
             
                 if (activeSubMeshCount != tmpLastCount)
                     onActiveSubMeshCountChanged?.Invoke(activeSubMeshCount, tmpLastCount);
+#endif
                 return;
             }
 
