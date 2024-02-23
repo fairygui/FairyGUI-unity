@@ -242,16 +242,26 @@ namespace FairyGUI
         {
             isFallback = false;
             _char = GetCharacterFromFontAsset(ch, _style, false);
-            if (_char == null)
+            float charWidth = 0;            
+            if (_char != null)
+            {
+                charWidth = _char.glyph.metrics.horizontalAdvance;
+            }
+            else
             {
                 _char = GetCharacterFromFontAsset(ch, _style, true);
-                if (_char != null)
+                if (_char != null && _char.textAsset is TMP_FontAsset fallbackAsset)
+                {
                     isFallback = true;
+                    float ratio = fallbackAsset.faceInfo.scale / fallbackAsset.faceInfo.pointSize
+                        / _fontAsset.faceInfo.scale * _fontAsset.faceInfo.pointSize;
+                    charWidth = _char.glyph.metrics.horizontalAdvance * ratio;
+                }
             }
 
             if (_char != null)
             {
-                width = _char.glyph.metrics.horizontalAdvance * _boldMultiplier * _scale;
+                width = charWidth * _boldMultiplier * _scale;
                 height = _lineHeight * _scale;
                 baseline = _ascent * _scale;
 
