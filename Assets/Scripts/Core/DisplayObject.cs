@@ -87,6 +87,8 @@ namespace FairyGUI
         EventListener _onClickLink;
         EventListener _onFocusIn;
         EventListener _onFocusOut;
+        EventListener _onEnable;
+        EventListener _onDisable;
 
         protected internal int _paintingMode; //1-滤镜，2-blendMode，4-transformMatrix, 8-cacheAsBitmap
         protected internal PaintingInfo _paintingInfo;
@@ -226,6 +228,21 @@ namespace FairyGUI
 
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        public EventListener onEnable
+        {
+            get { return _onEnable ?? (_onEnable = new EventListener(this, "onEnable")); }
+        }
+        /// <summary>
+        ///
+        /// </summary>
+        public EventListener onDisable
+        {
+            get { return _onDisable ?? (_onDisable = new EventListener(this, "onDisable")); }
+        }
+
         protected void CreateGameObject(string gameObjectName)
         {
             gameObject = new GameObject(gameObjectName);
@@ -239,6 +256,9 @@ namespace FairyGUI
             }
             gameObject.hideFlags = DisplayObject.hideFlags;
             gameObject.SetActive(false);
+            var events = gameObject.AddComponent<DisplayObjectEvents>();
+            events.onEnable = () => { onEnable.Call(); };
+            events.onDisable = () => { onDisable.Call(); };
         }
 
         protected void SetGameObject(GameObject gameObject)
@@ -1873,6 +1893,20 @@ namespace FairyGUI
         {
             if (displayObject != null)
                 displayObject._flags |= DisplayObject.Flags.GameObjectDisposed;
+        }
+    }
+
+    class DisplayObjectEvents : MonoBehaviour
+    {
+        public Action onEnable;
+        public Action onDisable;
+        void OnDisable()
+        {
+            onDisable?.Invoke();
+        }
+        void OnEnable()
+        {
+            onEnable?.Invoke();
         }
     }
 }
