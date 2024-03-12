@@ -99,7 +99,7 @@ namespace FairyGUI
                 _shape.gOwner = null;
                 _shape = null;
             }
-
+            if (displayObject != null) displayObject.Dispose();
             displayObject = obj;
 
             if (displayObject != null)
