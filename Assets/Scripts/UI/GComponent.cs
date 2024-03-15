@@ -1172,10 +1172,10 @@ namespace FairyGUI
                     tmp = child.y;
                     if (tmp < ay)
                         ay = tmp;
-                    tmp = child.x + child.actualWidth;
+                    tmp = child.x + (child.pivotAsAnchor ? child.actualWidth * (1 - child.pivot.x) : child.actualWidth);//Add anchor offset
                     if (tmp > ar)
                         ar = tmp;
-                    tmp = child.y + child.actualHeight;
+                    tmp = child.y + (child.pivotAsAnchor ? child.actualHeight * (1 - child.pivot.y) : child.actualHeight);//Add anchor offset
                     if (tmp > ab)
                         ab = tmp;
                 }
