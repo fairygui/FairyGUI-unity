@@ -50,13 +50,12 @@ namespace FairyGUI
         float _startTime;
         float _endTime;
         GTweenCallback _delayedCallDelegate;
+        GTweenCallback _checkAllDelegate;
         GTweenCallback1 _delayedCallDelegate2;
 
         const int OPTION_IGNORE_DISPLAY_CONTROLLER = 1;
         const int OPTION_AUTO_STOP_DISABLED = 2;
         const int OPTION_AUTO_STOP_AT_END = 4;
-
-        private static List<GPathPoint> helperPoints = new List<GPathPoint>();
 
         public Transition(GComponent owner)
         {
@@ -66,6 +65,7 @@ namespace FairyGUI
 
             _delayedCallDelegate = OnDelayedPlay;
             _delayedCallDelegate2 = OnDelayedPlayItem;
+            _checkAllDelegate = CheckAllComplete;
         }
 
         /// <summary>
@@ -402,6 +402,14 @@ namespace FairyGUI
         }
 
         /// <summary>
+        /// transition's total duration, maybe zero when the transition only has one frame
+        /// </summary>
+        public float totalDuration
+        {
+            get { return _totalDuration; }
+        }
+        
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="label"></param>
@@ -464,6 +472,10 @@ namespace FairyGUI
                             tvalue.frame = Convert.ToInt32(aParams[0]);
                             if (aParams.Length > 1)
                                 tvalue.playing = Convert.ToBoolean(aParams[1]);
+                            if (aParams.Length > 2)
+                                tvalue.animationName = (string)aParams[2];
+                            if (aParams.Length > 3)
+                                tvalue.skinName = (string)aParams[3];
                         }
                         break;
 
@@ -715,12 +727,12 @@ namespace FairyGUI
                 {
                     if (item.tweenConfig != null)
                     {
-                        if(!item.tweenConfig.startValue.b3)
+                        if (!item.tweenConfig.startValue.b3)
                         {
                             item.tweenConfig.startValue.f1 += dx;
                             item.tweenConfig.startValue.f2 += dy;
                         }
-                        if(!item.tweenConfig.endValue.b3)
+                        if (!item.tweenConfig.endValue.b3)
                         {
                             item.tweenConfig.endValue.f1 += dx;
                             item.tweenConfig.endValue.f2 += dy;
@@ -728,7 +740,7 @@ namespace FairyGUI
                     }
                     else
                     {
-                        if(!((TValue)item.value).b3)
+                        if (!((TValue)item.value).b3)
                         {
                             ((TValue)item.value).f1 += dx;
                             ((TValue)item.value).f2 += dy;
@@ -781,7 +793,7 @@ namespace FairyGUI
             _ownerBaseX = _owner.x;
             _ownerBaseY = _owner.y;
 
-            _totalTasks = 0;
+            _totalTasks = 1; //prevent to complete inside the loop
 
             bool needSkipAnimations = false;
             int cnt = _items.Length;
@@ -816,6 +828,8 @@ namespace FairyGUI
 
             if (needSkipAnimations)
                 SkipAnimations();
+
+            _totalTasks--;
         }
 
         void PlayItem(TransitionItem item)
@@ -871,7 +885,7 @@ namespace FairyGUI
                     }
 
                     item.tweener.SetDelay(time)
-                        .SetEase(item.tweenConfig.easeType)
+                        .SetEase(item.tweenConfig.easeType, item.tweenConfig.customEase)
                         .SetRepeat(item.tweenConfig.repeat, item.tweenConfig.yoyo)
                         .SetTimeScale(_timeScale)
                         .SetIgnoreEngineTimeScale(_ignoreEngineTimeScale)
@@ -1177,12 +1191,18 @@ namespace FairyGUI
                 if (_totalTimes < 0)
                 {
                     InternalPlay();
+                    if (_totalTasks == 0)
+                        GTween.DelayedCall(0).SetTarget(this).OnComplete(_checkAllDelegate);
                 }
                 else
                 {
                     _totalTimes--;
                     if (_totalTimes > 0)
+                    {
                         InternalPlay();
+                        if (_totalTasks == 0)
+                            GTween.DelayedCall(0).SetTarget(this).OnComplete(_checkAllDelegate);
+                    }
                     else
                     {
                         _playing = false;
@@ -1306,6 +1326,10 @@ namespace FairyGUI
                         ((IAnimationGear)item.target).playing = value.playing;
                         ((IAnimationGear)item.target).timeScale = _timeScale;
                         ((IAnimationGear)item.target).ignoreEngineTimeScale = _ignoreEngineTimeScale;
+                        if (value.animationName != null)
+                            ((GLoader3D)item.target).animationName = value.animationName;
+                        if (value.skinName != null)
+                            ((GLoader3D)item.target).skinName = value.skinName;
                     }
                     break;
 
@@ -1442,36 +1466,21 @@ namespace FairyGUI
 
                     if (buffer.version >= 2)
                     {
-                        int pathLen = buffer.ReadInt();
-                        if (pathLen > 0)
+                        var pts = buffer.ReadPath();
+                        if (pts.Count > 0)
                         {
                             item.tweenConfig.path = new GPath();
-                            helperPoints.Clear();
-                            List<GPathPoint> pts = helperPoints;
-
-                            for (int j = 0; j < pathLen; j++)
-                            {
-                                GPathPoint.CurveType curveType = (GPathPoint.CurveType)buffer.ReadByte();
-                                switch (curveType)
-                                {
-                                    case GPathPoint.CurveType.Bezier:
-                                        pts.Add(new GPathPoint(new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0),
-                                            new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0)));
-                                        break;
-
-                                    case GPathPoint.CurveType.CubicBezier:
-                                        pts.Add(new GPathPoint(new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0),
-                                            new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0),
-                                            new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0)));
-                                        break;
-
-                                    default:
-                                        pts.Add(new GPathPoint(new Vector3(buffer.ReadFloat(), buffer.ReadFloat(), 0), curveType));
-                                        break;
-                                }
-                            }
-
                             item.tweenConfig.path.Create(pts);
+                        }
+                    }
+
+                    if (buffer.version >= 4 && item.tweenConfig.easeType == EaseType.Custom)
+                    {
+                        var pts = buffer.ReadPath();
+                        if (pts.Count > 0)
+                        {
+                            item.tweenConfig.customEase = new CustomEase();
+                            item.tweenConfig.customEase.Create(pts);
                         }
                     }
                 }
@@ -1526,6 +1535,11 @@ namespace FairyGUI
                 case TransitionActionType.Animation:
                     ((TValue_Animation)value).playing = buffer.ReadBool();
                     ((TValue_Animation)value).frame = buffer.ReadInt();
+                    if (buffer.version >= 6)
+                    {
+                        ((TValue_Animation)value).animationName = buffer.ReadS();
+                        ((TValue_Animation)value).skinName = buffer.ReadS();
+                    }
                     break;
 
                 case TransitionActionType.Visible:
@@ -1631,6 +1645,7 @@ namespace FairyGUI
     {
         public float duration;
         public EaseType easeType;
+        public CustomEase customEase;
         public int repeat;
         public bool yoyo;
 
@@ -1660,6 +1675,8 @@ namespace FairyGUI
         public int frame;
         public bool playing;
         public bool flag;
+        public string animationName;
+        public string skinName;
     }
 
     class TValue_Sound

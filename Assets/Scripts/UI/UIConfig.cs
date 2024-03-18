@@ -86,6 +86,16 @@ namespace FairyGUI
         public static bool defaultScrollBounceEffect = true;
 
         /// <summary>
+        /// When the scrolling container is set to "snap to the item", the rolling distance threshold of which item is close to is determined.
+        /// </summary> 
+        public static float defaultScrollSnappingThreshold = 0.5f;
+
+        /// <summary>
+        /// When the scrolling container is set to "page mode", it determines the scrolling distance threshold to which page to turn.
+        /// </summary> 
+        public static float defaultScrollPagingThreshold = 0.3f;
+
+        /// <summary>
         /// Resources url of PopupMenu.
         /// </summary>
         public static string popupMenu;

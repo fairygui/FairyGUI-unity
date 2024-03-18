@@ -10,6 +10,7 @@ namespace FairyGUI
     {
         Dictionary<string, int> _storage;
         int _default;
+        GTextField _textField;
 
         public GearFontSize(GObject owner)
             : base(owner)
@@ -18,7 +19,14 @@ namespace FairyGUI
 
         protected override void Init()
         {
-            _default = ((GTextField)_owner).textFormat.size;
+            if (_owner is GLabel)
+                _textField = ((GLabel)_owner).GetTextField();
+            else if (_owner is GButton)
+                _textField = ((GButton)_owner).GetTextField();
+            else
+                _textField = (GTextField)_owner;
+
+            _default = _textField.textFormat.size;
             _storage = new Dictionary<string, int>();
         }
 
@@ -32,22 +40,26 @@ namespace FairyGUI
 
         override public void Apply()
         {
+            if (_textField == null)
+                return;
+
             _owner._gearLocked = true;
 
             int cv;
             if (!_storage.TryGetValue(_controller.selectedPageId, out cv))
                 cv = _default;
 
-            TextFormat tf = ((GTextField)_owner).textFormat;
+            TextFormat tf = _textField.textFormat;
             tf.size = cv;
-            ((GTextField)_owner).textFormat = tf;
+            _textField.textFormat = tf;
 
             _owner._gearLocked = false;
         }
 
         override public void UpdateState()
         {
-            _storage[_controller.selectedPageId] = ((GTextField)_owner).textFormat.size;
+            if (_textField != null)
+                _storage[_controller.selectedPageId] = _textField.textFormat.size;
         }
     }
 }

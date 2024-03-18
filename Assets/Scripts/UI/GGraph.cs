@@ -251,7 +251,7 @@ namespace FairyGUI
                     for (int i = 0; i < cnt; i++)
                         points[i].Set(buffer.ReadFloat(), buffer.ReadFloat());
 
-                    _shape.DrawPolygon(points, fillColor);
+                    _shape.DrawPolygon(points, fillColor, lineSize, lineColor);
                 }
                 else if (type == 4)
                 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 #if FAIRYGUI_TOLUA
 using LuaInterface;
@@ -46,6 +46,10 @@ namespace FairyGUI
     /// </summary>
     public class GTweener
     {
+        public static EaseType defaultEaseType = EaseType.QuadOut;
+        public static bool defaultIgnoreEngineTimeScale = false;
+        public static float defaultTimeScale = 1;
+
         internal object _target;
         internal TweenPropType _propType;
         internal bool _killed;
@@ -64,6 +68,7 @@ namespace FairyGUI
         bool _snapping;
         object _userData;
         GPath _path;
+        CustomEase _customEase;
 
         GTweenCallback _onUpdate;
         GTweenCallback _onStart;
@@ -150,6 +155,19 @@ namespace FairyGUI
         public GTweener SetEase(EaseType value)
         {
             _easeType = value;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="customEase"></param>
+        /// <returns></returns>
+        public GTweener SetEase(EaseType value, CustomEase customEase)
+        {
+            _easeType = value;
+            _customEase = customEase;
             return this;
         }
 
@@ -571,9 +589,9 @@ namespace FairyGUI
             _delay = 0;
             _duration = 0;
             _breakpoint = -1;
-            _easeType = EaseType.QuadOut;
-            _timeScale = 1;
-            _ignoreEngineTimeScale = false;
+            _easeType = defaultEaseType;
+            _timeScale = defaultTimeScale;
+            _ignoreEngineTimeScale = defaultIgnoreEngineTimeScale;
             _easePeriod = 0;
             _easeOvershootOrAmplitude = 1.70158f;
             _snapping = false;
@@ -587,6 +605,7 @@ namespace FairyGUI
             _normalizedTime = 0;
             _ended = 0;
             _path = null;
+            _customEase = null;
             _smoothStart = Time.frameCount == 1 ? 3 : 1;//刚启动时会有多帧的超时
         }
 
@@ -691,7 +710,7 @@ namespace FairyGUI
             }
 
             _normalizedTime = EaseManager.Evaluate(_easeType, reversed ? (_duration - tt) : tt, _duration,
-                _easeOvershootOrAmplitude, _easePeriod);
+                _easeOvershootOrAmplitude, _easePeriod, _customEase);
 
             _value.SetZero();
             _deltaValue.SetZero();

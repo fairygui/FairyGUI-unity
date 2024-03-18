@@ -956,7 +956,7 @@ namespace FairyGUI
                 && ((_flags & Flags.TabStop) != 0 || (_flags & Flags.TabStopChildren) != 0)
                 && (_flags & Flags.NotFocusable) == 0)
             {
-                Stage.inst.SetFous(this, true);
+                Stage.inst.SetFocus(this, true);
                 return true;
             }
             else
@@ -1764,7 +1764,7 @@ namespace FairyGUI
             return true;
         }
 
-        internal void _SetLayerDirect(int value)
+        virtual internal void _SetLayerDirect(int value)
         {
             if (_paintingMode > 0)
                 paintingGraphics.gameObject.layer = value;

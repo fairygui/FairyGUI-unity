@@ -39,19 +39,7 @@ namespace FairyGUIEditor
         void OnGUI()
         {
             if (itemStyle == null)
-            {
-                itemStyle = new GUIStyle(EditorStyles.textField);
-                itemStyle.normal.background = null;
-                itemStyle.onNormal.background = GUI.skin.GetStyle("ObjectPickerResultsEven").active.background;
-                itemStyle.focused.background = null;
-                itemStyle.onFocused.background = null;
-                itemStyle.hover.background = null;
-                itemStyle.onHover.background = null;
-                itemStyle.active.background = null;
-                itemStyle.onActive.background = null;
-                itemStyle.margin.top = 0;
-                itemStyle.margin.bottom = 0;
-            }
+                itemStyle = new GUIStyle(GUI.skin.GetStyle("Tag MenuItem"));
 
             EditorGUILayout.BeginHorizontal();
 
@@ -61,7 +49,9 @@ namespace FairyGUIEditor
 
             EditorGUILayout.BeginVertical();
             GUILayout.Space(10);
+
             EditorGUILayout.LabelField("Packages", (GUIStyle)"OL Title", GUILayout.Width(300));
+            GUILayout.Space(5);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(4);
@@ -80,7 +70,6 @@ namespace FairyGUIEditor
                 for (int i = 0; i < cnt; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
-                    GUILayout.Space(4);
                     if (GUILayout.Toggle(selectedPackageName == pkgs[i].name, pkgs[i].name, itemStyle, GUILayout.ExpandWidth(true)))
                     {
                         selectedPackage = i;
@@ -106,7 +95,9 @@ namespace FairyGUIEditor
 
             EditorGUILayout.BeginVertical();
             GUILayout.Space(10);
+
             EditorGUILayout.LabelField("Components", (GUIStyle)"OL Title", GUILayout.Width(220));
+            GUILayout.Space(5);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(4);
@@ -121,7 +112,6 @@ namespace FairyGUIEditor
                     if (pi.type == PackageItemType.Component && pi.exported)
                     {
                         EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(4);
                         if (GUILayout.Toggle(selectedComponentName == pi.name, pi.name, itemStyle, GUILayout.ExpandWidth(true)))
                             selectedComponentName = pi.name;
                         i++;
@@ -159,11 +149,17 @@ namespace FairyGUIEditor
                 UIPackage selectedPkg = pkgs[selectedPackage];
                 string tmp = selectedPkg.assetPath.ToLower();
                 string packagePath;
-                int pos = tmp.LastIndexOf("resources/");
+                int pos = tmp.LastIndexOf("/resources/");
                 if (pos != -1)
-                    packagePath = selectedPkg.assetPath.Substring(pos + 10);
+                    packagePath = selectedPkg.assetPath.Substring(pos + 11);
                 else
-                    packagePath = selectedPkg.assetPath;
+                {
+                    pos = tmp.IndexOf("resources/");
+                    if (pos == 0)
+                        packagePath = selectedPkg.assetPath.Substring(pos + 10);
+                    else
+                        packagePath = selectedPkg.assetPath;
+                }
                 if (Selection.activeGameObject != null)
                 {
 #if UNITY_2018_3_OR_NEWER

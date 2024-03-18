@@ -14,6 +14,8 @@ namespace FairyGUI
         public bool supportStencil;
 
         public event Action<UpdateContext> onUpdate;
+        public Action<Dictionary<Material, Material>> customCloneMaterials;
+        public Action customRecoverMaterials;
 
         protected GameObject _wrapTarget;
         protected List<RendererInfo> _renderers;
@@ -21,7 +23,6 @@ namespace FairyGUI
         protected Canvas _canvas;
         protected bool _cloneMaterial;
         protected bool _shouldCloneMaterial;
-        protected bool _supportMask;
 
         protected struct RendererInfo
         {
@@ -37,7 +38,7 @@ namespace FairyGUI
         /// </summary>
         public GoWrapper()
         {
-            _flags |= Flags.SkipBatching;
+            // _flags |= Flags.SkipBatching;
 
             _renderers = new List<RendererInfo>();
             _materialsBackup = new Dictionary<Material, Material>();
@@ -77,6 +78,11 @@ namespace FairyGUI
         /// <param name="cloneMaterial">如果true，则复制材质，否则直接使用sharedMaterial。</param>
         public void SetWrapTarget(GameObject target, bool cloneMaterial)
         {
+            // set Flags.SkipBatching only target not null
+            if (target == null) _flags &= ~Flags.SkipBatching;
+            else _flags |= Flags.SkipBatching;
+            InvalidateBatchingState();
+
             RecoverMaterials();
 
             _cloneMaterial = cloneMaterial;
@@ -85,7 +91,6 @@ namespace FairyGUI
 
             _canvas = null;
             _wrapTarget = target;
-            _supportMask = false;
             _shouldCloneMaterial = false;
             _renderers.Clear();
 
@@ -114,6 +119,24 @@ namespace FairyGUI
             }
         }
 
+        override internal void _SetLayerDirect(int value)
+        {  
+            if (_paintingMode > 0)
+                paintingGraphics.gameObject.layer = value;
+            else
+            {
+                gameObject.layer = value;
+                if (_wrapTarget != null)//这个if是为了在GoWrapper里使用模糊效果
+                {
+                    _wrapTarget.layer = value;
+                    foreach (Transform tf in _wrapTarget.GetComponentsInChildren<Transform>(true))
+                    {
+                        tf.gameObject.layer = value;
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// GoWrapper will cache all renderers of your gameobject on constructor. 
         /// If your gameobject change laterly, call this function to update the cache.
@@ -143,13 +166,25 @@ namespace FairyGUI
                     sortingOrder = r.sortingOrder
                 };
                 _renderers.Add(ri);
+
+                if (!_cloneMaterial && mats != null
+                    && ((r is SkinnedMeshRenderer) || (r is MeshRenderer)))
+                {
+                    int mcnt = mats.Length;
+                    for (int j = 0; j < mcnt; j++)
+                    {
+                        Material mat = mats[j];
+                        if (mat != null && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
+                            mat.renderQueue = 3000;
+                    }
+                }
             }
             _renderers.Sort((RendererInfo c1, RendererInfo c2) =>
             {
                 return c1.sortingOrder - c2.sortingOrder;
             });
 
-            _shouldCloneMaterial = true;
+            _shouldCloneMaterial = _cloneMaterial;
         }
 
         void CloneMaterials()
@@ -173,13 +208,6 @@ namespace FairyGUI
                     if (mat == null)
                         continue;
 
-                    if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
-                        mat.renderQueue = 3000;
-
-                    if (mat.HasProperty(ShaderConfig.ID_Stencil) || mat.HasProperty(ShaderConfig.ID_Stencil2)
-                        || mat.HasProperty(ShaderConfig.ID_ClipBox))
-                        _supportMask = true;
-
                     //确保相同的材质不会复制两次
                     Material newMat;
                     if (!_materialsBackup.TryGetValue(mat, out newMat))
@@ -188,9 +216,14 @@ namespace FairyGUI
                         _materialsBackup[mat] = newMat;
                     }
                     mats[j] = newMat;
+
+                    if (shouldSetRQ && mat.renderQueue != 3000) //Set the object rendering in Transparent Queue as UI objects
+                        newMat.renderQueue = 3000;
                 }
 
-                if (ri.renderer != null)
+                if (customCloneMaterials != null)
+                    customCloneMaterials.Invoke(_materialsBackup);
+                else if (ri.renderer != null)
                     ri.renderer.sharedMaterials = mats;
             }
         }
@@ -222,7 +255,11 @@ namespace FairyGUI
                             mats[j] = kv.Key;
                     }
                 }
-                ri.renderer.sharedMaterials = mats;
+
+                if (customRecoverMaterials != null)
+                    customRecoverMaterials.Invoke();
+                else
+                    ri.renderer.sharedMaterials = mats;
             }
 
             foreach (KeyValuePair<Material, Material> kv in _materialsBackup)
@@ -291,31 +328,54 @@ namespace FairyGUI
             if (_shouldCloneMaterial)
                 CloneMaterials();
 
-            if (_supportMask)
-            {
-                int cnt = _renderers.Count;
-                for (int i = 0; i < cnt; i++)
-                {
-                    RendererInfo ri = _renderers[i];
-                    Material[] mats = ri.materials;
-                    if (mats != null)
-                    {
-                        int cnt2 = mats.Length;
-                        for (int j = 0; j < cnt2; j++)
-                        {
-                            Material mat = mats[j];
-                            if (mat != null)
-                                context.ApplyClippingProperties(mat, false);
-                        }
-
-                        if (cnt2 > 0 && _cloneMaterial && ri.renderer != null
-                             && !Material.ReferenceEquals(ri.renderer.sharedMaterial, mats[0]))
-                            ri.renderer.sharedMaterials = mats;
-                    }
-                }
-            }
+            ApplyClipping(context);
 
             base.Update(context);
+        }
+
+        private List<Material> helperMaterials = new List<Material>();
+        virtual protected void ApplyClipping(UpdateContext context)
+        {
+#if UNITY_2018_2_OR_NEWER
+            int cnt = _renderers.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                Renderer renderer = _renderers[i].renderer;
+                if (renderer == null)
+                    continue;
+
+                if (customCloneMaterials != null)
+                    helperMaterials.AddRange(_materialsBackup.Values);
+                else
+                    renderer.GetSharedMaterials(helperMaterials);
+
+                int cnt2 = helperMaterials.Count;
+                for (int j = 0; j < cnt2; j++)
+                {
+                    Material mat = helperMaterials[j];
+                    if (mat != null)
+                        context.ApplyClippingProperties(mat, false);
+                }
+
+                helperMaterials.Clear();
+            }
+#else
+            int cnt = _renderers.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                Material[] mats = _renderers[i].materials;
+                if (mats == null)
+                    continue;
+                
+                int cnt2 = mats.Length;
+                for (int j = 0; j < cnt2; j++)
+                {
+                    Material mat = mats[j];
+                    if (mat != null)
+                        context.ApplyClippingProperties(mat, false);
+                }
+            }
+#endif
         }
 
         public override void Dispose()
@@ -338,6 +398,8 @@ namespace FairyGUI
             _renderers = null;
             _materialsBackup = null;
             _canvas = null;
+            customCloneMaterials = null;
+            customRecoverMaterials = null;
 
             base.Dispose();
         }

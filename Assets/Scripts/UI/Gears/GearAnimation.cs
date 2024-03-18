@@ -7,6 +7,8 @@ namespace FairyGUI
     {
         public bool playing;
         public int frame;
+        public string animationName;
+        public string skinName;
 
         public GearAnimationValue(bool playing, int frame)
         {
@@ -31,6 +33,11 @@ namespace FairyGUI
         protected override void Init()
         {
             _default = new GearAnimationValue(((IAnimationGear)_owner).playing, ((IAnimationGear)_owner).frame);
+            if (_owner is GLoader3D)
+            {
+                _default.animationName = ((GLoader3D)_owner).animationName;
+                _default.skinName = ((GLoader3D)_owner).skinName;
+            }
             _storage = new Dictionary<string, GearAnimationValue>();
         }
 
@@ -49,6 +56,17 @@ namespace FairyGUI
             gv.frame = buffer.ReadInt();
         }
 
+        public void AddExtStatus(string pageId, ByteBuffer buffer)
+        {
+            GearAnimationValue gv;
+            if (pageId == null)
+                gv = _default;
+            else
+                gv = _storage[pageId];
+            gv.animationName = buffer.ReadS();
+            gv.skinName = buffer.ReadS();
+        }
+
         override public void Apply()
         {
             _owner._gearLocked = true;
@@ -60,6 +78,11 @@ namespace FairyGUI
             IAnimationGear mc = (IAnimationGear)_owner;
             mc.frame = gv.frame;
             mc.playing = gv.playing;
+            if (_owner is GLoader3D)
+            {
+                ((GLoader3D)_owner).animationName = gv.animationName;
+                ((GLoader3D)_owner).skinName = gv.skinName;
+            }
 
             _owner._gearLocked = false;
         }
@@ -69,11 +92,17 @@ namespace FairyGUI
             IAnimationGear mc = (IAnimationGear)_owner;
             GearAnimationValue gv;
             if (!_storage.TryGetValue(_controller.selectedPageId, out gv))
-                _storage[_controller.selectedPageId] = new GearAnimationValue(mc.playing, mc.frame);
+                _storage[_controller.selectedPageId] = gv = new GearAnimationValue(mc.playing, mc.frame);
             else
             {
                 gv.playing = mc.playing;
                 gv.frame = mc.frame;
+            }
+
+            if (_owner is GLoader3D)
+            {
+                gv.animationName = ((GLoader3D)_owner).animationName;
+                gv.skinName = ((GLoader3D)_owner).skinName;
             }
         }
     }

@@ -75,7 +75,7 @@ namespace FairyGUI
                 int gearCnt = buffer.ReadShort();
                 for (int j = 0; j < gearCnt; j++)
                 {
-                    int nextPos = buffer.ReadShort();
+                    int nextPos = buffer.ReadUshort();
                     nextPos += buffer.position;
 
                     if (buffer.ReadByte() == 6) //gearText
@@ -148,7 +148,7 @@ namespace FairyGUI
                             int itemCount = buffer.ReadShort();
                             for (int j = 0; j < itemCount; j++)
                             {
-                                int nextPos = buffer.ReadShort();
+                                int nextPos = buffer.ReadUshort();
                                 nextPos += buffer.position;
 
                                 buffer.Skip(2); //url
@@ -229,7 +229,7 @@ namespace FairyGUI
                                 int itemCount = buffer.ReadShort();
                                 for (int j = 0; j < itemCount; j++)
                                 {
-                                    int nextPos = buffer.ReadShort();
+                                    int nextPos = buffer.ReadUshort();
                                     nextPos += buffer.position;
 
                                     if (strings.TryGetValue(elementId + "-" + j, out value))

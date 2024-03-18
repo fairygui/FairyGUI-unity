@@ -169,7 +169,8 @@ namespace FairyGUI
             camera.aspect = aspect * scaleX / scaleY;
             camera.orthographicSize = halfHeight * scaleY;
             _main.cachedTransform.localPosition = target.cachedTransform.TransformPoint(halfHeight * aspect - offset.x, -halfHeight + offset.y, 0);
-            _main.cachedTransform.localRotation = Quaternion.LookRotation(forward, upwards);
+            if (forward != Vector3.zero)
+                _main.cachedTransform.localRotation = Quaternion.LookRotation(forward, upwards);
 
             int oldLayer = 0;
 

@@ -1,6 +1,7 @@
 #if FAIRYGUI_SPINE
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Spine.Unity;
 
@@ -57,6 +58,9 @@ namespace FairyGUI
         {
             if (_spineAnimation != null)
                 FreeSpine();
+
+            _content.customCloneMaterials = MaterialOverride;
+            _content.customRecoverMaterials = CleanMaterialOverride;
 
             _spineAnimation = SkeletonRenderer.NewSpineGameObject<SkeletonAnimation>(asset);
             _spineAnimation.gameObject.name = asset.name;
@@ -142,6 +146,9 @@ namespace FairyGUI
                     else
                         GameObject.DestroyImmediate(_spineAnimation.gameObject);
                 }
+
+                _content.customCloneMaterials = null;
+                _content.customRecoverMaterials = null;
             }
         }
 
@@ -149,6 +156,23 @@ namespace FairyGUI
         {
             if (_spineAnimation != null)
                 _spineAnimation.skeleton.A = context.alpha * _content.alpha;
+        }
+
+        private void MaterialOverride(Dictionary<Material, Material> materials)
+        {
+            if (_spineAnimation != null)
+            {
+                foreach (var kv in materials)
+                {
+                    _spineAnimation.CustomMaterialOverride[kv.Key] = kv.Value;
+                }
+            }
+        }
+
+        private void CleanMaterialOverride()
+        {
+            if (_spineAnimation != null)
+                _spineAnimation.CustomMaterialOverride.Clear();
         }
     }
 }

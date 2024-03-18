@@ -269,11 +269,11 @@ namespace FairyGUI
             }
             set
             {
-                SetFous(value);
+                SetFocus(value);
             }
         }
 
-        public void SetFous(DisplayObject newFocus, bool byKey = false)
+        public void SetFocus(DisplayObject newFocus, bool byKey = false)
         {
             if (newFocus == this)
                 newFocus = null;
@@ -510,6 +510,27 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="touchId"></param>
+        /// <returns></returns>
+        public DisplayObject GetTouchTarget(int touchId)
+        {
+            if (_frameGotHitTarget != Time.frameCount)
+                GetHitTarget();
+
+            for (int j = 0; j < 5; j++)
+            {
+                TouchInfo touch = _touches[j];
+                if (touch.touchId == touchId)
+                    return touch.target != this ? touch.target : null;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int touchCount
         {
             get { return _touchCount; }
@@ -730,12 +751,12 @@ namespace FairyGUI
                     if (_nextFocus.tabStopChildren)
                     {
                         if (_nextFocus._lastFocus != null && _nextFocus.IsAncestorOf(_nextFocus._lastFocus))
-                            SetFous(_nextFocus._lastFocus);
+                            SetFocus(_nextFocus._lastFocus);
                         else
-                            SetFous(_nextFocus);
+                            SetFocus(_nextFocus);
                     }
                     else
-                        SetFous(_nextFocus);
+                        SetFocus(_nextFocus);
                 }
                 _nextFocus = null;
             }
@@ -974,7 +995,7 @@ namespace FairyGUI
                     }
 
                     if (_keyboard.done)
-                        SetFous(null);
+                        SetFocus(null);
                 }
             }
             else
@@ -1004,7 +1025,8 @@ namespace FairyGUI
                     _touchCount = 1;
                     touch.Begin();
                     touch.button = 0;
-                    SetFous(touch.target);
+                    touch.touchId = 0;
+                    SetFocus(touch.target);
 
                     touch.UpdateEvent();
                     touch.target.BubbleEvent("onTouchBegin", touch.evt);
@@ -1046,7 +1068,7 @@ namespace FairyGUI
                     _touchCount = 1;
                     touch.Begin();
                     touch.button = Input.GetMouseButtonDown(2) ? 2 : (Input.GetMouseButtonDown(1) ? 1 : 0);
-                    SetFous(touch.target);
+                    SetFocus(touch.target);
 
                     touch.UpdateEvent();
                     touch.target.BubbleEvent("onTouchBegin", touch.evt);
@@ -1122,7 +1144,7 @@ namespace FairyGUI
                         _touchCount++;
                         touch.Begin();
                         touch.button = 0;
-                        SetFous(touch.target);
+                        SetFocus(touch.target);
 
                         touch.UpdateEvent();
                         touch.target.BubbleEvent("onTouchBegin", touch.evt);

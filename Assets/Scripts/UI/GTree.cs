@@ -511,7 +511,7 @@ namespace FairyGUI
             int cnt = buffer.ReadShort();
             for (int i = 0; i < cnt; i++)
             {
-                nextPos = buffer.ReadShort();
+                nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 str = buffer.ReadS();

@@ -29,7 +29,10 @@ namespace FairyGUI
                 return false;
 
             if (shape.parent != null)
+            {
                 localPoint = shape.parent.TransformPoint(localPoint, shape);
+                contentRect.size = shape.size;
+            }
 
             IHitTest ht = shape.graphics.meshFactory as IHitTest;
             if (ht == null)

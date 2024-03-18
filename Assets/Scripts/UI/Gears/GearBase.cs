@@ -99,7 +99,7 @@ namespace FairyGUI
             {
                 if (this is GearXY)
                 {
-                    if(buffer.ReadBool())
+                    if (buffer.ReadBool())
                     {
                         ((GearXY)this).positionsInPercent = true;
                         for (int i = 0; i < cnt; i++)
@@ -117,6 +117,30 @@ namespace FairyGUI
                 }
                 else if (this is GearDisplay2)
                     ((GearDisplay2)this).condition = buffer.ReadByte();
+            }
+
+            if (buffer.version >= 4 && _tweenConfig != null && _tweenConfig.easeType == EaseType.Custom)
+            {
+                _tweenConfig.customEase = new CustomEase();
+                _tweenConfig.customEase.Create(buffer.ReadPath());
+            }
+
+            if (buffer.version >= 6)
+            {
+                if (this is GearAnimation)
+                {
+                    for (int i = 0; i < cnt; i++)
+                    {
+                        string page = buffer.ReadS();
+                        if (page == null)
+                            continue;
+
+                        ((GearAnimation)this).AddExtStatus(page, buffer);
+                    }
+
+                    if (buffer.ReadBool())
+                        ((GearAnimation)this).AddExtStatus(null, buffer);
+                }
             }
         }
 
@@ -149,6 +173,11 @@ namespace FairyGUI
         /// Ease type.
         /// </summary>
         public EaseType easeType;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public CustomEase customEase;
 
         /// <summary>
         /// Tween duration in seconds.

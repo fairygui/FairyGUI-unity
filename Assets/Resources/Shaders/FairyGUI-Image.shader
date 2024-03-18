@@ -85,6 +85,7 @@ Shader "FairyGUI/Image"
                 sampler2D _AlphaTex;
                 #endif
 
+                CBUFFER_START(UnityPerMaterial)
                 #ifdef CLIPPED
                 float4 _ClipBox = float4(-2, -2, 0, 0);
                 #endif
@@ -93,6 +94,7 @@ Shader "FairyGUI/Image"
                 float4 _ClipBox = float4(-2, -2, 0, 0);
                 float4 _ClipSoftness = float4(0, 0, 0, 0);
                 #endif
+                CBUFFER_END
 
                 #ifdef COLOR_FILTER
                 float4x4 _ColorMatrix;

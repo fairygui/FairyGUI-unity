@@ -139,11 +139,17 @@ namespace FairyGUI
             }
         }
 
+        [Obsolete("Use previousIndex")]
+        public int previsousIndex
+        {
+            get { return _previousIndex; }
+        }
+
         /// <summary>
         /// Previouse page index.
         /// 获得上次活动页面索引
         /// </summary>
-        public int previsousIndex
+        public int previousIndex
         {
             get { return _previousIndex; }
         }
@@ -314,7 +320,7 @@ namespace FairyGUI
             get
             {
                 if (_selectedIndex == -1)
-                    return null;
+                    return string.Empty;
                 else
                     return _pageIds[_selectedIndex];
             }
@@ -414,7 +420,7 @@ namespace FairyGUI
 
                 for (int i = 0; i < cnt; i++)
                 {
-                    int nextPos = buffer.ReadShort();
+                    int nextPos = buffer.ReadUshort();
                     nextPos += buffer.position;
 
                     ControllerAction action = ControllerAction.CreateAction((ControllerAction.ActionType)buffer.ReadByte());

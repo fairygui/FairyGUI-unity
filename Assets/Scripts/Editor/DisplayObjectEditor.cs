@@ -10,8 +10,25 @@ namespace FairyGUIEditor
     [CustomEditor(typeof(DisplayObjectInfo))]
     public class DisplayObjectEditor : Editor
     {
+#if UNITY_2019_1_OR_NEWER
+        bool _guiControllersFoldout = true;
+        bool _guiTransitionsFoldout = true;
+        bool _guiTextFormatFoldout = true;
+#endif
+
         void OnEnable()
         {
+            EditorApplication.update += _onEditorAppUpdate;
+        }
+
+        private void OnDisable()
+        {
+            EditorApplication.update -= _onEditorAppUpdate;
+        }
+
+        void _onEditorAppUpdate()
+        {
+            Repaint();
         }
 
         public override void OnInspectorGUI()
@@ -78,6 +95,11 @@ namespace FairyGUIEditor
                 }
 
                 EditorGUI.BeginChangeCheck();
+                float alpha = EditorGUILayout.Slider("Alpha", gObj.alpha, 0, 1);
+                if (EditorGUI.EndChangeCheck())
+                    gObj.alpha = alpha;
+
+                EditorGUI.BeginChangeCheck();
                 Vector3 position = EditorGUILayout.Vector3Field("Position", gObj.position);
                 if (EditorGUI.EndChangeCheck())
                     gObj.position = position;
@@ -120,6 +142,187 @@ namespace FairyGUIEditor
                 string icon = EditorGUILayout.TextField("Icon", gObj.icon);
                 if (EditorGUI.EndChangeCheck())
                     gObj.icon = icon;
+
+                //Draw Color Field
+                var objType = gObj.GetType();
+                var colorProperty = objType.GetProperty("color");
+                if (colorProperty != null)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    Color color = (Color)colorProperty.GetValue(gObj);
+                    color = EditorGUILayout.ColorField("Color", color);
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        colorProperty.SetValue(gObj, color);
+                    }
+                }
+
+                EditorGUI.BeginChangeCheck();
+                string tooltips = EditorGUILayout.TextField("Tooltips", gObj.tooltips);
+                if (EditorGUI.EndChangeCheck())
+                    gObj.tooltips = tooltips;
+
+                if (!(gObj is GImage))
+                {
+                    EditorGUI.BeginChangeCheck();
+                    bool touchable = EditorGUILayout.Toggle("Touchable", gObj.touchable);
+                    if (EditorGUI.EndChangeCheck())
+                        gObj.touchable = touchable;
+
+                    EditorGUI.BeginChangeCheck();
+                    bool draggable = EditorGUILayout.Toggle("Draggable", gObj.draggable);
+                    if (EditorGUI.EndChangeCheck())
+                        gObj.draggable = draggable;
+                }
+
+#if UNITY_2019_1_OR_NEWER
+                TextFormat textFormat = null;
+                if (gObj is GTextField gTxt)
+                {
+                    textFormat = gTxt.textFormat;
+                }
+
+                if (textFormat != null)
+                {
+                    _guiTextFormatFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(_guiTextFormatFoldout, "Text Format");
+                    EditorGUI.BeginChangeCheck();
+                    if (_guiTextFormatFoldout)
+                    {
+
+                        var initLabelWidth = EditorGUIUtility.labelWidth;
+
+                        var richStyle = new GUIStyle(GUI.skin.label);
+                        richStyle.richText = true;
+                        EditorGUIUtility.labelWidth = 60;
+                        textFormat.font = EditorGUILayout.TextField("Font", textFormat.font);
+                        textFormat.align = (AlignType)EditorGUILayout.EnumPopup("Align", textFormat.align);
+
+                        EditorGUIUtility.labelWidth = initLabelWidth;
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUIUtility.labelWidth = 40;
+                        textFormat.size = EditorGUILayout.IntField("Size", textFormat.size);
+                        textFormat.color = EditorGUILayout.ColorField("Color", textFormat.color);
+                        EditorGUIUtility.labelWidth = initLabelWidth;
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUIUtility.labelWidth = 40;
+                        textFormat.outline = EditorGUILayout.FloatField("Outline", textFormat.outline);
+                        textFormat.outlineColor = EditorGUILayout.ColorField("Color", textFormat.outlineColor);
+                        EditorGUIUtility.labelWidth = initLabelWidth;
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUIUtility.labelWidth = 50;
+                        textFormat.shadowOffset = EditorGUILayout.Vector2Field("Shadow Offset", textFormat.shadowOffset);
+                        textFormat.shadowColor = EditorGUILayout.ColorField("Color", textFormat.shadowColor);
+                        EditorGUIUtility.labelWidth = initLabelWidth;
+                        EditorGUILayout.EndHorizontal();
+
+
+                        EditorGUILayout.BeginHorizontal();
+                        textFormat.italic = EditorGUILayout.ToggleLeft("<i>I</i>", textFormat.italic, richStyle, GUILayout.Width(30));
+                        textFormat.bold = EditorGUILayout.ToggleLeft("<b>B</b>", textFormat.bold, richStyle, GUILayout.Width(30));
+                        textFormat.underline = EditorGUILayout.ToggleLeft("U̲", textFormat.underline, richStyle, GUILayout.Width(30));
+                        textFormat.strikethrough = EditorGUILayout.ToggleLeft(" S̶ ̶ ̶", textFormat.strikethrough, richStyle, GUILayout.Width(36));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUIUtility.labelWidth = 90;
+                        textFormat.lineSpacing = EditorGUILayout.IntField("Line Spacing", textFormat.lineSpacing);
+                        textFormat.letterSpacing = EditorGUILayout.IntField("Letter Spacing", textFormat.letterSpacing);
+                        EditorGUIUtility.labelWidth = initLabelWidth;
+                        EditorGUILayout.EndHorizontal();
+                        textFormat.specialStyle = (TextFormat.SpecialStyle)EditorGUILayout.EnumPopup("Special Style", textFormat.specialStyle);
+
+                    }
+                    if (EditorGUI.EndChangeCheck())
+                        gObj.asTextField.textFormat = textFormat;
+
+                    EditorGUILayout.EndFoldoutHeaderGroup();
+                }
+
+                if (gObj is GComponent gComp)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    bool opaque = EditorGUILayout.Toggle("Opaque", gComp.opaque);
+                    if (EditorGUI.EndChangeCheck())
+                        gComp.opaque = opaque;
+
+                    var headerLabelStyle = new GUIStyle(GUI.skin.label);
+                    headerLabelStyle.fontStyle = FontStyle.Bold;
+
+                    if (gComp.Controllers.Count > 0)
+                    {
+                        _guiControllersFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(_guiControllersFoldout, "Controllers");
+                        if (_guiControllersFoldout)
+                        {
+                            foreach (var ctl in gComp.Controllers)
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                EditorGUILayout.LabelField(ctl.name, headerLabelStyle, GUILayout.MaxWidth(ctl.name.Length * 15));
+
+                                for (var i = 0; i < ctl.pageCount; i++)
+                                {
+                                    var btnName = ctl.GetPageId(i) + ": " + ctl.GetPageName(i);
+                                    var btnStyle = new GUIStyle("ButtonMid");
+                                    if (ctl.selectedIndex == i)
+                                    {
+                                        btnStyle.normal.textColor = Color.green;
+                                        btnStyle.hover.textColor = Color.yellow;
+                                        btnStyle.fontStyle = FontStyle.Bold;
+                                    }
+                                    if (GUILayout.Button(btnName, btnStyle))
+                                    {
+                                        ctl.selectedIndex = i;
+                                    }
+                                }
+                                EditorGUILayout.EndHorizontal();
+                            }
+                        }
+                        EditorGUILayout.EndFoldoutHeaderGroup();
+                    }
+
+                    if (gComp.Transitions.Count > 0)
+                    {
+                        _guiTransitionsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(_guiTransitionsFoldout, "Transitions");
+                        if (_guiTransitionsFoldout)
+                        {
+                            foreach (var transition in gComp.Transitions)
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                var labelStyle = new GUIStyle(headerLabelStyle);
+                                if (transition.playing)
+                                {
+                                    labelStyle.normal.textColor = Color.yellow;
+                                }
+
+                                EditorGUILayout.LabelField($"{transition.name} - {transition.totalDuration}s", labelStyle, GUILayout.MinWidth(150));
+                                EditorGUI.BeginChangeCheck();
+                                var timeScale = transition.timeScale;
+
+
+                                if (EditorGUI.EndChangeCheck())
+                                    transition.timeScale = timeScale;
+
+
+                                if (GUILayout.Button("▶", GUILayout.Width(20)))
+                                {
+                                    transition.Play();
+                                }
+
+                                if (GUILayout.Button("■", GUILayout.Width(20)))
+                                {
+                                    transition.Stop();
+                                }
+
+                                EditorGUILayout.EndHorizontal();
+                            }
+                        }
+                        EditorGUILayout.EndFoldoutHeaderGroup();
+                    }
+                }
+#endif
             }
         }
     }

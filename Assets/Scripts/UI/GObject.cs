@@ -1017,7 +1017,7 @@ namespace FairyGUI
         public void RequestFocus()
         {
             if (displayObject != null)
-                Stage.inst.SetFous(displayObject, false);
+                Stage.inst.SetFocus(displayObject, false);
         }
 
         /// <summary>
@@ -1026,7 +1026,7 @@ namespace FairyGUI
         public void RequestFocus(bool byKey)
         {
             if (displayObject != null)
-                Stage.inst.SetFous(displayObject, byKey);
+                Stage.inst.SetFocus(displayObject, byKey);
         }
 
         /// <summary>
@@ -1980,7 +1980,7 @@ namespace FairyGUI
             int cnt = buffer.ReadShort();
             for (int i = 0; i < cnt; i++)
             {
-                int nextPos = buffer.ReadShort();
+                int nextPos = buffer.ReadUshort();
                 nextPos += buffer.position;
 
                 GearBase gear = GetGear(buffer.ReadByte());

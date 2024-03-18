@@ -124,8 +124,10 @@ SubShader {
 
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
-		#include "Assets/TextMesh Pro/Resources/Shaders/TMPro_Properties.cginc"
-		#include "Assets/TextMesh Pro/Resources/Shaders/TMPro.cginc"
+		//#include "Assets/TextMesh Pro/Resources/Shaders/TMPro_Properties.cginc"
+		//#include "Assets/TextMesh Pro/Resources/Shaders/TMPro.cginc"
+		#include "Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc"
+		#include "Assets/TextMesh Pro/Shaders/TMPro.cginc"
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -158,9 +160,11 @@ SubShader {
 		float4 _FaceTex_ST;
 		float4 _OutlineTex_ST;
 
+		CBUFFER_START(UnityPerMaterial)
 		#ifdef CLIPPED
 		float4 _ClipBox = float4(-2, -2, 0, 0);
 		#endif
+		CBUFFER_END
 
 		pixel_t VertShader(vertex_t input)
 		{
