@@ -47,7 +47,6 @@ namespace FairyGUI
 
         override public void Dispose()
         {
-            _contentItem.skeletonLoaders.Remove(this);
             _content.Dispose();
             base.Dispose();
         }

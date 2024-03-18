@@ -1253,8 +1253,10 @@ namespace FairyGUI
                     item.skeletonAsset = (Spine.Unity.SkeletonDataAsset)asset;
                     foreach (var gLoader3D in item.skeletonLoaders)
                     {
-                        gLoader3D.SetSpine((Spine.Unity.SkeletonDataAsset) item.skeletonAsset);
+                        if(!gLoader3D.isDisposed)
+                            gLoader3D.SetSpine((Spine.Unity.SkeletonDataAsset) item.skeletonAsset);
                     }
+                    item.skeletonLoaders.Clear();
 #endif
                     break;
 
