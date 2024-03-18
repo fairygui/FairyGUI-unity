@@ -818,7 +818,12 @@ namespace FairyGUI
                         return v;
                 }
                 else if (firstInLine != -1)
-                    return textField.charPositions[i - 1];
+                {
+                    if (textField.parsedText[i - 1] == '\n')
+                        return textField.charPositions[i - 1];
+                    else
+                        return v;
+                }
             }
 
             return textField.charPositions[i - 1];
