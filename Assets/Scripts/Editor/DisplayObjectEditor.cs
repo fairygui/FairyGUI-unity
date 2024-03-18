@@ -10,9 +10,11 @@ namespace FairyGUIEditor
     [CustomEditor(typeof(DisplayObjectInfo))]
     public class DisplayObjectEditor : Editor
     {
+#if UNITY_2019_1_OR_NEWER
         bool _guiControllersFoldout = true;
         bool _guiTransitionsFoldout = true;
         bool _guiTextFormatFoldout = true;
+#endif
 
         void OnEnable()
         {
@@ -160,7 +162,7 @@ namespace FairyGUIEditor
                 if (EditorGUI.EndChangeCheck())
                     gObj.tooltips = tooltips;
 
-                if (gObj is not (GImage))
+                if (!(gObj is GImage))
                 {
                     EditorGUI.BeginChangeCheck();
                     bool touchable = EditorGUILayout.Toggle("Touchable", gObj.touchable);
@@ -173,6 +175,7 @@ namespace FairyGUIEditor
                         gObj.draggable = draggable;
                 }
 
+#if UNITY_2019_1_OR_NEWER
                 TextFormat textFormat = null;
                 if (gObj is GTextField gTxt)
                 {
@@ -185,15 +188,15 @@ namespace FairyGUIEditor
                     EditorGUI.BeginChangeCheck();
                     if (_guiTextFormatFoldout)
                     {
-                       
+
                         var initLabelWidth = EditorGUIUtility.labelWidth;
 
                         var richStyle = new GUIStyle(GUI.skin.label);
                         richStyle.richText = true;
                         EditorGUIUtility.labelWidth = 60;
                         textFormat.font = EditorGUILayout.TextField("Font", textFormat.font);
-                        textFormat.align = (AlignType)EditorGUILayout.EnumPopup("Align",textFormat.align);
-                        
+                        textFormat.align = (AlignType)EditorGUILayout.EnumPopup("Align", textFormat.align);
+
                         EditorGUIUtility.labelWidth = initLabelWidth;
                         EditorGUILayout.BeginHorizontal();
                         EditorGUIUtility.labelWidth = 40;
@@ -215,10 +218,10 @@ namespace FairyGUIEditor
                         textFormat.shadowColor = EditorGUILayout.ColorField("Color", textFormat.shadowColor);
                         EditorGUIUtility.labelWidth = initLabelWidth;
                         EditorGUILayout.EndHorizontal();
-                       
+
 
                         EditorGUILayout.BeginHorizontal();
-                        textFormat.italic = EditorGUILayout.ToggleLeft("<i>I</i>", textFormat.italic, richStyle,GUILayout.Width(30));
+                        textFormat.italic = EditorGUILayout.ToggleLeft("<i>I</i>", textFormat.italic, richStyle, GUILayout.Width(30));
                         textFormat.bold = EditorGUILayout.ToggleLeft("<b>B</b>", textFormat.bold, richStyle, GUILayout.Width(30));
                         textFormat.underline = EditorGUILayout.ToggleLeft("U̲", textFormat.underline, richStyle, GUILayout.Width(30));
                         textFormat.strikethrough = EditorGUILayout.ToggleLeft(" S̶ ̶ ̶", textFormat.strikethrough, richStyle, GUILayout.Width(36));
@@ -319,7 +322,7 @@ namespace FairyGUIEditor
                         EditorGUILayout.EndFoldoutHeaderGroup();
                     }
                 }
-
+#endif
             }
         }
     }
