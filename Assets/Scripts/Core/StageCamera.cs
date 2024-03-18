@@ -179,17 +179,10 @@ namespace FairyGUI
             camera.orthographicSize = DefaultCameraSize;
             camera.nearClipPlane = -30;
             camera.farClipPlane = 30;
-
-#if UNITY_5_4_OR_NEWER
             camera.stereoTargetEye = StereoTargetEyeMask.None;
-#endif
-
-#if UNITY_5_6_OR_NEWER
             camera.allowHDR = false;
             camera.allowMSAA = false;
-#endif
             cameraObject.AddComponent<StageCamera>();
-
             return camera;
         }
     }

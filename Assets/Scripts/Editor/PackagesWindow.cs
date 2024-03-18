@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using FairyGUI;
 using UnityEngine;
 using UnityEditor;
-#if UNITY_5_3_OR_NEWER
 using UnityEditor.SceneManagement;
-#endif
+using System.Collections.Generic;
 #if UNITY_2018_3_OR_NEWER
 using UnityEditor.Experimental.SceneManagement;
 #endif
-using FairyGUI;
 
 namespace FairyGUIEditor
 {
@@ -189,13 +187,7 @@ namespace FairyGUIEditor
 
         void ApplyChange()
         {
-#if UNITY_5_3_OR_NEWER
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-#elif UNITY_5
-            EditorApplication.MarkSceneDirty();
-#else
-            EditorUtility.SetDirty(Selection.activeGameObject);
-#endif
         }
     }
 }
