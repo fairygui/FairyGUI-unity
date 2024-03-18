@@ -13,7 +13,7 @@ namespace FairyGUI
     public class InputTextField : RichTextField
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int maxLength { get; set; }
 
@@ -24,37 +24,37 @@ namespace FairyGUI
         public bool keyboardInput { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int keyboardType { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool hideInput { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool disableIME { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool mouseWheelEnabled { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static Action<InputTextField, string> onCopy;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static Action<InputTextField> onPaste;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static PopupMenu contextMenu;
 
@@ -119,7 +119,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public EventListener onChanged
         {
@@ -127,7 +127,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public EventListener onSubmit
         {
@@ -135,7 +135,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override string text
         {
@@ -152,7 +152,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public override TextFormat textFormat
         {
@@ -172,7 +172,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string restrict
         {
@@ -188,7 +188,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int caretPosition
         {
@@ -214,7 +214,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public string promptText
         {
@@ -234,7 +234,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool displayAsPassword
         {
@@ -250,7 +250,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool editable
         {
@@ -264,7 +264,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int border
         {
@@ -277,7 +277,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int corner
         {
@@ -290,7 +290,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public Color borderColor
         {
@@ -303,7 +303,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public Color backgroundColor
         {
@@ -337,7 +337,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="start"></param>
         /// <param name="length">-1 means the rest count from start</param>
@@ -360,7 +360,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="value"></param>
         public void ReplaceSelection(string value)
@@ -426,7 +426,7 @@ namespace FairyGUI
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="value"></param>
         public void ReplaceText(string value)
@@ -818,7 +818,7 @@ namespace FairyGUI
                         return v;
                 }
                 else if (firstInLine != -1)
-                    return v;
+                    return textField.charPositions[i - 1];
             }
 
             return textField.charPositions[i - 1];
