@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 #if FAIRYGUI_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.EnhancedTouch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
@@ -35,7 +34,6 @@ namespace FairyGUI
         DisplayObject _touchTarget;
         DisplayObject _focused;
         InputTextField _lastInput;
-        bool _IMEComposite;
         UpdateContext _updateContext;
         List<DisplayObject> _rollOutChain;
         List<DisplayObject> _rollOverChain;
@@ -160,38 +158,6 @@ namespace FairyGUI
             get; set;
         }
 
-#if FAIRYGUI_INPUT_SYSTEM
-        /// <summary>
-        /// New Input System CompositionString
-        /// </summary>
-        static string inputSystemCompositionString = string.Empty;
-
-        static void HandleOnIMECompositionChange(IMECompositionString composition)
-        {
-            // 如果这里赋值了还会导致输入重复的Bug, 因为应对不同输入法时InputSystem可能会返回完整的文字
-            // 此功能本身只是为了显示中途打字符号(例如打拼音时中途的英文), 不会影响最后输入, 而且严重依赖输入法, 故直接去除此功能
-            // 参考链接:
-            // https://github.com/Unity-Technologies/InputSystem/commit/6d8ff967aeff02a627668e878eda566b81fd7c40
-            // https://issuetracker.unity3d.com/issues/onimecompositionchange-does-not-return-an-empty-string-on-accept-when-using-microsoft-ime
-            inputSystemCompositionString = composition.ToString();
-        }
-#endif
-
-        /// <summary>
-        /// The current IME composition string being typed by the user.
-        /// </summary>
-        public static string compositionString
-        {
-            get
-            {
-#if FAIRYGUI_INPUT_SYSTEM
-                return inputSystemCompositionString;
-#else
-                return Input.compositionString;
-#endif
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -258,12 +224,7 @@ namespace FairyGUI
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
 #if FAIRYGUI_INPUT_SYSTEM
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard != null)
-            {
-                keyboard.onIMECompositionChange -= HandleOnIMECompositionChange;
-                keyboard.onIMECompositionChange += HandleOnIMECompositionChange;
-            }
+            InputTextField.RegisterEvent();
 #endif
         }
 
@@ -277,9 +238,7 @@ namespace FairyGUI
             base.Dispose();
 
 #if FAIRYGUI_INPUT_SYSTEM
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard != null)
-                keyboard.onIMECompositionChange -= HandleOnIMECompositionChange;
+            InputTextField.UnregisterEvent();
 #endif
 
             Timers.inst.Remove(RunTextureCollector);
@@ -943,13 +902,8 @@ namespace FairyGUI
         {
             if (evt.rawType == EventType.KeyDown)
             {
-                if (_IMEComposite && compositionString.Length == 0)
-                {
-                    _IMEComposite = false;
-                    // eat one key on IME closing
-                    if (evt.keyCode != KeyCode.None)
-                        return;
-                }
+                if (InputTextField.EatKeyEvent(evt))
+                    return;
 
                 TouchInfo touch = _touches[0];
                 touch.keyCode = evt.keyCode;
@@ -965,6 +919,9 @@ namespace FairyGUI
             }
             else if (evt.rawType == EventType.KeyUp)
             {
+                if (InputTextField.EatKeyEvent(evt))
+                    return;
+
                 TouchInfo touch = _touches[0];
                 touch.keyCode = evt.keyCode;
                 touch.modifiers = evt.modifiers;
@@ -1010,8 +967,11 @@ namespace FairyGUI
             else
                 HandleMouseEvents();
 
-            if (_focused is InputTextField)
-                HandleTextInput();
+            if (keyboardInput && _keyboard != null
+                && (_focused is InputTextField)
+                && ((InputTextField)_focused).editable
+                && ((InputTextField)_focused).keyboardInput)
+                HandleKeyboardInput();
         }
 
         void UpdateTouchPosition()
@@ -1057,33 +1017,20 @@ namespace FairyGUI
             }
         }
 
-        void HandleTextInput()
+        void HandleKeyboardInput()
         {
-            _IMEComposite = compositionString.Length > 0;
-
             InputTextField textField = (InputTextField)_focused;
-            if (!textField.editable)
-                return;
-
-            if (keyboardInput)
+            string s = _keyboard.GetInput();
+            if (s != null)
             {
-                if (textField.keyboardInput && _keyboard != null)
-                {
-                    string s = _keyboard.GetInput();
-                    if (s != null)
-                    {
-                        if (_keyboard.supportsCaret)
-                            textField.ReplaceSelection(s);
-                        else
-                            textField.ReplaceText(s);
-                    }
-
-                    if (_keyboard.done)
-                        SetFocus(null);
-                }
+                if (_keyboard.supportsCaret)
+                    textField.ReplaceSelection(s);
+                else
+                    textField.ReplaceText(s);
             }
-            else
-                textField.CheckComposition();
+
+            if (_keyboard.done)
+                SetFocus(null);
         }
 
         void HandleCustomInput()

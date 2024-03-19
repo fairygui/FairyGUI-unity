@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 #if FAIRYGUI_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 #endif
 
 namespace FairyGUI
@@ -561,12 +562,12 @@ namespace FairyGUI
             else
                 textField.text = _text;
 
-            _composing = Stage.compositionString.Length;
+            _composing = compositionString.Length;
             if (_composing > 0)
             {
                 StringBuilder buffer = new StringBuilder();
                 GetPartialText(0, _caretPosition, buffer);
-                buffer.Append(Stage.compositionString);
+                buffer.Append(compositionString);
                 GetPartialText(_caretPosition, -1, buffer);
 
                 textField.text = buffer.ToString();
@@ -641,7 +642,7 @@ namespace FairyGUI
         {
             TextField.CharPosition cp;
             if (_editing)
-                cp = GetCharPosition(_caretPosition + Stage.compositionString.Length);
+                cp = GetCharPosition(_caretPosition + compositionString.Length);
             else
                 cp = GetCharPosition(_caretPosition);
 
@@ -748,7 +749,7 @@ namespace FairyGUI
             }
 
             TextField.CharPosition start;
-            if (_editing && Stage.compositionString.Length > 0)
+            if (_editing && compositionString.Length > 0)
             {
                 if (_selectionStart < _caretPosition)
                 {
@@ -756,7 +757,7 @@ namespace FairyGUI
                     start = GetCharPosition(_selectionStart);
                 }
                 else
-                    start = GetCharPosition(_selectionStart + Stage.compositionString.Length);
+                    start = GetCharPosition(_selectionStart + compositionString.Length);
             }
             else
                 start = GetCharPosition(_selectionStart);
@@ -1420,6 +1421,7 @@ namespace FairyGUI
                     return true;
                 }
 
+#if !FAIRYGUI_INPUT_SYSTEM
                 if (_editable)
                 {
                     if (char.IsLowSurrogate(c))
@@ -1427,32 +1429,35 @@ namespace FairyGUI
                     else
                         ReplaceSelection(c.ToString());
                 }
+#endif
 
                 return true;
             }
             else
-            {
-                if (Stage.compositionString.Length > 0 && _editable)
-                {
-                    int composing = _composing;
-                    _composing = Stage.compositionString.Length;
-
-                    StringBuilder buffer = new StringBuilder();
-                    GetPartialText(0, _caretPosition, buffer);
-                    buffer.Append(Stage.compositionString);
-                    GetPartialText(_caretPosition + composing, -1, buffer);
-
-                    textField.text = buffer.ToString();
-                }
-
                 return keyCodeHandled;
-            }
         }
 
-        internal void CheckComposition()
+        void CheckComposition()
         {
-            if (_composing != 0 && Stage.compositionString.Length == 0)
+            if (!_editable || keyboardInput)
+                return;
+
+            if (compositionString.Length == 0)
+            {
                 UpdateText();
+            }
+            else
+            {
+                int composing = _composing;
+                _composing = compositionString.Length;
+
+                StringBuilder buffer = new StringBuilder();
+                GetPartialText(0, _caretPosition, buffer);
+                buffer.Append(compositionString);
+                GetPartialText(_caretPosition + composing, -1, buffer);
+
+                textField.text = buffer.ToString();
+            }
         }
 
         void __click(EventContext context)
@@ -1473,6 +1478,117 @@ namespace FairyGUI
                 contextMenu.Show();
             }
         }
+
+#if !FAIRYGUI_INPUT_SYSTEM
+        static bool _IMEActive;
+
+        public static bool EatKeyEvent(Event evt)
+        {
+            if (compositionString.Length > 0)
+            {
+                _IMEActive = true;
+
+                if (evt.rawType == EventType.KeyDown)
+                {
+                    var focus = Stage.inst.focus;
+                    if (focus is InputTextField)
+                        ((InputTextField)focus).CheckComposition();
+                }
+
+                return true;
+            }
+            else
+            {
+                if (_IMEActive && evt.keyCode != KeyCode.None)
+                {
+                    //需要吃掉最后一个按键，通常是选择候选词或者结束输入
+                    var focus = Stage.inst.focus;
+                    if (focus is InputTextField)
+                        ((InputTextField)focus).CheckComposition();
+                    return true;
+                }
+                _IMEActive = false;
+
+                return false;
+            }
+        }
+
+
+        public static string compositionString
+        {
+            get
+            {
+                if (Stage.keyboardInput)
+                    return String.Empty;
+
+                return Input.compositionString;
+            }
+        }
+
+#else
+        static string _compositionString = string.Empty;
+
+        public static void RegisterEvent()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                keyboard.onIMECompositionChange -= OnIMECompositionChange;
+                keyboard.onIMECompositionChange += OnIMECompositionChange;
+                keyboard.onTextInput -= OnTextInput;
+                keyboard.onTextInput += OnTextInput;
+            }
+        }
+
+        public static void UnregisterEvent()
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                keyboard.onIMECompositionChange -= OnIMECompositionChange;
+                keyboard.onTextInput -= OnTextInput;
+            }
+        }
+
+        public static bool EatKeyEvent(Event evt)
+        {
+            return compositionString.Length > 0;
+        }
+
+        static void OnIMECompositionChange(IMECompositionString composition)
+        {
+            if (Stage.keyboardInput)
+                return;
+
+            _compositionString = composition.ToString();
+            var focus = Stage.inst.focus;
+            if (focus is InputTextField)
+                ((InputTextField)focus).CheckComposition();
+        }
+
+        static void OnTextInput(char c)
+        {
+            var focus = Stage.inst.focus;
+            if ((focus is InputTextField) && ((InputTextField)focus).editable && !((InputTextField)focus).keyboardInput)
+                ((InputTextField)focus).ReplaceSelection(c.ToString());
+        }
+
+        /// <summary>
+        /// The current IME composition string being typed by the user.
+        /// </summary>
+        public static string compositionString
+        {
+            get
+            {
+                if (Stage.keyboardInput)
+                    return String.Empty;
+
+                return _compositionString;
+            }
+        }
+
+#endif
+
     }
 
     class TextInputHistory
