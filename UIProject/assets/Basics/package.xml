@@ -224,6 +224,7 @@
     <component id="srct87" name="Slider2.xml" path="/components/"/>
     <movieclip id="iwqq89" name="gz.jta" path="/images/"/>
     <image id="ty2k8a" name="radial.png" path="/images/" scale=""/>
+    <font id="ssu78b" name="LiberationSans SDF.ttf" path="/font/" renderMode="sdfaa" samplePointSize="60"/>
   </resources>
   <publish name="Basics">
     <atlas name="Default" index="0"/>
