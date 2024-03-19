@@ -749,7 +749,7 @@ namespace FairyGUI
 
         public void OnPopulateMesh(VertexBuffer vb)
         {
-            Rect rect = texture.GetDrawRect(vb.contentRect);
+            Rect rect = texture.GetDrawRect(vb.contentRect, flip);
 
             vb.AddQuad(rect, vb.vertexColor, vb.uvRect);
             vb.AddTriangles();
