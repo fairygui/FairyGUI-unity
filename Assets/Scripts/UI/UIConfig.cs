@@ -444,7 +444,7 @@ namespace FairyGUI
             UIConfig.tooltipsWin = null;
             UIConfig.verticalScrollBar = null;
             UIConfig.windowModalWaiting = null;
-            UIPackage.branch = null;
+            UIConfig.soundLoader = null;
         }
 
         public void ApplyModifiedProperties()
@@ -458,5 +458,13 @@ namespace FairyGUI
         /// 
         /// </summary>
         public static SoundLoader soundLoader = null;
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            ClearResourceRefs();
+        }
+#endif
     }
 }

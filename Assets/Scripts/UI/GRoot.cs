@@ -45,6 +45,15 @@ namespace FairyGUI
             }
         }
 
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            _inst = null;
+        }
+#endif
+
         public GRoot()
         {
             this.name = this.rootContainer.name = this.rootContainer.gameObject.name = "GRoot";

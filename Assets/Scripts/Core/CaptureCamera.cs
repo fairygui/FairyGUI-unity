@@ -29,6 +29,14 @@ namespace FairyGUI
         public const string LayerName = "VUI";
         public const string HiddenLayerName = "Hidden VUI";
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void Init()
+        {
+            _main = null;
+        }
+#endif
+
         void OnEnable()
         {
             cachedCamera = this.GetComponent<Camera>();

@@ -1676,5 +1676,15 @@ namespace FairyGUI
             Debug.LogWarning("To enable DragonBones support, add script define symbol: FAIRYGUI_DRAGONBONES");
 #endif
         }
+
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            RemoveAllPackages();
+            UIPackage.branch = null;
+        }
+#endif
     }
 }

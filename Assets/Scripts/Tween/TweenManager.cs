@@ -169,6 +169,17 @@ namespace FairyGUI
             }
         }
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            _tweenerPool.Clear();
+            _activeTweens = new GTweener[30];
+            _totalActiveTweens = 0;
+            _inited = false;
+        }
+#endif
+
         class TweenEngine : MonoBehaviour
         {
             void Update()

@@ -940,18 +940,8 @@ namespace FairyGUI
                 return;
             }
 
-#if UNITY_2023_2_OR_NEWER
+
             GUIUtility.systemCopyBuffer = value;
-#else
-
-#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
-            TextEditor textEditor = new TextEditor();
-            textEditor.text = value;
-            textEditor.OnFocus();
-            textEditor.Copy();
-#endif
-
-#endif
         }
 
         void DoPaste()
@@ -962,23 +952,9 @@ namespace FairyGUI
                 return;
             }
 
-#if UNITY_2023_2_OR_NEWER
             string value = GUIUtility.systemCopyBuffer;
             if (!string.IsNullOrEmpty(value))
                 ReplaceSelection(value);
-#else
-
-#if UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_EDITOR
-            TextEditor textEditor = new TextEditor();
-            textEditor.text = string.Empty;
-            textEditor.multiline = !textField.singleLine;
-            textEditor.Paste();
-            string value = textEditor.text;
-            if (!string.IsNullOrEmpty(value))
-                ReplaceSelection(value);
-#endif
-
-#endif
         }
 
         void CreateCaret()

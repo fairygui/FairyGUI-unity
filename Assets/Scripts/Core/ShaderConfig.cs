@@ -55,6 +55,14 @@ namespace FairyGUI
 
         public static int ID_Stencil2;
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            Get = Shader.Find;
+        }
+#endif
+
         static ShaderConfig()
         {
             ID_ClipBox = Shader.PropertyToID("_ClipBox");

@@ -21,16 +21,11 @@ namespace FairyGUI.Utils
 
         public HtmlSelect()
         {
-            if (resource != null)
+            comboBox = UIPackage.CreateObjectFromURL(resource).asComboBox;
+            _changeHandler = () =>
             {
-                comboBox = UIPackage.CreateObjectFromURL(resource).asComboBox;
-                _changeHandler = () =>
-                {
-                    _owner.DispatchEvent(CHANGED_EVENT, null, this);
-                };
-            }
-            else
-                Debug.LogWarning("FairyGUI: Set HtmlSelect.resource first");
+                _owner.DispatchEvent(CHANGED_EVENT, null, this);
+            };
         }
 
         public DisplayObject displayObject

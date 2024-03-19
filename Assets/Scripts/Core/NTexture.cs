@@ -111,6 +111,15 @@ namespace FairyGUI
             }
         }
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            DisposeEmpty();
+            CustomDestroyMethod = null;
+        }
+#endif
+
         /// <summary>
         /// 
         /// </summary>

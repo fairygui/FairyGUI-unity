@@ -18,6 +18,15 @@ namespace FairyGUI.Utils
 
         static Transform _poolManager;
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            inst = new HtmlPageContext();
+            _poolManager = null;
+        }
+#endif
+
         public HtmlPageContext()
         {
             _imagePool = new Stack<IHtmlObject>();
@@ -67,7 +76,12 @@ namespace FairyGUI.Utils
                         fromPool = true;
                     }
                     else
-                        ret = new HtmlButton();
+                    {
+                        if (HtmlButton.resource != null)
+                            ret = new HtmlButton();
+                        else
+                            Debug.LogWarning("FairyGUI: Set HtmlButton.resource first");
+                    }
                 }
                 else
                 {
@@ -88,7 +102,12 @@ namespace FairyGUI.Utils
                     fromPool = true;
                 }
                 else
-                    ret = new HtmlSelect();
+                {
+                    if (HtmlSelect.resource != null)
+                        ret = new HtmlSelect();
+                    else
+                        Debug.LogWarning("FairyGUI: Set HtmlSelect.resource first");
+                }
             }
 
             //Debug.Log("from=" + fromPool);

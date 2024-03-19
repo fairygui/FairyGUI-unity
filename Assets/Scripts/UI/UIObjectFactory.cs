@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 #if FAIRYGUI_TOLUA
 using LuaInterface;
 #endif
@@ -198,5 +199,13 @@ namespace FairyGUI
                     return null;
             }
         }
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            Clear();
+        }
+#endif
     }
 }

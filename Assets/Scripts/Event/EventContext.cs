@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace FairyGUI
 {
@@ -89,6 +90,16 @@ namespace FairyGUI
         {
             pool.Push(value);
         }
+
+
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            pool.Clear();
+        }
+#endif
     }
 
 }

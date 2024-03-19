@@ -63,5 +63,13 @@ namespace FairyGUI
 
             nativeClip = audioClip;
         }
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            CustomDestroyMethod = null;
+        }
+#endif
     }
 }

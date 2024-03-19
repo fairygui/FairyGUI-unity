@@ -306,5 +306,14 @@ namespace FairyGUI
                 }
             }
         }
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            OnBegin = null;
+            OnEnd = null;
+        }
+#endif
     }
 }

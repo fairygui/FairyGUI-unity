@@ -74,6 +74,15 @@ namespace FairyGUI
         {
             raycastHits.Clear();
         }
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            cachedMainCamera = null;
+            raycastHits.Clear();
+        }
+#endif
     }
 
 }

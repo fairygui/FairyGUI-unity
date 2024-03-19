@@ -21,16 +21,11 @@ namespace FairyGUI.Utils
 
         public HtmlButton()
         {
-            if (resource != null)
+            button = UIPackage.CreateObjectFromURL(resource).asCom;
+            _clickHandler = (EventContext context) =>
             {
-                button = UIPackage.CreateObjectFromURL(resource).asCom;
-                _clickHandler = (EventContext context) =>
-                {
-                    _owner.DispatchEvent(CLICK_EVENT, context.data, this);
-                };
-            }
-            else
-                Debug.LogWarning("FairyGUI: Set HtmlButton.resource first");
+                _owner.DispatchEvent(CLICK_EVENT, context.data, this);
+            };
         }
 
         public DisplayObject displayObject

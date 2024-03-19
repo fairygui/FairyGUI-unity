@@ -36,7 +36,16 @@ namespace FairyGUI
             {
                 beingQuit = true;
                 UIPackage.RemoveAllPackages();
+                Stage.inst.Dispose();
             }
         }
+
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void InitializeOnLoad()
+        {
+            beingQuit = false;
+        }
+#endif
     }
 }

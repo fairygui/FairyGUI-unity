@@ -20,6 +20,12 @@ namespace FairyGUIEditor
             EditorApplication.update += EditorApplication_Update;
         }
 
+        [RuntimeInitializeOnLoadMethod]
+        static void InitializeOnLoad()
+        {
+            _loaded = false;
+        }
+
         [MenuItem("GameObject/FairyGUI/UI Panel", false, 0)]
         static void CreatePanel()
         {
@@ -90,6 +96,7 @@ namespace FairyGUIEditor
             _loaded = true;
 
             UIPackage.RemoveAllPackages();
+            UIPackage.branch = null;
             FontManager.Clear();
             NTexture.DisposeEmpty();
             UIObjectFactory.Clear();
