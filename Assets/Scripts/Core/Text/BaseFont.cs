@@ -71,11 +71,12 @@ namespace FairyGUI
         {
         }
 
-        virtual public bool GetGlyph(char ch, out float width, out float height, out float baseline)
+        virtual public bool GetGlyph(char ch, out float width, out float height, out float baseline, out bool isFallback)
         {
             width = 0;
             height = 0;
             baseline = 0;
+            isFallback = false;
             return false;
         }
 
