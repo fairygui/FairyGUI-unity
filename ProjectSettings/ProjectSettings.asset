@@ -715,7 +715,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: FAIRYGUI_TMPRO;FAIRYGUI_INPUT_SYSTEM
+    Standalone: FAIRYGUI_TMPRO
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
