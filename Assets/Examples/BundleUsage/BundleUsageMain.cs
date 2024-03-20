@@ -2,10 +2,7 @@
 using UnityEngine;
 using FairyGUI;
 using System.Net;
-
-#if UNITY_5_4_OR_NEWER
 using UnityEngine.Networking;
-#endif
 
 /// <summary>
 /// Demonstrated how to load UI package from assetbundle. The bundle can be build from the Window Menu->Build FairyGUI example bundles.
@@ -30,6 +27,7 @@ class BundleUsageMain : MonoBehaviour
             url = "file:///" + url;
 
 #if UNITY_2017_2_OR_NEWER
+
 #if UNITY_2018_1_OR_NEWER
         UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(url);
 #else
@@ -61,14 +59,16 @@ class BundleUsageMain : MonoBehaviour
 
             _mainView = UIPackage.CreateObject("BundleUsage", "Main").asCom;
             _mainView.fairyBatching = true;
-            _mainView.SetSize(GRoot.inst.width, GRoot.inst.height);
+            _mainView.MakeFullScreen();
             _mainView.AddRelation(GRoot.inst, RelationType.Size);
 
             GRoot.inst.AddChild(_mainView);
             _mainView.GetTransition("t0").Play();
         }
         else
-            Debug.LogError(www.error);
+        {
+            Debug.LogWarning("Run Window->Build FairyGUI example Bundles first.");
+        }
     }
 
     void OnKeyDown(EventContext context)

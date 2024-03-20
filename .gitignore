@@ -37,3 +37,5 @@ sysinfo.txt
 /Packages/packages-lock.json
 TextMesh Pro/
 TextMesh Pro.meta
+Assets/StreamingAssets/
+Assets/StreamingAssets.meta
