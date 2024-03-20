@@ -3,6 +3,7 @@ using UnityEngine;
 using FairyGUI;
 using System.Net;
 using UnityEngine.Networking;
+using System;
 
 /// <summary>
 /// Demonstrated how to load UI package from assetbundle. The bundle can be build from the Window Menu->Build FairyGUI example bundles.
@@ -23,8 +24,12 @@ class BundleUsageMain : MonoBehaviour
     IEnumerator LoadUIPackage()
     {
         string url = Application.streamingAssetsPath.Replace("\\", "/") + "/fairygui-examples/bundleusage.ab";
-        if (Application.platform != RuntimePlatform.Android)
-            url = "file:///" + url;
+        if (Application.isEditor)
+        {
+            UriBuilder uri = new UriBuilder(url);
+            uri.Scheme = "file";
+            url = uri.ToString();
+        }
 
 #if UNITY_2017_2_OR_NEWER
 
