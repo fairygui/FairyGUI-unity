@@ -81,6 +81,7 @@ namespace FairyGUI
         int _composing;
         char _highSurrogateChar;
         string _textBeforeEdit;
+        bool _usingHtmlInput;
 
         EventListener _onChanged;
         EventListener _onSubmit;
@@ -370,7 +371,7 @@ namespace FairyGUI
         /// <param name="value"></param>
         public void ReplaceSelection(string value)
         {
-            if (keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret)
+            if (keyboardInput && Stage.keyboardInput && !Stage.keyboard.supportsCaret)
             {
                 this.text = _text + value;
                 OnChanged();
@@ -976,7 +977,7 @@ namespace FairyGUI
         void __touchBegin(EventContext context)
         {
             if (!_editing || textField.charPositions.Count <= 1
-                || keyboardInput && Stage.keyboardInput && !Stage.inst.keyboard.supportsCaret
+                || keyboardInput && Stage.keyboardInput && !Stage.keyboard.supportsCaret
                 || context.inputEvent.button != 0)
                 return;
 
@@ -1068,6 +1069,15 @@ namespace FairyGUI
                     SetSelection(0, -1);
                 }
             }
+#if UNITY_WEBGL && FAIRYGUI_WEBGL_TEXT_INPUT
+            else if (!disableIME && !Application.isEditor)
+            {
+                _usingHtmlInput = true;
+                textField.visible = false;
+                _caret.visible = false;
+                WebGLTextInput.Start(this);
+            }
+#endif
             else
             {
 #if FAIRYGUI_INPUT_SYSTEM
@@ -1095,7 +1105,16 @@ namespace FairyGUI
                 return;
 
             _editing = false;
-            if (Stage.keyboardInput)
+            if (_usingHtmlInput)
+            {
+                _usingHtmlInput = false;
+                textField.visible = true;
+                _caret.visible = true;
+#if UNITY_WEBGL && FAIRYGUI_WEBGL_TEXT_INPUT
+                WebGLTextInput.Stop();
+#endif
+            }
+            else if (Stage.keyboardInput)
             {
                 if (keyboardInput)
                     Stage.inst.CloseKeyboard();
@@ -1564,7 +1583,6 @@ namespace FairyGUI
         }
 
 #endif
-
     }
 
     class TextInputHistory
