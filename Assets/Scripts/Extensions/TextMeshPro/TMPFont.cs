@@ -122,6 +122,7 @@ namespace FairyGUI
             if (_format.outline > 0)
             {
                 graphics.ToggleKeyword("OUTLINE_ON", true);
+                _material.EnableKeyword("OUTLINE_ON");
 
                 block.SetFloat(ShaderUtilities.ID_OutlineWidth, _format.outline);
                 block.SetColor(ShaderUtilities.ID_OutlineColor, _format.outlineColor);
@@ -129,6 +130,7 @@ namespace FairyGUI
             else
             {
                 graphics.ToggleKeyword("OUTLINE_ON", false);
+                _material.DisableKeyword("OUTLINE_ON");
 
                 block.SetFloat(ShaderUtilities.ID_OutlineWidth, 0);
             }
@@ -136,6 +138,7 @@ namespace FairyGUI
             if (_format.shadowOffset.x != 0 || _format.shadowOffset.y != 0)
             {
                 graphics.ToggleKeyword("UNDERLAY_ON", true);
+                _material.EnableKeyword("UNDERLAY_ON");
 
                 block.SetColor(ShaderUtilities.ID_UnderlayColor, _format.shadowColor);
                 block.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, _format.shadowOffset.x);
@@ -145,6 +148,7 @@ namespace FairyGUI
             else
             {
                 graphics.ToggleKeyword("UNDERLAY_ON", false);
+                _material.DisableKeyword("UNDERLAY_ON");
 
                 block.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, 0);
                 block.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, 0);
@@ -272,9 +276,9 @@ namespace FairyGUI
 #pragma warning disable
             TMP_FontAsset actualAsset;
 #pragma warning restore
-            return TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, true, fontStyle, _fontWeight, 
+            return TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, true, fontStyle, _fontWeight,
                 out isAlternativeTypeface
-                //,out actualAsset //old TMP version need this line
+            //,out actualAsset //old TMP version need this line
             );
         }
 
@@ -338,8 +342,8 @@ namespace FairyGUI
 
             float u = (rect.x - _padding - _stylePadding) / _fontAsset.atlasWidth;
             float v = (rect.y - _padding - _stylePadding) / _fontAsset.atlasHeight;
-            float uw = (rect.width + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasWidth;
-            float vw = (rect.height + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasHeight;
+            float uw = rect.width > 0 ? (rect.width + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasWidth : 0;
+            float vw = rect.height > 0 ? (rect.height + _padding * 2 + _stylePadding * 2) / _fontAsset.atlasHeight : 0;
 
             uvBottomLeft = new Vector2(u, v);
             uvTopLeft = new Vector2(u, v + vw);
