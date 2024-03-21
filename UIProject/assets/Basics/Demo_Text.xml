@@ -28,6 +28,5 @@
     <text id="n26" name="n26" xy="806,61" size="136,32" fontSize="22" ubb="true" strokeColor="#000000" text="[color=#FF9900,#FFFFFF]Gradient Text[/color]"/>
     <text id="n27" name="n27" xy="972,61" size="136,32" fontSize="22" ubb="true" strokeColor="#000000" text="[color=#3399FF,#3399FF,#FFFFFF,#FFFFFF]Gradient Text[/color]"/>
     <text id="n28" name="n28" xy="475,92" size="172,32" fontSize="22" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" shadowColor="#000000" shadowOffset="3,3" text="Text with shadow"/>
-    <text id="n29_ssu7" name="n29" xy="489,10" size="294,42" font="ui://9leh0eyfssu78b" fontSize="29" color="#ccff00" autoSize="none" strokeColor="#ff3333" strokeSize="0.244" faceDilate="0.324" text="Text Mesh Pro"/>
   </displayList>
 </component>

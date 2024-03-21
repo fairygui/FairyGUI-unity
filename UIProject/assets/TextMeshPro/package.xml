@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="33vzljm4">
+  <resources>
+    <component id="v0400" name="Main.xml" path="/" exported="true"/>
+    <font id="v040e" name="LiberationSans SDF.ttf" path="/font/" renderMode="sdfaa" samplePointSize="60"/>
+    <image id="mpswf" name="1f608.png" path="/" exported="true"/>
+    <image id="mpswg" name="1f609.png" path="/" exported="true"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

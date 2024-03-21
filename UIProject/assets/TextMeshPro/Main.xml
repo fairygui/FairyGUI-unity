@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1136,640">
+  <displayList>
+    <richtext id="n0_v040" name="n0" xy="34,94" size="549,202" font="ui://33vzljm4v040e" fontSize="42" color="#ccff00" ubb="true" autoSize="none" shadowColor="#000000" shadowOffset="1,1" underlaySoftness="0.056" text="[color=#FF3300][b]FairyGUI Editor[/b][/color] is a [i]WYSWYG[/i][size=30] Game UI Editor[/size][img]ui://33vzljm4mpswf[/img][img]ui://33vzljm4mpswg[/img]&#xA;[url=xxxx]I am link[/url]&#xA;&#xA;"/>
+    <text id="n1_v040" name="n1" xy="33,26" size="545,55" font="ui://33vzljm4v040e" fontSize="41" color="#ccff00" autoSize="none" strokeColor="#ff3333" strokeSize="0.244" faceDilate="0.324" text="Text Mesh Pro"/>
+    <graph id="n2_mpsw" name="n2" xy="171,337" size="348,35" type="rect"/>
+    <text id="n3_mpsw" name="n3" xy="175,339" size="341,32" font="ui://33vzljm4v040e" fontSize="22" vAlign="middle" autoSize="none" singleLine="true" text="" input="true" prompt="[i][color=#999999]Your Name Here[/color][/i]"/>
+    <text id="n4_mpsw" name="n4" xy="46,342" size="120,32" font="ui://33vzljm4v040e" fontSize="22" color="#ffffff" autoSize="height" strokeColor="#000000" shadowColor="#000000" shadowOffset="1,1" faceDilate="1" underlaySoftness="1" text="Input Test"/>
+  </displayList>
+</component>
