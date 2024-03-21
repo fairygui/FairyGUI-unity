@@ -97,13 +97,6 @@ namespace FairyGUI
                 font.name = name;
                 sFontFactory.Add(name, font);
                 ((TMPFont)font).fontAsset = (TMPro.TMP_FontAsset)asset;
-
-                if (!_checkTextMeshPro)
-                {
-                    _checkTextMeshPro = true;
-                    if (ShaderConfig.Get("TextMeshPro/Distance Field") == null)
-                        Debug.LogWarning("Missing TMP_SDF.shader, please import the TMP essential resources.");
-                }
             }
 #endif
             else
