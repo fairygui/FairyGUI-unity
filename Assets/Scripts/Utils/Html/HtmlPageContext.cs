@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace FairyGUI.Utils
@@ -14,7 +15,17 @@ namespace FairyGUI.Utils
         Stack<IHtmlObject> _selectPool;
         Stack<IHtmlObject> _linkPool;
 
-        public static HtmlPageContext inst = new HtmlPageContext();
+        static HtmlPageContext _inst;
+
+        public static HtmlPageContext inst
+        {
+            get
+            {
+                if (_inst == null)
+                    _inst = new HtmlPageContext();
+                return _inst;
+            }
+        }
 
         static Transform _poolManager;
 
@@ -22,7 +33,7 @@ namespace FairyGUI.Utils
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void InitializeOnLoad()
         {
-            inst = new HtmlPageContext();
+            _inst = null;
             _poolManager = null;
         }
 #endif
