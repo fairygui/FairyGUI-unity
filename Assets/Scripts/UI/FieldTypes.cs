@@ -66,7 +66,8 @@
         ScaleMatchHeight,
         ScaleMatchWidth,
         ScaleFree,
-        ScaleNoBorder
+        ScaleNoBorder,
+        Resize = ScaleFree,
     }
 
     public enum AutoSizeType
