@@ -2,13 +2,14 @@
 using System.Text;
 using UnityEngine;
 using FairyGUI.Utils;
+using System.Collections.Generic;
 
 namespace FairyGUI
 {
     /// <summary>
     /// 
     /// </summary>
-    public class DisplayObject : EventDispatcher
+    public class DisplayObject : EventDispatcher, IBatchable
     {
         /// <summary>
         /// 
@@ -93,7 +94,6 @@ namespace FairyGUI
         protected Rect _contentRect;
         protected NGraphics.VertexMatrix _vertexMatrix;
         protected internal Flags _flags;
-        protected internal float[] _batchingBounds;
 
         internal static uint _gInstanceCounter;
 
@@ -831,7 +831,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        virtual public Material material
+        public Material material
         {
             get
             {
@@ -850,7 +850,7 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        virtual public string shader
+        public string shader
         {
             get
             {
@@ -869,26 +869,30 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
-        virtual public int renderingOrder
+        public int renderingOrder
         {
             get
             {
                 return _renderingOrder;
             }
-            set
-            {
-                if ((_flags & Flags.GameObjectDisposed) != 0)
-                {
-                    DisplayDisposedWarning();
-                    return;
-                }
+        }
 
-                _renderingOrder = value;
-                if (graphics != null)
-                    graphics.sortingOrder = value;
-                if (_paintingMode > 0)
-                    paintingGraphics.sortingOrder = value;
+        virtual public void SetRenderingOrder(UpdateContext context, bool inBatch)
+        {
+            if ((_flags & Flags.GameObjectDisposed) != 0)
+            {
+                DisplayDisposedWarning();
+                return;
             }
+
+            _renderingOrder = context.renderingOrder + 1;
+            if (graphics != null)
+                graphics.SetRenderingOrder(context, inBatch);
+            else
+                context.renderingOrder++;
+
+            if (_paintingMode > 0)
+                paintingGraphics.renderingOrder = _renderingOrder;
         }
 
         /// <summary>
@@ -1152,7 +1156,7 @@ namespace FairyGUI
                     this.InvalidateBatchingState();
 
                 if (graphics != null)
-                    this.gameObject.layer = CaptureCamera.hiddenLayer;
+                    _SetLayerDirect(CaptureCamera.hiddenLayer);
             }
             if (extend != null)
                 _paintingInfo.extend = (Margin)extend;
@@ -1183,7 +1187,7 @@ namespace FairyGUI
                     this.InvalidateBatchingState();
 
                 if (graphics != null)
-                    this.gameObject.layer = paintingGraphics.gameObject.layer;
+                    _SetLayerDirect(paintingGraphics.gameObject.layer);
             }
         }
 
@@ -1749,8 +1753,9 @@ namespace FairyGUI
                 paintingGraphics.gameObject.layer = value;
             else if (gameObject.layer != value)
             {
-                gameObject.layer = value;
-                if ((this is Container))
+                _SetLayerDirect(value);
+
+                if (this is Container)
                 {
                     int cnt = ((Container)this).numChildren;
                     for (int i = 0; i < cnt; i++)
@@ -1766,10 +1771,15 @@ namespace FairyGUI
 
         virtual internal void _SetLayerDirect(int value)
         {
-            if (_paintingMode > 0)
-                paintingGraphics.gameObject.layer = value;
-            else
-                gameObject.layer = value;
+            gameObject.layer = value;
+
+            if (graphics != null && graphics.subInstances != null)
+            {
+                foreach (var g in graphics.subInstances)
+                {
+                    g.gameObject.layer = value;
+                }
+            }
         }
 
         virtual public void Dispose()
@@ -1824,6 +1834,39 @@ namespace FairyGUI
             }
         }
 
+        BatchElement _batchElement;
+        virtual public BatchElement AddToBatch(List<BatchElement> batchElements, bool force)
+        {
+            if (graphics != null || force)
+            {
+                if (_batchElement == null)
+                    _batchElement = new BatchElement(this, null);
+                _batchElement.material = material;
+                _batchElement.breakBatch = (_flags & Flags.SkipBatching) != 0;
+                batchElements.Add(_batchElement);
+
+                if (graphics != null && graphics.subInstances != null)
+                {
+                    foreach (var g in graphics.subInstances)
+                    {
+                        var m = g.material;
+                        if (m != null)
+                        {
+                            var subBatchElement = g._batchElement;
+                            if (subBatchElement == null)
+                                subBatchElement = new BatchElement(g, _batchElement.bounds);
+                            subBatchElement.material = m;
+                            batchElements.Add(subBatchElement);
+                        }
+                    }
+                }
+
+                return _batchElement;
+            }
+            else
+                return null;
+        }
+
         protected internal class PaintingInfo
         {
             public Action captureDelegate; //缓存这个delegate，可以防止Capture状态下每帧104B的GC
@@ -1833,7 +1876,7 @@ namespace FairyGUI
         }
 
         [Flags]
-        protected internal enum Flags
+        public enum Flags
         {
             Disposed = 1,
             UserGameObject = 2,

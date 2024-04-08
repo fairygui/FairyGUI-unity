@@ -102,11 +102,10 @@ namespace FairyGUI
 
         static Color32[] vertexColors = new Color32[4];
 
-        override public int DrawGlyph(float x, float y,
-            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        override public void DrawGlyph(VertexBuffer vb, float x, float y)
         {
             if (_glyph == null) //space
-                return 0;
+                return;
 
             topLeft.x = x + _glyph.x * _scale;
             topLeft.y = y + (_glyph.lineHeight - _glyph.y) * _scale;
@@ -118,38 +117,36 @@ namespace FairyGUI
             bottomLeft.x = topLeft.x;
             bottomLeft.y = bottomRight.y;
 
-            vertList.Add(bottomLeft);
-            vertList.Add(topLeft);
-            vertList.Add(topRight);
-            vertList.Add(bottomRight);
+            vb.vertices.Add(bottomLeft);
+            vb.vertices.Add(topLeft);
+            vb.vertices.Add(topRight);
+            vb.vertices.Add(bottomRight);
 
-            uvList.AddRange(_glyph.uv);
+            vb.uvs.AddRange(_glyph.uv);
 
             if (hasChannel)
             {
                 Vector2 channel = new Vector2(_glyph.channel, 0);
-                uv2List.Add(channel);
-                uv2List.Add(channel);
-                uv2List.Add(channel);
-                uv2List.Add(channel);
+                vb.uvs2.Add(channel);
+                vb.uvs2.Add(channel);
+                vb.uvs2.Add(channel);
+                vb.uvs2.Add(channel);
             }
 
             if (canTint)
             {
-                colList.Add(vertexColors[0]);
-                colList.Add(vertexColors[1]);
-                colList.Add(vertexColors[2]);
-                colList.Add(vertexColors[3]);
+                vb.colors.Add(vertexColors[0]);
+                vb.colors.Add(vertexColors[1]);
+                vb.colors.Add(vertexColors[2]);
+                vb.colors.Add(vertexColors[3]);
             }
             else
             {
-                colList.Add(Color.white);
-                colList.Add(Color.white);
-                colList.Add(Color.white);
-                colList.Add(Color.white);
+                vb.colors.Add(Color.white);
+                vb.colors.Add(Color.white);
+                vb.colors.Add(Color.white);
+                vb.colors.Add(Color.white);
             }
-
-            return 4;
         }
 
         override public bool HasCharacter(char ch)

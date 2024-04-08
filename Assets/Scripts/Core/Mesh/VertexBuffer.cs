@@ -437,5 +437,79 @@ namespace FairyGUI
             if (vb._alphaInVertexColor)
                 _alphaInVertexColor = true;
         }
+
+        static float[] STROKE_OFFSET = new float[]
+        {
+             -1, 0, 1, 0,
+            0, -1, 0, 1,
+            -1, -1, 1, -1,
+            -1, 1, 1, 1
+        };
+        public void GenerateOutline(int dirs, float width, Color color)
+        {
+            int count = vertices.Count;
+            if (count + dirs * count > VerticesLimit)
+            {
+                Debug.LogWarning("Outline effect cannot be completed as mesh is too large.");
+                return;
+            }
+
+            VertexBuffer vb2 = VertexBuffer.Begin();
+            for (int j = 0; j < dirs; j++)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    Vector3 vert = vertices[i];
+                    vb2.vertices.Add(new Vector3(vert.x + STROKE_OFFSET[j * 2] * width, vert.y + STROKE_OFFSET[j * 2 + 1] * width, 0));
+                    vb2.colors.Add(color);
+                }
+
+                vb2.uvs.AddRange(uvs);
+                if (uvs2.Count > 0)
+                    vb2.uvs2.AddRange(uvs2);
+            }
+            Insert(vb2);
+            vb2.End();
+        }
+
+        public void GenerateShadow(Vector2 offset, Color color)
+        {
+            int count = vertices.Count;
+            if (count + count > VerticesLimit)
+            {
+                Debug.LogWarning("Shadow effect cannot be completed as mesh is too large.");
+                return;
+            }
+
+            VertexBuffer vb2 = VertexBuffer.Begin();
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 vert = vertices[i];
+                vb2.vertices.Add(new Vector3(vert.x + offset.x, vert.y - offset.y, 0));
+                vb2.colors.Add(color);
+            }
+
+            vb2.uvs.AddRange(uvs);
+            if (uvs2.Count > 0)
+                vb2.uvs2.AddRange(uvs2);
+            Insert(vb2);
+            vb2.End();
+        }
+
+        const int VerticesLimit = 65000;
+        public void CheckMeshLimit()
+        {
+            int count = vertices.Count;
+            if (count > VerticesLimit)
+            {
+                Debug.LogWarning("A mesh may not have more than " + VerticesLimit + " vertices.");
+                vertices.RemoveRange(VerticesLimit, count - VerticesLimit);
+                colors.RemoveRange(VerticesLimit, count - VerticesLimit);
+                uvs.RemoveRange(VerticesLimit, count - VerticesLimit);
+                if (uvs2.Count > 0)
+                    uvs2.RemoveRange(VerticesLimit, count - VerticesLimit);
+                count = VerticesLimit;
+            }
+        }
     }
 }

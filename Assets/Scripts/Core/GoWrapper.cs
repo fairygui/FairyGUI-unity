@@ -38,8 +38,6 @@ namespace FairyGUI
         /// </summary>
         public GoWrapper()
         {
-            // _flags |= Flags.SkipBatching;
-
             _renderers = new List<RendererInfo>();
             _materialsBackup = new Dictionary<Material, Material>();
 
@@ -78,9 +76,6 @@ namespace FairyGUI
         /// <param name="cloneMaterial">如果true，则复制材质，否则直接使用sharedMaterial。</param>
         public void SetWrapTarget(GameObject target, bool cloneMaterial)
         {
-            // set Flags.SkipBatching only target not null
-            if (target == null) _flags &= ~Flags.SkipBatching;
-            else _flags |= Flags.SkipBatching;
             InvalidateBatchingState();
 
             RecoverMaterials();
@@ -120,23 +115,18 @@ namespace FairyGUI
         }
 
         override internal void _SetLayerDirect(int value)
-        {  
-            if (_paintingMode > 0)
-                paintingGraphics.gameObject.layer = value;
-            else
+        {
+            gameObject.layer = value;
+            if (_wrapTarget != null)//这个if是为了在GoWrapper里使用模糊效果
             {
-                gameObject.layer = value;
-                if (_wrapTarget != null)//这个if是为了在GoWrapper里使用模糊效果
+                _wrapTarget.layer = value;
+                foreach (Transform tf in _wrapTarget.GetComponentsInChildren<Transform>(true))
                 {
-                    _wrapTarget.layer = value;
-                    foreach (Transform tf in _wrapTarget.GetComponentsInChildren<Transform>(true))
-                    {
-                        tf.gameObject.layer = value;
-                    }
+                    tf.gameObject.layer = value;
                 }
             }
         }
-        
+
         /// <summary>
         /// GoWrapper will cache all renderers of your gameobject on constructor. 
         /// If your gameobject change laterly, call this function to update the cache.
@@ -268,33 +258,40 @@ namespace FairyGUI
             _materialsBackup.Clear();
         }
 
-        public override int renderingOrder
+        public override void SetRenderingOrder(UpdateContext context, bool inBatch)
         {
-            get
-            {
-                return base.renderingOrder;
-            }
-            set
-            {
-                base.renderingOrder = value;
+            base.SetRenderingOrder(context, inBatch);
 
-                if (_canvas != null)
-                    _canvas.sortingOrder = value;
-                else
+            int value = base.renderingOrder;
+
+            if (_canvas != null)
+                _canvas.sortingOrder = value;
+            else
+            {
+                int cnt = _renderers.Count;
+                for (int i = 0; i < cnt; i++)
                 {
-                    int cnt = _renderers.Count;
-                    for (int i = 0; i < cnt; i++)
+                    RendererInfo ri = _renderers[i];
+                    if (ri.renderer != null)
                     {
-                        RendererInfo ri = _renderers[i];
-                        if (ri.renderer != null)
-                        {
-                            if (i != 0 && _renderers[i].sortingOrder != _renderers[i - 1].sortingOrder)
-                                value = UpdateContext.current.renderingOrder++;
-                            ri.renderer.sortingOrder = value;
-                        }
+                        if (i != 0 && _renderers[i].sortingOrder != _renderers[i - 1].sortingOrder)
+                            value = context.renderingOrder++;
+                        ri.renderer.sortingOrder = value;
                     }
                 }
             }
+        }
+
+        public override BatchElement AddToBatch(List<BatchElement> batchElements, bool force)
+        {
+            if (this._wrapTarget != null)
+            {
+                BatchElement batchElement = base.AddToBatch(batchElements, true);
+                batchElement.breakBatch = true;
+                return batchElement;
+            }
+            else
+                return null;
         }
 
         override protected bool SetLayer(int value, bool fromParent)

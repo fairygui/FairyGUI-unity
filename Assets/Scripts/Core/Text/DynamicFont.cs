@@ -109,8 +109,10 @@ namespace FairyGUI
             format.FillVertexColors(vertexColors);
         }
 
-        override public void PrepareCharacters(string text)
+        override public void PrepareCharacters(string text, TextFormat format, float fontSizeScale)
         {
+            SetFormat(format, fontSizeScale);
+
             _font.RequestCharactersInTexture(text, _size, _style);
         }
 
@@ -181,8 +183,7 @@ namespace FairyGUI
             new Vector3(0f, 0.5f, 0f)
         };
 
-        override public int DrawGlyph(float x, float y,
-            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        override public void DrawGlyph(VertexBuffer vb, float x, float y)
         {
             topLeft.x = _char.minX;
             topLeft.y = _char.maxY;
@@ -212,25 +213,25 @@ namespace FairyGUI
             bottomLeft.x = topLeft.x;
             bottomLeft.y = bottomRight.y;
 
-            vertList.Add(bottomLeft);
-            vertList.Add(topLeft);
-            vertList.Add(topRight);
-            vertList.Add(bottomRight);
+            vb.vertices.Add(bottomLeft);
+            vb.vertices.Add(topLeft);
+            vb.vertices.Add(topRight);
+            vb.vertices.Add(bottomRight);
 
             uvBottomLeft = _char.uvBottomLeft;
             uvTopLeft = _char.uvTopLeft;
             uvTopRight = _char.uvTopRight;
             uvBottomRight = _char.uvBottomRight;
 
-            uvList.Add(uvBottomLeft);
-            uvList.Add(uvTopLeft);
-            uvList.Add(uvTopRight);
-            uvList.Add(uvBottomRight);
+            vb.uvs.Add(uvBottomLeft);
+            vb.uvs.Add(uvTopLeft);
+            vb.uvs.Add(uvTopRight);
+            vb.uvs.Add(uvBottomRight);
 
-            colList.Add(vertexColors[0]);
-            colList.Add(vertexColors[1]);
-            colList.Add(vertexColors[2]);
-            colList.Add(vertexColors[3]);
+            vb.colors.Add(vertexColors[0]);
+            vb.colors.Add(vertexColors[1]);
+            vb.colors.Add(vertexColors[2]);
+            vb.colors.Add(vertexColors[3]);
 
             if (_boldVertice)
             {
@@ -238,30 +239,25 @@ namespace FairyGUI
                 {
                     Vector3 boldOffset = BOLD_OFFSET[b];
 
-                    vertList.Add(bottomLeft + boldOffset);
-                    vertList.Add(topLeft + boldOffset);
-                    vertList.Add(topRight + boldOffset);
-                    vertList.Add(bottomRight + boldOffset);
+                    vb.vertices.Add(bottomLeft + boldOffset);
+                    vb.vertices.Add(topLeft + boldOffset);
+                    vb.vertices.Add(topRight + boldOffset);
+                    vb.vertices.Add(bottomRight + boldOffset);
 
-                    uvList.Add(uvBottomLeft);
-                    uvList.Add(uvTopLeft);
-                    uvList.Add(uvTopRight);
-                    uvList.Add(uvBottomRight);
+                    vb.uvs.Add(uvBottomLeft);
+                    vb.uvs.Add(uvTopLeft);
+                    vb.uvs.Add(uvTopRight);
+                    vb.uvs.Add(uvBottomRight);
 
-                    colList.Add(vertexColors[0]);
-                    colList.Add(vertexColors[1]);
-                    colList.Add(vertexColors[2]);
-                    colList.Add(vertexColors[3]);
+                    vb.colors.Add(vertexColors[0]);
+                    vb.colors.Add(vertexColors[1]);
+                    vb.colors.Add(vertexColors[2]);
+                    vb.colors.Add(vertexColors[3]);
                 }
-
-                return 20;
             }
-            else
-                return 4;
         }
 
-        override public int DrawLine(float x, float y, float width, int fontSize, int type,
-            List<Vector3> vertList, List<Vector2> uvList, List<Vector2> uv2List, List<Color32> colList)
+        override public void DrawLine(VertexBuffer vb, float x, float y, float width, int fontSize, int type)
         {
             if (!_gotLineChar)
             {
@@ -291,10 +287,10 @@ namespace FairyGUI
             bottomLeft.x = topLeft.x;
             bottomLeft.y = bottomRight.y;
 
-            vertList.Add(bottomLeft);
-            vertList.Add(topLeft);
-            vertList.Add(topRight);
-            vertList.Add(bottomRight);
+            vb.vertices.Add(bottomLeft);
+            vb.vertices.Add(topLeft);
+            vb.vertices.Add(topRight);
+            vb.vertices.Add(bottomRight);
 
             uvBottomLeft = _lineChar.uvBottomLeft;
             uvTopLeft = _lineChar.uvTopLeft;
@@ -313,15 +309,15 @@ namespace FairyGUI
             else
                 u0.y = (_lineChar.uvBottomLeft.y + _lineChar.uvBottomRight.y) * 0.5f;
 
-            uvList.Add(u0);
-            uvList.Add(u0);
-            uvList.Add(u0);
-            uvList.Add(u0);
+            vb.uvs.Add(u0);
+            vb.uvs.Add(u0);
+            vb.uvs.Add(u0);
+            vb.uvs.Add(u0);
 
-            colList.Add(vertexColors[0]);
-            colList.Add(vertexColors[1]);
-            colList.Add(vertexColors[2]);
-            colList.Add(vertexColors[3]);
+            vb.colors.Add(vertexColors[0]);
+            vb.colors.Add(vertexColors[1]);
+            vb.colors.Add(vertexColors[2]);
+            vb.colors.Add(vertexColors[3]);
 
             if (_boldVertice)
             {
@@ -329,26 +325,22 @@ namespace FairyGUI
                 {
                     Vector3 boldOffset = BOLD_OFFSET[b];
 
-                    vertList.Add(bottomLeft + boldOffset);
-                    vertList.Add(topLeft + boldOffset);
-                    vertList.Add(topRight + boldOffset);
-                    vertList.Add(bottomRight + boldOffset);
+                    vb.vertices.Add(bottomLeft + boldOffset);
+                    vb.vertices.Add(topLeft + boldOffset);
+                    vb.vertices.Add(topRight + boldOffset);
+                    vb.vertices.Add(bottomRight + boldOffset);
 
-                    uvList.Add(u0);
-                    uvList.Add(u0);
-                    uvList.Add(u0);
-                    uvList.Add(u0);
+                    vb.uvs.Add(u0);
+                    vb.uvs.Add(u0);
+                    vb.uvs.Add(u0);
+                    vb.uvs.Add(u0);
 
-                    colList.Add(vertexColors[0]);
-                    colList.Add(vertexColors[1]);
-                    colList.Add(vertexColors[2]);
-                    colList.Add(vertexColors[3]);
+                    vb.colors.Add(vertexColors[0]);
+                    vb.colors.Add(vertexColors[1]);
+                    vb.colors.Add(vertexColors[2]);
+                    vb.colors.Add(vertexColors[3]);
                 }
-
-                return 20;
             }
-            else
-                return 4;
         }
 
         override public bool HasCharacter(char ch)

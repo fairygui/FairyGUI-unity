@@ -9,7 +9,7 @@ namespace FairyGUI
     /// <summary>
     /// 
     /// </summary>
-    public class NGraphics : IMeshFactory
+    public class NGraphics : IMeshFactory, IBatchable
     {
         /// <summary>
         /// 
@@ -46,6 +46,16 @@ namespace FairyGUI
         /// </summary>
         public event Action meshModifier;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<NGraphics> subInstances;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Vector4 userData;
+
         NTexture _texture;
         string _shader;
         Material _material;
@@ -76,6 +86,8 @@ namespace FairyGUI
 
         MaterialPropertyBlock _propertyBlock;
         bool _blockUpdated;
+
+        internal BatchElement _batchElement;
 
         /// <summary>
         /// 
@@ -150,6 +162,12 @@ namespace FairyGUI
             {
                 _contentRect = value;
                 _meshDirty = true;
+
+                if (subInstances != null)
+                {
+                    foreach (var sub in subInstances)
+                        sub.contentRect = value;
+                }
             }
         }
 
@@ -347,10 +365,33 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+        [Obsolete("Use renderingOrder")]
         public int sortingOrder
         {
             get { return meshRenderer.sortingOrder; }
             set { meshRenderer.sortingOrder = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int renderingOrder
+        {
+            get { return meshRenderer.sortingOrder; }
+            set { meshRenderer.sortingOrder = value; }
+        }
+
+        public void SetRenderingOrder(UpdateContext context, bool inBatch)
+        {
+            meshRenderer.sortingOrder = context.renderingOrder++;
+
+            if (subInstances != null && !inBatch)
+            {
+                foreach (var sub in subInstances)
+                {
+                    sub.meshRenderer.sortingOrder = context.renderingOrder++;
+                }
+            }
         }
 
         /// <summary>
@@ -455,6 +496,12 @@ namespace FairyGUI
         public void SetMeshDirty()
         {
             _meshDirty = true;
+
+            if (subInstances != null)
+            {
+                foreach (var g in subInstances)
+                    g._meshDirty = true;
+            }
         }
 
         /// <summary>
@@ -463,13 +510,23 @@ namespace FairyGUI
         /// <returns></returns>
         public bool UpdateMesh()
         {
+            bool ret = false;
             if (_meshDirty)
             {
                 UpdateMeshNow();
-                return true;
+                ret = true;
             }
-            else
-                return false;
+
+            if (subInstances != null)
+            {
+                foreach (var g in subInstances)
+                {
+                    if (g.UpdateMesh())
+                        ret = true;
+                }
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -500,6 +557,13 @@ namespace FairyGUI
             meshFilter = null;
             _stencilEraser = null;
             meshModifier = null;
+
+            if (subInstances != null)
+            {
+                foreach (var sub in subInstances)
+                    sub.Dispose();
+                subInstances.Clear();
+            }
         }
 
         /// <summary>
@@ -584,6 +648,12 @@ namespace FairyGUI
 
                     _maskFlag = 0;
                 }
+            }
+
+            if (subInstances != null)
+            {
+                foreach (var sub in subInstances)
+                    sub.Update(context, alpha, grayed);
             }
         }
 
@@ -754,6 +824,18 @@ namespace FairyGUI
             vb.AddQuad(rect, vb.vertexColor, vb.uvRect);
             vb.AddTriangles();
             vb._isArbitraryQuad = _vertexMatrix != null;
+        }
+
+        public NGraphics CreateSubInstance(string name)
+        {
+            if (subInstances == null)
+                subInstances = new List<NGraphics>();
+
+            GameObject newGameObject = new GameObject(name);
+            newGameObject.transform.SetParent(gameObject.transform, false);
+            newGameObject.layer = gameObject.layer;
+            newGameObject.hideFlags = gameObject.hideFlags;
+            return new NGraphics(newGameObject);
         }
 
         class StencilEraser
