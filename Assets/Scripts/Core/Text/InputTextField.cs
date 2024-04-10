@@ -691,9 +691,9 @@ namespace FairyGUI
                     Keyboard keyboard = Keyboard.current;
                     if (keyboard != null)
                         keyboard.SetIMECursorPosition(cursorPos);
-#else
-                    Input.compositionCursorPos = cursorPos;
 #endif
+                    Input.compositionCursorPos = cursorPos;
+
                 }
 
                 _nextBlink = Time.time + 0.5f;
@@ -1084,12 +1084,13 @@ namespace FairyGUI
                 Keyboard keyboard = Keyboard.current;
                 if (keyboard != null)
                     keyboard.SetIMEEnabled(!disableIME && !_displayAsPassword);
-#else
+#endif
+                //Even using input system, we should use to the old input interface to enable IME (why)
                 if (!disableIME && !_displayAsPassword)
                     Input.imeCompositionMode = IMECompositionMode.On;
                 else
                     Input.imeCompositionMode = IMECompositionMode.Off;
-#endif
+
                 _composing = 0;
 
                 if ((string)context.data == "key") //select all if got focus by tab key
@@ -1125,9 +1126,9 @@ namespace FairyGUI
                 Keyboard keyboard = Keyboard.current;
                 if (keyboard != null)
                     keyboard.SetIMEEnabled(true);
-#else
-                Input.imeCompositionMode = IMECompositionMode.Auto;
 #endif
+                Input.imeCompositionMode = IMECompositionMode.Auto;
+
                 TextInputHistory.inst.StopRecord(this);
             }
 
@@ -1398,38 +1399,43 @@ namespace FairyGUI
             char c = evt.character;
             if (c != 0)
             {
-                if (evt.ctrlOrCmd)
-                    return true;
-
-                if (c == '\r' || c == 3)
-                    c = '\n';
-
-                if (c == 25)/*shift+tab*/
-                    c = '\t';
-
-                if (c == 27/*escape*/ || textField.singleLine && (c == '\n' || c == '\t'))
-                    return true;
-
-                if (char.IsHighSurrogate(c))
-                {
-                    _highSurrogateChar = c;
-                    return true;
-                }
-
-#if !FAIRYGUI_INPUT_SYSTEM
-                if (_editable)
-                {
-                    if (char.IsLowSurrogate(c))
-                        ReplaceSelection(char.ConvertFromUtf32(((int)c & 0x03FF) + ((((int)_highSurrogateChar & 0x03FF) + 0x40) << 10)));
-                    else
-                        ReplaceSelection(c.ToString());
-                }
+#if FAIRYGUI_INPUT_SYSTEM
+                if (!evt.ctrlOrCmd && (c == '\n' || c == '\r' || c == '\t' || c == 25 || c == 3))
+                    HandleTextInput(c);
+#else
+                if (!evt.ctrlOrCmd)
+                    HandleTextInput(c);
 #endif
-
                 return true;
             }
             else
                 return keyCodeHandled;
+        }
+
+        void HandleTextInput(char c)
+        {
+            if (c == '\r' || c == 3)
+                c = '\n';
+
+            if (c == 25)/*shift+tab*/
+                c = '\t';
+
+            if (c == 27/*escape*/ || textField.singleLine && (c == '\n' || c == '\t'))
+                return;
+
+            if (_editable)
+            {
+                if (char.IsHighSurrogate(c))
+                {
+                    _highSurrogateChar = c;
+                    return;
+                }
+
+                if (char.IsLowSurrogate(c))
+                    ReplaceSelection(char.ConvertFromUtf32(((int)c & 0x03FF) + ((((int)_highSurrogateChar & 0x03FF) + 0x40) << 10)));
+                else
+                    ReplaceSelection(c.ToString());
+            }
         }
 
         void CheckComposition()
@@ -1563,9 +1569,18 @@ namespace FairyGUI
 
         static void OnTextInput(char c)
         {
+            // filter control chars
+            // if Active input handling is BOTH, we will receive these controls chars in this callback
+            // howeveer, if Active input handling is New, we will not receive these controls chars in this callback
+            if (c < 32 && c != 3 && c != '\t' && c != '\n' && c != '\r' && c != 25
+                || c >= 127 && c <= 159
+                || c >= 63232 && c <= 63235//why arrow keys have these codes?
+             )
+                return;
+
             var focus = Stage.inst.focus;
-            if ((focus is InputTextField) && ((InputTextField)focus).editable && !((InputTextField)focus).keyboardInput)
-                ((InputTextField)focus).ReplaceSelection(c.ToString());
+            if ((focus is InputTextField) && !((InputTextField)focus).keyboardInput)
+                ((InputTextField)focus).HandleTextInput(c);
         }
 
         /// <summary>
