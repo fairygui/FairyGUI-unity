@@ -1401,7 +1401,11 @@ namespace FairyGUI
             {
 #if FAIRYGUI_INPUT_SYSTEM
                 if (!evt.ctrlOrCmd && (c == '\n' || c == '\r' || c == '\t' || c == 25 || c == 3))
+                {
+                    _keydownFrame = Time.frameCount;
+                    _keydownChar = c;
                     HandleTextInput(c);
+                }
 #else
                 if (!evt.ctrlOrCmd)
                     HandleTextInput(c);
@@ -1528,6 +1532,8 @@ namespace FairyGUI
 
 #else
         static string _compositionString = string.Empty;
+        static int _keydownFrame;
+        static char _keydownChar;
 
         public static void RegisterEvent()
         {
@@ -1569,13 +1575,17 @@ namespace FairyGUI
 
         static void OnTextInput(char c)
         {
-            // filter control chars
-            // if Active input handling is BOTH, we will receive these controls chars in this callback
-            // howeveer, if Active input handling is New, we will not receive these controls chars in this callback
-            if (c < 32 && c != 3 && c != '\t' && c != '\n' && c != '\r' && c != 25
-                || c >= 127 && c <= 159
-                || c >= 63232 && c <= 63235//why arrow keys have these codes?
-             )
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard.ctrlKey.isPressed || Keyboard.current.altKey.isPressed
+                || keyboard.leftCommandKey.isPressed || keyboard.rightCommandKey.isPressed
+            )
+                return;
+
+            if (_keydownFrame == Time.frameCount && _keydownChar == c)
+                return;
+
+            if (c < 32 || c >= 127 && c <= 159
+                || c >= 0xF700 && c <= 0xF7FF /*why home/end/arrow-keys have these codes?*/)
                 return;
 
             var focus = Stage.inst.focus;
