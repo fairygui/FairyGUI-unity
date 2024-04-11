@@ -34,6 +34,9 @@ namespace FairyGUI
         bool isMain;
         [NonSerialized]
         Display _display;
+#if HDRP
+        FGUIHDRPRenderPass hdrpPass;
+#endif
 
         /// <summary>
         /// 
@@ -74,6 +77,24 @@ namespace FairyGUI
             if (Display.displays.Length > 1 && cachedCamera.targetDisplay != 0 && cachedCamera.targetDisplay < Display.displays.Length)
                 _display = Display.displays[cachedCamera.targetDisplay];
 
+#if HDRP
+            var volume = this.gameObject.GetComponent<UnityEngine.Rendering.HighDefinition.CustomPassVolume>();
+            if (!volume)
+            {
+                volume = this.gameObject.AddComponent<UnityEngine.Rendering.HighDefinition.CustomPassVolume>();
+                volume.injectionPoint = UnityEngine.Rendering.HighDefinition.CustomPassInjectionPoint.AfterPostProcess;
+            }
+            hdrpPass = volume.customPasses.Find(t => t is FGUIHDRPRenderPass) as FGUIHDRPRenderPass;
+            if (hdrpPass == null)
+            {
+                hdrpPass = (FGUIHDRPRenderPass)volume.AddPassOfType<FGUIHDRPRenderPass>();
+                hdrpPass.name = nameof(FGUIHDRPRenderPass);
+                hdrpPass.layer = 1 << LayerMask.NameToLayer(LayerName);
+            }
+            //涉及到摄像机修改的太多 这里就只enable=false
+            if (Application.isPlaying)
+                cachedCamera.enabled = false;
+#endif
             if (_display == null)
                 OnScreenSizeChanged(Screen.width, Screen.height);
             else
@@ -132,6 +153,10 @@ namespace FairyGUI
                         UIContentScaler.scaleFactor = 1;
                 }
             }
+#if HDRP
+            if (hdrpPass != null)
+                hdrpPass.ApplyChange(this.transform);
+#endif
         }
 
         void OnRenderObject()
@@ -194,7 +219,15 @@ namespace FairyGUI
             camera.stereoTargetEye = StereoTargetEyeMask.None;
             camera.allowHDR = false;
             camera.allowMSAA = false;
+#if HDRP
+            var volume = cameraObject.AddComponent<UnityEngine.Rendering.HighDefinition.CustomPassVolume>();
+            volume.injectionPoint = UnityEngine.Rendering.HighDefinition.CustomPassInjectionPoint.AfterPostProcess;
+            var pass = (FGUIHDRPRenderPass)volume.AddPassOfType<FGUIHDRPRenderPass>();
+            pass.name = nameof(FGUIHDRPRenderPass);
+            pass.layer = cullingMask;
+#endif
             cameraObject.AddComponent<StageCamera>();
+
             return camera;
         }
     }
