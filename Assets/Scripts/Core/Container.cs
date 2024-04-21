@@ -517,7 +517,7 @@ namespace FairyGUI
             if (Display.displays.Length > 1)
             {
                 Vector3 p = Display.RelativeMouseAt(HitTestContext.screenPoint);
-                if (p != Vector3.zero)
+                if (p.x != 0 || p.y != 0) //(p != Vector3.zero) we got (0,0,1) in some unity version, especially on recovering from sleep
                     HitTestContext.screenPoint = p;
             }
             HitTestContext.worldPoint = StageCamera.main.ScreenToWorldPoint(HitTestContext.screenPoint);
