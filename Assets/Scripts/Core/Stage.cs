@@ -130,6 +130,7 @@ namespace FairyGUI
 #endif
                     _clickTestThreshold = 50;
                     _touchSupportDetected = true;
+                    inst.ResetInputState();
                 }
                 else
                 {
@@ -876,7 +877,7 @@ namespace FairyGUI
 
                     TouchInfo touch = null;
                     TouchInfo free = null;
-                    for (int j = 0; j < 5; j++)
+                    for (int j = 4; j >= 0; j--)
                     {
                         if (_touches[j].touchId == touchId)
                         {
