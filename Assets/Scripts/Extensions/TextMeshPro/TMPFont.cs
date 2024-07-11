@@ -99,8 +99,8 @@ namespace FairyGUI
 
         void OnCreateNewMaterial(Material mat)
         {
-            mat.SetFloat(ShaderUtilities.ID_TextureWidth, mainTexture.width);
-            mat.SetFloat(ShaderUtilities.ID_TextureHeight, mainTexture.height);
+            mat.SetFloat(ShaderUtilities.ID_TextureWidth, fontAsset.atlasWidth);
+            mat.SetFloat(ShaderUtilities.ID_TextureHeight, fontAsset.atlasHeight);
             mat.SetFloat(ShaderUtilities.ID_GradientScale, _gradientScale);
             mat.SetFloat(ShaderUtilities.ID_WeightNormal, fontAsset.normalStyle);
             mat.SetFloat(ShaderUtilities.ID_WeightBold, fontAsset.boldStyle);
