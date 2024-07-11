@@ -1,5 +1,6 @@
 using UnityEngine;
 using FairyGUI.Utils;
+using System;
 
 namespace FairyGUI
 {
@@ -24,6 +25,11 @@ namespace FairyGUI
 
         protected PackageItem _contentItem;
         protected GoWrapper _content;
+
+#if FAIRYGUI_PUERTS
+        public Action __loadExternal;
+        public Action __freeExternal;
+#endif
 
         public GLoader3D()
         {
@@ -387,11 +393,24 @@ namespace FairyGUI
 
         virtual protected void LoadExternal()
         {
+#if FAIRYGUI_PUERTS
+            if (__loadExternal != null)
+            {
+                __loadExternal();
+                return;
+            }
+#endif
         }
 
         virtual protected void FreeExternal()
         {
-            GameObject.DestroyImmediate(_content.wrapTarget);
+#if FAIRYGUI_PUERTS
+            if (__freeExternal != null)
+            {
+                __freeExternal();
+            }
+            if (_content.wrapTarget != null) GameObject.DestroyImmediate(_content.wrapTarget);
+#endif
         }
 
         protected void UpdateLayout()

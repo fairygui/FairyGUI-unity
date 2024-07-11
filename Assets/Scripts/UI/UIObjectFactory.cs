@@ -14,9 +14,11 @@ namespace FairyGUI
     {
         public delegate GComponent GComponentCreator();
         public delegate GLoader GLoaderCreator();
+        public delegate GLoader3D GLoader3DCreator();
 
         static Dictionary<string, GComponentCreator> packageItemExtensions = new Dictionary<string, GComponentCreator>();
         static GLoaderCreator loaderCreator;
+        static GLoader3DCreator loader3DCreator;
 
         /// <summary>
         /// 
@@ -79,6 +81,15 @@ namespace FairyGUI
         public static void SetLoaderExtension(GLoaderCreator creator)
         {
             loaderCreator = creator;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="creator"></param>
+        public static void SetLoader3DExtension(GLoader3DCreator creator)
+        {
+            loader3DCreator = creator;
         }
 
         internal static void ResolvePackageItemExtension(PackageItem pi)
@@ -193,7 +204,10 @@ namespace FairyGUI
                     return new GTree();
 
                 case ObjectType.Loader3D:
-                    return new GLoader3D();
+                    if (loader3DCreator != null)
+                        return loader3DCreator();
+                    else
+                        return new GLoader3D();
 
                 default:
                     return null;
