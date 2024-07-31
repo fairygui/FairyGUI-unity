@@ -383,13 +383,13 @@ namespace FairyGUI
 
         public void SetRenderingOrder(UpdateContext context, bool inBatch)
         {
-            meshRenderer.sortingOrder = ++context.renderingOrder;
+            meshRenderer.sortingOrder = context.renderingOrder++;
 
             if (subInstances != null && !inBatch)
             {
                 foreach (var sub in subInstances)
                 {
-                    sub.meshRenderer.sortingOrder = ++context.renderingOrder;
+                    sub.meshRenderer.sortingOrder = context.renderingOrder++;
                 }
             }
         }

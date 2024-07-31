@@ -280,6 +280,7 @@ namespace FairyGUI
                     }
                 }
             }
+            context.renderingOrder++;
         }
 
         public override BatchElement AddToBatch(List<BatchElement> batchElements, bool force)
