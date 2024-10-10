@@ -139,10 +139,10 @@ Shader "FairyGUI/Image"
                     #endif
 
                     #ifdef SOFT_CLIPPED
-        			float2 factor;
-        			float2 condition = step(i.clipPos.xy, 0);
-        			float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
-        			factor.xy = (1.0 - abs(input.mask.xy)) * (clip_softness.xw + clip_softness.zy);
+		float2 factor;
+		float2 condition = step(i.clipPos.xy, 0);
+		float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
+		factor.xy = (1.0 - abs(input.mask.xy)) * (clip_softness.xw + clip_softness.zy);
                     col.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
                     #endif
 
