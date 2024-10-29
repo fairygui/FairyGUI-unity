@@ -279,6 +279,8 @@ namespace FairyGUI
                         ri.renderer.sortingOrder = value;
                     }
                 }
+                if (cnt > 0)
+                    context.renderingOrder++;
             }
         }
 
