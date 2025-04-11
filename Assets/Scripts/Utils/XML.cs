@@ -199,7 +199,7 @@ namespace FairyGUI.Utils
             if (_attributes == null)
                 _attributes = new Dictionary<string, string>();
 
-            _attributes[attrName] = string.Format("{0:#.####}", attrValue);
+            _attributes[attrName] = string.Format("{0:0.####}", attrValue);
         }
 
         public void RemoveAttribute(string attrName)
