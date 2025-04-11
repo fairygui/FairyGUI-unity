@@ -81,6 +81,9 @@ Properties {
 	_StencilReadMask	("Stencil Read Mask", Float) = 255
 
 	_ColorMask			("Color Mask", Float) = 15
+
+    _BlendSrcFactor ("Blend SrcFactor", Float) = 5
+    _BlendDstFactor ("Blend DstFactor", Float) = 10
 }
 
 SubShader {
@@ -106,7 +109,8 @@ SubShader {
 	Lighting Off
 	Fog { Mode Off }
 	ZTest [unity_GUIZTestMode]
-	Blend One OneMinusSrcAlpha
+    
+    Blend [_BlendSrcFactor] [_BlendDstFactor]
 	ColorMask [_ColorMask]
 
 	Pass {
@@ -120,8 +124,8 @@ SubShader {
 
 		//#pragma multi_compile __ UNITY_UI_CLIP_RECT
 		//#pragma multi_compile __ UNITY_UI_ALPHACLIP
-		#pragma multi_compile NOT_GRAYED GRAYED
-		#pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED
+		#pragma multi_compile _ GRAYED
+		#pragma multi_compile _ CLIPPED SOFT_CLIPPED
 
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
@@ -455,26 +459,20 @@ SubShader {
 		#endif
 
 		#ifdef SOFT_CLIPPED
-			float2 factor = float2(0,0);
-			if(input.mask.x<0)
-				factor.x = (1.0-abs(input.mask.x)) * _ClipSoftness.x;
-			else
-				factor.x = (1.0-input.mask.x) * _ClipSoftness.z;
-			if(input.mask.y<0)
-				factor.y = (1.0-abs(input.mask.y)) * _ClipSoftness.w;
-			else
-				factor.y = (1.0-input.mask.y) * _ClipSoftness.y;
+			float2 factor;
+			float2 condition = step(input.mask.xy, 0);
+			float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
+			factor.xy = (1.0 - abs(input.mask.xy)) * (clip_softness.xw + clip_softness.zy);
 			faceColor.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
 			clip(faceColor.a - 0.001);
 		#endif
-
-			return faceColor * input.color.a;
-		}
+		return half4(faceColor.rgb, input.color.a * faceColor.a);
+}
 
 		ENDCG
 	}
 }
 
-Fallback "TextMeshPro/Mobile/Distance Field"
+//Fallback "TextMeshPro/Mobile/Distance Field"
 CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
 }
