@@ -49,9 +49,9 @@ Shader "FairyGUI/Image"
         Pass
         {
             CGPROGRAM
-                #pragma multi_compile NOT_COMBINED COMBINED
-                #pragma multi_compile NOT_GRAYED GRAYED COLOR_FILTER
-                #pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED ALPHA_MASK
+                #pragma multi_compile _ COMBINED
+                #pragma multi_compile _ GRAYED COLOR_FILTER
+                #pragma multi_compile _ CLIPPED SOFT_CLIPPED ALPHA_MASK
                 #pragma vertex vert
                 #pragma fragment frag
                 
@@ -139,15 +139,10 @@ Shader "FairyGUI/Image"
                     #endif
 
                     #ifdef SOFT_CLIPPED
-                    float2 factor = float2(0,0);
-                    if(i.clipPos.x<0)
-                        factor.x = (1.0-abs(i.clipPos.x)) * _ClipSoftness.x;
-                    else
-                        factor.x = (1.0-i.clipPos.x) * _ClipSoftness.z;
-                    if(i.clipPos.y<0)
-                        factor.y = (1.0-abs(i.clipPos.y)) * _ClipSoftness.w;
-                    else
-                        factor.y = (1.0-i.clipPos.y) * _ClipSoftness.y;
+		            float2 factor;
+		            float2 condition = step(i.clipPos.xy, 0);
+		            float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
+		            factor.xy = (1.0 - abs(i.clipPos.xy)) * (clip_softness.xw + clip_softness.zy);
                     col.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
                     #endif
 

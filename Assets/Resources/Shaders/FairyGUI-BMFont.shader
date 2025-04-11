@@ -49,8 +49,8 @@ Shader "FairyGUI/BMFont"
         Pass
         {
             CGPROGRAM
-                #pragma multi_compile NOT_GRAYED GRAYED
-                #pragma multi_compile NOT_CLIPPED CLIPPED SOFT_CLIPPED
+                #pragma multi_compile _ GRAYED
+                #pragma multi_compile _ CLIPPED SOFT_CLIPPED
                 #pragma vertex vert
                 #pragma fragment frag
                 #pragma exclude_renderers d3d9 opengl flash
@@ -127,28 +127,22 @@ Shader "FairyGUI/BMFont"
                     #endif
 
                     #ifdef SOFT_CLIPPED
-                    float2 factor = float2(0,0);
-                    if(i.clipPos.x<0)
-                        factor.x = (1.0-abs(i.clipPos.x)) * _ClipSoftness.x;
-                    else
-                        factor.x = (1.0-i.clipPos.x) * _ClipSoftness.z;
-                    if(i.clipPos.y<0)
-                        factor.y = (1.0-abs(i.clipPos.y)) * _ClipSoftness.w;
-                    else
-                        factor.y = (1.0-i.clipPos.y) * _ClipSoftness.y;
+		            float2 factor;
+		            float2 condition = step(i.clipPos.xy, 0);
+		            float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
+		            factor.xy = (1.0 - abs(i.clipPos.xy)) * (clip_softness.xw + clip_softness.zy);
                     col.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
                     #endif
-
                     #ifdef CLIPPED
                     float2 factor = abs(i.clipPos);
                     col.a *= step(max(factor.x, factor.y), 1);
                     #endif
 
                     return col;
-                }
+            }
             ENDCG
         }
     }
 
-    Fallback "FairyGUI/Text"
+    //Fallback "FairyGUI/Text"
 }
