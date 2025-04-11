@@ -917,7 +917,7 @@ namespace FairyGUI
 #endif
                 pos.y = Screen.height - pos.y;
                 TouchInfo touch = _touches[0];
-                if (pos.x < 0 || pos.y < 0) // outside of the window
+                if (float.IsNaN(pos.x) || float.IsNaN(pos.y) || float.pos.x < 0 || pos.y < 0) // outside of the window
                     _touchTarget = this;
                 else
                     _touchTarget = HitTest(pos, true);
