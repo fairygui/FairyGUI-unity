@@ -82,7 +82,7 @@ Properties {
 
 	_ColorMask			("Color Mask", Float) = 15
 
-    _BlendSrcFactor ("Blend SrcFactor", Float) = 5
+    _BlendSrcFactor ("Blend SrcFactor", Float) = 1
     _BlendDstFactor ("Blend DstFactor", Float) = 10
 }
 
