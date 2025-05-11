@@ -466,7 +466,7 @@ SubShader {
 			faceColor.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
 			clip(faceColor.a - 0.001);
 		#endif
-		return half4(faceColor.rgb, input.color.a * faceColor.a);
+		return faceColor * input.color.a;
 }
 
 		ENDCG
