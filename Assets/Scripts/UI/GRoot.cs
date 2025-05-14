@@ -33,6 +33,13 @@ namespace FairyGUI
         GObject _tooltipWin;
         GObject _defaultTooltipWin;
 
+        GComponent _popupLayer;
+        public GComponent popupLayer
+        {
+            get { return _popupLayer != null ? _popupLayer : this; }
+            set { _popupLayer = value; }
+        }
+
         internal static GRoot _inst;
         public static GRoot inst
         {
@@ -130,7 +137,7 @@ namespace FairyGUI
         /// <param name="win"></param>
         public void ShowWindow(Window win)
         {
-            AddChild(win);
+            popupLayer.AddChild(win);
             AdjustModalLayer();
         }
 
@@ -162,8 +169,8 @@ namespace FairyGUI
         /// <param name="dispose">True to dispose the window.</param>
         public void HideWindowImmediately(Window win, bool dispose)
         {
-            if (win.parent == this)
-                RemoveChild(win, dispose);
+            if (win.parent == popupLayer)
+                popupLayer.RemoveChild(win, dispose);
             else if (dispose)
                 win.Dispose();
 
@@ -176,16 +183,16 @@ namespace FairyGUI
         /// <param name="win"></param>
         public void BringToFront(Window win)
         {
-            int cnt = this.numChildren;
+            int cnt = popupLayer.numChildren;
             int i;
             if (_modalLayer != null && _modalLayer.parent != null && !win.modal)
-                i = GetChildIndex(_modalLayer) - 1;
+                i = popupLayer.GetChildIndex(_modalLayer) - 1;
             else
                 i = cnt - 1;
 
             for (; i >= 0; i--)
             {
-                GObject g = GetChildAt(i);
+                GObject g = popupLayer.GetChildAt(i);
                 if (g == win)
                     return;
                 if (g is Window)
@@ -193,7 +200,7 @@ namespace FairyGUI
             }
 
             if (i >= 0)
-                SetChildIndex(win, i);
+                popupLayer.SetChildIndex(win, i);
         }
 
         /// <summary>
@@ -208,12 +215,12 @@ namespace FairyGUI
                 if (_modalWaitPane == null || _modalWaitPane.isDisposed)
                 {
                     _modalWaitPane = UIPackage.CreateObjectFromURL(UIConfig.globalModalWaiting);
-                    _modalWaitPane.SetHome(this);
+                    _modalWaitPane.SetHome(popupLayer);
                 }
-                _modalWaitPane.SetSize(this.width, this.height);
-                _modalWaitPane.AddRelation(this, RelationType.Size);
+                _modalWaitPane.SetSize(popupLayer.width, popupLayer.height);
+                _modalWaitPane.AddRelation(popupLayer, RelationType.Size);
 
-                AddChild(_modalWaitPane);
+                popupLayer.AddChild(_modalWaitPane);
             }
         }
 
@@ -223,7 +230,7 @@ namespace FairyGUI
         public void CloseModalWait()
         {
             if (_modalWaitPane != null && _modalWaitPane.parent != null)
-                RemoveChild(_modalWaitPane);
+                popupLayer.RemoveChild(_modalWaitPane);
         }
 
         /// <summary>
@@ -258,10 +265,10 @@ namespace FairyGUI
         /// <returns></returns>
         public Window GetTopWindow()
         {
-            int cnt = this.numChildren;
+            int cnt = popupLayer.numChildren;
             for (int i = cnt - 1; i >= 0; i--)
             {
-                GObject g = this.GetChildAt(i);
+                GObject g = popupLayer.GetChildAt(i);
                 if (g is Window)
                 {
                     return (Window)(g);
@@ -288,10 +295,10 @@ namespace FairyGUI
         void CreateModalLayer()
         {
             _modalLayer = new GGraph();
-            _modalLayer.DrawRect(this.width, this.height, 0, Color.white, UIConfig.modalLayerColor);
-            _modalLayer.AddRelation(this, RelationType.Size);
+            _modalLayer.DrawRect(popupLayer.width, popupLayer.height, 0, Color.white, UIConfig.modalLayerColor);
+            _modalLayer.AddRelation(popupLayer, RelationType.Size);
             _modalLayer.name = _modalLayer.gameObjectName = "ModalLayer";
-            _modalLayer.SetHome(this);
+            _modalLayer.SetHome(popupLayer);
         }
 
         /// <summary>
@@ -346,26 +353,26 @@ namespace FairyGUI
             if (_modalLayer == null || _modalLayer.isDisposed)
                 CreateModalLayer();
 
-            int cnt = this.numChildren;
+            int cnt = popupLayer.numChildren;
 
             if (_modalWaitPane != null && _modalWaitPane.parent != null)
-                SetChildIndex(_modalWaitPane, cnt - 1);
+                popupLayer.SetChildIndex(_modalWaitPane, cnt - 1);
 
             for (int i = cnt - 1; i >= 0; i--)
             {
-                GObject g = this.GetChildAt(i);
+                GObject g = popupLayer.GetChildAt(i);
                 if ((g is Window) && (g as Window).modal)
                 {
                     if (_modalLayer.parent == null)
-                        AddChildAt(_modalLayer, i);
+                        popupLayer.AddChildAt(_modalLayer, i);
                     else
-                        SetChildIndexBefore(_modalLayer, i);
+                        popupLayer.SetChildIndexBefore(_modalLayer, i);
                     return;
                 }
             }
 
             if (_modalLayer.parent != null)
-                RemoveChild(_modalLayer);
+                _modalLayer.RemoveFromParent();
         }
 
         /// <summary>
@@ -448,7 +455,7 @@ namespace FairyGUI
                 GObject p = target;
                 while (p != null)
                 {
-                    if (p.parent == this)
+                    if (p.parent == popupLayer)
                     {
                         if (popup.sortingOrder < p.sortingOrder)
                         {
@@ -460,7 +467,7 @@ namespace FairyGUI
                 }
             }
 
-            AddChild(popup);
+            popupLayer.AddChild(popup);
             AdjustModalLayer();
 
             if ((popup is Window) && target == null && dir == PopupDirection.Auto)
@@ -495,14 +502,14 @@ namespace FairyGUI
             }
             else
             {
-                pos = this.GlobalToLocal(Stage.inst.touchPosition);
+                pos = popupLayer.GlobalToLocal(Stage.inst.touchPosition);
             }
             float xx, yy;
             xx = pos.x;
-            if (xx + popup.width > this.width)
+            if (xx + popup.width > popupLayer.width)
                 xx = xx + size.x - popup.width;
             yy = pos.y + size.y;
-            if ((dir == PopupDirection.Auto && yy + popup.height > this.height)
+            if ((dir == PopupDirection.Auto && yy + popup.height > popupLayer.height)
                 || dir == PopupDirection.Up)
             {
                 yy = pos.y - popup.height - 1;
@@ -622,7 +629,7 @@ namespace FairyGUI
                 if (target is Window)
                     ((Window)target).Hide();
                 else
-                    RemoveChild(target);
+                    target.RemoveFromParent();
             }
         }
 
@@ -652,7 +659,7 @@ namespace FairyGUI
                 }
 
                 _defaultTooltipWin = UIPackage.CreateObjectFromURL(resourceURL);
-                _defaultTooltipWin.SetHome(this);
+                _defaultTooltipWin.SetHome(popupLayer);
                 _defaultTooltipWin.touchable = false;
             }
 
@@ -690,13 +697,13 @@ namespace FairyGUI
             float xx = Stage.inst.touchPosition.x + 10;
             float yy = Stage.inst.touchPosition.y + 20;
 
-            Vector2 pt = this.GlobalToLocal(new Vector2(xx, yy));
+            Vector2 pt = popupLayer.GlobalToLocal(new Vector2(xx, yy));
             xx = pt.x;
             yy = pt.y;
 
-            if (xx + _tooltipWin.width > this.width)
+            if (xx + _tooltipWin.width > popupLayer.width)
                 xx = xx - _tooltipWin.width;
-            if (yy + _tooltipWin.height > this.height)
+            if (yy + _tooltipWin.height > popupLayer.height)
             {
                 yy = yy - _tooltipWin.height - 1;
                 if (yy < 0)
@@ -705,7 +712,7 @@ namespace FairyGUI
 
             _tooltipWin.x = Mathf.RoundToInt(xx);
             _tooltipWin.y = Mathf.RoundToInt(yy);
-            AddChild(_tooltipWin);
+            popupLayer.AddChild(_tooltipWin);
         }
 
         /// <summary>
@@ -716,7 +723,7 @@ namespace FairyGUI
             if (_tooltipWin != null)
             {
                 if (_tooltipWin.parent != null)
-                    RemoveChild(_tooltipWin);
+                    _tooltipWin.RemoveFromParent();
                 _tooltipWin = null;
             }
         }
