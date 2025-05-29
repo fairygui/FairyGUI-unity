@@ -266,7 +266,7 @@ namespace FairyGUI
                             distances[i] = buffer.ReadFloat();
                     }
 
-                    _shape.DrawRegularPolygon(sides, lineSize, fillColor, lineColor, fillColor, startAngle, distances);
+                    _shape.DrawRegularPolygon(sides, lineSize, null, lineColor, fillColor, startAngle, distances);
                 }
             }
         }

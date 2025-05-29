@@ -200,7 +200,7 @@ namespace FairyGUI
         /// <param name="fillColor"></param>
         /// <param name="rotation"></param>
         /// <param name="distances"></param>
-        public void DrawRegularPolygon(int sides, float lineSize, Color centerColor, Color lineColor, Color fillColor, float rotation, float[] distances)
+        public void DrawRegularPolygon(int sides, float lineSize, Color? centerColor, Color lineColor, Color fillColor, float rotation, float[] distances)
         {
             RegularPolygonMesh mesh = graphics.GetMeshFactory<RegularPolygonMesh>();
             mesh.sides = sides;
