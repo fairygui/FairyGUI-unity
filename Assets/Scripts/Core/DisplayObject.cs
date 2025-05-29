@@ -226,6 +226,59 @@ namespace FairyGUI
 
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        public EventListener onEnable
+        {
+            get
+            {
+                CreateEventComponent();
+                return _onEnable ?? (_onEnable = new EventListener(this, "onEnable"));
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public EventListener onDisable
+        {
+            get
+            {
+                CreateEventComponent();
+                return _onDisable ?? (_onDisable = new EventListener(this, "onDisable"));
+            }
+        }
+        EventListener _onEnable;
+        EventListener _onDisable;
+
+
+        class DisplayObjectEvents : MonoBehaviour
+        {
+            public Action onEnable;
+            public Action onDisable;
+
+            void OnDisable()
+            {
+                onDisable?.Invoke();
+            }
+
+            void OnEnable()
+            {
+                onEnable?.Invoke();
+            }
+        }
+        DisplayObjectEvents _events;
+        protected void CreateEventComponent()
+        {
+            if (_events == null)
+            {
+                _events = gameObject.AddComponent<DisplayObjectEvents>();
+                _events.onEnable = () => _onEnable?.Call();
+                _events.onDisable = () => _onDisable?.Call();
+            }
+        }
+
         protected void CreateGameObject(string gameObjectName)
         {
             gameObject = new GameObject(gameObjectName);
