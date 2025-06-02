@@ -10,7 +10,7 @@ var WebGLTextInput = {
         canvasEle = document.getElementById('unity-canvas');
     },
 
-    WebGLTextInputSetText: function (text, multiline, color, fontSize, fontFace, maxLength) {
+    WebGLTextInputShow: function (x, y, width, height, scaleX, scaleY, text, multiline, color, fontSize, fontFace, maxLength, align, lineSpacing) {
         if (containerEle == null) {
             InitInput(inputEle = document.createElement("input"));
             InitInput(textareaEle = document.createElement("textarea"));
@@ -23,6 +23,12 @@ var WebGLTextInput = {
             canvasEle.parentElement.appendChild(containerEle);
         }
 
+        containerEle.style.top = y / devicePixelRatio + "px";
+        containerEle.style.left = x / devicePixelRatio + "px";
+        containerEle.style.width = width / devicePixelRatio + "px";
+        containerEle.style.height = height / devicePixelRatio + "px";
+        containerEle.style.transform = "scale(" + scaleX + "," + scaleY + ")";
+
         inputEle.parentElement && (containerEle.removeChild(inputEle));
         textareaEle.parentElement && (containerEle.removeChild(textareaEle));
 
@@ -32,18 +38,13 @@ var WebGLTextInput = {
 
         current.maxLength = maxLength <= 0 ? 1E5 : maxLength;
         current.value = UTF8ToString(text);
-        current.style.color = color;
-        current.style.fontSize = fontSize + 'px';
-        current.style.fontFamily = fontFace;
-        current.focus();
-    },
+        current.style.color = '#' + UTF8ToString(color);
+        current.style.fontSize = fontSize / devicePixelRatio + 'px';
+        current.style.fontFamily = UTF8ToString(fontFace);
+        current.style.textAlign = ['left','center','right'][align];
+        current.style.lineHeight = `calc(1.25em + ${lineSpacing / devicePixelRatio}px)`;
 
-    WebGLTextInputShow: function (x, y, width, height, scaleX, scaleY) {
-        containerEle.style.top = y + "px";
-        containerEle.style.left = x + "px";
-        containerEle.style.width = width + "px";
-        containerEle.style.height = height + "px";
-        containerEle.style.transform = "scale(" + scaleX + "," + scaleY + ")";
+        current.focus();
     },
 
     WebGLTextInputHide: function () {
