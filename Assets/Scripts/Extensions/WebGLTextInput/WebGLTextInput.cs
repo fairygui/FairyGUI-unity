@@ -15,32 +15,26 @@ public static class WebGLTextInput
 
     public static void Start(InputTextField target)
     {
-        WebGLTextInputSetText(target.text,
+        var rect = target.TransformRect(new Rect(0, 0, target.width, target.height), null);
+        rect.min = StageCamera.main.WorldToScreenPoint(rect.min);
+        rect.max = StageCamera.main.WorldToScreenPoint(rect.max);
+        rect.y = Screen.height - rect.y - rect.height;
+
+        WebGLTextInputShow(rect.x, rect.y, target.width, target.height, rect.width / target.width, rect.height / target.height, target.text,
             !target.textField.singleLine,
             ColorUtility.ToHtmlStringRGBA(target.textFormat.color),
             target.textFormat.size,
             target.textFormat.font,
-            target.maxLength);
-
+            target.maxLength,
+            target.textFormat.align,
+            target.textFormat.lineSpacing);
+        
         WebGLInput.captureAllKeyboardInput = false;
-
-        SyncTransform(target);
     }
 
     public static void Stop()
     {
         WebGLTextInputHide();
-    }
-
-    public static void SyncTransform(InputTextField target)
-    {
-        Rect rect = target.TransformRect(new Rect(0, 0, target.width, target.height), null);
-        rect.min = StageCamera.main.WorldToScreenPoint(rect.min);
-        rect.max = StageCamera.main.WorldToScreenPoint(rect.max);
-        rect.y = Screen.height - rect.y - rect.height;
-
-        WebGLTextInputShow(rect.x, rect.y, target.width, target.height,
-            rect.width / target.width, rect.height / target.height);
     }
 
     [MonoPInvokeCallback(typeof(Action<string>))]
@@ -65,10 +59,8 @@ public static class WebGLTextInput
     public static extern void WebGLTextInputInit(Action<string> onInputCallback, Action onBlurCallback);
 
     [DllImport("__Internal")]
-    public static extern void WebGLTextInputSetText(string text, bool multiline, string color, int fontSize, string fontFace, int maxLength);
-
-    [DllImport("__Internal")]
-    public static extern void WebGLTextInputShow(float x, float y, float width, float height, float scaleX, float scaleY);
+    public static extern void WebGLTextInputShow(float x, float y, float width, float height, float scaleX, float scaleY, string text, bool multiline, string color, int fontSize,
+        string fontFace, int maxLength, AlignType align, int lineSpacing);
 
     [DllImport("__Internal")]
     public static extern void WebGLTextInputHide();
