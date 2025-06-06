@@ -22,12 +22,20 @@ namespace FairyGUI
         /// <summary>
         /// 
         /// </summary>
+#if UNITY_2019_1_OR_NEWER
+        public static string imageShader = "FairyGUI/Image-URP";
+#else
         public static string imageShader = "FairyGUI/Image";
+#endif
 
         /// <summary>
         /// 
         /// </summary>
+#if UNITY_2019_1_OR_NEWER
+        public static string textShader = "FairyGUI/Text-URP";
+#else
         public static string textShader = "FairyGUI/Text";
+#endif
 
         /// <summary>
         /// 
