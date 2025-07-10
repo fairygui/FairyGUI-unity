@@ -2,9 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
-using TMPro;
+using UnityEngine.TextCore.LowLevel;
 
 namespace FairyGUI
 {
@@ -40,6 +42,7 @@ namespace FairyGUI
         TMPFont _fallbackFont;
         List<TMPFont> _fallbackFonts;
         VertexBuffer[] _subMeshBuffers;
+        FallbackSystemFontContext fallbackSystemFontContext;
         bool _preparing;
 
         public TMPFont()
@@ -57,6 +60,7 @@ namespace FairyGUI
         override public void Dispose()
         {
             Release();
+            fallbackSystemFontContext?.ClearReferences();
         }
 
         public TMP_FontAsset fontAsset
@@ -94,7 +98,7 @@ namespace FairyGUI
             // _lineHeight = _fontAsset.faceInfo.lineHeight;
             _ascent = _fontAsset.faceInfo.pointSize;
             _lineHeight = _fontAsset.faceInfo.pointSize * 1.25f;
-            _gradientScale = fontAsset.atlasPadding + 1;
+            _gradientScale = _fontAsset.atlasPadding + 1;
         }
 
         void OnCreateNewMaterial(Material mat)
@@ -104,6 +108,12 @@ namespace FairyGUI
             mat.SetFloat(ShaderUtilities.ID_GradientScale, _gradientScale);
             mat.SetFloat(ShaderUtilities.ID_WeightNormal, fontAsset.normalStyle);
             mat.SetFloat(ShaderUtilities.ID_WeightBold, fontAsset.boldStyle);
+        }
+
+        public void SetFallbackSystemFontFamily(string[] family)
+        {
+            fallbackSystemFontContext?.ClearReferences();
+            fallbackSystemFontContext = new(this, family);
         }
 
         public override void Prepare(TextFormat format)
@@ -332,6 +342,7 @@ namespace FairyGUI
             if (!GetCharacterFromFontAsset(ch, _style, _fontWeight))
             {
                 width = height = baseline = 0;
+                Debug.LogWarning($"character {ch} not found");
                 return false;
             }
 
@@ -375,6 +386,13 @@ namespace FairyGUI
             _char = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, _fontAsset, true, fontStyle, fontWeight,
                 out isAlternativeTypeface
             );
+
+            if (_char == null && fallbackSystemFontContext != null)
+            {
+                // find in system font and result the relevant fontAsset as _fallbackFont;
+                _char = fallbackSystemFontContext.Resolve(unicode, fontStyle, fontWeight);
+            }
+
             if (_char == null)
                 return false;
 
@@ -783,6 +801,63 @@ namespace FairyGUI
                 t = Mathf.Max(1, Mathf.Max(Mathf.Abs(_format.shadowOffset.x), Mathf.Abs(-_format.shadowOffset.y)) + _format.faceDilate + _format.underlaySoftness);
                 _ratioC = Mathf.Max(0, _gradientScale - clamp - range) / (_gradientScale * t);
             }
+        }
+    }
+
+    class FallbackSystemFontContext
+    {
+        private TMPFont ownerFont;
+        private List<string> candidateSystemFontPaths = new();
+        public List<TMP_FontAsset> loadedFontAssets = new();
+
+        internal FallbackSystemFontContext(TMPFont tmpFont, string[] fontFamily)
+        {
+            this.ownerFont = tmpFont;
+            SystemFontService.ResolveInstalledFonts(fontFamily ?? Array.Empty<string>(), resultPaths: candidateSystemFontPaths);
+            Debug.Log($"{candidateSystemFontPaths.Count} fallback system fonts resolved:");
+            foreach (var path in candidateSystemFontPaths)
+            {
+                Debug.Log(path);
+            }
+        }
+
+        public TMP_Character Resolve(uint unicode, FontStyles fontStyles, FontWeight fontWeight)
+        {
+            // find in the loaded
+            foreach (var fontAsset in loadedFontAssets)
+            {
+                // why dont we check character in nativeFont directly?
+                var characterInfo = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, fontAsset, false, fontStyles, fontWeight, out _);
+                if (characterInfo != null)
+                {
+                    return characterInfo;
+                }
+            }
+
+            // load and find
+            var pathsCount = candidateSystemFontPaths.Count;
+            for (int i = loadedFontAssets.Count; i < pathsCount; i++)
+            {
+                var fontPath = candidateSystemFontPaths[i];
+                var nativeFont = new Font(fontPath);
+                var originFontAsset = ownerFont.fontAsset;
+                var fontAsset = TMP_FontAsset.CreateFontAsset(nativeFont, 60, 9, GlyphRenderMode.SDFAA, originFontAsset.atlasWidth, originFontAsset.atlasHeight);
+                loadedFontAssets.Add(fontAsset);
+                var characterInfo = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, fontAsset, false, fontStyles, fontWeight, out _);
+                if (characterInfo != null)
+                {
+                    return characterInfo;
+                }
+            }
+
+            return null;
+        }
+
+        public void ClearReferences()
+        {
+            ownerFont = null;
+            loadedFontAssets?.Clear();
+            candidateSystemFontPaths?.Clear();
         }
     }
 

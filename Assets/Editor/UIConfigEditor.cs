@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using FairyGUI;
 using UnityEditor;
-using FairyGUI;
+using UnityEngine;
 
 namespace FairyGUIEditor
 {
@@ -14,7 +14,7 @@ namespace FairyGUIEditor
         bool itemsFoldout;
         bool packagesFoldOut;
         int errorState;
-
+        static GUIStyle s_textAreaStyle;
         private const float kButtonWidth = 18f;
 
         void OnEnable()
@@ -31,7 +31,7 @@ namespace FairyGUIEditor
             serializedObject.Update();
 
             DrawPropertiesExcluding(serializedObject, propertyToExclude);
-            
+
             UIConfig config = (UIConfig)target;
 
             EditorGUILayout.BeginHorizontal();
@@ -140,6 +140,13 @@ namespace FairyGUIEditor
                             value.s = EditorGUILayout.TextField(value.s);
                             if (EditorGUI.EndChangeCheck())
                                 modified = true;
+                            break;
+
+                        case UIConfig.ConfigKey.SystemFontFamily:
+                            value.s = EditorGUILayout.TextArea(value.s, s_textAreaStyle ??= new GUIStyle("TextField")
+                            {
+                                wordWrap = true,
+                            });
                             break;
                     }
 
