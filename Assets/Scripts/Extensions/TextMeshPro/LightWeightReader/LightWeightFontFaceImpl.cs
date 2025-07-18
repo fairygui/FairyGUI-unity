@@ -30,7 +30,15 @@ namespace FairyGUI
         {
             if (supportedEncodingCodePages.Contains(codePage))
             {
-                return Encoding.GetEncoding((int)codePage);
+                try
+                {
+                    return Encoding.GetEncoding((int)codePage);
+                }
+                catch
+                {
+                    supportedEncodingCodePages.Remove(codePage);
+                    return null;
+                }
             }
             else
             {
