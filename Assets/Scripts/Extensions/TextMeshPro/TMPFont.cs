@@ -112,6 +112,23 @@ namespace FairyGUI
             _topTextFormat = _format = format;
         }
 
+        
+        public override void PrepareCharacters(string text, TextFormat format, float fontSizeScale)
+        {
+            if(_fontAsset == null)
+            {
+                return;
+            }
+            if(AtlasPopulationMode.Static == _fontAsset.atlasPopulationMode)
+            {
+                return;
+            }
+            
+            SetFormat(format, fontSizeScale);
+
+            _fontAsset.TryAddCharacters(text, out string missingCharacters, true);
+        }
+
         static List<NGraphics> subInstancesCopy = new List<NGraphics>();
         public override bool BuildGraphics(NGraphics graphics)
         {
