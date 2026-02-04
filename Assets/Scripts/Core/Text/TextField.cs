@@ -840,7 +840,7 @@ namespace FairyGUI
                     {
                         if (sLineChars.Count > 0)
                         {
-                            wordLen = 2; //避免上标和下标折到下一行
+                            wordLen = 1; //避免上标和下标折到下一行
                             wordPossible = true;
                         }
                     }
