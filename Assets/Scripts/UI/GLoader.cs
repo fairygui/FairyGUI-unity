@@ -33,6 +33,7 @@ namespace FairyGUI
 #if FAIRYGUI_PUERTS
         public Action __loadExternal;
         public Action<NTexture> __freeExternal;
+        public Action<string> __setUrl;
 #endif
 
         public GLoader()
@@ -94,6 +95,12 @@ namespace FairyGUI
 
                 ClearContent();
                 _url = value;
+#if FAIRYGUI_PUERTS
+                if (__setUrl != null)
+                {
+                    __setUrl(_url);
+                }
+#endif
                 LoadContent();
                 UpdateGear(7);
             }
@@ -405,6 +412,21 @@ namespace FairyGUI
                 LoadExternal();
         }
 
+        public void SetComponentContent(GComponent obj)
+        {
+            if (obj == _content2) return;
+            ClearContent();
+            _content2 = obj;
+
+            if (_content2 != null)
+            {
+                ((Container)displayObject).AddChild(obj.displayObject);
+                sourceWidth = (int)_content2.width;
+                sourceHeight = (int)_content2.height;
+                UpdateLayout();
+            }
+        }
+
         protected void LoadFromPackage(string itemURL)
         {
             _contentItem = UIPackage.GetItemByURL(itemURL);
@@ -635,11 +657,14 @@ namespace FairyGUI
             {
                 if (_useResize)
                 {
-                    _content2.SetScale(1, 1);
+                    sx = sy = 1;
+                    contentWidth = width;
+                    contentHeight = height;
+                    _content2.SetXY(0, 0);
+                    _content2.SetScale(sx, sy);
                     _content2.SetSize(contentWidth, contentHeight, true);
                 }
-                else
-                    _content2.SetScale(sx, sy);
+                _content2.SetScale(sx, sy);
             }
             else
                 _content.size = new Vector2(contentWidth, contentHeight);
@@ -724,6 +749,8 @@ namespace FairyGUI
             }
             if (buffer.version >= 7)
                 _useResize = buffer.ReadBool();
+            else
+                _useResize = _fill == FillType.ScaleFree;
 
             if (!string.IsNullOrEmpty(_url))
                 LoadContent();

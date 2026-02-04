@@ -66,6 +66,22 @@ namespace FairyGUI
 
         override public void Dispose()
         {
+
+#if FAIRYGUI_TOLUA
+            if (_peerTable != null)
+            {
+                _peerTable.Dispose();
+                _peerTable = null;
+            }
+#endif
+
+#if FAIRYGUI_PUERTS
+            if (__onDispose != null)
+                __onDispose();
+            __onConstruct = null;
+            __onDispose = null;
+#endif
+
             int cnt = _transitions.Count;
             for (int i = 0; i < cnt; ++i)
             {
@@ -83,8 +99,6 @@ namespace FairyGUI
             if (scrollPane != null)
                 scrollPane.Dispose();
 
-            base.Dispose(); //Dispose native tree first, avoid DisplayObject.RemoveFromParent call
-
             cnt = _children.Count;
             for (int i = cnt - 1; i >= 0; --i)
             {
@@ -93,20 +107,7 @@ namespace FairyGUI
                 obj.Dispose();
             }
 
-#if FAIRYGUI_TOLUA
-            if (_peerTable != null)
-            {
-                _peerTable.Dispose();
-                _peerTable = null;
-            }
-#endif
-
-#if FAIRYGUI_PUERTS
-            if (__onDispose != null)
-                __onDispose();
-            __onConstruct = null;
-            __onDispose = null;
-#endif
+            base.Dispose(); //Dispose native tree first, avoid DisplayObject.RemoveFromParent call
         }
 
         /// <summary>
