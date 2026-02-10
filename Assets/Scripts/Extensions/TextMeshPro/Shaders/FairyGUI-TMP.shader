@@ -459,10 +459,11 @@ SubShader {
 		#endif
 
 		#ifdef SOFT_CLIPPED
-			float2 factor;
-			float2 condition = step(input.mask.xy, 0);
-			float4 clip_softness = _ClipSoftness * float4(condition, 1 - condition);
-			factor.xy = (1.0 - abs(input.mask.xy)) * (clip_softness.xw + clip_softness.zy);
+			float2 cond = step(i.clipPos.xy, 0);
+			float2 softnessRT = float2(_ClipSoftness.z, _ClipSoftness.y);
+			float2 softnessLB = float2(_ClipSoftness.x, _ClipSoftness.w);
+			float2 softness = softnessRT + cond * (softnessLB - softnessRT);
+			float2 factor  = (1.0 - abs(i.clipPos.xy)) * softness;
 			faceColor.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
 			clip(faceColor.a - 0.001);
 		#endif
