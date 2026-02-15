@@ -23,6 +23,12 @@ namespace FairyGUI
         public object data;
 
         /// <summary>
+        /// User defined data.
+        /// GList 内部会赋值
+        /// </summary>
+        public object dataSource;
+
+        /// <summary>
         /// The source width of the object.
         /// </summary>
         public int sourceWidth;
