@@ -17,6 +17,17 @@ namespace FairyGUI
         /// </summary>
         public static string defaultFont = "";
 
+        /// <summary>
+        /// Fallback system font when charater in the default font is not available.<br/>
+        /// 
+        /// You can either type the family name or full name of the font. The full name is compared first to avoid naming conflicts. e.g. valid name can be: `Microsoft YaHei`, `Microsoft YaHei Bold`, `"Microsoft YaHei Regular` <br/>
+        /// 
+        /// Fonts referenced here are not included in the build, when a character is failed to resolve, the first who matches with installed font in local machine will be taken to render the text continuously.<br/>
+        /// 
+        /// NOTE: this feature is not supported on WebGL (the same as Console platform), as WebGL does not support system font loading for its limited file system. Additionally, the system fonts query API in which has permission limitations, meanwhile, it does not has an ability to query by specific LCID. see: https://wicg.github.io/local-font-access/#issue-05afe850
+        /// </summary>
+        public static string[] systemFontFamily = Array.Empty<string>();
+
         [Obsolete("No use anymore")]
         public static bool renderingTextBrighterOnDesktop = true;
 
@@ -209,6 +220,7 @@ namespace FairyGUI
             DepthSupportForPaintingMode,
             RichTextRowVerticalAlign,
             Branch,
+            SystemFontFamily,
 
             PleaseSelect = 100
         }
@@ -365,6 +377,21 @@ namespace FairyGUI
                     case ConfigKey.Branch:
                         UIPackage.branch = value.s;
                         break;
+
+                    case ConfigKey.SystemFontFamily:
+                        if (string.IsNullOrEmpty(value.s))
+                        {
+                            UIConfig.systemFontFamily = Array.Empty<string>();
+
+                        }
+                        else
+                        {
+                            string[] familyNames = value.s.Split(new char[] { ',', ';', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                            for (int j = 0; j < familyNames.Length; j++)
+                                familyNames[j] = familyNames[j].Trim();
+                            UIConfig.systemFontFamily = familyNames;
+                        }
+                        break;
                 }
             }
         }
@@ -429,7 +456,12 @@ namespace FairyGUI
                 case ConfigKey.Branch:
                     value.s = "";
                     break;
+
+                case ConfigKey.SystemFontFamily:
+                    value.s = "Noto Sans CJK SC, Noto Sans SC, Noto Sans Han, PingFang SC, Arial Unicode, SimHei, Hiragino Sans GB, Heiti SC, WenQuanYi Micro Hei";
+                    break;
             }
+
         }
 
         public static void ClearResourceRefs()
