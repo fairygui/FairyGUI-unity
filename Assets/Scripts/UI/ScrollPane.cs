@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using FairyGUI.Utils;
 
@@ -64,6 +64,7 @@ namespace FairyGUI
         Vector2 _tweenChange;
         Vector2 _tweenTime;
         Vector2 _tweenDuration;
+        readonly bool[] _tweenBounce = new bool[2];
 
         Action _refreshDelegate;
         TimerCallback _tweenUpdateDelegate;
@@ -88,6 +89,21 @@ namespace FairyGUI
         public static float TWEEN_TIME_GO = 0.3f; //调用SetPos(ani)时使用的缓动时间
         public static float TWEEN_TIME_DEFAULT = 0.3f; //惯性滚动的最小缓动时间
         public static float PULL_RATIO = 0.5f; //下拉过顶或者上拉过底时允许超过的距离占显示区域的比例
+        const float VELOCITY_DAMPING_RATE = 0.833f;
+        const float RUBBER_BAND_COEFFICIENT = 0.55f;
+        const float MIN_VELOCITY_SAMPLE_DELTA = 1f / 240f;
+        const float VELOCITY_SMOOTH_FACTOR = 12f;
+        const float VELOCITY_SCALE_BLEND = 0.5f;
+        const float VELOCITY_SCALE_MIN = 0.25f;
+        const float VELOCITY_SCALE_MAX = 4f;
+        const float TOUCH_DELTA_EPSILON = 0.001f;
+        const float INERTIA_TRIGGER_DESKTOP = 480f;
+        const float INERTIA_TRIGGER_TOUCH = 920f;
+        const float INERTIA_FULL_RANGE = 1.7f;
+        const float INERTIA_RELEASE_SCALE = 0.9f;
+        const float BOUNCE_TIME_MIN = 0.18f;
+        const float BOUNCE_TIME_MAX = 0.42f;
+        const float BOUNCE_EPSILON = 0.001f;
 
         public ScrollPane(GComponent owner)
         {
@@ -1372,6 +1388,8 @@ namespace FairyGUI
 
                 if (pos.x != _container.x || pos.y != _container.y)
                 {
+                    _tweenBounce[0] = false;
+                    _tweenBounce[1] = false;
                     _tweenDuration = new Vector2(TWEEN_TIME_GO, TWEEN_TIME_GO);
                     _tweenStart = _container.xy;
                     _tweenChange = pos - _tweenStart;
@@ -1392,6 +1410,68 @@ namespace FairyGUI
 
             if (_pageMode)
                 UpdatePageController();
+        }
+
+        float GetBounceLimit(int axis, bool positiveEdge)
+        {
+            GComponent target = positiveEdge ? _header : _footer;
+            if (target != null)
+            {
+                float limit = axis == 0 ? target.maxWidth : target.maxHeight;
+                if (limit > 0)
+                    return limit;
+            }
+
+            return _viewSize[axis] * PULL_RATIO;
+        }
+
+        float ApplyEdgeResistance(float overshoot, int axis, bool positiveEdge)
+        {
+            float limit = GetBounceLimit(axis, positiveEdge);
+            if (limit <= 0)
+                return 0;
+
+            float viewSize = Mathf.Max(1, _viewSize[axis]);
+            float distance = Mathf.Abs(overshoot);
+            float compressed = (1f - 1f / ((distance * RUBBER_BAND_COEFFICIENT / viewSize) + 1f)) * viewSize;
+            compressed = Mathf.Min(compressed, limit);
+
+            return positiveEdge ? compressed : -compressed;
+        }
+
+        float GetReleaseVelocity(int axis)
+        {
+            float velocity = Mathf.Abs(_velocity[axis]) * _velocityScale;
+            if (Stage.touchScreen)
+                velocity *= 1136f / Mathf.Max(Screen.width, Screen.height);
+
+            return velocity;
+        }
+
+        float GetBounceDuration(float start, float end, int axis)
+        {
+            float distance = Mathf.Abs(end - start);
+            float limit = Mathf.Max(1, GetBounceLimit(axis, end >= 0));
+            float normalizedDistance = Mathf.Clamp01(distance / limit);
+            float duration = Mathf.Lerp(BOUNCE_TIME_MIN, BOUNCE_TIME_MAX, Mathf.Sqrt(normalizedDistance));
+
+            float releaseVelocity = GetReleaseVelocity(axis);
+            if (releaseVelocity > 0)
+            {
+                float velocityFactor = Mathf.Clamp01(releaseVelocity / 2400f);
+                duration = Mathf.Lerp(duration, BOUNCE_TIME_MIN, velocityFactor * 0.35f);
+            }
+
+            return duration;
+        }
+
+        void SetBounceTween(int axis, float start, float end)
+        {
+            _tweenBounce[axis] = true;
+            _tweenTime[axis] = 0;
+            _tweenDuration[axis] = GetBounceDuration(start, end, axis);
+            _tweenChange[axis] = end - start;
+            _tweenStart[axis] = start;
         }
 
         private void __touchBegin(EventContext context)
@@ -1506,8 +1586,6 @@ namespace FairyGUI
             }
 
             Vector2 newPos = _containerPos + pt - _beginTouchPos;
-            newPos.x = (int)newPos.x;
-            newPos.y = (int)newPos.y;
 
             if (sv)
             {
@@ -1515,19 +1593,15 @@ namespace FairyGUI
                 {
                     if (!_bouncebackEffect)
                         _container.y = 0;
-                    else if (_header != null && _header.maxHeight != 0)
-                        _container.y = (int)Mathf.Min(newPos.y * 0.5f, _header.maxHeight);
                     else
-                        _container.y = (int)Mathf.Min(newPos.y * 0.5f, _viewSize.y * PULL_RATIO);
+                        _container.y = ApplyEdgeResistance(newPos.y, 1, true);
                 }
                 else if (newPos.y < -_overlapSize.y)
                 {
                     if (!_bouncebackEffect)
                         _container.y = -_overlapSize.y;
-                    else if (_footer != null && _footer.maxHeight > 0)
-                        _container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_footer.maxHeight) - _overlapSize.y;
                     else
-                        _container.y = (int)Mathf.Max((newPos.y + _overlapSize.y) * 0.5f, -_viewSize.y * PULL_RATIO) - _overlapSize.y;
+                        _container.y = -_overlapSize.y + ApplyEdgeResistance(newPos.y + _overlapSize.y, 1, false);
                 }
                 else
                     _container.y = newPos.y;
@@ -1539,44 +1613,48 @@ namespace FairyGUI
                 {
                     if (!_bouncebackEffect)
                         _container.x = 0;
-                    else if (_header != null && _header.maxWidth != 0)
-                        _container.x = (int)Mathf.Min(newPos.x * 0.5f, _header.maxWidth);
                     else
-                        _container.x = (int)Mathf.Min(newPos.x * 0.5f, _viewSize.x * PULL_RATIO);
+                        _container.x = ApplyEdgeResistance(newPos.x, 0, true);
                 }
                 else if (newPos.x < 0 - _overlapSize.x)
                 {
                     if (!_bouncebackEffect)
                         _container.x = -_overlapSize.x;
-                    else if (_footer != null && _footer.maxWidth > 0)
-                        _container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_footer.maxWidth) - _overlapSize.x;
                     else
-                        _container.x = (int)Mathf.Max((newPos.x + _overlapSize.x) * 0.5f, -_viewSize.x * PULL_RATIO) - _overlapSize.x;
+                        _container.x = -_overlapSize.x + ApplyEdgeResistance(newPos.x + _overlapSize.x, 0, false);
                 }
                 else
                     _container.x = newPos.x;
             }
 
             //更新速度
-            float deltaTime = Time.unscaledDeltaTime;
+            float deltaTime = Mathf.Max(Time.unscaledDeltaTime, MIN_VELOCITY_SAMPLE_DELTA);
             float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
             if (elapsed > 1) //速度衰减
-                _velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+                _velocity = _velocity * Mathf.Pow(VELOCITY_DAMPING_RATE, elapsed);
             Vector2 deltaPosition = pt - _lastTouchPos;
             if (!sh)
                 deltaPosition.x = 0;
             if (!sv)
                 deltaPosition.y = 0;
-            _velocity = Vector2.Lerp(_velocity, deltaPosition / deltaTime, deltaTime * 10);
+            float velocityBlend = 1f - Mathf.Exp(-deltaTime * VELOCITY_SMOOTH_FACTOR);
+            _velocity = Vector2.Lerp(_velocity, deltaPosition / deltaTime, velocityBlend);
 
             /*速度计算使用的是本地位移，但在后续的惯性滚动判断中需要用到屏幕位移，所以这里要记录一个位移的比例。
              *后续的处理要使用这个比例但不使用坐标转换的方法的原因是，在曲面UI等异形UI中，还无法简单地进行屏幕坐标和本地坐标的转换。
              */
-            Vector2 deltaGlobalPosition = _lastTouchGlobalPos - evt.position;
-            if (deltaPosition.x != 0)
-                _velocityScale = Mathf.Abs(deltaGlobalPosition.x / deltaPosition.x);
-            else if (deltaPosition.y != 0)
-                _velocityScale = Mathf.Abs(deltaGlobalPosition.y / deltaPosition.y);
+            Vector2 deltaGlobalPosition = evt.position - _lastTouchGlobalPos;
+            float measuredVelocityScale = 0;
+            if (Mathf.Abs(deltaPosition.x) > TOUCH_DELTA_EPSILON)
+                measuredVelocityScale = Mathf.Abs(deltaGlobalPosition.x / deltaPosition.x);
+            else if (Mathf.Abs(deltaPosition.y) > TOUCH_DELTA_EPSILON)
+                measuredVelocityScale = Mathf.Abs(deltaGlobalPosition.y / deltaPosition.y);
+
+            if (measuredVelocityScale > 0)
+            {
+                measuredVelocityScale = Mathf.Clamp(measuredVelocityScale, VELOCITY_SCALE_MIN, VELOCITY_SCALE_MAX);
+                _velocityScale = Mathf.Lerp(_velocityScale, measuredVelocityScale, VELOCITY_SCALE_BLEND);
+            }
 
             _lastTouchPos = pt;
             _lastTouchGlobalPos = evt.position;
@@ -1622,6 +1700,8 @@ namespace FairyGUI
 
             _dragged = false;
             _tweenStart = _container.xy;
+            _tweenBounce[0] = false;
+            _tweenBounce[1] = false;
 
             Vector2 endPos = _tweenStart;
             bool flag = false;
@@ -1671,6 +1751,10 @@ namespace FairyGUI
                 }
 
                 _tweenDuration.Set(TWEEN_TIME_DEFAULT, TWEEN_TIME_DEFAULT);
+                if (_tweenStart.x > 0 || _tweenStart.x < -_overlapSize.x)
+                    SetBounceTween(0, _tweenStart.x, endPos.x);
+                if (_tweenStart.y > 0 || _tweenStart.y < -_overlapSize.y)
+                    SetBounceTween(1, _tweenStart.y, endPos.y);
             }
             else
             {
@@ -1679,7 +1763,7 @@ namespace FairyGUI
                 {
                     float elapsed = (Time.unscaledTime - _lastMoveTime) * 60 - 1;
                     if (elapsed > 1)
-                        _velocity = _velocity * Mathf.Pow(0.833f, elapsed);
+                        _velocity = _velocity * Mathf.Pow(VELOCITY_DAMPING_RATE, elapsed);
 
                     //根据速度计算目标位置和需要时间
                     endPos = UpdateTargetAndDuration(_tweenStart);
@@ -2045,6 +2129,15 @@ namespace FairyGUI
             return ret;
         }
 
+        static float EvaluateInertiaRatio(float velocity, float threshold)
+        {
+            if (velocity <= threshold)
+                return 0;
+
+            float normalized = Mathf.Clamp01((velocity - threshold) / (threshold * INERTIA_FULL_RANGE));
+            return normalized * normalized * (3f - 2f * normalized); // smoothstep
+        }
+
         float UpdateTargetAndDuration(float pos, int axis)
         {
             float v = _velocity[axis];
@@ -2062,23 +2155,11 @@ namespace FairyGUI
                 if (Stage.touchScreen)
                     v2 *= 1136f / Mathf.Max(Screen.width, Screen.height);
                 //这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
-                float ratio = 0;
-                if (_pageMode || !Stage.touchScreen)
-                {
-                    if (v2 > 500)
-                        ratio = Mathf.Pow((v2 - 500) / 500, 2);
-                }
-                else
-                {
-                    if (v2 > 1000)
-                        ratio = Mathf.Pow((v2 - 1000) / 1000, 2);
-                }
+                float ratio = EvaluateInertiaRatio(v2, (_pageMode || !Stage.touchScreen) ? INERTIA_TRIGGER_DESKTOP : INERTIA_TRIGGER_TOUCH);
 
                 if (ratio != 0)
                 {
-                    if (ratio > 1)
-                        ratio = 1;
-
+                    ratio *= INERTIA_RELEASE_SCALE;
                     v2 *= ratio;
                     v *= ratio;
                     _velocity[axis] = v;
@@ -2086,10 +2167,13 @@ namespace FairyGUI
                     //算法：v*（_decelerationRate的n次幂）= 60，即在n帧后速度降为60（假设每秒60帧）。
                     duration = Mathf.Log(60 / v2, _decelerationRate) / 60;
 
-                    //计算距离要使用本地速度
-                    //理论公式貌似滚动的距离不够，改为经验公式
-                    //float change = (int)((v/ 60 - 1) / (1 - _decelerationRate));
-                    float change = (int)(v * duration * 0.4f);
+                    // 使用几何衰减积分距离，手感会比经验系数更稳定。
+                    float frameCount = duration * 60f;
+                    float change = 0;
+                    if (_decelerationRate < 0.9999f)
+                        change = v / 60f * (1 - Mathf.Pow(_decelerationRate, frameCount)) / (1 - _decelerationRate);
+                    else
+                        change = v * duration;
                     pos += change;
                 }
             }
@@ -2134,6 +2218,8 @@ namespace FairyGUI
             }
 
             _tweening = 0;
+            _tweenBounce[0] = false;
+            _tweenBounce[1] = false;
             Timers.inst.Remove(_tweenUpdateDelegate);
 
             UpdateScrollBarVisible();
@@ -2225,6 +2311,8 @@ namespace FairyGUI
             if (_tweenChange.x == 0 && _tweenChange.y == 0)
             {
                 _tweening = 0;
+                _tweenBounce[0] = false;
+                _tweenBounce[1] = false;
                 Timers.inst.Remove(_tweenUpdateDelegate);
 
                 LoopCheckingCurrent();
@@ -2252,11 +2340,12 @@ namespace FairyGUI
                 {
                     newValue = _tweenStart[axis] + _tweenChange[axis];
                     _tweenChange[axis] = 0;
+                    _tweenBounce[axis] = false;
                 }
                 else
                 {
-                    float ratio = EaseFunc(_tweenTime[axis], _tweenDuration[axis]);
-                    newValue = _tweenStart[axis] + (int)(_tweenChange[axis] * ratio);
+                    float ratio = EaseFunc(_tweenTime[axis], _tweenDuration[axis], _tweenBounce[axis]);
+                    newValue = _tweenStart[axis] + _tweenChange[axis] * ratio;
                 }
 
                 float threshold1 = 0;
@@ -2278,18 +2367,12 @@ namespace FairyGUI
                     if (newValue > 20 + threshold1 && _tweenChange[axis] > 0
                         || newValue > threshold1 && _tweenChange[axis] == 0)//开始回弹
                     {
-                        _tweenTime[axis] = 0;
-                        _tweenDuration[axis] = TWEEN_TIME_DEFAULT;
-                        _tweenChange[axis] = -newValue + threshold1;
-                        _tweenStart[axis] = newValue;
+                        SetBounceTween(axis, newValue, threshold1);
                     }
                     else if (newValue < threshold2 - 20 && _tweenChange[axis] < 0
                         || newValue < threshold2 && _tweenChange[axis] == 0)//开始回弹
                     {
-                        _tweenTime[axis] = 0;
-                        _tweenDuration[axis] = TWEEN_TIME_DEFAULT;
-                        _tweenChange[axis] = threshold2 - newValue;
-                        _tweenStart[axis] = newValue;
+                        SetBounceTween(axis, newValue, threshold2);
                     }
                 }
                 else
@@ -2298,11 +2381,13 @@ namespace FairyGUI
                     {
                         newValue = threshold1;
                         _tweenChange[axis] = 0;
+                        _tweenBounce[axis] = false;
                     }
                     else if (newValue < threshold2)
                     {
                         newValue = threshold2;
                         _tweenChange[axis] = 0;
+                        _tweenBounce[axis] = false;
                     }
                 }
             }
@@ -2312,9 +2397,17 @@ namespace FairyGUI
             return newValue;
         }
 
-        static float EaseFunc(float t, float d)
+        static float EaseFunc(float t, float d, bool bounce)
         {
-            return (t = t / d - 1) * t * t + 1;//cubicOut
+            float normalized = Mathf.Clamp01(t / d);
+            if (bounce)
+            {
+                float response = 8f * normalized;
+                float settle = 1f - (1f + response) * Mathf.Exp(-response);
+                return Mathf.Min(1f, settle / (1f - (1f + 8f) * Mathf.Exp(-8f) + BOUNCE_EPSILON));
+            }
+
+            return (normalized -= 1f) * normalized * normalized + 1f;//cubicOut
         }
     }
 }
