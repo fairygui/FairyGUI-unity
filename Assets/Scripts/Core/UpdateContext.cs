@@ -19,6 +19,7 @@ namespace FairyGUI
             public uint clipId;
             public int rectMaskDepth;
             public int referenceValue;
+            public int compareValue;
             public bool reversed;
         }
 
@@ -60,10 +61,12 @@ namespace FairyGUI
             batchingDepth = 0;
             rectMaskDepth = 0;
             stencilReferenceValue = 0;
+            stencilCompareValue = 0;
             alpha = 1;
             grayed = false;
 
             clipped = false;
+            clipInfo = default;
             _clipStack.Clear();
 
             Stats.ObjectCount = 0;
@@ -181,6 +184,7 @@ namespace FairyGUI
 
             clipInfo.clipId = clipId;
             clipInfo.referenceValue = stencilReferenceValue;
+            clipInfo.compareValue = stencilCompareValue;
             clipInfo.reversed = reversedMask;
             clipped = true;
         }
@@ -192,6 +196,7 @@ namespace FairyGUI
         {
             clipInfo = _clipStack.Pop();
             stencilReferenceValue = clipInfo.referenceValue;
+            stencilCompareValue = clipInfo.compareValue;
             rectMaskDepth = clipInfo.rectMaskDepth;
             clipped = stencilReferenceValue != 0 || rectMaskDepth != 0;
         }
@@ -203,7 +208,11 @@ namespace FairyGUI
 
             clipInfo.rectMaskDepth = 0;
             clipInfo.referenceValue = 0;
+            clipInfo.compareValue = 0;
             clipInfo.reversed = false;
+            rectMaskDepth = 0;
+            stencilReferenceValue = 0;
+            stencilCompareValue = 0;
             clipped = false;
         }
 
@@ -211,6 +220,7 @@ namespace FairyGUI
         {
             clipInfo = _clipStack.Pop();
             stencilReferenceValue = clipInfo.referenceValue;
+            stencilCompareValue = clipInfo.compareValue;
             rectMaskDepth = clipInfo.rectMaskDepth;
             clipped = stencilReferenceValue != 0 || rectMaskDepth != 0;
         }
